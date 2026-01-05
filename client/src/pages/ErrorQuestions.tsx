@@ -7,7 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { trpc } from "@/lib/trpc";
-import { Upload, Camera, FileText, Loader2, CheckCircle, AlertCircle, Download, Clock } from "lucide-react";
+import { Upload, Camera, FileText, Loader2, CheckCircle, AlertCircle, Download, Clock, Star } from "lucide-react";
 import { ExportDialog } from "@/components/ExportDialog";
 import { ErrorExportDialog } from "@/components/ErrorExportDialog";
 import { TagManagementDialog } from "@/components/TagManagementDialog";
@@ -33,6 +33,7 @@ export default function ErrorQuestions() {
   );
   const [selectedSubject, setSelectedSubject] = useState<Subject | "all">("all");
   const [selectedSemester, setSelectedSemester] = useState<"all" | "first" | "second">("all");
+  const [showFavoriteOnly, setShowFavoriteOnly] = useState(false);
   
   // 标签数据
   const { data: allTags = [] } = trpc.tags.list.useQuery();
@@ -50,6 +51,28 @@ export default function ErrorQuestions() {
   const handleAddToReview = (errorQuestionId: number, e: React.MouseEvent) => {
     e.stopPropagation();
     addToReviewMutation.mutate({ errorQuestionId });
+  };
+  
+  // 收藏/取消收藏mutation
+  const toggleFavoriteMutation = trpc.errorQuestions.toggleFavorite.useMutation({
+    onSuccess: (data) => {
+      if (data.isFavorite) {
+        toast.success("已收藏");
+      } else {
+        toast.success("已取消收藏");
+      }
+      utils.errorQuestions.list.invalidate();
+      utils.errorQuestions.listBySchoolLevel.invalidate();
+      utils.errorQuestions.listBySchoolLevelAndSubject.invalidate();
+    },
+    onError: (error) => {
+      toast.error(`操作失败：${error.message}`);
+    },
+  });
+  
+  const handleToggleFavorite = (questionId: number, e: React.MouseEvent) => {
+    e.stopPropagation();
+    toggleFavoriteMutation.mutate({ questionId });
   };
   
   // 表单状态
@@ -85,11 +108,26 @@ export default function ErrorQuestions() {
     { enabled: selectedLevel !== "all" && selectedSubject !== "all" }
   );
   
-  const errorQuestions = selectedLevel === "all" && selectedSubject === "all" 
+  let errorQuestions = selectedLevel === "all" && selectedSubject === "all" 
     ? allQuestions
     : selectedLevel !== "all" && selectedSubject === "all"
     ? levelQuestions
     : levelSubjectQuestions;
+  
+  // 前端筛选：学期、收藏（标签筛选由后端处理）
+  if (errorQuestions) {
+    errorQuestions = errorQuestions.filter(q => {
+      // 学期筛选
+      if (selectedSemester !== "all" && q.semester !== selectedSemester) {
+        return false;
+      }
+      // 收藏筛选
+      if (showFavoriteOnly && !q.isFavorite) {
+        return false;
+      }
+      return true;
+    });
+  }
     
   const isLoading = isLoadingAll || isLoadingLevel || isLoadingLevelSubject;
   
@@ -546,6 +584,23 @@ export default function ErrorQuestions() {
                 </Select>
               </div>
               
+              {/* 收藏筛选 */}
+              <div className="flex-1 min-w-[200px]">
+                <Label className="mb-2">收藏</Label>
+                <Select 
+                  value={showFavoriteOnly ? "favorite" : "all"}
+                  onValueChange={(v) => setShowFavoriteOnly(v === "favorite")}
+                >
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">全部</SelectItem>
+                    <SelectItem value="favorite">仅显示收藏</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              
               {/* 统计信息 */}
               <div className="flex items-end">
                 <div className="text-sm text-muted-foreground">
@@ -581,6 +636,9 @@ export default function ErrorQuestions() {
                           <span className="flex-shrink-0 px-2 py-0.5 text-xs font-medium bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400 rounded-full">
                             已掌握
                           </span>
+                        )}
+                        {question.isFavorite && (
+                          <Star className="h-4 w-4 fill-yellow-400 text-yellow-400 flex-shrink-0" />
                         )}
                       </div>
                       <CardDescription className="flex items-center gap-2 flex-wrap">

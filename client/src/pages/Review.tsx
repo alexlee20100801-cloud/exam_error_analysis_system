@@ -6,7 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Clock, CheckCircle2, Calendar, Bell, BookOpen, TrendingUp, Sparkles, Eye, Play } from "lucide-react";
+import { Clock, CheckCircle2, Calendar, Bell, BookOpen, TrendingUp, Sparkles, Eye, Play, Star } from "lucide-react";
 import DashboardLayout from "@/components/DashboardLayout";
 import { getSubjectName } from "@shared/subjects";
 import { toast } from "sonner";
@@ -84,6 +84,35 @@ export default function Review() {
       setReviewingQuestion(null);
       setUserAnswer("");
       setShowAnswer(false);
+    }
+  };
+
+  // 收藏/取消收藏
+  const toggleFavoriteMutation = trpc.errorQuestions.toggleFavorite.useMutation({
+    onSuccess: (data) => {
+      if (data.isFavorite) {
+        toast.success("已收藏");
+      } else {
+        toast.success("已取消收藏");
+      }
+      // 更新当前题目的收藏状态
+      if (reviewingQuestion) {
+        setReviewingQuestion({
+          ...reviewingQuestion,
+          isFavorite: data.isFavorite,
+        });
+      }
+      refetchDue();
+      refetchPlans();
+    },
+    onError: (error) => {
+      toast.error(`操作失败：${error.message}`);
+    },
+  });
+
+  const handleToggleFavorite = () => {
+    if (reviewingQuestion) {
+      toggleFavoriteMutation.mutate({ questionId: reviewingQuestion.id });
     }
   };
 
@@ -362,10 +391,26 @@ export default function Review() {
       <Dialog open={!!reviewingQuestion} onOpenChange={(open) => !open && setReviewingQuestion(null)}>
         <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle className="flex items-center gap-2">
-              <Play className="h-5 w-5" />
-              复习错题
-            </DialogTitle>
+            <div className="flex items-center justify-between">
+              <DialogTitle className="flex items-center gap-2">
+                <Play className="h-5 w-5" />
+                复习错题
+              </DialogTitle>
+              {reviewingQuestion && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={handleToggleFavorite}
+                  disabled={toggleFavoriteMutation.isPending}
+                  className="flex items-center gap-1"
+                >
+                  <Star
+                    className={`h-5 w-5 ${reviewingQuestion.isFavorite ? 'fill-yellow-400 text-yellow-400' : 'text-muted-foreground'}`}
+                  />
+                  {reviewingQuestion.isFavorite ? '已收藏' : '收藏'}
+                </Button>
+              )}
+            </div>
             <DialogDescription>
               请尝试重新答题，然后查看正确答案和解析
             </DialogDescription>

@@ -85,6 +85,7 @@ export const errorQuestions = mysqlTable("error_questions", {
   // 状态
   isAnalyzed: boolean("isAnalyzed").default(false), // 是否已AI分析
   isMastered: boolean("isMastered").default(false), // 是否已掌握
+  isFavorite: boolean("isFavorite").default(false), // 是否已收藏
   reviewCount: int("reviewCount").default(0), // 复习次数
   lastReviewedAt: timestamp("lastReviewedAt"), // 最后复习时间
   createdAt: timestamp("createdAt").defaultNow().notNull(),

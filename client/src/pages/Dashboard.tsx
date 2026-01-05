@@ -1,7 +1,7 @@
 import DashboardLayout from "@/components/DashboardLayout";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { trpc } from "@/lib/trpc";
-import { BookOpen, Brain, Target, TrendingUp, Calendar, Video, Trophy, Flame, GraduationCap, BookMarked, Plus, Play, BarChart3, AlertCircle } from "lucide-react";
+import { BookOpen, Brain, Target, TrendingUp, Calendar, Video, Trophy, Flame, GraduationCap, BookMarked, Plus, Play, BarChart3, AlertCircle, Star } from "lucide-react";
 import { SCHOOL_LEVELS, SUBJECTS } from "../../../shared/subjects";
 import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
@@ -13,6 +13,7 @@ export default function Dashboard() {
   const { data: achievementStats } = trpc.achievements.getStats.useQuery();
   const { data: streakData } = trpc.achievements.getCurrentStreak.useQuery();
   const { data: fullStats } = trpc.stats.getFullStats.useQuery();
+  const { data: favoriteData } = trpc.errorQuestions.getFavoriteCount.useQuery();
 
   const totalQuestions = errorQuestions?.length || 0;
   const analyzedQuestions = errorQuestions?.filter(q => q.isAnalyzed).length || 0;
@@ -194,6 +195,19 @@ export default function Dashboard() {
               </div>
               <p className="text-xs text-muted-foreground">
                 总积分 {achievementStats?.totalPoints || 0}
+              </p>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">收藏题目</CardTitle>
+              <Star className="h-4 w-4 text-yellow-500" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">{favoriteData?.count || 0}</div>
+              <p className="text-xs text-muted-foreground">
+                重要或易错题目
               </p>
             </CardContent>
           </Card>

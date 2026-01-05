@@ -296,4 +296,51 @@ export const errorQuestionsRouter = router({
         reviewCount: (question.reviewCount || 0) + 1,
       };
     }),
+
+  /**
+   * 收藏错题
+   */
+  toggleFavorite: protectedProcedure
+    .input(z.object({
+      questionId: z.number(),
+    }))
+    .mutation(async ({ ctx, input }) => {
+      const question = await getErrorQuestionById(input.questionId);
+      if (!question || question.userId !== ctx.user.id) {
+        throw new Error("无权修改此错题");
+      }
+
+      const newFavoriteStatus = !question.isFavorite;
+      await updateErrorQuestion(input.questionId, {
+        isFavorite: newFavoriteStatus,
+      });
+
+      return {
+        success: true,
+        isFavorite: newFavoriteStatus,
+      };
+    }),
+
+  /**
+   * 获取收藏的错题数量
+   */
+  getFavoriteCount: protectedProcedure
+    .query(async ({ ctx }) => {
+      const db = await getDb();
+      if (!db) throw new Error("Database connection failed");
+
+      const questions = await db
+        .select()
+        .from(errorQuestions)
+        .where(
+          and(
+            eq(errorQuestions.userId, ctx.user.id),
+            eq(errorQuestions.isFavorite, true)
+          )
+        );
+
+      return {
+        count: questions.length,
+      };
+    }),
 });
