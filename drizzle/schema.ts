@@ -29,6 +29,12 @@ export type InsertUser = typeof users.$inferInsert;
 export const subjectEnum = ["chinese", "math", "english", "physics", "chemistry", "biology", "politics", "history", "geography"] as const;
 
 /**
+ * 学期枚举 - 上学期/下学期
+ */
+export const semesterEnum = ["first", "second"] as const;
+export type Semester = typeof semesterEnum[number];
+
+/**
  * 知识点表 - 深圳初高中各学科知识点分类体系
  */
 export const knowledgePoints = mysqlTable("knowledge_points", {
@@ -36,6 +42,7 @@ export const knowledgePoints = mysqlTable("knowledge_points", {
   name: varchar("name", { length: 200 }).notNull(),
   subject: mysqlEnum("subject", subjectEnum).notNull(),
   grade: mysqlEnum("grade", ["junior1", "junior2", "junior3", "senior1", "senior2", "senior3"]).notNull(),
+  semester: mysqlEnum("semester", semesterEnum), // 学期：上学期/下学期
   // 知识点层级结构：chapter > section > point
   level: mysqlEnum("level", ["chapter", "section", "point"]).notNull(),
   parentId: int("parentId"), // 父知识点ID，用于构建树形结构
@@ -63,6 +70,7 @@ export const errorQuestions = mysqlTable("error_questions", {
   schoolLevel: mysqlEnum("schoolLevel", ["junior", "senior"]).notNull(), // 板块：初中/高中
   subject: mysqlEnum("subject", subjectEnum).notNull(),
   grade: mysqlEnum("grade", ["junior1", "junior2", "junior3", "senior1", "senior2", "senior3"]).notNull(),
+  semester: mysqlEnum("semester", semesterEnum), // 学期：上学期/下学期
   difficulty: mysqlEnum("difficulty", ["easy", "medium", "hard"]),
   // AI分析结果
   errorAnalysis: text("errorAnalysis"), // AI分析的错误点
@@ -99,6 +107,7 @@ export const questionBank = mysqlTable("question_bank", {
   // 分类
   subject: mysqlEnum("subject", subjectEnum).notNull(),
   grade: mysqlEnum("grade", ["junior1", "junior2", "junior3", "senior1", "senior2", "senior3"]).notNull(),
+  semester: mysqlEnum("semester", semesterEnum), // 学期：上学期/下学期
   difficulty: mysqlEnum("difficulty", ["easy", "medium", "hard"]).notNull(),
   knowledgePointIds: json("knowledgePointIds").$type<number[]>(), // 关联的知识点ID数组
   // 来源
@@ -427,6 +436,7 @@ export const realExamQuestions = mysqlTable("real_exam_questions", {
   // 分类信息
   subject: mysqlEnum("subject", subjectEnum).notNull(),
   grade: mysqlEnum("grade", ["junior1", "junior2", "junior3", "senior1", "senior2", "senior3"]).notNull(),
+  semester: mysqlEnum("semester", semesterEnum), // 学期：上学期/下学期
   schoolLevel: mysqlEnum("schoolLevel", ["junior", "senior"]).notNull(),
   difficulty: mysqlEnum("difficulty", ["easy", "medium", "hard"]).notNull(),
   knowledgePointIds: json("knowledgePointIds").$type<number[]>(), // 关联的知识点ID数组

@@ -32,6 +32,7 @@ export default function ErrorQuestions() {
     levelParam === 'junior' ? 'junior' : levelParam === 'senior' ? 'senior' : "all"
   );
   const [selectedSubject, setSelectedSubject] = useState<Subject | "all">("all");
+  const [selectedSemester, setSelectedSemester] = useState<"all" | "first" | "second">("all");
   
   // 标签数据
   const { data: allTags = [] } = trpc.tags.list.useQuery();
@@ -409,6 +410,24 @@ export default function ErrorQuestions() {
                         {subject.icon} {subject.name}
                       </SelectItem>
                     ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              
+              {/* 学期筛选 */}
+              <div className="flex-1 min-w-[200px]">
+                <Label className="mb-2">学期</Label>
+                <Select 
+                  value={selectedSemester} 
+                  onValueChange={(v) => setSelectedSemester(v as "all" | "first" | "second")}
+                >
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">全部</SelectItem>
+                    <SelectItem value="first">上学期</SelectItem>
+                    <SelectItem value="second">下学期</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
