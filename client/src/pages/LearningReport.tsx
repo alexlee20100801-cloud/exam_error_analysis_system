@@ -14,6 +14,9 @@ import {
 } from "lucide-react";
 import { useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
+import { LearningReportExportDialog } from "@/components/LearningReportExportDialog";
+import { Download } from "lucide-react";
+import { useState } from "react";
 import { ALL_SUBJECTS, SUBJECTS, getSubjectName } from "@shared/subjects";
 import {
   RadarChart,
@@ -58,6 +61,7 @@ function SubjectReportCard({ subject }: { subject: string }) {
  */
 export default function LearningReport() {
   const { user, loading: authLoading } = useAuth();
+  const [exportDialogOpen, setExportDialogOpen] = useState(false);
 
   // 获取学习总览数据
   const { data: overview, isLoading: overviewLoading } = trpc.learningStats.getOverview.useQuery(
@@ -154,10 +158,22 @@ export default function LearningReport() {
     <DashboardLayout>
       <div className="space-y-6">
         {/* 页面标题 */}
-        <div>
-          <h1 className="text-3xl font-bold">学习报告</h1>
-          <p className="text-muted-foreground mt-2">查看你的学习进度和数据统计</p>
+        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+          <div>
+            <h1 className="text-3xl font-bold">学习报告</h1>
+            <p className="text-muted-foreground mt-2">查看你的学习进度和数据统计</p>
+          </div>
+          <Button onClick={() => setExportDialogOpen(true)} size="lg">
+            <Download className="mr-2 h-4 w-4" />
+            导出PDF报告
+          </Button>
         </div>
+
+        {/* 导出对话框 */}
+        <LearningReportExportDialog
+          open={exportDialogOpen}
+          onOpenChange={setExportDialogOpen}
+        />
 
         {/* 学习总览卡片 */}
         {overviewLoading ? (
