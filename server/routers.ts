@@ -10,6 +10,7 @@ import { practiceRouter } from "./routers/practice";
 import { reviewRouter } from "./routers/review";
 import { learningStatsRouter } from "./routers/learningStats";
 import { practiceQuestionsRouter } from "./routers/practiceQuestions";
+import { exportRouter } from "./routers/export";
 
 export const appRouter = router({
   system: systemRouter,
@@ -46,6 +47,9 @@ export const appRouter = router({
   
   // 练习题生成和批改
   practiceQuestions: practiceQuestionsRouter,
+  
+  // 错题导出
+  export: exportRouter,
 });
 
 export type AppRouter = typeof appRouter;

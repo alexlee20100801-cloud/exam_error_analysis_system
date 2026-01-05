@@ -7,7 +7,8 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { trpc } from "@/lib/trpc";
-import { Upload, Camera, FileText, Loader2, CheckCircle, AlertCircle } from "lucide-react";
+import { Upload, Camera, FileText, Loader2, CheckCircle, AlertCircle, Download } from "lucide-react";
+import { ExportDialog } from "@/components/ExportDialog";
 import { useState } from "react";
 import { toast } from "sonner";
 import { useLocation } from "wouter";
@@ -16,6 +17,7 @@ export default function ErrorQuestions() {
   const [, setLocation] = useLocation();
   const [uploadDialogOpen, setUploadDialogOpen] = useState(false);
   const [uploadMethod, setUploadMethod] = useState<"photo" | "manual">("photo");
+  const [exportDialogOpen, setExportDialogOpen] = useState(false);
   
   // 表单状态
   const [title, setTitle] = useState("");
@@ -158,8 +160,12 @@ export default function ErrorQuestions() {
             <h1 className="text-3xl font-bold text-foreground">错题本</h1>
             <p className="text-muted-foreground mt-2">管理和分析你的错题</p>
           </div>
-          <Dialog open={uploadDialogOpen} onOpenChange={setUploadDialogOpen}>
-            <DialogTrigger asChild>
+          <div className="flex gap-2">
+            <Button size="lg" variant="outline" onClick={() => setExportDialogOpen(true)}>
+              <Download className="mr-2 h-4 w-4" />
+              导出
+            </Button>
+            <Dialog open={uploadDialogOpen} onOpenChange={setUploadDialogOpen}>            <DialogTrigger asChild>
               <Button size="lg">
                 <Upload className="mr-2 h-4 w-4" />
                 上传错题
@@ -290,7 +296,11 @@ export default function ErrorQuestions() {
               </div>
             </DialogContent>
           </Dialog>
+          </div>
         </div>
+
+        {/* 导出对话框 */}
+        <ExportDialog open={exportDialogOpen} onOpenChange={setExportDialogOpen} />
 
         {/* 错题列表 */}
         {isLoading ? (
