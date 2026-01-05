@@ -13,8 +13,11 @@ export const users = mysqlTable("users", {
   userType: mysqlEnum("userType", ["student", "parent"]).default("student").notNull(),
   // 学生信息
   grade: mysqlEnum("grade", ["junior1", "junior2", "junior3", "senior1", "senior2", "senior3"]),
+  currentSemester: mysqlEnum("currentSemester", ["first", "second"]), // 当前学期
   school: varchar("school", { length: 200 }),
   region: varchar("region", { length: 100 }), // 所在地区（如：深圳市南山区）
+  // 菜单偏好设置（JSON格式存储禁用的菜单项）
+  disabledMenuItems: json("disabledMenuItems").$type<string[]>(),
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
   lastSignedIn: timestamp("lastSignedIn").defaultNow().notNull(),

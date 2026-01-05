@@ -21,7 +21,7 @@ import {
 } from "@/components/ui/sidebar";
 import { getLoginUrl } from "@/const";
 import { useIsMobile } from "@/hooks/useMobile";
-import { LayoutDashboard, LogOut, PanelLeft, Users, BookOpen, GraduationCap, School, Trophy, Video, Calendar, BarChart3, Clock, UserCircle, FileText, Database, FileQuestion, Route } from "lucide-react";
+import { LayoutDashboard, LogOut, PanelLeft, Users, BookOpen, GraduationCap, School, Trophy, Video, Calendar, BarChart3, Clock, UserCircle, FileText, Database, FileQuestion, Route, Settings } from "lucide-react";
 import { trpc } from "@/lib/trpc";
 import { Badge } from "@/components/ui/badge";
 import { CSSProperties, useEffect, useRef, useState } from "react";
@@ -29,24 +29,33 @@ import { useLocation } from "wouter";
 import { DashboardLayoutSkeleton } from './DashboardLayoutSkeleton';
 import { Button } from "./ui/button";
 
+// 菜单项配置（包含id字段用于匹配配置）
 const menuItems = [
-  { icon: LayoutDashboard, label: "学习概览", path: "/" },
-  { icon: BookOpen, label: "错题本", path: "/error-questions" },
-  { icon: School, label: "初中错题", path: "/error-questions?level=junior", indent: true },
-  { icon: GraduationCap, label: "高中错题", path: "/error-questions?level=senior", indent: true },
-  { icon: FileText, label: "AI试卷生成", path: "/exam-generator" },
-  { icon: FileQuestion, label: "真题练习", path: "/real-exam-practice" },
-  { icon: Route, label: "学习路径", path: "/learning-path" },
-  { icon: BarChart3, label: "学习报告", path: "/learning-report" },
-  { icon: Clock, label: "复习提醒", path: "/review" },
-  { icon: Calendar, label: "学习日历", path: "/study-calendar" },
-  { icon: Video, label: "视频学习", path: "/videos" },
-  { icon: Trophy, label: "学习成就", path: "/achievements" },
+  { id: "dashboard", icon: LayoutDashboard, label: "学习概览", path: "/", isCore: true },
+  { id: "error-questions", icon: BookOpen, label: "错题本", path: "/error-questions", isCore: true },
+  { id: "junior-errors", icon: School, label: "初中错题", path: "/error-questions?level=junior", indent: true, schoolLevel: "junior" },
+  { id: "senior-errors", icon: GraduationCap, label: "高中错题", path: "/error-questions?level=senior", indent: true, schoolLevel: "senior" },
+  { id: "ai-exam", icon: FileText, label: "AI试卷生成", path: "/exam-generator" },
+  { id: "practice", icon: FileQuestion, label: "真题练习", path: "/real-exam-practice" },
+  { id: "learning-path", icon: Route, label: "学习路径", path: "/learning-path" },
+  { id: "report", icon: BarChart3, label: "学习报告", path: "/learning-report" },
+  { id: "review", icon: Clock, label: "复习提醒", path: "/review" },
+  { id: "calendar", icon: Calendar, label: "学习日历", path: "/study-calendar" },
+  { id: "video", icon: Video, label: "视频学习", path: "/videos" },
+  { id: "achievements", icon: Trophy, label: "学习成就", path: "/achievements" },
 ];
 
 const adminMenuItems = [
-  { icon: Database, label: "题库管理", path: "/admin/question-bank" },
+  { id: "question-bank", icon: Database, label: "题库管理", path: "/admin/question-bank" },
 ];
+
+const settingsMenuItem = {
+  id: "settings",
+  icon: Settings,
+  label: "个人设置",
+  path: "/settings",
+  isCore: true,
+};
 
 const SIDEBAR_WIDTH_KEY = "sidebar-width";
 const DEFAULT_WIDTH = 280;
@@ -133,6 +142,26 @@ function DashboardLayoutContent({
   
   // 获取板块统计数据
   const { data: levelStats } = trpc.stats.getByLevel.useQuery();
+  
+  // 获取用户设置
+  const { data: settings } = trpc.userSettings.getSettings.useQuery();
+  
+  // 过滤菜单项
+  const filteredMenuItems = menuItems.filter(item => {
+    // 核心功能不过滤
+    if (item.isCore) return true;
+    
+    // 检查用户是否禁用了该菜单项
+    if (settings?.disabledMenuItems?.includes(item.id)) return false;
+    
+    // 根据板块过滤（初中/高中）
+    if (item.schoolLevel && settings?.grade) {
+      const userSchoolLevel = settings.grade.startsWith('junior') ? 'junior' : 'senior';
+      if (item.schoolLevel !== userSchoolLevel) return false;
+    }
+    
+    return true;
+  });
 
   useEffect(() => {
     if (isCollapsed) {
@@ -199,7 +228,7 @@ function DashboardLayoutContent({
 
           <SidebarContent className="gap-0">
             <SidebarMenu className="px-2 py-1">
-              {menuItems.map(item => {
+              {filteredMenuItems.map(item => {
                 const isActive = location === item.path || (item.path.includes('?') && location.startsWith(item.path.split('?')[0]));
                 
                 // 获取对应板块的错题数量
@@ -231,6 +260,23 @@ function DashboardLayoutContent({
                   </SidebarMenuItem>
                 );
               })}
+            </SidebarMenu>
+            
+            {/* 设置菜单 */}
+            <SidebarMenu className="px-2 py-1 mt-2 border-t pt-2">
+              <SidebarMenuItem>
+                <SidebarMenuButton
+                  isActive={location === settingsMenuItem.path}
+                  onClick={() => setLocation(settingsMenuItem.path)}
+                  tooltip={settingsMenuItem.label}
+                  className="h-10 transition-all font-normal"
+                >
+                  <settingsMenuItem.icon
+                    className={`h-4 w-4 ${location === settingsMenuItem.path ? "text-primary" : ""}`}
+                  />
+                  <span className="flex-1">{settingsMenuItem.label}</span>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
             </SidebarMenu>
             
             {/* 管理员菜单 */}
