@@ -11,15 +11,20 @@ import { Upload, Camera, FileText, Loader2, CheckCircle, AlertCircle, Download }
 import { ExportDialog } from "@/components/ExportDialog";
 import { useState } from "react";
 import { toast } from "sonner";
-import { useLocation } from "wouter";
+import { useLocation, useSearch } from "wouter";
 import { SCHOOL_LEVELS, SUBJECTS, type SchoolLevel, type Subject } from "../../../shared/subjects";
 
 export default function ErrorQuestions() {
   const [, setLocation] = useLocation();
+  const searchParams = new URLSearchParams(useSearch());
+  const levelParam = searchParams.get('level');
+  
   const [uploadDialogOpen, setUploadDialogOpen] = useState(false);
   const [uploadMethod, setUploadMethod] = useState<"photo" | "manual">("photo");
   const [exportDialogOpen, setExportDialogOpen] = useState(false);
-  const [selectedLevel, setSelectedLevel] = useState<SchoolLevel | "all">("all");
+  const [selectedLevel, setSelectedLevel] = useState<SchoolLevel | "all">(
+    levelParam === 'junior' ? 'junior' : levelParam === 'senior' ? 'senior' : "all"
+  );
   const [selectedSubject, setSelectedSubject] = useState<Subject | "all">("all");
   
   // 表单状态

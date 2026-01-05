@@ -21,15 +21,23 @@ import {
 } from "@/components/ui/sidebar";
 import { getLoginUrl } from "@/const";
 import { useIsMobile } from "@/hooks/useMobile";
-import { LayoutDashboard, LogOut, PanelLeft, Users } from "lucide-react";
+import { LayoutDashboard, LogOut, PanelLeft, Users, BookOpen, GraduationCap, School, Trophy, Video, Calendar, BarChart3 } from "lucide-react";
+import { trpc } from "@/lib/trpc";
+import { Badge } from "@/components/ui/badge";
 import { CSSProperties, useEffect, useRef, useState } from "react";
 import { useLocation } from "wouter";
 import { DashboardLayoutSkeleton } from './DashboardLayoutSkeleton';
 import { Button } from "./ui/button";
 
 const menuItems = [
-  { icon: LayoutDashboard, label: "Page 1", path: "/" },
-  { icon: Users, label: "Page 2", path: "/some-path" },
+  { icon: LayoutDashboard, label: "学习概览", path: "/" },
+  { icon: BookOpen, label: "错题本", path: "/error-questions" },
+  { icon: School, label: "初中错题", path: "/error-questions?level=junior", indent: true },
+  { icon: GraduationCap, label: "高中错题", path: "/error-questions?level=senior", indent: true },
+  { icon: BarChart3, label: "学习报告", path: "/learning-report" },
+  { icon: Video, label: "视频学习", path: "/videos" },
+  { icon: Calendar, label: "复习计划", path: "/review-plan" },
+  { icon: Trophy, label: "学习成就", path: "/achievements" },
 ];
 
 const SIDEBAR_WIDTH_KEY = "sidebar-width";
@@ -114,6 +122,9 @@ function DashboardLayoutContent({
   const sidebarRef = useRef<HTMLDivElement>(null);
   const activeMenuItem = menuItems.find(item => item.path === location);
   const isMobile = useIsMobile();
+  
+  // 获取板块统计数据
+  const { data: levelStats } = trpc.stats.getByLevel.useQuery();
 
   useEffect(() => {
     if (isCollapsed) {
@@ -181,19 +192,33 @@ function DashboardLayoutContent({
           <SidebarContent className="gap-0">
             <SidebarMenu className="px-2 py-1">
               {menuItems.map(item => {
-                const isActive = location === item.path;
+                const isActive = location === item.path || (item.path.includes('?') && location.startsWith(item.path.split('?')[0]));
+                
+                // 获取对应板块的错题数量
+                let badgeCount: number | undefined;
+                if (item.path.includes('level=junior')) {
+                  badgeCount = levelStats?.junior;
+                } else if (item.path.includes('level=senior')) {
+                  badgeCount = levelStats?.senior;
+                }
+                
                 return (
                   <SidebarMenuItem key={item.path}>
                     <SidebarMenuButton
                       isActive={isActive}
                       onClick={() => setLocation(item.path)}
                       tooltip={item.label}
-                      className={`h-10 transition-all font-normal`}
+                      className={`h-10 transition-all font-normal ${item.indent ? 'pl-8' : ''}`}
                     >
                       <item.icon
-                        className={`h-4 w-4 ${isActive ? "text-primary" : ""}`}
+                        className={`h-4 w-4 ${isActive ? "text-primary" : ""} ${item.path.includes('level=junior') ? 'text-blue-500' : ''} ${item.path.includes('level=senior') ? 'text-purple-500' : ''}`}
                       />
-                      <span>{item.label}</span>
+                      <span className="flex-1">{item.label}</span>
+                      {badgeCount !== undefined && badgeCount > 0 && !isCollapsed && (
+                        <Badge variant="secondary" className="ml-auto text-xs px-1.5 py-0.5">
+                          {badgeCount}
+                        </Badge>
+                      )}
                     </SidebarMenuButton>
                   </SidebarMenuItem>
                 );
