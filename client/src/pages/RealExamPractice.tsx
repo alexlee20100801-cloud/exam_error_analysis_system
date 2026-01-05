@@ -49,10 +49,10 @@ const DIFFICULTIES = {
 export default function RealExamPractice() {
   const { user } = useAuth();
   const [filters, setFilters] = useState({
-    subject: "",
-    grade: user?.grade || "",
-    difficulty: "",
-    school: "",
+    subject: "all",
+    grade: user?.grade || "all",
+    difficulty: "all",
+    school: "all",
   });
   
   const [selectedQuestion, setSelectedQuestion] = useState<any>(null);
@@ -69,7 +69,10 @@ export default function RealExamPractice() {
 
   // 获取真题列表
   const { data: questionsData, isLoading, refetch } = trpc.realExam.getRealExamQuestions.useQuery({
-    ...filters,
+    subject: filters.subject !== "all" ? filters.subject : undefined,
+    grade: filters.grade !== "all" ? filters.grade : undefined,
+    difficulty: filters.difficulty !== "all" ? filters.difficulty : undefined,
+    school: filters.school !== "all" ? filters.school : undefined,
     limit: 50,
   });
 
@@ -267,7 +270,7 @@ export default function RealExamPractice() {
                   <SelectValue placeholder="全部" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">全部</SelectItem>
+                  <SelectItem value="all">全部</SelectItem>
                   {Object.entries(SUBJECTS).map(([key, name]) => (
                     <SelectItem key={key} value={key}>{name}</SelectItem>
                   ))}
@@ -285,7 +288,7 @@ export default function RealExamPractice() {
                   <SelectValue placeholder="全部" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">全部</SelectItem>
+                  <SelectItem value="all">全部</SelectItem>
                   {Object.entries(GRADES).map(([key, name]) => (
                     <SelectItem key={key} value={key}>{name}</SelectItem>
                   ))}
@@ -303,7 +306,7 @@ export default function RealExamPractice() {
                   <SelectValue placeholder="全部" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">全部</SelectItem>
+                  <SelectItem value="all">全部</SelectItem>
                   {Object.entries(DIFFICULTIES).map(([key, name]) => (
                     <SelectItem key={key} value={key}>{name}</SelectItem>
                   ))}
@@ -321,7 +324,7 @@ export default function RealExamPractice() {
                   <SelectValue placeholder="全部" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">全部</SelectItem>
+                  <SelectItem value="all">全部</SelectItem>
                   {schools?.filter((school): school is string => school !== null).map((school) => (
                     <SelectItem key={school} value={school}>{school}</SelectItem>
                   ))}
