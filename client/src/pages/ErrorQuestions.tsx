@@ -17,6 +17,7 @@ import { toast } from "sonner";
 import { usePullToRefresh } from "@/hooks/usePullToRefresh";
 import { useIsMobile } from "@/hooks/useMobile";
 import { RefreshCw } from "lucide-react";
+import { VoiceInputButton } from "@/components/VoiceInputButton";
 import { useLocation, useSearch } from "wouter";
 import { SCHOOL_LEVELS, SUBJECTS, type SchoolLevel, type Subject } from "../../../shared/subjects";
 
@@ -471,10 +472,17 @@ export default function ErrorQuestions() {
                 {/* 手动输入 */}
                 {uploadMethod === "manual" && (
                   <div>
-                    <Label htmlFor="content">题目内容 *</Label>
+                    <div className="flex items-center justify-between mb-2">
+                      <Label htmlFor="content">题目内容 *</Label>
+                      <VoiceInputButton
+                        onTranscript={(text) => setContent((prev) => prev + text)}
+                        lang={subject === "english" ? "en-US" : "zh-CN"}
+                        size="sm"
+                      />
+                    </div>
                     <Textarea
                       id="content"
-                      placeholder="输入完整的题目内容..."
+                      placeholder="输入完整的题目内容，或点击语音输入按钮..."
                       value={content}
                       onChange={(e) => setContent(e.target.value)}
                       rows={8}

@@ -17,6 +17,7 @@ import { useSwipeGesture } from "@/hooks/useSwipeGesture";
 import { useIsMobile } from "@/hooks/useMobile";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
+import { VoiceInputButton } from "@/components/VoiceInputButton";
 
 export default function Review() {
   const [, setLocation] = useLocation();
@@ -499,16 +500,23 @@ export default function Review() {
               {/* 答题区域 */}
               {!showAnswer && (
                 <div className="space-y-3">
-                  <Label htmlFor="user-answer">你的答案</Label>
+                  <div className="flex items-center justify-between">
+                    <Label htmlFor="user-answer">你的答案</Label>
+                    <VoiceInputButton
+                      onTranscript={(text) => setUserAnswer((prev) => prev + text)}
+                      lang={reviewingQuestion.subject === "english" ? "en-US" : "zh-CN"}
+                      size="sm"
+                    />
+                  </div>
                   <Textarea
                     id="user-answer"
-                    placeholder="请在此输入你的答案..."
+                    placeholder="请在此输入你的答案，或点击语音输入按钮..."
                     value={userAnswer}
                     onChange={(e) => setUserAnswer(e.target.value)}
                     rows={6}
                     className="resize-none"
                   />
-                  <Button onClick={handleSubmitReview} className="w-full">
+                  <Button onClick={handleSubmitReview} className="w-full" disabled={!userAnswer.trim()}>
                     查看答案和解析
                   </Button>
                 </div>
