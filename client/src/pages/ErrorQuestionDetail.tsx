@@ -18,7 +18,8 @@ import {
   ArrowLeft,
   Sparkles,
   Video,
-  ClipboardList
+  ClipboardList,
+  Clock
 } from "lucide-react";
 import { useLocation, useRoute } from "wouter";
 import { toast } from "sonner";
@@ -45,6 +46,20 @@ export default function ErrorQuestionDetail() {
     },
     onError: (error) => {
       toast.error(`分析失败：${error.message}`);
+    },
+  });
+
+  // 加入复习计划mutation
+  const addToReviewMutation = trpc.reviewPlan.addToReviewPlan.useMutation({
+    onSuccess: (data) => {
+      if (data.success) {
+        toast.success("已加入复习计划！系统将按艾宾浩斯曲线提醒您复习");
+      } else {
+        toast.info("该错题已在复习计划中");
+      }
+    },
+    onError: (error) => {
+      toast.error(`加入复习计划失败：${error.message}`);
     },
   });
 
@@ -145,14 +160,25 @@ export default function ErrorQuestionDetail() {
             </div>
           </div>
           
-          <Button
-            onClick={handleDetailedAnalysis}
-            disabled={analyzeDetailedMutation.isPending}
-            size="lg"
-          >
-            <Sparkles className="mr-2 h-4 w-4" />
-            {analyzeDetailedMutation.isPending ? "分析中..." : "AI深度分析"}
-          </Button>
+          <div className="flex gap-2">
+            <Button
+              variant="outline"
+              onClick={() => addToReviewMutation.mutate({ errorQuestionId: questionId })}
+              disabled={addToReviewMutation.isPending}
+              size="lg"
+            >
+              <Clock className="mr-2 h-4 w-4" />
+              {addToReviewMutation.isPending ? "添加中..." : "加入复习计划"}
+            </Button>
+            <Button
+              onClick={handleDetailedAnalysis}
+              disabled={analyzeDetailedMutation.isPending}
+              size="lg"
+            >
+              <Sparkles className="mr-2 h-4 w-4" />
+              {analyzeDetailedMutation.isPending ? "分析中..." : "AI深度分析"}
+            </Button>
+          </div>
         </div>
 
         {/* 题目内容 */}

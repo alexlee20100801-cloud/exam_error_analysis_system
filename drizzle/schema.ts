@@ -133,6 +133,28 @@ export type PracticeRecord = typeof practiceRecords.$inferSelect;
 export type InsertPracticeRecord = typeof practiceRecords.$inferInsert;
 
 /**
+ * 错题复习记录表 - 基于艾宾浩斯遗忘曲线的复习计划
+ */
+export const errorReviewRecords = mysqlTable("error_review_records", {
+  id: int("id").autoincrement().primaryKey(),
+  userId: int("userId").notNull(),
+  errorQuestionId: int("errorQuestionId").notNull(),
+  // 复习计划
+  reviewRound: int("reviewRound").default(0).notNull(), // 当前复习轮次（0=刚加入计划，1=第一次复习）
+  lastReviewedAt: timestamp("lastReviewedAt"), // 最后一次复习时间
+  nextReviewAt: timestamp("nextReviewAt").notNull(), // 下次复习时间
+  // 复习状态
+  isCompleted: boolean("isCompleted").default(false), // 是否完成所有复习轮次
+  isPaused: boolean("isPaused").default(false), // 是否暂停复习计划
+  // 时间戳
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type ErrorReviewRecord = typeof errorReviewRecords.$inferSelect;
+export type InsertErrorReviewRecord = typeof errorReviewRecords.$inferInsert;
+
+/**
  * 学习进度表 - 知识点掌握度追踪
  */
 export const learningProgress = mysqlTable("learning_progress", {

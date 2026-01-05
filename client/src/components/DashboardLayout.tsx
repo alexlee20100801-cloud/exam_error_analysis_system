@@ -21,7 +21,7 @@ import {
 } from "@/components/ui/sidebar";
 import { getLoginUrl } from "@/const";
 import { useIsMobile } from "@/hooks/useMobile";
-import { LayoutDashboard, LogOut, PanelLeft, Users, BookOpen, GraduationCap, School, Trophy, Video, Calendar, BarChart3 } from "lucide-react";
+import { LayoutDashboard, LogOut, PanelLeft, Users, BookOpen, GraduationCap, School, Trophy, Video, Calendar, BarChart3, Clock } from "lucide-react";
 import { trpc } from "@/lib/trpc";
 import { Badge } from "@/components/ui/badge";
 import { CSSProperties, useEffect, useRef, useState } from "react";
@@ -35,6 +35,7 @@ const menuItems = [
   { icon: School, label: "初中错题", path: "/error-questions?level=junior", indent: true },
   { icon: GraduationCap, label: "高中错题", path: "/error-questions?level=senior", indent: true },
   { icon: BarChart3, label: "学习报告", path: "/learning-report" },
+  { icon: Clock, label: "复习提醒", path: "/review" },
   { icon: Video, label: "视频学习", path: "/videos" },
   { icon: Calendar, label: "复习计划", path: "/review-plan" },
   { icon: Trophy, label: "学习成就", path: "/achievements" },
