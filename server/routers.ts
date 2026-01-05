@@ -25,6 +25,7 @@ import { parentSupervisionRouter } from "./routers/parentSupervision";
 import { realExamRouter } from "./routers/realExam";
 import { questionBankRouter } from "./routers/questionBankRouter";
 import { learningPathRouter } from "./routers/learningPath";
+import { semesterRouter } from "./routers/semesterRouter";
 
 export const appRouter = router({
   system: systemRouter,
@@ -94,6 +95,7 @@ export const appRouter = router({
   realExam: realExamRouter,
   questionBank: questionBankRouter,
   learningPath: learningPathRouter,
+  semester: semesterRouter,
 });
 
 export type AppRouter = typeof appRouter;

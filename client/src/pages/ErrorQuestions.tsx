@@ -44,6 +44,9 @@ export default function ErrorQuestions() {
   const [grade, setGrade] = useState("");
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string>("");
+  const [semester, setSemester] = useState<"first" | "second" | null>(null);
+  const [semesterReason, setSemesterReason] = useState<string>("");
+  const [isIdentifyingSemester, setIsIdentifyingSemester] = useState(false);
 
   const utils = trpc.useUtils();
   
@@ -75,6 +78,32 @@ export default function ErrorQuestions() {
     
   const isLoading = isLoadingAll || isLoadingLevel || isLoadingLevelSubject;
   
+  const identifySemesterMutation = trpc.semester.identifyQuestionSemester.useMutation();
+
+  // AI识别学期
+  const handleIdentifySemester = async () => {
+    if (!grade || !subject || !content) {
+      toast.error("请先填写年级、学科和题目内容");
+      return;
+    }
+
+    setIsIdentifyingSemester(true);
+    try {
+      const result = await identifySemesterMutation.mutateAsync({
+        grade,
+        subject,
+        questionContent: content
+      });
+      setSemester(result.semester);
+      setSemesterReason(result.reason);
+      toast.success(`AI识别完成：${result.reason}`);
+    } catch (error) {
+      toast.error("学期识别失败，请手动选择");
+    } finally {
+      setIsIdentifyingSemester(false);
+    }
+  };
+
   const createManualMutation = trpc.errorQuestions.create.useMutation({
     onSuccess: () => {
       toast.success("错题创建成功！");
@@ -291,6 +320,46 @@ export default function ErrorQuestions() {
                         </SelectContent>
                       </Select>
                     </div>
+                  </div>
+
+                  {/* 学期选择和AI识别 */}
+                  <div className="space-y-2">
+                    <div className="flex items-center gap-2">
+                      <Label htmlFor="semester">学期</Label>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        onClick={handleIdentifySemester}
+                        disabled={isIdentifyingSemester || !grade || !subject || !content}
+                      >
+                        {isIdentifyingSemester ? (
+                          <>
+                            <Loader2 className="mr-2 h-3 w-3 animate-spin" />
+                            AI识别中...
+                          </>
+                        ) : (
+                          "AI自动识别"
+                        )}
+                      </Button>
+                    </div>
+                    <Select 
+                      value={semester || ""} 
+                      onValueChange={(v) => setSemester(v as "first" | "second")}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="选择学期或使用AI识别" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="first">上学期</SelectItem>
+                        <SelectItem value="second">下学期</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    {semesterReason && (
+                      <p className="text-sm text-muted-foreground">
+                        {semesterReason}
+                      </p>
+                    )}
                   </div>
                 </div>
 
