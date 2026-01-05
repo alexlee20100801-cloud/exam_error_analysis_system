@@ -208,3 +208,50 @@ export const reviewPlans = mysqlTable("review_plans", {
 
 export type ReviewPlan = typeof reviewPlans.$inferSelect;
 export type InsertReviewPlan = typeof reviewPlans.$inferInsert;
+
+/**
+ * 成就徽章表
+ */
+export const achievements = mysqlTable("achievements", {
+  id: int("id").autoincrement().primaryKey(),
+  code: varchar("code", { length: 64 }).notNull().unique(), // 成就唯一标识
+  name: varchar("name", { length: 128 }).notNull(), // 成就名称
+  description: text("description").notNull(), // 成就描述
+  category: mysqlEnum("category", ["learning", "practice", "streak", "mastery", "social"]).notNull(), // 成就类别
+  icon: varchar("icon", { length: 64 }).notNull(), // 图标名称
+  color: varchar("color", { length: 32 }).notNull(), // 徽章颜色
+  requirement: int("requirement").notNull(), // 解锁要求数值
+  points: int("points").notNull().default(10), // 成就积分
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export type Achievement = typeof achievements.$inferSelect;
+export type InsertAchievement = typeof achievements.$inferInsert;
+
+/**
+ * 用户成就关联表
+ */
+export const userAchievements = mysqlTable("user_achievements", {
+  id: int("id").autoincrement().primaryKey(),
+  userId: int("userId").notNull(),
+  achievementId: int("achievementId").notNull(),
+  unlockedAt: timestamp("unlockedAt").defaultNow().notNull(),
+  progress: int("progress").notNull().default(0), // 当前进度
+});
+
+export type UserAchievement = typeof userAchievements.$inferSelect;
+export type InsertUserAchievement = typeof userAchievements.$inferInsert;
+
+/**
+ * 连续打卡记录表
+ */
+export const checkInRecords = mysqlTable("check_in_records", {
+  id: int("id").autoincrement().primaryKey(),
+  userId: int("userId").notNull(),
+  checkInDate: timestamp("checkInDate").notNull(), // 打卡日期（只记录日期部分）
+  activityType: mysqlEnum("activityType", ["error_question", "practice", "review", "video"]).notNull(), // 活动类型
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export type CheckInRecord = typeof checkInRecords.$inferSelect;
+export type InsertCheckInRecord = typeof checkInRecords.$inferInsert;

@@ -13,6 +13,7 @@ import Practice from "./pages/Practice";
 import LearningReport from "./pages/LearningReport";
 import VideoLearning from "./pages/VideoLearning";
 import ReviewPlan from "./pages/ReviewPlan";
+import Achievements from "./pages/Achievements";
 
 function Router() {
   return (
@@ -25,7 +26,8 @@ function Router() {
       <Route path={"/practice"} component={Practice} />
       <Route path={"/report"} component={LearningReport} />
           <Route path="/videos" component={VideoLearning} />
-          <Route path={"/review"} component={ReviewPlan} />
+        <Route path="/review-plan" component={ReviewPlan} />
+      <Route path="/achievements" component={Achievements} />
       <Route path={"/404"} component={NotFound} />
       <Route component={NotFound} />
     </Switch>
