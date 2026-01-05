@@ -18,6 +18,8 @@ import SubjectReport from "./pages/SubjectReport";
 import KnowledgePointDetail from "@/pages/KnowledgePointDetail";
 import Review from "@/pages/Review";
 import StudyCalendar from "@/pages/StudyCalendar";
+import ParentDashboard from "@/pages/ParentDashboard";
+import ParentNotifications from "@/pages/ParentNotifications";
 
 function Router() {
   return (
@@ -36,6 +38,8 @@ function Router() {
       <Route path="/knowledge-point/:id" component={KnowledgePointDetail} />
       <Route path="/review" component={Review} />
       <Route path="/study-calendar" component={StudyCalendar} />
+      <Route path="/parent" component={ParentDashboard} />
+      <Route path="/parent/notifications" component={ParentNotifications} />
       <Route path={"/404"} component={NotFound} />
       <Route component={NotFound} />
     </Switch>

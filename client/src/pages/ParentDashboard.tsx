@@ -5,7 +5,8 @@ import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Plus, UserPlus, TrendingUp, BookOpen, Target } from "lucide-react";
+import { Plus, UserPlus, TrendingUp, BookOpen, Target, Bell } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
 
 import { useLocation } from "wouter";
 
@@ -16,7 +17,10 @@ export default function ParentDashboard() {
   const [bindDialogOpen, setBindDialogOpen] = useState(false);
 
   const { data: students, isLoading, refetch } = trpc.parentSupervision.getMyStudents.useQuery();
+  const { data: reminders } = trpc.parentSupervision.getMyReminders.useQuery();
   const acceptInviteMutation = trpc.parentSupervision.acceptInvite.useMutation();
+
+  const unreadCount = reminders?.filter((r) => !r.read).length || 0;
 
   const handleAcceptInvite = async () => {
     if (!inviteCode.trim()) {
@@ -52,13 +56,23 @@ export default function ParentDashboard() {
           <h1 className="text-3xl font-bold">家长监督中心</h1>
           <p className="text-muted-foreground mt-2">查看和管理孩子的学习情况</p>
         </div>
-        <Dialog open={bindDialogOpen} onOpenChange={setBindDialogOpen}>
-          <DialogTrigger asChild>
-            <Button>
-              <UserPlus className="mr-2 h-4 w-4" />
-              绑定学生
-            </Button>
-          </DialogTrigger>
+        <div className="flex gap-3">
+          <Button variant="outline" onClick={() => setLocation("/parent/notifications")} className="relative">
+            <Bell className="mr-2 h-4 w-4" />
+            通知中心
+            {unreadCount > 0 && (
+              <Badge variant="destructive" className="ml-2">
+                {unreadCount}
+              </Badge>
+            )}
+          </Button>
+          <Dialog open={bindDialogOpen} onOpenChange={setBindDialogOpen}>
+            <DialogTrigger asChild>
+              <Button>
+                <UserPlus className="mr-2 h-4 w-4" />
+                绑定学生
+              </Button>
+            </DialogTrigger>
           <DialogContent>
             <DialogHeader>
               <DialogTitle>绑定学生账号</DialogTitle>
@@ -84,7 +98,8 @@ export default function ParentDashboard() {
               </Button>
             </div>
           </DialogContent>
-        </Dialog>
+          </Dialog>
+        </div>
       </div>
 
       {!students || students.length === 0 ? (

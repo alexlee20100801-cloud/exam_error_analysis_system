@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { protectedProcedure, router } from "../_core/trpc";
 import * as parentService from "../parentSupervisionService";
+import * as reminderService from "../goalReminderService";
 import { notifyOwner } from "../_core/notification";
 
 export const parentSupervisionRouter = router({
@@ -79,4 +80,24 @@ export const parentSupervisionRouter = router({
       const result = await parentService.updateGoalProgress(input.goalId, input.currentValue);
       return result;
     }),
+
+  // 获取家长的所有提醒
+  getMyReminders: protectedProcedure.query(async ({ ctx }) => {
+    const reminders = await reminderService.getParentReminders(ctx.user.id);
+    return reminders;
+  }),
+
+  // 标记提醒为已读
+  markReminderRead: protectedProcedure
+    .input(z.object({ reminderId: z.number() }))
+    .mutation(async ({ input }) => {
+      const result = await reminderService.markReminderAsRead(input.reminderId);
+      return result;
+    }),
+
+  // 手动触发检查提醒（仅用于测试）
+  triggerReminderCheck: protectedProcedure.mutation(async () => {
+    await reminderService.checkAndSendReminders();
+    return { success: true };
+  }),
 });

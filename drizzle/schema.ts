@@ -388,3 +388,23 @@ export const learningGoals = mysqlTable("learning_goals", {
 
 export type LearningGoal = typeof learningGoals.$inferSelect;
 export type InsertLearningGoal = typeof learningGoals.$inferInsert;
+
+/**
+ * 目标提醒记录表
+ */
+export const goalReminders = mysqlTable("goal_reminders", {
+  id: int("id").autoincrement().primaryKey(),
+  goalId: int("goalId").notNull(), // 学习目标ID
+  parentId: int("parentId").notNull(), // 接收提醒的家长ID
+  studentId: int("studentId").notNull(), // 学生ID
+  reminderType: mysqlEnum("reminderType", ["deadline_approaching", "progress_behind", "goal_failed", "goal_achieved"]).notNull(), // 提醒类型
+  message: text("message").notNull(), // 提醒消息内容
+  sent: boolean("sent").notNull().default(false), // 是否已发送
+  sentAt: timestamp("sentAt"), // 发送时间
+  read: boolean("read").notNull().default(false), // 是否已读
+  readAt: timestamp("readAt"), // 阅读时间
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export type GoalReminder = typeof goalReminders.$inferSelect;
+export type InsertGoalReminder = typeof goalReminders.$inferInsert;
