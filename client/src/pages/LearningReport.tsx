@@ -9,8 +9,12 @@ import {
   Clock, 
   Target, 
   TrendingUp,
-  BookOpen
+  BookOpen,
+  FileText
 } from "lucide-react";
+import { useLocation } from "wouter";
+import { Button } from "@/components/ui/button";
+import { ALL_SUBJECTS, SUBJECTS, getSubjectName } from "@shared/subjects";
 import {
   RadarChart,
   PolarGrid,
@@ -29,6 +33,24 @@ import {
   Tooltip,
   Legend,
 } from "recharts";
+
+/**
+ * 学科报告卡片组件
+ */
+function SubjectReportCard({ subject }: { subject: string }) {
+  const [, setLocation] = useLocation();
+  
+  return (
+    <Button
+      variant="outline"
+      className="h-auto py-4 flex flex-col items-center gap-2 hover:bg-accent"
+      onClick={() => setLocation(`/subject-report/${subject}`)}
+    >
+      <span className="text-2xl">{SUBJECTS[subject as keyof typeof SUBJECTS]?.icon}</span>
+      <span className="text-sm font-medium">{getSubjectName(subject as any)}</span>
+    </Button>
+  );
+}
 
 /**
  * 学习报告页面
@@ -304,6 +326,24 @@ export default function LearningReport() {
             </CardContent>
           </Card>
         </div>
+
+        {/* 学科学习报告入口 */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <FileText className="h-5 w-5" />
+              学科学习报告
+            </CardTitle>
+            <CardDescription>查看每个学科的详细分析报告</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3">
+              {ALL_SUBJECTS.map((subject) => (
+                <SubjectReportCard key={subject} subject={subject} />
+              ))}
+            </div>
+          </CardContent>
+        </Card>
 
         {/* 学习时长趋势折线图 */}
         <Card>

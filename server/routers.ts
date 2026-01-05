@@ -13,6 +13,7 @@ import { reviewRouter } from "./routers/review";
 import { learningStatsRouter } from "./routers/learningStats";
 import { practiceQuestionsRouter } from "./routers/practiceQuestions";
 import { exportRouter } from "./routers/export";
+import { subjectReportRouter } from "./routers/subjectReport";
 
 export const appRouter = router({
   system: systemRouter,
@@ -54,6 +55,9 @@ export const appRouter = router({
   export: exportRouter,
   achievements: achievementsRouter,
   stats: statsRouter,
+  
+  // 学科学习报告
+  subjectReport: subjectReportRouter,
 });
 
 export type AppRouter = typeof appRouter;
