@@ -21,6 +21,7 @@ import { voiceExplanationRouter } from "./routers/voiceExplanation";
 import { learningReportExportRouter } from "./routers/learningReportExport";
 import { tagsRouter } from "./routers/tags";
 import { examAndPlanRouter } from "./routers/examAndPlan";
+import { parentSupervisionRouter } from "./routers/parentSupervision";
 
 export const appRouter = router({
   system: systemRouter,
@@ -82,6 +83,9 @@ export const appRouter = router({
   
   // 考试和复习计划
   examAndPlan: examAndPlanRouter,
+  
+  // 家长监督
+  parentSupervision: parentSupervisionRouter,
 });
 
 export type AppRouter = typeof appRouter;

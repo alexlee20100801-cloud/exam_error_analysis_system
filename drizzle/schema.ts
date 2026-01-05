@@ -10,6 +10,7 @@ export const users = mysqlTable("users", {
   email: varchar("email", { length: 320 }),
   loginMethod: varchar("loginMethod", { length: 64 }),
   role: mysqlEnum("role", ["user", "admin"]).default("user").notNull(),
+  userType: mysqlEnum("userType", ["student", "parent"]).default("student").notNull(),
   // 学生信息
   grade: mysqlEnum("grade", ["junior1", "junior2", "junior3", "senior1", "senior2", "senior3"]),
   school: varchar("school", { length: 200 }),
@@ -349,3 +350,41 @@ export const studyPlans = mysqlTable("study_plans", {
 
 export type StudyPlan = typeof studyPlans.$inferSelect;
 export type InsertStudyPlan = typeof studyPlans.$inferInsert;
+
+/**
+ * 家长-学生关联表
+ */
+export const parentStudentRelations = mysqlTable("parent_student_relations", {
+  id: int("id").autoincrement().primaryKey(),
+  parentId: int("parentId").notNull(), // 家长用户ID
+  studentId: int("studentId").notNull(), // 学生用户ID
+  inviteCode: varchar("inviteCode", { length: 32 }).unique(), // 邀请码
+  status: mysqlEnum("status", ["pending", "active", "rejected"]).default("pending").notNull(), // 绑定状态
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type ParentStudentRelation = typeof parentStudentRelations.$inferSelect;
+export type InsertParentStudentRelation = typeof parentStudentRelations.$inferInsert;
+
+/**
+ * 学习目标表
+ */
+export const learningGoals = mysqlTable("learning_goals", {
+  id: int("id").autoincrement().primaryKey(),
+  studentId: int("studentId").notNull(), // 学生用户ID
+  parentId: int("parentId"), // 设置目标的家长ID（可选，学生也可自己设置）
+  goalType: mysqlEnum("goalType", ["error_count", "mastery_rate", "review_count", "study_time"]).notNull(), // 目标类型
+  targetValue: int("targetValue").notNull(), // 目标值
+  currentValue: int("currentValue").notNull().default(0), // 当前值
+  period: mysqlEnum("period", ["daily", "weekly", "monthly"]).notNull(), // 周期
+  startDate: timestamp("startDate").notNull(), // 开始日期
+  endDate: timestamp("endDate").notNull(), // 截止日期
+  completed: boolean("completed").notNull().default(false), // 是否完成
+  completedAt: timestamp("completedAt"), // 完成时间
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type LearningGoal = typeof learningGoals.$inferSelect;
+export type InsertLearningGoal = typeof learningGoals.$inferInsert;
