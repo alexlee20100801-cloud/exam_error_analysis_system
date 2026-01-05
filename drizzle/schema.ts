@@ -71,6 +71,7 @@ export const errorQuestions = mysqlTable("error_questions", {
   // 用户信息
   userAnswer: text("userAnswer"), // 用户的错误答案
   userNotes: text("userNotes"), // 用户笔记
+  voiceExplanation: text("voiceExplanation"), // AI语音讲解稿（缓存）
   // 状态
   isAnalyzed: boolean("isAnalyzed").default(false), // 是否已AI分析
   isMastered: boolean("isMastered").default(false), // 是否已掌握

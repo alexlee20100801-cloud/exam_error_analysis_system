@@ -19,11 +19,14 @@ import {
   Sparkles,
   Video,
   ClipboardList,
-  Clock
+  Clock,
+  Volume2
 } from "lucide-react";
 import { useLocation, useRoute } from "wouter";
 import { toast } from "sonner";
 import { Streamdown } from "streamdown";
+import { VoicePlayer } from "@/components/VoicePlayer";
+import { useState } from "react";
 
 export default function ErrorQuestionDetail() {
   const { user, loading: authLoading } = useAuth();
@@ -31,6 +34,7 @@ export default function ErrorQuestionDetail() {
   const [, setLocation] = useLocation();
   
   const questionId = params?.id ? parseInt(params.id) : 0;
+  const [showVoicePlayer, setShowVoicePlayer] = useState(false);
 
   // 获取错题详情
   const { data: question, isLoading: questionLoading } = trpc.errorQuestions.getById.useQuery(
@@ -48,6 +52,12 @@ export default function ErrorQuestionDetail() {
       toast.error(`分析失败：${error.message}`);
     },
   });
+
+  // 获取AI语音讲解
+  const { data: voiceData, isLoading: voiceLoading, refetch: refetchVoice } = trpc.voiceExplanation.getScript.useQuery(
+    { errorQuestionId: questionId },
+    { enabled: false } // 默认不加载，点击按钮时才加载
+  );
 
   // 加入复习计划mutation
   const addToReviewMutation = trpc.reviewPlan.addToReviewPlan.useMutation({
@@ -161,6 +171,23 @@ export default function ErrorQuestionDetail() {
           </div>
           
           <div className="flex gap-2">
+            <Button
+              variant="outline"
+              onClick={() => {
+                if (!showVoicePlayer) {
+                  refetchVoice();
+                  setShowVoicePlayer(true);
+                  toast.info("正在生成AI语音讲解...");
+                } else {
+                  setShowVoicePlayer(false);
+                }
+              }}
+              disabled={voiceLoading}
+              size="lg"
+            >
+              <Volume2 className="mr-2 h-4 w-4" />
+              {voiceLoading ? "生成中..." : showVoicePlayer ? "隐藏AI讲解" : "AI语音讲解"}
+            </Button>
             <Button
               variant="outline"
               onClick={() => addToReviewMutation.mutate({ errorQuestionId: questionId })}
@@ -449,6 +476,16 @@ export default function ErrorQuestionDetail() {
               点击右上角的"AI深度分析"按钮，获取详细的考点解读、易错点分析和学习建议
             </AlertDescription>
           </Alert>
+        )}
+
+        {/* AI语音讲解 */}
+        {showVoicePlayer && voiceData?.script && (
+          <div className="mb-6">
+            <VoicePlayer 
+              script={voiceData.script} 
+              title="AI语音讲解" 
+            />
+          </div>
         )}
 
         {/* 快捷操作 */}

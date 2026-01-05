@@ -1,0 +1,1 @@
+ALTER TABLE `error_questions` ADD `voiceExplanation` text;

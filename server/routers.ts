@@ -17,6 +17,7 @@ import { subjectReportRouter } from "./routers/subjectReport";
 import { knowledgePointDetailRouter } from "./routers/knowledgePointDetail";
 import { reviewPlanRouter } from "./routers/reviewPlan";
 import { errorExportRouter } from "./routers/errorExport";
+import { voiceExplanationRouter } from "./routers/voiceExplanation";
 
 export const appRouter = router({
   system: systemRouter,
@@ -66,6 +67,9 @@ export const appRouter = router({
   knowledgePointDetail: knowledgePointDetailRouter,
   reviewPlan: reviewPlanRouter,
   errorExport: errorExportRouter,
+  
+  // AI语音讲解
+  voiceExplanation: voiceExplanationRouter,
 });
 
 export type AppRouter = typeof appRouter;
