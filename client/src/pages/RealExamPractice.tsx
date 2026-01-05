@@ -16,7 +16,7 @@ import {
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
-import { BookOpen, Heart, Clock, CheckCircle2, XCircle, School, Calendar } from "lucide-react";
+import { BookOpen, Heart, Clock, CheckCircle2, XCircle, School, Calendar, Sparkles, TrendingUp } from "lucide-react";
 
 // 常量定义
 const SUBJECTS = {
@@ -59,6 +59,13 @@ export default function RealExamPractice() {
   const [userAnswer, setUserAnswer] = useState("");
   const [showResult, setShowResult] = useState(false);
   const [isCorrect, setIsCorrect] = useState(false);
+
+  // 获取智能推荐
+  const { data: recommendedQuestions } = trpc.realExam.getRecommendedQuestions.useQuery({
+    limit: 6,
+  });
+
+  const { data: recommendationStats } = trpc.realExam.getRecommendationStats.useQuery();
 
   // 获取真题列表
   const { data: questionsData, isLoading, refetch } = trpc.realExam.getRealExamQuestions.useQuery({
@@ -140,6 +147,108 @@ export default function RealExamPractice() {
           练习深圳地区名校真题，提升应试能力
         </p>
       </div>
+
+      {/* 智能推荐面板 */}
+      {recommendedQuestions && recommendedQuestions.length > 0 && (
+        <Card className="mb-6 border-2 border-primary/20 bg-gradient-to-r from-blue-50 to-purple-50">
+          <CardHeader>
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="p-2 bg-primary/10 rounded-lg">
+                  <Sparkles className="h-6 w-6 text-primary" />
+                </div>
+                <div>
+                  <CardTitle className="flex items-center gap-2">
+                    智能推荐
+                    <Badge variant="secondary" className="text-xs">
+                      基于你的错题分析
+                    </Badge>
+                  </CardTitle>
+                  <CardDescription className="mt-1">
+                    {recommendationStats && (
+                      <span className="flex items-center gap-2 text-sm">
+                        <TrendingUp className="h-4 w-4" />
+                        已分析 {recommendationStats.totalErrorQuestions} 道错题，
+                        发现 {recommendationStats.weakKnowledgePointsCount} 个薄弱知识点
+                      </span>
+                    )}
+                  </CardDescription>
+                </div>
+              </div>
+            </div>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {recommendedQuestions.map((rec: any) => (
+                <Card
+                  key={rec.question.id}
+                  className="hover:shadow-md transition-shadow bg-white"
+                >
+                  <CardHeader className="pb-3">
+                    <div className="flex items-start justify-between">
+                      <div className="flex-1">
+                        <CardTitle className="text-base mb-1">
+                          {rec.question.title}
+                        </CardTitle>
+                        {rec.reason && (
+                          <Badge variant="outline" className="text-xs mb-2">
+                            {rec.reason}
+                          </Badge>
+                        )}
+                      </div>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() =>
+                          toggleBookmarkMutation.mutate({
+                            questionId: rec.question.id,
+                          })
+                        }
+                        className="shrink-0"
+                      >
+                        <Heart
+                          className={`h-4 w-4 ${
+                            isBookmarked(rec.question.id)
+                              ? "fill-red-500 text-red-500"
+                              : "text-muted-foreground"
+                          }`}
+                        />
+                      </Button>
+                    </div>
+                  </CardHeader>
+                  <CardContent className="pt-0">
+                    <div className="flex flex-wrap gap-1 mb-3">
+                      <Badge variant="secondary" className="text-xs">
+                        {SUBJECTS[rec.question.subject as keyof typeof SUBJECTS]}
+                      </Badge>
+                      <Badge variant="outline" className="text-xs">
+                        {
+                          DIFFICULTIES[
+                            rec.question.difficulty as keyof typeof DIFFICULTIES
+                          ]
+                        }
+                      </Badge>
+                      {rec.question.sourceSchool && (
+                        <Badge variant="outline" className="text-xs gap-1">
+                          <School className="h-3 w-3" />
+                          {rec.question.sourceSchool}
+                        </Badge>
+                      )}
+                    </div>
+                    <Button
+                      size="sm"
+                      className="w-full"
+                      onClick={() => setSelectedQuestion(rec.question)}
+                    >
+                      开始练习
+                    </Button>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
       {/* 筛选器 */}
       <Card className="mb-6">

@@ -2,6 +2,7 @@ import { z } from "zod";
 import { protectedProcedure, router } from "../_core/trpc";
 import * as realExamService from "../realExamService";
 import * as examPaperService from "../examPaperService";
+import * as recommendationService from "../recommendationService";
 
 export const realExamRouter = router({
   // 获取真题列表
@@ -149,6 +150,21 @@ export const realExamRouter = router({
         ...input,
       });
     }),
+
+  // 获取智能推荐的真题
+  getRecommendedQuestions: protectedProcedure
+    .input(z.object({ limit: z.number().optional().default(10) }))
+    .query(async ({ ctx, input }) => {
+      return await recommendationService.getRecommendedRealExams(
+        ctx.user.id,
+        input.limit
+      );
+    }),
+
+  // 获取推荐统计信息
+  getRecommendationStats: protectedProcedure.query(async ({ ctx }) => {
+    return await recommendationService.getRecommendationStats(ctx.user.id);
+  }),
 
   // 使用AI生成题目
   generateQuestionsWithAI: protectedProcedure
