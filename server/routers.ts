@@ -19,6 +19,7 @@ import { reviewPlanRouter } from "./routers/reviewPlan";
 import { errorExportRouter } from "./routers/errorExport";
 import { voiceExplanationRouter } from "./routers/voiceExplanation";
 import { learningReportExportRouter } from "./routers/learningReportExport";
+import { tagsRouter } from "./routers/tags";
 
 export const appRouter = router({
   system: systemRouter,
@@ -74,6 +75,9 @@ export const appRouter = router({
   
   // 学习报告导出
   learningReportExport: learningReportExportRouter,
+  
+  // 错题标签
+  tags: tagsRouter,
 });
 
 export type AppRouter = typeof appRouter;

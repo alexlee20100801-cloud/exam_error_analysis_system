@@ -279,3 +279,32 @@ export const checkInRecords = mysqlTable("check_in_records", {
 
 export type CheckInRecord = typeof checkInRecords.$inferSelect;
 export type InsertCheckInRecord = typeof checkInRecords.$inferInsert;
+
+/**
+ * 错题标签表
+ */
+export const errorQuestionTags = mysqlTable("error_question_tags", {
+  id: int("id").autoincrement().primaryKey(),
+  userId: int("userId").notNull(), // 标签所属用户
+  name: varchar("name", { length: 50 }).notNull(), // 标签名称
+  color: varchar("color", { length: 20 }).notNull().default("#3B82F6"), // 标签颜色（十六进制）
+  description: text("description"), // 标签描述
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type ErrorQuestionTag = typeof errorQuestionTags.$inferSelect;
+export type InsertErrorQuestionTag = typeof errorQuestionTags.$inferInsert;
+
+/**
+ * 错题-标签关联表（多对多关系）
+ */
+export const errorQuestionTagRelations = mysqlTable("error_question_tag_relations", {
+  id: int("id").autoincrement().primaryKey(),
+  errorQuestionId: int("errorQuestionId").notNull(), // 错题ID
+  tagId: int("tagId").notNull(), // 标签ID
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export type ErrorQuestionTagRelation = typeof errorQuestionTagRelations.$inferSelect;
+export type InsertErrorQuestionTagRelation = typeof errorQuestionTagRelations.$inferInsert;

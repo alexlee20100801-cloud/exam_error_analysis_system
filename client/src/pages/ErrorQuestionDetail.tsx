@@ -26,6 +26,7 @@ import { useLocation, useRoute } from "wouter";
 import { toast } from "sonner";
 import { Streamdown } from "streamdown";
 import { VoicePlayer } from "@/components/VoicePlayer";
+import { TagSelector } from "@/components/TagSelector";
 import { useState } from "react";
 
 export default function ErrorQuestionDetail() {
@@ -35,6 +36,12 @@ export default function ErrorQuestionDetail() {
   
   const questionId = params?.id ? parseInt(params.id) : 0;
   const [showVoicePlayer, setShowVoicePlayer] = useState(false);
+  
+  // 获取错题标签
+  const { data: questionTags = [] } = trpc.tags.getErrorQuestionTags.useQuery(
+    { errorQuestionId: questionId },
+    { enabled: !!questionId }
+  );
 
   // 获取错题详情
   const { data: question, isLoading: questionLoading } = trpc.errorQuestions.getById.useQuery(
@@ -499,6 +506,22 @@ export default function ErrorQuestionDetail() {
             </AlertDescription>
           </Alert>
         )}
+
+        {/* 错题标签 */}
+        <Card className="mb-6">
+          <CardHeader>
+            <CardTitle className="text-lg">错题标签</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <TagSelector 
+              errorQuestionId={questionId} 
+              selectedTags={questionTags}
+              onTagsChange={() => {
+                utils.tags.getErrorQuestionTags.invalidate({ errorQuestionId: questionId });
+              }}
+            />
+          </CardContent>
+        </Card>
 
         {/* AI语音讲解 */}
         {showVoicePlayer && voiceData?.script && (

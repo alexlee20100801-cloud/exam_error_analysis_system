@@ -10,6 +10,8 @@ import { trpc } from "@/lib/trpc";
 import { Upload, Camera, FileText, Loader2, CheckCircle, AlertCircle, Download } from "lucide-react";
 import { ExportDialog } from "@/components/ExportDialog";
 import { ErrorExportDialog } from "@/components/ErrorExportDialog";
+import { TagManagementDialog } from "@/components/TagManagementDialog";
+import { TagSelector } from "@/components/TagSelector";
 import { useState } from "react";
 import { toast } from "sonner";
 import { useLocation, useSearch } from "wouter";
@@ -24,10 +26,15 @@ export default function ErrorQuestions() {
   const [uploadMethod, setUploadMethod] = useState<"photo" | "manual">("photo");
   const [exportDialogOpen, setExportDialogOpen] = useState(false);
   const [errorExportDialogOpen, setErrorExportDialogOpen] = useState(false);
+  const [tagManagementDialogOpen, setTagManagementDialogOpen] = useState(false);
+  const [selectedTagIds, setSelectedTagIds] = useState<number[]>([]);
   const [selectedLevel, setSelectedLevel] = useState<SchoolLevel | "all">(
     levelParam === 'junior' ? 'junior' : levelParam === 'senior' ? 'senior' : "all"
   );
   const [selectedSubject, setSelectedSubject] = useState<Subject | "all">("all");
+  
+  // 标签数据
+  const { data: allTags = [] } = trpc.tags.list.useQuery();
   
   // 表单状态
   const [title, setTitle] = useState("");
@@ -342,6 +349,10 @@ export default function ErrorQuestions() {
 
         {/* 导出对话框 */}
         <ExportDialog open={exportDialogOpen} onOpenChange={setExportDialogOpen} />
+      <TagManagementDialog 
+        open={tagManagementDialogOpen} 
+        onOpenChange={setTagManagementDialogOpen}
+      />
       <ErrorExportDialog 
         open={errorExportDialogOpen} 
         onOpenChange={setErrorExportDialogOpen}
@@ -353,7 +364,12 @@ export default function ErrorQuestions() {
         {/* 板块和学科筛选器 */}
         <Card>
           <CardHeader>
-            <CardTitle>分类筛选</CardTitle>
+            <div className="flex items-center justify-between">
+              <CardTitle>分类筛选</CardTitle>
+              <Button variant="outline" size="sm" onClick={() => setTagManagementDialogOpen(true)}>
+                标签管理
+              </Button>
+            </div>
           </CardHeader>
           <CardContent>
             <div className="flex flex-wrap gap-4">
@@ -391,6 +407,36 @@ export default function ErrorQuestions() {
                     {Object.entries(SUBJECTS).map(([key, subject]) => (
                       <SelectItem key={key} value={key}>
                         {subject.icon} {subject.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              
+              {/* 标签筛选 */}
+              <div className="flex-1 min-w-[200px]">
+                <Label className="mb-2">标签</Label>
+                <Select 
+                  value={selectedTagIds.length > 0 ? selectedTagIds[0].toString() : "all"}
+                  onValueChange={(v) => {
+                    if (v === "all") {
+                      setSelectedTagIds([]);
+                    } else {
+                      setSelectedTagIds([parseInt(v)]);
+                    }
+                  }}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="全部" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">全部</SelectItem>
+                    {allTags.map((tag) => (
+                      <SelectItem key={tag.id} value={tag.id.toString()}>
+                        <div className="flex items-center gap-2">
+                          <div className="w-3 h-3 rounded-full" style={{ backgroundColor: tag.color }} />
+                          {tag.name} ({tag.errorCount})
+                        </div>
                       </SelectItem>
                     ))}
                   </SelectContent>
