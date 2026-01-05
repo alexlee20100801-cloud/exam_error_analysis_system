@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { protectedProcedure, router } from "../_core/trpc";
 import * as learningPathService from "../learningPathService";
+import * as learningAdviceService from "../learningAdviceService";
 
 export const learningPathRouter = router({
   /**
@@ -70,6 +71,19 @@ export const learningPathRouter = router({
         input.pathId,
         ctx.user.id
       );
+    }),
+
+  /**
+   * 生成学习建议
+   */
+  generateAdvice: protectedProcedure
+    .input(
+      z.object({
+        pathId: z.number(),
+      })
+    )
+    .mutation(async ({ ctx, input }) => {
+      return await learningAdviceService.generateLearningAdvice(input.pathId, ctx.user.id);
     }),
 
   /**

@@ -30,7 +30,9 @@ import {
   BookOpen,
   XCircle,
   TrendingUp,
-  Brain
+  Brain,
+  Lightbulb,
+  RefreshCw
 } from "lucide-react";
 import { LineChart, Line, RadarChart, Radar, PolarGrid, PolarAngleAxis, PolarRadiusAxis, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from "recharts";
 
@@ -129,6 +131,29 @@ export default function LearningPath() {
     { pathId: selectedPathId! },
     { enabled: !!selectedPathId }
   );
+
+  // 学习建议状态
+  const [learningAdvice, setLearningAdvice] = useState<any>(null);
+  const [isGeneratingAdvice, setIsGeneratingAdvice] = useState(false);
+
+  // 生成学习建议
+  const generateAdviceMutation = trpc.learningPath.generateAdvice.useMutation({
+    onSuccess: (data) => {
+      setLearningAdvice(data);
+      setIsGeneratingAdvice(false);
+      toast.success("学习建议生成成功！");
+    },
+    onError: (error) => {
+      setIsGeneratingAdvice(false);
+      toast.error(`生成失败：${error.message}`);
+    },
+  });
+
+  const handleGenerateAdvice = () => {
+    if (!selectedPathId) return;
+    setIsGeneratingAdvice(true);
+    generateAdviceMutation.mutate({ pathId: selectedPathId });
+  };
 
   // 生成学习路径
   const generateMutation = trpc.learningPath.generate.useMutation({
@@ -439,6 +464,147 @@ export default function LearningPath() {
                 </Card>
               </div>
             </div>
+          )}
+
+          {/* AI学习建议 */}
+          {statistics && statistics.completedNodes > 0 && (
+            <Card>
+              <CardHeader>
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <Lightbulb className="h-5 w-5 text-yellow-600" />
+                    <CardTitle>AI学习建议</CardTitle>
+                  </div>
+                  <Button
+                    onClick={handleGenerateAdvice}
+                    disabled={isGeneratingAdvice}
+                    size="sm"
+                    variant="outline"
+                  >
+                    {isGeneratingAdvice ? (
+                      <>
+                        <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
+                        生成中...
+                      </>
+                    ) : (
+                      <>
+                        <Sparkles className="h-4 w-4 mr-2" />
+                        {learningAdvice ? "重新生成" : "生成建议"}
+                      </>
+                    )}
+                  </Button>
+                </div>
+                <CardDescription>
+                  基于你的学习数据，AI为你生成个性化的学习建议
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                {learningAdvice ? (
+                  <div className="space-y-6">
+                    {/* 整体评价 */}
+                    <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                      <h4 className="font-semibold text-blue-900 mb-2">整体评价</h4>
+                      <p className="text-blue-800">{learningAdvice.overall_assessment}</p>
+                    </div>
+
+                    {/* 知识点巩固建议 */}
+                    {learningAdvice.knowledge_consolidation && learningAdvice.knowledge_consolidation.length > 0 && (
+                      <div>
+                        <h4 className="font-semibold mb-3 flex items-center gap-2">
+                          <Target className="h-4 w-4" />
+                          知识点巩固建议
+                        </h4>
+                        <div className="space-y-3">
+                          {learningAdvice.knowledge_consolidation.map((item: any, index: number) => (
+                            <div
+                              key={index}
+                              className="border rounded-lg p-3 hover:bg-accent/50 transition-colors"
+                            >
+                              <div className="flex items-start justify-between mb-2">
+                                <span className="font-medium">{item.knowledge_point}</span>
+                                <Badge
+                                  variant={item.priority === "high" ? "destructive" : item.priority === "medium" ? "default" : "secondary"}
+                                >
+                                  {item.priority === "high" ? "高优先级" : item.priority === "medium" ? "中优先级" : "低优先级"}
+                                </Badge>
+                              </div>
+                              <p className="text-sm text-muted-foreground">{item.suggestion}</p>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* 学习方法建议 */}
+                    {learningAdvice.learning_methods && learningAdvice.learning_methods.length > 0 && (
+                      <div>
+                        <h4 className="font-semibold mb-3 flex items-center gap-2">
+                          <BookOpen className="h-4 w-4" />
+                          学习方法建议
+                        </h4>
+                        <div className="space-y-3">
+                          {learningAdvice.learning_methods.map((item: any, index: number) => (
+                            <div key={index} className="border rounded-lg p-3">
+                              <div className="font-medium mb-1">{item.method}</div>
+                              <p className="text-sm text-muted-foreground">{item.description}</p>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* 时间管理建议 */}
+                    {learningAdvice.time_management && (
+                      <div>
+                        <h4 className="font-semibold mb-3 flex items-center gap-2">
+                          <Clock className="h-4 w-4" />
+                          时间管理建议
+                        </h4>
+                        <div className="border rounded-lg p-3 space-y-2">
+                          <div>
+                            <span className="font-medium">建议每日学习时长：</span>
+                            <span className="ml-2 text-primary">{learningAdvice.time_management.daily_study_time}</span>
+                          </div>
+                          {learningAdvice.time_management.focus_areas && learningAdvice.time_management.focus_areas.length > 0 && (
+                            <div>
+                              <div className="font-medium mb-1">重点关注领域：</div>
+                              <div className="flex flex-wrap gap-2">
+                                {learningAdvice.time_management.focus_areas.map((area: string, index: number) => (
+                                  <Badge key={index} variant="outline">{area}</Badge>
+                                ))}
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* 接下来的行动步骤 */}
+                    {learningAdvice.next_steps && learningAdvice.next_steps.length > 0 && (
+                      <div>
+                        <h4 className="font-semibold mb-3 flex items-center gap-2">
+                          <ArrowRight className="h-4 w-4" />
+                          接下来的行动步骤
+                        </h4>
+                        <div className="space-y-2">
+                          {learningAdvice.next_steps.map((step: string, index: number) => (
+                            <div key={index} className="flex items-start gap-2">
+                              <div className="mt-1.5 h-1.5 w-1.5 rounded-full bg-primary flex-shrink-0" />
+                              <span className="text-sm">{step}</span>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                ) : (
+                  <div className="text-center py-8 text-muted-foreground">
+                    <Lightbulb className="h-12 w-12 mx-auto mb-3 opacity-50" />
+                    <p>点击上方按钮生成个性化学习建议</p>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
           )}
 
           <div className="flex items-center gap-4">
