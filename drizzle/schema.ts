@@ -65,6 +65,7 @@ export const errorQuestions = mysqlTable("error_questions", {
   errorAnalysis: text("errorAnalysis"), // AI分析的错误点
   correctAnswer: text("correctAnswer"), // 正确答案
   detailedExplanation: text("detailedExplanation"), // 详细解析
+  detailedAnalysis: text("detailedAnalysis"), // AI深度分析结果（JSON格式）
   knowledgePointIds: json("knowledgePointIds").$type<number[]>(), // 关联的知识点ID数组
   // 用户信息
   userAnswer: text("userAnswer"), // 用户的错误答案

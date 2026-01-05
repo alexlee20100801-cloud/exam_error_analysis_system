@@ -7,6 +7,7 @@ import { ThemeProvider } from "./contexts/ThemeContext";
 import Home from "./pages/Home";
 import Dashboard from "./pages/Dashboard";
 import ErrorQuestions from "./pages/ErrorQuestions";
+import ErrorQuestionDetail from "./pages/ErrorQuestionDetail";
 import Practice from "./pages/Practice";
 import LearningReport from "./pages/LearningReport";
 import Videos from "./pages/Videos";
@@ -17,7 +18,8 @@ function Router() {
     <Switch>
       <Route path={"/"} component={Home} />
       <Route path={"/dashboard"} component={Dashboard} />
-      <Route path={"/error-questions"} component={ErrorQuestions} />
+      <Route path="/error-questions" component={ErrorQuestions} />
+      <Route path="/error-questions/:id" component={ErrorQuestionDetail} />
       <Route path={"/practice"} component={Practice} />
       <Route path={"/report"} component={LearningReport} />
       <Route path={"/videos"} component={Videos} />

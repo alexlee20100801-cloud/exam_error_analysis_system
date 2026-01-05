@@ -214,3 +214,155 @@ ${standardKnowledgePoints.map(kp => `ID: ${kp.id}, 名称: ${kp.name}`).join('\n
     return matchedIds;
   }
 }
+
+/**
+ * 详细分析结果接口
+ */
+export interface DetailedAnalysisResult {
+  success: boolean;
+  analysis?: {
+    // 基础分析
+    errorType: string;
+    errorAnalysis: string;
+    difficulty: "easy" | "medium" | "hard";
+    
+    // 深度分析
+    keyPoints: string[];
+    keyPointsExplanation: string;
+    commonMistakes: string[];
+    mistakesAnalysis: string;
+    
+    // 知识点关联
+    knowledgePoints: Array<{
+      name: string;
+      category: string;
+      importance: "high" | "medium" | "low";
+    }>;
+    knowledgeGraph: string;
+    
+    // 解题指导
+    solvingSteps: string[];
+    solvingStrategy: string;
+    tips: string[];
+    
+    // 学习建议
+    studyAdvice: string;
+    practiceDirection: string;
+  };
+  error?: string;
+}
+
+/**
+ * 深度分析错题（增强版）
+ */
+export async function analyzeQuestionDetailed(
+  questionContent: string,
+  userAnswer: string,
+  correctAnswer: string,
+  subject: string,
+  grade: string
+): Promise<DetailedAnalysisResult> {
+  try {
+    const gradeMap: Record<string, string> = {
+      junior1: "初一",
+      junior2: "初二",
+      junior3: "初三",
+      senior1: "高一",
+      senior2: "高二",
+      senior3: "高三",
+    };
+
+    const subjectMap: Record<string, string> = {
+      chinese: "语文",
+      math: "数学",
+      english: "英语",
+      physics: "物理",
+      chemistry: "化学",
+      biology: "生物",
+      politics: "政治",
+      history: "历史",
+      geography: "地理",
+    };
+
+    const gradeText = gradeMap[grade] || grade;
+    const subjectText = subjectMap[subject] || subject;
+
+    const systemPrompt = `你是一位资深的${gradeText}${subjectText}教师，拥有20年教学经验，擅长深入分析学生的错题，找出根本原因，并提供针对性的学习建议。`;
+
+    const userPrompt = `请对以下错题进行深入、全面的分析：
+
+**题目内容：**
+${questionContent}
+
+**学生答案：**
+${userAnswer}
+
+**正确答案：**
+${correctAnswer}
+
+请从以下维度进行详细分析并以JSON格式返回。`;
+
+    const response = await invokeLLM({
+      messages: [
+        { role: "system", content: systemPrompt },
+        { role: "user", content: userPrompt }
+      ],
+      response_format: {
+        type: "json_schema",
+        json_schema: {
+          name: "detailed_analysis",
+          strict: true,
+          schema: {
+            type: "object",
+            properties: {
+              errorType: { type: "string" },
+              errorAnalysis: { type: "string" },
+              difficulty: { type: "string", enum: ["easy", "medium", "hard"] },
+              keyPoints: { type: "array", items: { type: "string" } },
+              keyPointsExplanation: { type: "string" },
+              commonMistakes: { type: "array", items: { type: "string" } },
+              mistakesAnalysis: { type: "string" },
+              knowledgePoints: {
+                type: "array",
+                items: {
+                  type: "object",
+                  properties: {
+                    name: { type: "string" },
+                    category: { type: "string" },
+                    importance: { type: "string", enum: ["high", "medium", "low"] }
+                  },
+                  required: ["name", "category", "importance"],
+                  additionalProperties: false
+                }
+              },
+              knowledgeGraph: { type: "string" },
+              solvingSteps: { type: "array", items: { type: "string" } },
+              solvingStrategy: { type: "string" },
+              tips: { type: "array", items: { type: "string" } },
+              studyAdvice: { type: "string" },
+              practiceDirection: { type: "string" }
+            },
+            required: ["errorType", "errorAnalysis", "difficulty", "keyPoints", "keyPointsExplanation", "commonMistakes", "mistakesAnalysis", "knowledgePoints", "knowledgeGraph", "solvingSteps", "solvingStrategy", "tips", "studyAdvice", "practiceDirection"],
+            additionalProperties: false
+          }
+        }
+      }
+    });
+
+    const messageContent = response.choices[0]?.message?.content;
+    const resultText = typeof messageContent === 'string' ? messageContent : "";
+
+    if (!resultText) {
+      return { success: false, error: "AI分析返回空结果" };
+    }
+
+    const analysisData = JSON.parse(resultText);
+    return { success: true, analysis: analysisData };
+  } catch (error) {
+    console.error("[AI Analysis] 深度分析失败:", error);
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : "AI分析服务异常"
+    };
+  }
+}

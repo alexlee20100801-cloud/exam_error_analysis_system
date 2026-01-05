@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { protectedProcedure, router } from "../_core/trpc";
-import { analyzeErrorQuestion, matchKnowledgePoints } from "../aiAnalysisService";
+import { analyzeErrorQuestion, matchKnowledgePoints, analyzeQuestionDetailed } from "../aiAnalysisService";
 import { 
   getErrorQuestionById, 
   updateErrorQuestion,
@@ -162,6 +162,95 @@ export const aiAnalysisRouter = router({
         results,
         successCount: results.filter(r => r.success).length,
         failCount: results.filter(r => !r.success).length,
+      };
+    }),
+
+  /**
+   * 深度分析错题（增强版）
+   */
+  analyzeQuestionDetailed: protectedProcedure
+    .input(z.object({
+      questionId: z.number(),
+    }))
+    .mutation(async ({ ctx, input }) => {
+      const question = await getErrorQuestionById(input.questionId);
+      
+      if (!question) {
+        throw new Error("错题不存在");
+      }
+      
+      if (question.userId !== ctx.user.id) {
+        throw new Error("无权分析此错题");
+      }
+
+      let correctAnswer = question.correctAnswer;
+      if (!correctAnswer) {
+        const basicAnalysis = await analyzeErrorQuestion(
+          question.content,
+          question.subject,
+          question.grade,
+          question.userAnswer || undefined
+        );
+        if (basicAnalysis.success && basicAnalysis.correctAnswer) {
+          correctAnswer = basicAnalysis.correctAnswer;
+          await updateErrorQuestion(input.questionId, {
+            correctAnswer: correctAnswer,
+          });
+        }
+      }
+
+      if (!correctAnswer) {
+        return {
+          success: false,
+          error: "无法获取正确答案"
+        };
+      }
+
+      const detailedResult = await analyzeQuestionDetailed(
+        question.content,
+        question.userAnswer || "未提供学生答案",
+        correctAnswer,
+        question.subject,
+        question.grade
+      );
+
+      if (!detailedResult.success) {
+        return {
+          success: false,
+          error: detailedResult.error
+        };
+      }
+
+      const aiKnowledgePoints = detailedResult.analysis?.knowledgePoints.map(kp => kp.name) || [];
+      const standardKnowledgePoints = await getKnowledgePointsBySubjectAndGrade(
+        question.subject,
+        question.grade
+      );
+
+      let knowledgePointIds: number[] = [];
+      if (aiKnowledgePoints.length > 0 && standardKnowledgePoints.length > 0) {
+        knowledgePointIds = await matchKnowledgePoints(
+          aiKnowledgePoints,
+          question.subject,
+          question.grade,
+          standardKnowledgePoints
+        );
+      }
+
+      await updateErrorQuestion(input.questionId, {
+        errorAnalysis: detailedResult.analysis?.errorAnalysis,
+        correctAnswer: correctAnswer,
+        detailedExplanation: detailedResult.analysis?.solvingStrategy,
+        detailedAnalysis: JSON.stringify(detailedResult.analysis),
+        knowledgePointIds: knowledgePointIds,
+        difficulty: detailedResult.analysis?.difficulty,
+        isAnalyzed: true,
+      });
+
+      return {
+        success: true,
+        analysis: detailedResult.analysis,
+        knowledgePointIds: knowledgePointIds,
       };
     }),
 });

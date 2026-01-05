@@ -10,8 +10,10 @@ import { trpc } from "@/lib/trpc";
 import { Upload, Camera, FileText, Loader2, CheckCircle, AlertCircle } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
+import { useLocation } from "wouter";
 
 export default function ErrorQuestions() {
+  const [, setLocation] = useLocation();
   const [uploadDialogOpen, setUploadDialogOpen] = useState(false);
   const [uploadMethod, setUploadMethod] = useState<"photo" | "manual">("photo");
   
@@ -334,7 +336,7 @@ export default function ErrorQuestions() {
                   </div>
                 </CardHeader>
                 <CardContent>
-                  <div className="space-y-3">
+                  <div className="space-y-3 cursor-pointer" onClick={() => setLocation(`/error-questions/${question.id}`)}>
                     {question.imageUrl && (
                       <img src={question.imageUrl} alt="题目" className="max-h-48 rounded border" />
                     )}

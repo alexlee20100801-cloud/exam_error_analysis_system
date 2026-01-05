@@ -15,6 +15,13 @@
       "when": 1767614454668,
       "tag": "0001_useful_fat_cobra",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "5",
+      "when": 1767615475311,
+      "tag": "0002_windy_terrax",
+      "breakpoints": true
     }
   ]
 }
