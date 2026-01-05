@@ -21,6 +21,8 @@ import StudyCalendar from "@/pages/StudyCalendar";
 import ParentDashboard from "@/pages/ParentDashboard";
 import ParentNotifications from "@/pages/ParentNotifications";
 import StudentProfile from "@/pages/StudentProfile";
+import ExamPaperGenerator from "@/pages/ExamPaperGenerator";
+import ExamPaperDetail from "@/pages/ExamPaperDetail";
 
 function Router() {
   return (
@@ -42,6 +44,8 @@ function Router() {
       <Route path="/parent" component={ParentDashboard} />
       <Route path="/parent/notifications" component={ParentNotifications} />
       <Route path="/profile" component={StudentProfile} />
+      <Route path="/exam-generator" component={ExamPaperGenerator} />
+      <Route path="/exam-paper/:id" component={ExamPaperDetail} />
       <Route path={"/404"} component={NotFound} />
       <Route component={NotFound} />
     </Switch>
