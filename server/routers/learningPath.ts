@@ -42,6 +42,19 @@ export const learningPathRouter = router({
     }),
 
   /**
+   * 获取路径统计数据
+   */
+  getStatistics: protectedProcedure
+    .input(
+      z.object({
+        pathId: z.number(),
+      })
+    )
+    .query(async ({ ctx, input }) => {
+      return await learningPathService.getPathStatistics(input.pathId, ctx.user.id);
+    }),
+
+  /**
    * 获取节点题目
    */
   getNodeQuestions: protectedProcedure

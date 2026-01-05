@@ -359,6 +359,91 @@ export async function getNodeQuestions(nodeId: string, pathId: number, userId: n
 }
 
 /**
+ * 获取学习路径的统计数据
+ */
+export async function getPathStatistics(pathId: number, userId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not initialized");
+
+  // 获取路径详情
+  const pathDetail = await getLearningPathDetail(pathId, userId);
+  if (!pathDetail) throw new Error("Learning path not found");
+
+  // 获取所有节点的进度记录
+  const progressRecords = await db
+    .select()
+    .from(schema.learningPathProgress)
+    .where(
+      and(
+        eq(schema.learningPathProgress.pathId, pathId),
+        eq(schema.learningPathProgress.userId, userId)
+      )
+    )
+    .orderBy(schema.learningPathProgress.completedAt);
+
+  // 计算得分趋势
+  const scoresTrend = progressRecords
+    .filter((r) => r.status === "completed" && r.score !== null)
+    .map((r, index) => ({
+      nodeIndex: index + 1,
+      score: r.score!,
+      completedAt: r.completedAt,
+    }));
+
+  // 统计知识点掌握度
+  const knowledgePointStats = new Map<string, { totalScore: number; count: number }>();
+  
+  for (const record of progressRecords) {
+    if (record.status === "completed" && record.score !== null) {
+      const node = pathDetail.nodes.find((n) => n.id === record.nodeId);
+      if (node) {
+        const kpName = node.knowledgePointName;
+        const existing = knowledgePointStats.get(kpName) || { totalScore: 0, count: 0 };
+        knowledgePointStats.set(kpName, {
+          totalScore: existing.totalScore + record.score,
+          count: existing.count + 1,
+        });
+      }
+    }
+  }
+
+  const knowledgePointMastery = Array.from(knowledgePointStats.entries()).map(
+    ([name, stats]) => ({
+      knowledgePoint: name,
+      masteryLevel: Math.round(stats.totalScore / stats.count),
+    })
+  );
+
+  // 计算学习时长（估算，每个节点假设10分钟）
+  const totalStudyTime = progressRecords.filter((r) => r.status === "completed").length * 10;
+
+  // 计算平均得分
+  const completedScores = progressRecords
+    .filter((r) => r.status === "completed" && r.score !== null)
+    .map((r) => r.score!);
+  const averageScore =
+    completedScores.length > 0
+      ? Math.round(completedScores.reduce((a, b) => a + b, 0) / completedScores.length)
+      : 0;
+
+  // 计算进步幅度
+  const improvement =
+    scoresTrend.length >= 2
+      ? scoresTrend[scoresTrend.length - 1].score - scoresTrend[0].score
+      : 0;
+
+  return {
+    scoresTrend,
+    knowledgePointMastery,
+    totalStudyTime: Math.round(totalStudyTime / 1000 / 60), // 转换为分钟
+    averageScore,
+    improvement,
+    completedNodes: progressRecords.filter((r) => r.status === "completed").length,
+    totalNodes: pathDetail.totalNodes,
+  };
+}
+
+/**
  * 完成节点
  */
 export async function completePathNode(

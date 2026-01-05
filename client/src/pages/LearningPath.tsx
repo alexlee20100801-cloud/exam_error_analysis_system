@@ -28,8 +28,11 @@ import {
   Sparkles,
   ArrowRight,
   BookOpen,
-  XCircle
+  XCircle,
+  TrendingUp,
+  Brain
 } from "lucide-react";
+import { LineChart, Line, RadarChart, Radar, PolarGrid, PolarAngleAxis, PolarRadiusAxis, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from "recharts";
 
 // 常量定义
 const SUBJECTS = {
@@ -119,6 +122,12 @@ export default function LearningPath() {
       nodeId: selectedNode?.id || "",
     },
     { enabled: !!selectedPathId && !!selectedNode }
+  );
+
+  // 获取路径统计数据
+  const { data: statistics } = trpc.learningPath.getStatistics.useQuery(
+    { pathId: selectedPathId! },
+    { enabled: !!selectedPathId }
   );
 
   // 生成学习路径
@@ -304,6 +313,134 @@ export default function LearningPath() {
       {/* 路径详情 */}
       {selectedPathId && pathDetail && (
         <div className="space-y-6">
+          {/* 统计面板 */}
+          {statistics && statistics.completedNodes > 0 && (
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              {/* 得分趋势图 */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <TrendingUp className="h-5 w-5 text-blue-600" />
+                    得分趋势
+                  </CardTitle>
+                  <CardDescription>展示你在各节点的得分变化</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  {statistics.scoresTrend.length > 0 ? (
+                    <ResponsiveContainer width="100%" height={250}>
+                      <LineChart data={statistics.scoresTrend}>
+                        <CartesianGrid strokeDasharray="3 3" />
+                        <XAxis 
+                          dataKey="nodeIndex" 
+                          label={{ value: '节点序号', position: 'insideBottom', offset: -5 }}
+                        />
+                        <YAxis 
+                          domain={[0, 100]}
+                          label={{ value: '得分', angle: -90, position: 'insideLeft' }}
+                        />
+                        <Tooltip />
+                        <Legend />
+                        <Line 
+                          type="monotone" 
+                          dataKey="score" 
+                          stroke="#3b82f6" 
+                          strokeWidth={2}
+                          name="得分"
+                          dot={{ r: 4 }}
+                        />
+                      </LineChart>
+                    </ResponsiveContainer>
+                  ) : (
+                    <div className="h-[250px] flex items-center justify-center text-muted-foreground">
+                      暂无数据
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+
+              {/* 知识点掌握度雷达图 */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Brain className="h-5 w-5 text-purple-600" />
+                    知识点掌握度
+                  </CardTitle>
+                  <CardDescription>展示各知识点的掌握程度</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  {statistics.knowledgePointMastery.length > 0 ? (
+                    <ResponsiveContainer width="100%" height={250}>
+                      <RadarChart data={statistics.knowledgePointMastery}>
+                        <PolarGrid />
+                        <PolarAngleAxis dataKey="knowledgePoint" />
+                        <PolarRadiusAxis domain={[0, 100]} />
+                        <Tooltip />
+                        <Radar 
+                          name="掌握度" 
+                          dataKey="masteryLevel" 
+                          stroke="#8b5cf6" 
+                          fill="#8b5cf6" 
+                          fillOpacity={0.6}
+                        />
+                      </RadarChart>
+                    </ResponsiveContainer>
+                  ) : (
+                    <div className="h-[250px] flex items-center justify-center text-muted-foreground">
+                      暂无数据
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+
+              {/* 学习指标卡片 */}
+              <div className="lg:col-span-2 grid grid-cols-1 sm:grid-cols-4 gap-4">
+                <Card>
+                  <CardContent className="pt-6">
+                    <div className="text-center">
+                      <div className="text-3xl font-bold text-blue-600">
+                        {statistics.averageScore}
+                      </div>
+                      <div className="text-sm text-muted-foreground mt-1">平均得分</div>
+                    </div>
+                  </CardContent>
+                </Card>
+
+                <Card>
+                  <CardContent className="pt-6">
+                    <div className="text-center">
+                      <div className="text-3xl font-bold text-green-600">
+                        {statistics.improvement > 0 ? '+' : ''}{statistics.improvement}
+                      </div>
+                      <div className="text-sm text-muted-foreground mt-1">进步幅度</div>
+                    </div>
+                  </CardContent>
+                </Card>
+
+                <Card>
+                  <CardContent className="pt-6">
+                    <div className="text-center">
+                      <div className="text-3xl font-bold text-purple-600">
+                        {statistics.totalStudyTime}
+                      </div>
+                      <div className="text-sm text-muted-foreground mt-1">学习时长(分钟)</div>
+                    </div>
+                  </CardContent>
+                </Card>
+
+                <Card>
+                  <CardContent className="pt-6">
+                    <div className="text-center">
+                      <div className="text-3xl font-bold text-orange-600">
+                        {statistics.completedNodes}/{statistics.totalNodes}
+                      </div>
+                      <div className="text-sm text-muted-foreground mt-1">完成节点</div>
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
+            </div>
+          )}
+
           <div className="flex items-center gap-4">
             <Button
               variant="outline"
