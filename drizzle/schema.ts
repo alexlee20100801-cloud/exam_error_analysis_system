@@ -501,3 +501,44 @@ export const generatedExamPapers = mysqlTable("generated_exam_papers", {
 
 export type GeneratedExamPaper = typeof generatedExamPapers.$inferSelect;
 export type InsertGeneratedExamPaper = typeof generatedExamPapers.$inferInsert;
+
+/**
+ * 学习路径表 - 个性化学习路径
+ */
+export const learningPaths = mysqlTable("learning_paths", {
+  id: int("id").autoincrement().primaryKey(),
+  userId: int("user_id").notNull(),
+  subject: mysqlEnum("subject", subjectEnum).notNull(),
+  grade: mysqlEnum("grade", ["junior1", "junior2", "junior3", "senior1", "senior2", "senior3"]).notNull(),
+  title: varchar("title", { length: 200 }).notNull(),
+  description: text("description"),
+  pathData: json("path_data").$type<any>(), // 路径节点数据（JSON格式）
+  totalNodes: int("total_nodes").notNull().default(0),
+  completedNodes: int("completed_nodes").notNull().default(0),
+  status: mysqlEnum("status", ["active", "completed", "paused"]).notNull().default("active"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().onUpdateNow().notNull(),
+});
+
+export type LearningPath = typeof learningPaths.$inferSelect;
+export type InsertLearningPath = typeof learningPaths.$inferInsert;
+
+/**
+ * 学习路径节点进度表
+ */
+export const learningPathProgress = mysqlTable("learning_path_progress", {
+  id: int("id").autoincrement().primaryKey(),
+  userId: int("user_id").notNull(),
+  pathId: int("path_id").notNull(),
+  nodeId: varchar("node_id", { length: 100 }).notNull(), // 节点ID
+  knowledgePointId: int("knowledge_point_id"),
+  status: mysqlEnum("status", ["locked", "available", "in_progress", "completed"]).notNull().default("locked"),
+  score: int("score"), // 该节点的得分
+  attempts: int("attempts").notNull().default(0), // 尝试次数
+  completedAt: timestamp("completed_at"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().onUpdateNow().notNull(),
+});
+
+export type LearningPathProgress = typeof learningPathProgress.$inferSelect;
+export type InsertLearningPathProgress = typeof learningPathProgress.$inferInsert;

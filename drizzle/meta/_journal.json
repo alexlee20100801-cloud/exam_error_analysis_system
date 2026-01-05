@@ -92,6 +92,13 @@
       "when": 1767628666505,
       "tag": "0012_secret_terrax",
       "breakpoints": true
+    },
+    {
+      "idx": 13,
+      "version": "5",
+      "when": 1767630368031,
+      "tag": "0013_slim_iron_patriot",
+      "breakpoints": true
     }
   ]
 }

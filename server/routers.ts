@@ -24,6 +24,7 @@ import { examAndPlanRouter } from "./routers/examAndPlan";
 import { parentSupervisionRouter } from "./routers/parentSupervision";
 import { realExamRouter } from "./routers/realExam";
 import { questionBankRouter } from "./routers/questionBankRouter";
+import { learningPathRouter } from "./routers/learningPath";
 
 export const appRouter = router({
   system: systemRouter,
@@ -92,6 +93,7 @@ export const appRouter = router({
   // 真题和AI试卷
   realExam: realExamRouter,
   questionBank: questionBankRouter,
+  learningPath: learningPathRouter,
 });
 
 export type AppRouter = typeof appRouter;

@@ -25,6 +25,7 @@ import ExamPaperGenerator from "@/pages/ExamPaperGenerator";
 import ExamPaperDetail from "@/pages/ExamPaperDetail";
 import QuestionBankManagement from "@/pages/QuestionBankManagement";
 import RealExamPractice from "@/pages/RealExamPractice";
+import LearningPath from "@/pages/LearningPath";
 
 function Router() {
   return (
@@ -50,6 +51,7 @@ function Router() {
       <Route path="/exam-paper/:id" component={ExamPaperDetail} />
       <Route path="/admin/question-bank" component={QuestionBankManagement} />
       <Route path="/real-exam-practice" component={RealExamPractice} />
+      <Route path="/learning-path" component={LearningPath} />
       <Route path={"/404"} component={NotFound} />
       <Route component={NotFound} />
     </Switch>
