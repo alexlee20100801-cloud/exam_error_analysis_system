@@ -9,6 +9,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { trpc } from "@/lib/trpc";
 import { Upload, Camera, FileText, Loader2, CheckCircle, AlertCircle, Download } from "lucide-react";
 import { ExportDialog } from "@/components/ExportDialog";
+import { ErrorExportDialog } from "@/components/ErrorExportDialog";
 import { useState } from "react";
 import { toast } from "sonner";
 import { useLocation, useSearch } from "wouter";
@@ -22,6 +23,7 @@ export default function ErrorQuestions() {
   const [uploadDialogOpen, setUploadDialogOpen] = useState(false);
   const [uploadMethod, setUploadMethod] = useState<"photo" | "manual">("photo");
   const [exportDialogOpen, setExportDialogOpen] = useState(false);
+  const [errorExportDialogOpen, setErrorExportDialogOpen] = useState(false);
   const [selectedLevel, setSelectedLevel] = useState<SchoolLevel | "all">(
     levelParam === 'junior' ? 'junior' : levelParam === 'senior' ? 'senior' : "all"
   );
@@ -196,9 +198,13 @@ export default function ErrorQuestions() {
             <p className="text-muted-foreground mt-2">管理和分析你的错题</p>
           </div>
           <div className="flex gap-2">
-            <Button size="lg" variant="outline" onClick={() => setExportDialogOpen(true)}>
+            <Button variant="outline" size="lg" onClick={() => setExportDialogOpen(true)}>
               <Download className="mr-2 h-4 w-4" />
-              导出
+              导出Excel
+            </Button>
+            <Button variant="outline" size="lg" onClick={() => setErrorExportDialogOpen(true)}>
+              <FileText className="mr-2 h-4 w-4" />
+              导出PDF
             </Button>
             <Dialog open={uploadDialogOpen} onOpenChange={setUploadDialogOpen}>            <DialogTrigger asChild>
               <Button size="lg">
@@ -336,6 +342,13 @@ export default function ErrorQuestions() {
 
         {/* 导出对话框 */}
         <ExportDialog open={exportDialogOpen} onOpenChange={setExportDialogOpen} />
+      <ErrorExportDialog 
+        open={errorExportDialogOpen} 
+        onOpenChange={setErrorExportDialogOpen}
+        defaultFilters={{
+          subjects: selectedSubject !== "all" ? [selectedSubject] : undefined,
+        }}
+      />
 
         {/* 板块和学科筛选器 */}
         <Card>

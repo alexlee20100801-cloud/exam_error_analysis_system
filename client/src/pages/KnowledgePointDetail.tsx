@@ -5,7 +5,9 @@ import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from "recharts";
-import { ArrowLeft, Brain, AlertTriangle, TrendingUp, BookOpen, Video, Target, Lightbulb, GitCompare, Zap } from "lucide-react";
+import { ArrowLeft, Brain, AlertTriangle, TrendingUp, BookOpen, Video, Target, Lightbulb, GitCompare, Zap, FileDown } from "lucide-react";
+import { ErrorExportDialog } from "@/components/ErrorExportDialog";
+import { useState } from "react";
 import DashboardLayout from "@/components/DashboardLayout";
 import { getSubjectName } from "@shared/subjects";
 
@@ -13,6 +15,7 @@ export default function KnowledgePointDetail() {
   const params = useParams();
   const [, setLocation] = useLocation();
   const knowledgePointId = parseInt(params.id || "0");
+  const [exportDialogOpen, setExportDialogOpen] = useState(false);
 
   // 获取知识点详情数据
   const { data: detail, isLoading, error } = trpc.knowledgePointDetail.getDetail.useQuery({
@@ -58,17 +61,32 @@ export default function KnowledgePointDetail() {
     <DashboardLayout>
       <div className="container mx-auto py-8 space-y-6">
         {/* 头部导航 */}
-        <div className="flex items-center gap-4">
-          <Button variant="ghost" size="icon" onClick={() => setLocation("/report")}>
-            <ArrowLeft className="h-5 w-5" />
-          </Button>
-          <div>
-            <h1 className="text-3xl font-bold">{info.name}</h1>
-            <p className="text-muted-foreground mt-1">
-              {getSubjectName(info.subject as any)} · {info.difficulty === "easy" ? "简单" : info.difficulty === "medium" ? "中等" : "困难"}
-            </p>
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-4">
+            <Button variant="ghost" size="icon" onClick={() => setLocation("/report")}>
+              <ArrowLeft className="h-5 w-5" />
+            </Button>
+            <div>
+              <h1 className="text-3xl font-bold">{info.name}</h1>
+              <p className="text-muted-foreground mt-1">
+                {getSubjectName(info.subject as any)} · {info.difficulty === "easy" ? "简单" : info.difficulty === "medium" ? "中等" : "困难"}
+              </p>
+            </div>
           </div>
+          <Button variant="outline" onClick={() => setExportDialogOpen(true)}>
+            <FileDown className="mr-2 h-4 w-4" />
+            导出错题
+          </Button>
         </div>
+
+        {/* 导出对话框 */}
+        <ErrorExportDialog
+          open={exportDialogOpen}
+          onOpenChange={setExportDialogOpen}
+          defaultFilters={{
+            knowledgePointIds: [knowledgePointId],
+          }}
+        />
 
         {/* 统计卡片 */}
         <div className="grid gap-4 md:grid-cols-4">
