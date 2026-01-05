@@ -27,6 +27,8 @@ import QuestionBankManagement from "@/pages/QuestionBankManagement";
 import RealExamPractice from "@/pages/RealExamPractice";
 import LearningPath from "@/pages/LearningPath";
 import Settings from "@/pages/Settings";
+import { PWAInstallPrompt } from "@/components/PWAInstallPrompt";
+import { MobileBottomNav } from "@/components/MobileBottomNav";
 
 function Router() {
   return (
@@ -65,7 +67,9 @@ function App() {
       <ThemeProvider defaultTheme="light">
         <TooltipProvider>
           <Toaster />
+          <PWAInstallPrompt />
           <Router />
+          <MobileBottomNav />
         </TooltipProvider>
       </ThemeProvider>
     </ErrorBoundary>

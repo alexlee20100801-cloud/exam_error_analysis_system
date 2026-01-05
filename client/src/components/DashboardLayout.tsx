@@ -72,6 +72,7 @@ export default function DashboardLayout({
     return saved ? parseInt(saved, 10) : DEFAULT_WIDTH;
   });
   const { loading, user } = useAuth();
+  const isMobile = useIsMobile();
 
   useEffect(() => {
     localStorage.setItem(SIDEBAR_WIDTH_KEY, sidebarWidth.toString());
@@ -201,12 +202,14 @@ function DashboardLayoutContent({
 
   return (
     <>
-      <div className="relative" ref={sidebarRef}>
-        <Sidebar
-          collapsible="icon"
-          className="border-r-0"
-          disableTransition={isResizing}
-        >
+      {/* 移动端隐藏侧边栏 */}
+      {!isMobile && (
+        <div className="relative" ref={sidebarRef}>
+          <Sidebar
+            collapsible="icon"
+            className="border-r-0"
+            disableTransition={isResizing}
+          >
           <SidebarHeader className="h-16 justify-center">
             <div className="flex items-center gap-3 px-2 transition-all w-full">
               <button
@@ -355,6 +358,7 @@ function DashboardLayoutContent({
           style={{ zIndex: 50 }}
         />
       </div>
+      )}
 
       <SidebarInset>
         {isMobile && (
