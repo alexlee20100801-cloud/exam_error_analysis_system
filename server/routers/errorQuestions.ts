@@ -1,5 +1,9 @@
 import { z } from "zod";
+import { eq, and, desc } from "drizzle-orm";
 import { protectedProcedure, router } from "../_core/trpc";
+import { getSchoolLevelFromGrade } from "../utils/schoolLevelHelper";
+import { errorQuestions } from "../../drizzle/schema";
+import { getDb } from "../db";
 import { 
   createErrorQuestion, 
   getErrorQuestionsByUserId,
@@ -25,10 +29,12 @@ export const errorQuestionsRouter = router({
       userNotes: z.string().optional(),
     }))
     .mutation(async ({ ctx, input }) => {
+      const schoolLevel = getSchoolLevelFromGrade(input.grade);
       const result = await createErrorQuestion({
         userId: ctx.user.id,
         title: input.title,
         content: input.content,
+        schoolLevel,
         subject: input.subject,
         grade: input.grade,
         difficulty: input.difficulty,
@@ -81,12 +87,14 @@ export const errorQuestionsRouter = router({
         }
 
         // 3. 创建错题记录
+        const schoolLevel = getSchoolLevelFromGrade(input.grade);
         const result = await createErrorQuestion({
           userId: ctx.user.id,
           title: input.title,
           content: ocrResult.content,
           imageUrl: imageUrl,
           imageKey: imageKey,
+          schoolLevel,
           subject: input.subject,
           grade: input.grade,
           userAnswer: input.userAnswer,
@@ -123,6 +131,58 @@ export const errorQuestionsRouter = router({
         input?.limit || 50
       );
       return questions;
+    }),
+
+  /**
+   * 按板块筛选错题
+   */
+  listBySchoolLevel: protectedProcedure
+    .input(z.object({
+      schoolLevel: z.enum(["junior", "senior"]),
+      limit: z.number().min(1).max(100).default(50),
+    }))
+    .query(async ({ ctx, input }) => {
+      const db = await getDb();
+      if (!db) return [];
+      
+      return await db
+        .select()
+        .from(errorQuestions)
+        .where(
+          and(
+            eq(errorQuestions.userId, ctx.user.id),
+            eq(errorQuestions.schoolLevel, input.schoolLevel)
+          )
+        )
+        .orderBy(desc(errorQuestions.createdAt))
+        .limit(input.limit);
+    }),
+
+  /**
+   * 按板块和学科筛选错题
+   */
+  listBySchoolLevelAndSubject: protectedProcedure
+    .input(z.object({
+      schoolLevel: z.enum(["junior", "senior"]),
+      subject: z.enum(["chinese", "math", "english", "physics", "chemistry", "biology", "politics", "history", "geography"]),
+      limit: z.number().min(1).max(100).default(50),
+    }))
+    .query(async ({ ctx, input }) => {
+      const db = await getDb();
+      if (!db) return [];
+      
+      return await db
+        .select()
+        .from(errorQuestions)
+        .where(
+          and(
+            eq(errorQuestions.userId, ctx.user.id),
+            eq(errorQuestions.schoolLevel, input.schoolLevel),
+            eq(errorQuestions.subject, input.subject)
+          )
+        )
+        .orderBy(desc(errorQuestions.createdAt))
+        .limit(input.limit);
     }),
 
   /**

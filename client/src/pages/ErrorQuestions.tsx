@@ -12,12 +12,15 @@ import { ExportDialog } from "@/components/ExportDialog";
 import { useState } from "react";
 import { toast } from "sonner";
 import { useLocation } from "wouter";
+import { SCHOOL_LEVELS, SUBJECTS, type SchoolLevel, type Subject } from "../../../shared/subjects";
 
 export default function ErrorQuestions() {
   const [, setLocation] = useLocation();
   const [uploadDialogOpen, setUploadDialogOpen] = useState(false);
   const [uploadMethod, setUploadMethod] = useState<"photo" | "manual">("photo");
   const [exportDialogOpen, setExportDialogOpen] = useState(false);
+  const [selectedLevel, setSelectedLevel] = useState<SchoolLevel | "all">("all");
+  const [selectedSubject, setSelectedSubject] = useState<Subject | "all">("all");
   
   // 表单状态
   const [title, setTitle] = useState("");
@@ -28,7 +31,34 @@ export default function ErrorQuestions() {
   const [imagePreview, setImagePreview] = useState<string>("");
 
   const utils = trpc.useUtils();
-  const { data: errorQuestions, isLoading } = trpc.errorQuestions.list.useQuery({ limit: 50 });
+  
+  // 根据筛选条件动态查询
+  const { data: allQuestions, isLoading: isLoadingAll } = trpc.errorQuestions.list.useQuery(
+    { limit: 50 },
+    { enabled: selectedLevel === "all" && selectedSubject === "all" }
+  );
+  
+  const { data: levelQuestions, isLoading: isLoadingLevel } = trpc.errorQuestions.listBySchoolLevel.useQuery(
+    { schoolLevel: selectedLevel as SchoolLevel, limit: 50 },
+    { enabled: selectedLevel !== "all" && selectedSubject === "all" }
+  );
+  
+  const { data: levelSubjectQuestions, isLoading: isLoadingLevelSubject } = trpc.errorQuestions.listBySchoolLevelAndSubject.useQuery(
+    { 
+      schoolLevel: selectedLevel as SchoolLevel, 
+      subject: selectedSubject as Subject,
+      limit: 50 
+    },
+    { enabled: selectedLevel !== "all" && selectedSubject !== "all" }
+  );
+  
+  const errorQuestions = selectedLevel === "all" && selectedSubject === "all" 
+    ? allQuestions
+    : selectedLevel !== "all" && selectedSubject === "all"
+    ? levelQuestions
+    : levelSubjectQuestions;
+    
+  const isLoading = isLoadingAll || isLoadingLevel || isLoadingLevelSubject;
   
   const createManualMutation = trpc.errorQuestions.create.useMutation({
     onSuccess: () => {
@@ -301,6 +331,63 @@ export default function ErrorQuestions() {
 
         {/* 导出对话框 */}
         <ExportDialog open={exportDialogOpen} onOpenChange={setExportDialogOpen} />
+
+        {/* 板块和学科筛选器 */}
+        <Card>
+          <CardHeader>
+            <CardTitle>分类筛选</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="flex flex-wrap gap-4">
+              {/* 板块筛选 */}
+              <div className="flex-1 min-w-[200px]">
+                <Label className="mb-2">板块</Label>
+                <Select value={selectedLevel} onValueChange={(v) => {
+                  setSelectedLevel(v as SchoolLevel | "all");
+                  setSelectedSubject("all"); // 重置学科筛选
+                }}>
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">全部</SelectItem>
+                    <SelectItem value="junior">{SCHOOL_LEVELS.junior.name}</SelectItem>
+                    <SelectItem value="senior">{SCHOOL_LEVELS.senior.name}</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              
+              {/* 学科筛选 */}
+              <div className="flex-1 min-w-[200px]">
+                <Label className="mb-2">学科</Label>
+                <Select 
+                  value={selectedSubject} 
+                  onValueChange={(v) => setSelectedSubject(v as Subject | "all")}
+                  disabled={selectedLevel === "all"}
+                >
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">全部</SelectItem>
+                    {Object.entries(SUBJECTS).map(([key, subject]) => (
+                      <SelectItem key={key} value={key}>
+                        {subject.icon} {subject.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              
+              {/* 统计信息 */}
+              <div className="flex items-end">
+                <div className="text-sm text-muted-foreground">
+                  共 <span className="font-semibold text-foreground">{errorQuestions?.length || 0}</span> 道错题
+                </div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
 
         {/* 错题列表 */}
         {isLoading ? (

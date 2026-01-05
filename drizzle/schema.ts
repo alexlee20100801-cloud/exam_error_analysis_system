@@ -58,6 +58,7 @@ export const errorQuestions = mysqlTable("error_questions", {
   imageUrl: text("imageUrl"), // 原始题目图片URL
   imageKey: varchar("imageKey", { length: 500 }), // S3存储key
   // 分类信息
+  schoolLevel: mysqlEnum("schoolLevel", ["junior", "senior"]).notNull(), // 板块：初中/高中
   subject: mysqlEnum("subject", subjectEnum).notNull(),
   grade: mysqlEnum("grade", ["junior1", "junior2", "junior3", "senior1", "senior2", "senior3"]).notNull(),
   difficulty: mysqlEnum("difficulty", ["easy", "medium", "hard"]),

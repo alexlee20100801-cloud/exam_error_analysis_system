@@ -3,6 +3,7 @@ import { getSessionCookieOptions } from "./_core/cookies";
 import { systemRouter } from "./_core/systemRouter";
 import { publicProcedure, router } from "./_core/trpc";
 import { achievementsRouter } from "./routers/achievements";
+import { statsRouter } from "./routers/stats";
 import { errorQuestionsRouter } from "./routers/errorQuestions";
 import { knowledgePointsRouter } from "./routers/knowledgePoints";
 import { aiAnalysisRouter } from "./routers/aiAnalysis";
@@ -52,6 +53,7 @@ export const appRouter = router({
   // 错题导出
   export: exportRouter,
   achievements: achievementsRouter,
+  stats: statsRouter,
 });
 
 export type AppRouter = typeof appRouter;

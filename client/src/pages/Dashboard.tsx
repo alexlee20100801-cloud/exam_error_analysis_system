@@ -1,7 +1,8 @@
 import DashboardLayout from "@/components/DashboardLayout";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { trpc } from "@/lib/trpc";
-import { BookOpen, Brain, Target, TrendingUp, Calendar, Video, Trophy, Flame } from "lucide-react";
+import { BookOpen, Brain, Target, TrendingUp, Calendar, Video, Trophy, Flame, GraduationCap, BookMarked } from "lucide-react";
+import { SCHOOL_LEVELS, SUBJECTS } from "../../../shared/subjects";
 import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
 
@@ -11,6 +12,7 @@ export default function Dashboard() {
   const { data: reviewStats, isLoading: loadingReview } = trpc.review.getStatistics.useQuery();
   const { data: achievementStats } = trpc.achievements.getStats.useQuery();
   const { data: streakData } = trpc.achievements.getCurrentStreak.useQuery();
+  const { data: fullStats } = trpc.stats.getFullStats.useQuery();
 
   const totalQuestions = errorQuestions?.length || 0;
   const analyzedQuestions = errorQuestions?.filter(q => q.isAnalyzed).length || 0;
@@ -28,6 +30,70 @@ export default function Dashboard() {
           <h1 className="text-3xl font-bold text-foreground">学习概览</h1>
           <p className="text-muted-foreground mt-2">欢迎回来！查看你的学习进度和待办任务</p>
         </div>
+
+        {/* 板块统计 */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <GraduationCap className="h-5 w-5" />
+              板块统计
+            </CardTitle>
+            <CardDescription>按初中、高中分类的错题数量</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="flex flex-col items-center p-4 bg-blue-50 dark:bg-blue-950/20 rounded-lg">
+                <div className="text-3xl font-bold text-blue-600 dark:text-blue-400">
+                  {fullStats?.byLevel.junior || 0}
+                </div>
+                <div className="text-sm text-muted-foreground mt-1">
+                  {SCHOOL_LEVELS.junior.name}
+                </div>
+              </div>
+              <div className="flex flex-col items-center p-4 bg-purple-50 dark:bg-purple-950/20 rounded-lg">
+                <div className="text-3xl font-bold text-purple-600 dark:text-purple-400">
+                  {fullStats?.byLevel.senior || 0}
+                </div>
+                <div className="text-sm text-muted-foreground mt-1">
+                  {SCHOOL_LEVELS.senior.name}
+                </div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* 学科统计 */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <BookMarked className="h-5 w-5" />
+              学科分布
+            </CardTitle>
+            <CardDescription>各学科错题数量统计</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-2">
+              {Object.entries(SUBJECTS).map(([key, subject]) => {
+                const count = fullStats?.bySubject.all[key] || 0;
+                if (count === 0) return null;
+                return (
+                  <div key={key} className="flex items-center justify-between py-2 border-b last:border-0">
+                    <div className="flex items-center gap-2">
+                      <span className="text-lg">{subject.icon}</span>
+                      <span className="text-sm font-medium">{subject.name}</span>
+                    </div>
+                    <span className="text-sm font-bold text-primary">{count} 道</span>
+                  </div>
+                );
+              })}
+              {!fullStats?.bySubject.all || Object.keys(fullStats.bySubject.all).length === 0 && (
+                <div className="text-center text-sm text-muted-foreground py-4">
+                  暂无错题数据
+                </div>
+              )}
+            </div>
+          </CardContent>
+        </Card>
 
         {/* 统计卡片 */}
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">

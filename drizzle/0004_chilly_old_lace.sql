@@ -1,0 +1,1 @@
+ALTER TABLE `error_questions` ADD `schoolLevel` enum('junior','senior') NOT NULL;
