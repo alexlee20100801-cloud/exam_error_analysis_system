@@ -20,6 +20,7 @@ import Review from "@/pages/Review";
 import StudyCalendar from "@/pages/StudyCalendar";
 import ParentDashboard from "@/pages/ParentDashboard";
 import ParentNotifications from "@/pages/ParentNotifications";
+import StudentProfile from "@/pages/StudentProfile";
 
 function Router() {
   return (
@@ -40,6 +41,7 @@ function Router() {
       <Route path="/study-calendar" component={StudyCalendar} />
       <Route path="/parent" component={ParentDashboard} />
       <Route path="/parent/notifications" component={ParentNotifications} />
+      <Route path="/profile" component={StudentProfile} />
       <Route path={"/404"} component={NotFound} />
       <Route component={NotFound} />
     </Switch>
