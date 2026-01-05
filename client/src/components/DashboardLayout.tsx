@@ -21,7 +21,7 @@ import {
 } from "@/components/ui/sidebar";
 import { getLoginUrl } from "@/const";
 import { useIsMobile } from "@/hooks/useMobile";
-import { LayoutDashboard, LogOut, PanelLeft, Users, BookOpen, GraduationCap, School, Trophy, Video, Calendar, BarChart3, Clock, UserCircle, FileText } from "lucide-react";
+import { LayoutDashboard, LogOut, PanelLeft, Users, BookOpen, GraduationCap, School, Trophy, Video, Calendar, BarChart3, Clock, UserCircle, FileText, Database } from "lucide-react";
 import { trpc } from "@/lib/trpc";
 import { Badge } from "@/components/ui/badge";
 import { CSSProperties, useEffect, useRef, useState } from "react";
@@ -40,6 +40,10 @@ const menuItems = [
   { icon: Calendar, label: "学习日历", path: "/study-calendar" },
   { icon: Video, label: "视频学习", path: "/videos" },
   { icon: Trophy, label: "学习成就", path: "/achievements" },
+];
+
+const adminMenuItems = [
+  { icon: Database, label: "题库管理", path: "/admin/question-bank" },
 ];
 
 const SIDEBAR_WIDTH_KEY = "sidebar-width";
@@ -226,6 +230,34 @@ function DashboardLayoutContent({
                 );
               })}
             </SidebarMenu>
+            
+            {/* 管理员菜单 */}
+            {user?.role === "admin" && (
+              <SidebarMenu className="px-2 py-1 mt-2 border-t pt-2">
+                <div className="px-2 py-1 text-xs font-semibold text-muted-foreground">
+                  管理功能
+                </div>
+                {adminMenuItems.map(item => {
+                  const isActive = location === item.path;
+                  
+                  return (
+                    <SidebarMenuItem key={item.path}>
+                      <SidebarMenuButton
+                        isActive={isActive}
+                        onClick={() => setLocation(item.path)}
+                        tooltip={item.label}
+                        className="h-10 transition-all font-normal"
+                      >
+                        <item.icon
+                          className={`h-4 w-4 ${isActive ? "text-primary" : ""}`}
+                        />
+                        <span className="flex-1">{item.label}</span>
+                      </SidebarMenuButton>
+                    </SidebarMenuItem>
+                  );
+                })}
+              </SidebarMenu>
+            )}
           </SidebarContent>
 
           <SidebarFooter className="p-3">

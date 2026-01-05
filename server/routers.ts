@@ -23,6 +23,7 @@ import { tagsRouter } from "./routers/tags";
 import { examAndPlanRouter } from "./routers/examAndPlan";
 import { parentSupervisionRouter } from "./routers/parentSupervision";
 import { realExamRouter } from "./routers/realExam";
+import { questionBankRouter } from "./routers/questionBankRouter";
 
 export const appRouter = router({
   system: systemRouter,
@@ -90,6 +91,7 @@ export const appRouter = router({
   
   // 真题和AI试卷
   realExam: realExamRouter,
+  questionBank: questionBankRouter,
 });
 
 export type AppRouter = typeof appRouter;
