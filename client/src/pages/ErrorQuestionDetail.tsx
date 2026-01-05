@@ -451,7 +451,11 @@ export default function ErrorQuestionDetail() {
               <CardDescription>生成相似题目巩固知识</CardDescription>
             </CardHeader>
             <CardContent>
-              <Button variant="outline" className="w-full">
+              <Button 
+                variant="outline" 
+                className="w-full"
+                onClick={() => setLocation(`/practice-questions/${question.id}`)}
+              >
                 生成练习题
               </Button>
             </CardContent>

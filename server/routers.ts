@@ -8,6 +8,7 @@ import { aiAnalysisRouter } from "./routers/aiAnalysis";
 import { videosRouter } from "./routers/videos";
 import { practiceRouter } from "./routers/practice";
 import { reviewRouter } from "./routers/review";
+import { practiceQuestionsRouter } from "./routers/practiceQuestions";
 
 export const appRouter = router({
   system: systemRouter,
@@ -40,6 +41,9 @@ export const appRouter = router({
   
   // 复习计划
   review: reviewRouter,
+  
+  // 练习题生成和批改
+  practiceQuestions: practiceQuestionsRouter,
 });
 
 export type AppRouter = typeof appRouter;
