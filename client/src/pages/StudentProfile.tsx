@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
 import { Copy, RefreshCw, UserPlus, User, Mail, GraduationCap } from "lucide-react";
 
@@ -74,24 +75,34 @@ export default function StudentProfile() {
               <Input value={user.id.toString()} disabled />
             </div>
           </div>
-          {user.grade && (
+          <div className="space-y-2">
+            <Label className="flex items-center gap-2">
+              <GraduationCap className="h-4 w-4" />
+              年级
+            </Label>
+            <Input 
+              value={
+                user.grade === "junior1" ? "初一" :
+                user.grade === "junior2" ? "初二" :
+                user.grade === "junior3" ? "初三" :
+                user.grade === "senior1" ? "高一" :
+                user.grade === "senior2" ? "高二" :
+                user.grade === "senior3" ? "高三" :
+                user.grade || "未设置"
+              } 
+              disabled 
+            />
+          </div>
+          {user.school && (
             <div className="space-y-2">
-              <Label className="flex items-center gap-2">
-                <GraduationCap className="h-4 w-4" />
-                年级
-              </Label>
-              <Input 
-                value={
-                  user.grade === "junior1" ? "初一" :
-                  user.grade === "junior2" ? "初二" :
-                  user.grade === "junior3" ? "初三" :
-                  user.grade === "senior1" ? "高一" :
-                  user.grade === "senior2" ? "高二" :
-                  user.grade === "senior3" ? "高三" :
-                  user.grade
-                } 
-                disabled 
-              />
+              <Label>学校</Label>
+              <Input value={user.school} disabled />
+            </div>
+          )}
+          {user.region && (
+            <div className="space-y-2">
+              <Label>所在地区</Label>
+              <Input value={user.region} disabled />
             </div>
           )}
         </CardContent>

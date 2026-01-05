@@ -1,4 +1,4 @@
-import { int, mysqlEnum, mysqlTable, text, timestamp, varchar, float, boolean, json } from "drizzle-orm/mysql-core";
+import { int, mysqlEnum, mysqlTable, text, timestamp, varchar, float, boolean, json, decimal } from "drizzle-orm/mysql-core";
 
 /**
  * 用户表 - 核心认证和用户信息
@@ -14,6 +14,7 @@ export const users = mysqlTable("users", {
   // 学生信息
   grade: mysqlEnum("grade", ["junior1", "junior2", "junior3", "senior1", "senior2", "senior3"]),
   school: varchar("school", { length: 200 }),
+  region: varchar("region", { length: 100 }), // 所在地区（如：深圳市南山区）
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
   lastSignedIn: timestamp("lastSignedIn").defaultNow().notNull(),
@@ -92,6 +93,7 @@ export const questionBank = mysqlTable("question_bank", {
   id: int("id").autoincrement().primaryKey(),
   title: varchar("title", { length: 500 }).notNull(),
   content: text("content").notNull(),
+  questionType: mysqlEnum("questionType", ["choice", "blank", "short_answer", "essay", "calculation"]).notNull(),
   answer: text("answer").notNull(),
   explanation: text("explanation"),
   // 分类
@@ -408,3 +410,94 @@ export const goalReminders = mysqlTable("goal_reminders", {
 
 export type GoalReminder = typeof goalReminders.$inferSelect;
 export type InsertGoalReminder = typeof goalReminders.$inferInsert;
+
+/**
+ * 真题表 - 存储各学校历年真题
+ */
+export const realExamQuestions = mysqlTable("real_exam_questions", {
+  id: int("id").autoincrement().primaryKey(),
+  // 题目内容
+  title: varchar("title", { length: 500 }).notNull(),
+  content: text("content").notNull(), // 题目内容
+  questionType: mysqlEnum("questionType", ["choice", "blank", "short_answer", "essay", "calculation"]).notNull(), // 题型
+  answer: text("answer").notNull(), // 答案
+  explanation: text("explanation"), // 解析
+  imageUrl: text("imageUrl"), // 题目图片URL
+  imageKey: varchar("imageKey", { length: 500 }), // S3存储key
+  // 分类信息
+  subject: mysqlEnum("subject", subjectEnum).notNull(),
+  grade: mysqlEnum("grade", ["junior1", "junior2", "junior3", "senior1", "senior2", "senior3"]).notNull(),
+  schoolLevel: mysqlEnum("schoolLevel", ["junior", "senior"]).notNull(),
+  difficulty: mysqlEnum("difficulty", ["easy", "medium", "hard"]).notNull(),
+  knowledgePointIds: json("knowledgePointIds").$type<number[]>(), // 关联的知识点ID数组
+  // 来源信息
+  sourceSchool: varchar("sourceSchool", { length: 200 }), // 来源学校（如：深圳中学、深圳外国语学校）
+  sourceRegion: varchar("sourceRegion", { length: 100 }), // 来源地区（如：深圳市南山区）
+  examYear: int("examYear"), // 考试年份（如：2023）
+  examSemester: mysqlEnum("examSemester", ["first", "second"]), // 学期（上学期/下学期）
+  examType: varchar("examType", { length: 100 }), // 考试类型（如：期中考试、期末考试、月考）
+  // 统计信息
+  usageCount: int("usageCount").default(0), // 使用次数
+  averageScore: decimal("averageScore", { precision: 5, scale: 2 }), // 平均得分率
+  // 状态
+  isVerified: boolean("isVerified").default(false), // 是否已验证
+  isPublic: boolean("isPublic").default(true), // 是否公开
+  createdBy: int("createdBy"), // 创建者ID（管理员）
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type RealExamQuestion = typeof realExamQuestions.$inferSelect;
+export type InsertRealExamQuestion = typeof realExamQuestions.$inferInsert;
+
+/**
+ * 用户真题练习记录表
+ */
+export const realExamPracticeRecords = mysqlTable("real_exam_practice_records", {
+  id: int("id").autoincrement().primaryKey(),
+  userId: int("userId").notNull(),
+  questionId: int("questionId").notNull(), // 关联real_exam_questions表
+  // 练习信息
+  userAnswer: text("userAnswer"), // 用户答案
+  isCorrect: boolean("isCorrect"), // 是否正确
+  timeSpent: int("timeSpent"), // 用时（秒）
+  score: decimal("score", { precision: 5, scale: 2 }), // 得分
+  // 状态
+  isBookmarked: boolean("isBookmarked").default(false), // 是否收藏
+  practiceDate: timestamp("practiceDate").defaultNow().notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export type RealExamPracticeRecord = typeof realExamPracticeRecords.$inferSelect;
+export type InsertRealExamPracticeRecord = typeof realExamPracticeRecords.$inferInsert;
+
+/**
+ * AI生成试卷表
+ */
+export const generatedExamPapers = mysqlTable("generated_exam_papers", {
+  id: int("id").autoincrement().primaryKey(),
+  userId: int("userId").notNull(),
+  // 试卷信息
+  title: varchar("title", { length: 200 }).notNull(),
+  subject: mysqlEnum("subject", subjectEnum).notNull(),
+  grade: mysqlEnum("grade", ["junior1", "junior2", "junior3", "senior1", "senior2", "senior3"]).notNull(),
+  schoolLevel: mysqlEnum("schoolLevel", ["junior", "senior"]).notNull(),
+  // 生成配置
+  totalQuestions: int("totalQuestions").notNull(), // 总题数
+  totalScore: int("totalScore").notNull(), // 总分
+  difficulty: mysqlEnum("difficulty", ["easy", "medium", "hard"]).notNull(),
+  knowledgePointIds: json("knowledgePointIds").$type<number[]>(), // 涉及的知识点ID数组
+  questionTypes: json("questionTypes").$type<{type: string, count: number}[]>(), // 题型分布
+  // 试卷内容
+  questions: json("questions").$type<{id: number, type: string, score: number}[]>(), // 题目列表（引用question_bank或real_exam_questions）
+  // 状态
+  isCompleted: boolean("isCompleted").default(false), // 是否已完成
+  completedAt: timestamp("completedAt"), // 完成时间
+  totalTimeSpent: int("totalTimeSpent"), // 总用时（分钟）
+  userScore: decimal("userScore", { precision: 5, scale: 2 }), // 用户得分
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type GeneratedExamPaper = typeof generatedExamPapers.$inferSelect;
+export type InsertGeneratedExamPaper = typeof generatedExamPapers.$inferInsert;

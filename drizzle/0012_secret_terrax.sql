@@ -1,0 +1,1 @@
+ALTER TABLE `question_bank` ADD `questionType` enum('choice','blank','short_answer','essay','calculation') NOT NULL;

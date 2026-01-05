@@ -60,6 +60,7 @@ export const practiceRouter = router({
         const saved = await createQuestionBankItem({
           title: question.title,
           content: question.content,
+          questionType: "short_answer", // 默认为简答题
           answer: question.answer,
           explanation: question.explanation,
           subject: subject,
@@ -132,6 +133,7 @@ export const practiceRouter = router({
         const saved = await createQuestionBankItem({
           title: question.title,
           content: question.content,
+          questionType: "short_answer", // 默认为简答题
           answer: question.answer,
           explanation: question.explanation,
           subject: errorQuestion.subject,
