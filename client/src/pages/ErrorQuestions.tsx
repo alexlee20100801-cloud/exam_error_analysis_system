@@ -17,7 +17,7 @@ import { toast } from "sonner";
 import { usePullToRefresh } from "@/hooks/usePullToRefresh";
 import { useIsMobile } from "@/hooks/useMobile";
 import { RefreshCw } from "lucide-react";
-import { VoiceInputButton } from "@/components/VoiceInputButton";
+import { VoiceInputButtonEnhanced } from "@/components/VoiceInputButtonEnhanced";
 import { useLocation, useSearch } from "wouter";
 import { SCHOOL_LEVELS, SUBJECTS, type SchoolLevel, type Subject } from "../../../shared/subjects";
 
@@ -474,10 +474,11 @@ export default function ErrorQuestions() {
                   <div>
                     <div className="flex items-center justify-between mb-2">
                       <Label htmlFor="content">题目内容 *</Label>
-                      <VoiceInputButton
+                      <VoiceInputButtonEnhanced
                         onTranscript={(text) => setContent((prev) => prev + text)}
                         lang={subject === "english" ? "en-US" : "zh-CN"}
                         size="sm"
+                        mode="advanced"
                       />
                     </div>
                     <Textarea

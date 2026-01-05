@@ -17,7 +17,7 @@ import { useSwipeGesture } from "@/hooks/useSwipeGesture";
 import { useIsMobile } from "@/hooks/useMobile";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-import { VoiceInputButton } from "@/components/VoiceInputButton";
+import { VoiceInputButtonEnhanced } from "@/components/VoiceInputButtonEnhanced";
 
 export default function Review() {
   const [, setLocation] = useLocation();
@@ -502,10 +502,11 @@ export default function Review() {
                 <div className="space-y-3">
                   <div className="flex items-center justify-between">
                     <Label htmlFor="user-answer">你的答案</Label>
-                    <VoiceInputButton
+                    <VoiceInputButtonEnhanced
                       onTranscript={(text) => setUserAnswer((prev) => prev + text)}
                       lang={reviewingQuestion.subject === "english" ? "en-US" : "zh-CN"}
                       size="sm"
+                      mode="advanced"
                     />
                   </div>
                   <Textarea
