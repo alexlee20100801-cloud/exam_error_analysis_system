@@ -20,6 +20,7 @@ import { errorExportRouter } from "./routers/errorExport";
 import { voiceExplanationRouter } from "./routers/voiceExplanation";
 import { learningReportExportRouter } from "./routers/learningReportExport";
 import { tagsRouter } from "./routers/tags";
+import { examAndPlanRouter } from "./routers/examAndPlan";
 
 export const appRouter = router({
   system: systemRouter,
@@ -78,6 +79,9 @@ export const appRouter = router({
   
   // 错题标签
   tags: tagsRouter,
+  
+  // 考试和复习计划
+  examAndPlan: examAndPlanRouter,
 });
 
 export type AppRouter = typeof appRouter;

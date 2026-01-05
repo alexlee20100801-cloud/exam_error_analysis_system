@@ -36,8 +36,8 @@ const menuItems = [
   { icon: GraduationCap, label: "高中错题", path: "/error-questions?level=senior", indent: true },
   { icon: BarChart3, label: "学习报告", path: "/learning-report" },
   { icon: Clock, label: "复习提醒", path: "/review" },
+  { icon: Calendar, label: "学习日历", path: "/study-calendar" },
   { icon: Video, label: "视频学习", path: "/videos" },
-  { icon: Calendar, label: "复习计划", path: "/review-plan" },
   { icon: Trophy, label: "学习成就", path: "/achievements" },
 ];
 

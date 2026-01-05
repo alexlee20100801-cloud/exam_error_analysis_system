@@ -308,3 +308,44 @@ export const errorQuestionTagRelations = mysqlTable("error_question_tag_relation
 
 export type ErrorQuestionTagRelation = typeof errorQuestionTagRelations.$inferSelect;
 export type InsertErrorQuestionTagRelation = typeof errorQuestionTagRelations.$inferInsert;
+
+/**
+ * 考试日期表
+ */
+export const exams = mysqlTable("exams", {
+  id: int("id").autoincrement().primaryKey(),
+  userId: int("userId").notNull(), // 考试所属用户
+  name: varchar("name", { length: 100 }).notNull(), // 考试名称（如"期中考试"、"月考"）
+  examDate: timestamp("examDate").notNull(), // 考试日期
+  subject: mysqlEnum("subject", subjectEnum).notNull(), // 考试科目
+  section: mysqlEnum("section", ["junior", "senior"]).notNull(), // 板块（初中/高中）
+  grade: mysqlEnum("grade", ["junior1", "junior2", "junior3", "senior1", "senior2", "senior3"]).notNull(), // 年级
+  scope: text("scope"), // 考试范围（知识点、章节等）
+  description: text("description"), // 考试说明
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type Exam = typeof exams.$inferSelect;
+export type InsertExam = typeof exams.$inferInsert;
+
+/**
+ * 复习计划表
+ */
+export const studyPlans = mysqlTable("study_plans", {
+  id: int("id").autoincrement().primaryKey(),
+  userId: int("userId").notNull(), // 计划所属用户
+  examId: int("examId").notNull(), // 关联的考试ID
+  planDate: timestamp("planDate").notNull(), // 计划日期
+  taskType: mysqlEnum("taskType", ["knowledge_point", "error_question", "practice"]).notNull(), // 任务类型
+  targetId: int("targetId"), // 目标ID（知识点ID或错题ID）
+  targetName: varchar("targetName", { length: 200 }), // 目标名称
+  priority: int("priority").notNull().default(0), // 优先级（0-100）
+  estimatedMinutes: int("estimatedMinutes"), // 预计学习时长（分钟）
+  completed: boolean("completed").notNull().default(false), // 是否完成
+  completedAt: timestamp("completedAt"), // 完成时间
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export type StudyPlan = typeof studyPlans.$inferSelect;
+export type InsertStudyPlan = typeof studyPlans.$inferInsert;
