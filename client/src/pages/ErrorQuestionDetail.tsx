@@ -139,38 +139,60 @@ export default function ErrorQuestionDetail() {
   return (
     <DashboardLayout>
       <div className="container py-8 max-w-6xl">
+        {/* 面包屑导航 */}
+        <div className="flex items-center gap-2 text-sm text-muted-foreground mb-4">
+          <button 
+            onClick={() => setLocation("/dashboard")} 
+            className="hover:text-foreground transition-colors"
+          >
+            首页
+          </button>
+          <span>/</span>
+          <button 
+            onClick={() => setLocation("/error-questions")} 
+            className="hover:text-foreground transition-colors"
+          >
+            错题本
+          </button>
+          <span>/</span>
+          <span className="text-foreground font-medium">错题详情</span>
+        </div>
+
         {/* 头部 */}
-        <div className="flex items-center justify-between mb-6">
-          <div className="flex items-center gap-4">
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => setLocation("/error-questions")}
-            >
-              <ArrowLeft className="mr-2 h-4 w-4" />
-              返回
-            </Button>
-            <div>
-              <h1 className="text-3xl font-bold">{question.title || "错题详情"}</h1>
-              <div className="flex items-center gap-2 mt-2">
-                <Badge variant="outline">{subjectMap[question.subject]}</Badge>
-                <Badge variant="outline">{gradeMap[question.grade]}</Badge>
+        <div className="mb-6">
+          <div className="flex items-start justify-between gap-4 mb-4">
+            <div className="flex-1">
+              <h1 className="text-3xl font-bold mb-3">{question.title || "错题详情"}</h1>
+              <div className="flex items-center gap-2 flex-wrap">
+                <Badge variant="outline" className="text-sm">
+                  {subjectMap[question.subject]}
+                </Badge>
+                <Badge variant="outline" className="text-sm">
+                  {gradeMap[question.grade]}
+                </Badge>
                 {question.difficulty && (
-                  <Badge className={difficultyMap[question.difficulty].color}>
+                  <Badge className={`${difficultyMap[question.difficulty].color} text-sm`}>
                     {difficultyMap[question.difficulty].label}
                   </Badge>
                 )}
                 {question.isMastered && (
-                  <Badge className="bg-green-100 text-green-800">
+                  <Badge className="bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400 text-sm">
                     <CheckCircle className="mr-1 h-3 w-3" />
                     已掌握
+                  </Badge>
+                )}
+                {question.isAnalyzed && (
+                  <Badge className="bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400 text-sm">
+                    <Brain className="mr-1 h-3 w-3" />
+                    已分析
                   </Badge>
                 )}
               </div>
             </div>
           </div>
           
-          <div className="flex gap-2">
+          {/* 操作按钮 */}
+          <div className="flex flex-wrap gap-2">
             <Button
               variant="outline"
               onClick={() => {

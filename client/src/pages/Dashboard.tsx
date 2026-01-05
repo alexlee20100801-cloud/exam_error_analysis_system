@@ -1,7 +1,7 @@
 import DashboardLayout from "@/components/DashboardLayout";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { trpc } from "@/lib/trpc";
-import { BookOpen, Brain, Target, TrendingUp, Calendar, Video, Trophy, Flame, GraduationCap, BookMarked } from "lucide-react";
+import { BookOpen, Brain, Target, TrendingUp, Calendar, Video, Trophy, Flame, GraduationCap, BookMarked, Plus, Play, BarChart3, AlertCircle } from "lucide-react";
 import { SCHOOL_LEVELS, SUBJECTS } from "../../../shared/subjects";
 import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
@@ -25,11 +25,45 @@ export default function Dashboard() {
   return (
     <DashboardLayout>
       <div className="space-y-6">
-        {/* 页面标题 */}
-        <div>
-          <h1 className="text-3xl font-bold text-foreground">学习概览</h1>
-          <p className="text-muted-foreground mt-2">欢迎回来！查看你的学习进度和待办任务</p>
+        {/* 页面标题和快捷操作 */}
+        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+          <div>
+            <h1 className="text-3xl font-bold text-foreground">学习概览</h1>
+            <p className="text-muted-foreground mt-2">欢迎回来！查看你的学习进度和待办任务</p>
+          </div>
+          <div className="flex gap-2">
+            <Button asChild size="lg">
+              <Link href="/error-questions">
+                <Plus className="mr-2 h-4 w-4" />
+                添加错题
+              </Link>
+            </Button>
+            {reviewStats && reviewStats.pending > 0 && (
+              <Button asChild size="lg" variant="outline">
+                <Link href="/review">
+                  <Play className="mr-2 h-4 w-4" />
+                  开始复习 ({reviewStats.pending})
+                </Link>
+              </Button>
+            )}
+          </div>
         </div>
+
+        {/* 学习建议提示 */}
+        {reviewStats && reviewStats.pending > 0 && (
+          <Card className="border-orange-200 dark:border-orange-900 bg-orange-50 dark:bg-orange-950/20">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2 text-orange-700 dark:text-orange-400">
+                <AlertCircle className="h-5 w-5" />
+                今日学习建议
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="text-sm text-orange-600 dark:text-orange-300">
+              你有 <strong>{reviewStats.pending}</strong> 道错题待复习，其中 <strong>{reviewStats.byPriority.urgent || 0}</strong> 道为紧急复习。
+              建议优先复习紧急项目，以保持最佳记忆效果。
+            </CardContent>
+          </Card>
+        )}
 
         {/* 板块统计 */}
         <Card>

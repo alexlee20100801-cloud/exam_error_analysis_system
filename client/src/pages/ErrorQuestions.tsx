@@ -416,29 +416,61 @@ export default function ErrorQuestions() {
         ) : errorQuestions && errorQuestions.length > 0 ? (
           <div className="grid gap-4">
             {errorQuestions.map((question) => (
-              <Card key={question.id} className="hover:shadow-md transition-shadow">
+              <Card 
+                key={question.id} 
+                className="hover:shadow-lg hover:border-primary/50 transition-all duration-200 cursor-pointer group"
+                onClick={() => setLocation(`/error-questions/${question.id}`)}
+              >
                 <CardHeader>
-                  <div className="flex justify-between items-start">
-                    <div className="flex-1">
-                      <CardTitle className="text-lg">{question.title}</CardTitle>
-                      <CardDescription className="mt-2">
-                        {subjectOptions.find(s => s.value === question.subject)?.label} · 
-                        {gradeOptions.find(g => g.value === question.grade)?.label}
-                        {question.difficulty && ` · ${question.difficulty === 'easy' ? '简单' : question.difficulty === 'medium' ? '中等' : '困难'}`}
+                  <div className="flex justify-between items-start gap-4">
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 mb-2">
+                        <CardTitle className="text-lg group-hover:text-primary transition-colors truncate">
+                          {question.title}
+                        </CardTitle>
+                        {question.isMastered && (
+                          <span className="flex-shrink-0 px-2 py-0.5 text-xs font-medium bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400 rounded-full">
+                            已掌握
+                          </span>
+                        )}
+                      </div>
+                      <CardDescription className="flex items-center gap-2 flex-wrap">
+                        <span className="inline-flex items-center gap-1">
+                          {SUBJECTS[question.subject as Subject]?.icon}
+                          {subjectOptions.find(s => s.value === question.subject)?.label}
+                        </span>
+                        <span className="text-muted-foreground/50">·</span>
+                        <span>{gradeOptions.find(g => g.value === question.grade)?.label}</span>
+                        {question.difficulty && (
+                          <>
+                            <span className="text-muted-foreground/50">·</span>
+                            <span className={`font-medium ${
+                              question.difficulty === 'easy' ? 'text-green-600 dark:text-green-400' :
+                              question.difficulty === 'medium' ? 'text-yellow-600 dark:text-yellow-400' :
+                              'text-red-600 dark:text-red-400'
+                            }`}>
+                              {question.difficulty === 'easy' ? '简单' : question.difficulty === 'medium' ? '中等' : '困难'}
+                            </span>
+                          </>
+                        )}
                       </CardDescription>
                     </div>
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-2 flex-shrink-0">
                       {question.isAnalyzed ? (
-                        <span className="flex items-center text-sm text-green-600">
-                          <CheckCircle className="h-4 w-4 mr-1" />
+                        <span className="flex items-center gap-1 text-sm font-medium text-green-600 dark:text-green-400 bg-green-50 dark:bg-green-950/30 px-3 py-1.5 rounded-full">
+                          <CheckCircle className="h-4 w-4" />
                           已分析
                         </span>
                       ) : (
                         <Button
                           size="sm"
                           variant="outline"
-                          onClick={() => handleAnalyze(question.id)}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleAnalyze(question.id);
+                          }}
                           disabled={analyzeMutation.isPending}
+                          className="hover:bg-primary hover:text-primary-foreground"
                         >
                           {analyzeMutation.isPending ? (
                             <Loader2 className="h-4 w-4 animate-spin" />
@@ -451,17 +483,26 @@ export default function ErrorQuestions() {
                   </div>
                 </CardHeader>
                 <CardContent>
-                  <div className="space-y-3 cursor-pointer" onClick={() => setLocation(`/error-questions/${question.id}`)}>
+                  <div className="space-y-3">
                     {question.imageUrl && (
-                      <img src={question.imageUrl} alt="题目" className="max-h-48 rounded border" />
+                      <div className="relative overflow-hidden rounded-lg border bg-muted/30">
+                        <img 
+                          src={question.imageUrl} 
+                          alt="题目" 
+                          className="max-h-48 w-auto mx-auto object-contain group-hover:scale-105 transition-transform duration-200" 
+                        />
+                      </div>
                     )}
-                    <p className="text-sm text-foreground whitespace-pre-wrap line-clamp-3">
+                    <p className="text-sm text-foreground whitespace-pre-wrap line-clamp-3 leading-relaxed">
                       {question.content}
                     </p>
                     {question.errorAnalysis && (
-                      <div className="bg-muted/50 p-3 rounded-lg">
-                        <p className="text-sm font-medium text-foreground mb-1">错误分析：</p>
-                        <p className="text-sm text-muted-foreground">{question.errorAnalysis}</p>
+                      <div className="bg-red-50 dark:bg-red-950/20 border border-red-200 dark:border-red-900 p-3 rounded-lg">
+                        <p className="text-sm font-medium text-red-700 dark:text-red-400 mb-1 flex items-center gap-1">
+                          <AlertCircle className="h-3.5 w-3.5" />
+                          错误分析
+                        </p>
+                        <p className="text-sm text-red-600 dark:text-red-300 line-clamp-2">{question.errorAnalysis}</p>
                       </div>
                     )}
                   </div>

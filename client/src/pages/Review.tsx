@@ -97,49 +97,58 @@ export default function Review() {
     <DashboardLayout>
       <div className="container mx-auto py-8 space-y-6">
         {/* 页面标题 */}
-        <div className="flex items-center justify-between">
+        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
           <div>
-            <h1 className="text-3xl font-bold">复习计划</h1>
-            <p className="text-muted-foreground mt-1">基于艾宾浩斯遗忘曲线的智能复习提醒</p>
+            <h1 className="text-3xl font-bold flex items-center gap-2">
+              <Clock className="h-8 w-8 text-primary" />
+              复习计划
+            </h1>
+            <p className="text-muted-foreground mt-2">基于艾宾浩斯遗忘曲线的智能复习提醒</p>
           </div>
-          <Button onClick={handleSendReminder} disabled={sendReminderMutation.isPending}>
+          <Button onClick={handleSendReminder} disabled={sendReminderMutation.isPending} size="lg">
             <Bell className="h-4 w-4 mr-2" />
-            发送复习提醒
+            {sendReminderMutation.isPending ? "发送中..." : "发送复习提醒"}
           </Button>
         </div>
 
         {/* 统计卡片 */}
-        <div className="grid gap-6 md:grid-cols-3">
-          <Card>
+        <div className="grid gap-4 md:grid-cols-3">
+          <Card className="border-orange-200 bg-gradient-to-br from-orange-50 to-orange-100/50 dark:from-orange-950/20 dark:to-orange-900/10">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">待复习</CardTitle>
-              <Clock className="h-4 w-4 text-orange-600" />
+              <CardTitle className="text-sm font-medium text-orange-900 dark:text-orange-100">待复习</CardTitle>
+              <div className="h-10 w-10 rounded-full bg-orange-100 dark:bg-orange-900/30 flex items-center justify-center">
+                <Clock className="h-5 w-5 text-orange-600 dark:text-orange-400" />
+              </div>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-orange-600">{stats?.dueCount || 0}</div>
-              <p className="text-xs text-muted-foreground mt-1">已到复习时间</p>
+              <div className="text-3xl font-bold text-orange-600 dark:text-orange-400">{stats?.dueCount || 0}</div>
+              <p className="text-xs text-orange-600/70 dark:text-orange-400/70 mt-1">已到复习时间</p>
             </CardContent>
           </Card>
 
-          <Card>
+          <Card className="border-blue-200 bg-gradient-to-br from-blue-50 to-blue-100/50 dark:from-blue-950/20 dark:to-blue-900/10">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">计划中</CardTitle>
-              <Calendar className="h-4 w-4 text-blue-600" />
+              <CardTitle className="text-sm font-medium text-blue-900 dark:text-blue-100">计划中</CardTitle>
+              <div className="h-10 w-10 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center">
+                <Calendar className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+              </div>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-blue-600">{stats?.totalCount || 0}</div>
-              <p className="text-xs text-muted-foreground mt-1">复习计划总数</p>
+              <div className="text-3xl font-bold text-blue-600 dark:text-blue-400">{stats?.totalCount || 0}</div>
+              <p className="text-xs text-blue-600/70 dark:text-blue-400/70 mt-1">复习计划总数</p>
             </CardContent>
           </Card>
 
-          <Card>
+          <Card className="border-green-200 bg-gradient-to-br from-green-50 to-green-100/50 dark:from-green-950/20 dark:to-green-900/10">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">已掌握</CardTitle>
-              <CheckCircle2 className="h-4 w-4 text-green-600" />
+              <CardTitle className="text-sm font-medium text-green-900 dark:text-green-100">已掌握</CardTitle>
+              <div className="h-10 w-10 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center">
+                <CheckCircle2 className="h-5 w-5 text-green-600 dark:text-green-400" />
+              </div>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-green-600">{stats?.completedCount || 0}</div>
-              <p className="text-xs text-muted-foreground mt-1">完成所有复习轮次</p>
+              <div className="text-3xl font-bold text-green-600 dark:text-green-400">{stats?.completedCount || 0}</div>
+              <p className="text-xs text-green-600/70 dark:text-green-400/70 mt-1">完成所有复习轮次</p>
             </CardContent>
           </Card>
         </div>
