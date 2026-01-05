@@ -27,6 +27,7 @@ import { questionBankRouter } from "./routers/questionBankRouter";
 import { learningPathRouter } from "./routers/learningPath";
 import { semesterRouter } from "./routers/semesterRouter";
 import { userSettingsRouter } from "./routers/userSettings";
+import { similarQuestionsRouter } from "./routers/similarQuestions";
 
 export const appRouter = router({
   system: systemRouter,
@@ -100,6 +101,7 @@ export const appRouter = router({
   
   // 用户设置
   userSettings: userSettingsRouter,
+  similarQuestions: similarQuestionsRouter,
 });
 
 export type AppRouter = typeof appRouter;

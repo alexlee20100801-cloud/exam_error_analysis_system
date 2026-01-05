@@ -27,6 +27,7 @@ import { toast } from "sonner";
 import { Streamdown } from "streamdown";
 import { VoicePlayer } from "@/components/VoicePlayer";
 import { TagSelector } from "@/components/TagSelector";
+import { SimilarQuestionsSection } from "@/components/SimilarQuestionsSection";
 import { useState } from "react";
 import { useSwipeGesture } from "@/hooks/useSwipeGesture";
 import { useIsMobile } from "@/hooks/useMobile";
@@ -595,8 +596,11 @@ export default function ErrorQuestionDetail() {
           </div>
         )}
 
+        {/* 相似题目推荐 */}
+        <SimilarQuestionsSection questionId={questionId} />
+
         {/* 快捷操作 */}
-        <div className="grid md:grid-cols-3 gap-4">
+        <div className="grid md:grid-cols-3 gap-4 mt-6">
           <Card className="hover:shadow-md transition-shadow cursor-pointer">
             <CardHeader>
               <CardTitle className="text-lg flex items-center gap-2">
