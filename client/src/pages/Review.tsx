@@ -6,13 +6,21 @@ import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Clock, CheckCircle2, Calendar, Bell, BookOpen, TrendingUp, Sparkles } from "lucide-react";
+import { Clock, CheckCircle2, Calendar, Bell, BookOpen, TrendingUp, Sparkles, Eye, Play } from "lucide-react";
 import DashboardLayout from "@/components/DashboardLayout";
 import { getSubjectName } from "@shared/subjects";
 import { toast } from "sonner";
 
+import { useState } from "react";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Textarea } from "@/components/ui/textarea";
+import { Label } from "@/components/ui/label";
+
 export default function Review() {
   const [, setLocation] = useLocation();
+  const [reviewingQuestion, setReviewingQuestion] = useState<any>(null);
+  const [userAnswer, setUserAnswer] = useState("");
+  const [showAnswer, setShowAnswer] = useState(false);
 
   // 获取待复习错题
   const { data: dueReviews, isLoading: dueLoading, refetch: refetchDue } = trpc.reviewPlan.getDueReviews.useQuery();
@@ -58,6 +66,25 @@ export default function Review() {
 
   const handleSendReminder = () => {
     sendReminderMutation.mutate();
+  };
+
+  const handleStartReview = (question: any) => {
+    setReviewingQuestion(question);
+    setUserAnswer("");
+    setShowAnswer(false);
+  };
+
+  const handleSubmitReview = () => {
+    setShowAnswer(true);
+  };
+
+  const handleCompleteReview = () => {
+    if (reviewingQuestion) {
+      markReviewedMutation.mutate({ errorQuestionId: reviewingQuestion.id });
+      setReviewingQuestion(null);
+      setUserAnswer("");
+      setShowAnswer(false);
+    }
   };
 
   const formatDate = (date: Date | string) => {
@@ -240,15 +267,15 @@ export default function Review() {
                             size="sm"
                             onClick={() => setLocation(`/error-questions/${review.id}`)}
                           >
+                            <Eye className="h-4 w-4 mr-1" />
                             查看详情
                           </Button>
                           <Button
                             size="sm"
-                            onClick={() => handleMarkReviewed(review.id)}
-                            disabled={markReviewedMutation.isPending}
+                            onClick={() => handleStartReview(review)}
                           >
-                            <CheckCircle2 className="h-4 w-4 mr-1" />
-                            标记已复习
+                            <Play className="h-4 w-4 mr-1" />
+                            开始复习
                           </Button>
                         </div>
                       </div>
@@ -330,6 +357,126 @@ export default function Review() {
           </TabsContent>
         </Tabs>
       </div>
+
+      {/* 复习答题对话框 */}
+      <Dialog open={!!reviewingQuestion} onOpenChange={(open) => !open && setReviewingQuestion(null)}>
+        <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Play className="h-5 w-5" />
+              复习错题
+            </DialogTitle>
+            <DialogDescription>
+              请尝试重新答题，然后查看正确答案和解析
+            </DialogDescription>
+          </DialogHeader>
+
+          {reviewingQuestion && (
+            <div className="space-y-6">
+              {/* 错题信息 */}
+              <div className="space-y-3">
+                <div className="flex items-center gap-2">
+                  <Badge variant="outline">{getSubjectName(reviewingQuestion.subject)}</Badge>
+                  <Badge variant="secondary">第 {reviewingQuestion.reviewRound + 1} 次复习</Badge>
+                  <Badge>{reviewingQuestion.difficulty === "easy" ? "简单" : reviewingQuestion.difficulty === "medium" ? "中等" : "困难"}</Badge>
+                </div>
+                <h3 className="text-lg font-semibold">{reviewingQuestion.title}</h3>
+                <div className="bg-muted p-4 rounded-lg">
+                  <p className="whitespace-pre-wrap">{reviewingQuestion.content}</p>
+                  {reviewingQuestion.imageUrl && (
+                    <img src={reviewingQuestion.imageUrl} alt="题目图片" className="mt-4 max-w-full rounded-lg" />
+                  )}
+                </div>
+              </div>
+
+              {/* 答题区域 */}
+              {!showAnswer && (
+                <div className="space-y-3">
+                  <Label htmlFor="user-answer">你的答案</Label>
+                  <Textarea
+                    id="user-answer"
+                    placeholder="请在此输入你的答案..."
+                    value={userAnswer}
+                    onChange={(e) => setUserAnswer(e.target.value)}
+                    rows={6}
+                    className="resize-none"
+                  />
+                  <Button onClick={handleSubmitReview} className="w-full">
+                    查看答案和解析
+                  </Button>
+                </div>
+              )}
+
+              {/* 答案和解析 */}
+              {showAnswer && (
+                <div className="space-y-4">
+                  {/* 用户答案 */}
+                  {userAnswer && (
+                    <div className="space-y-2">
+                      <Label className="text-base font-semibold">你的答案</Label>
+                      <div className="bg-blue-50 dark:bg-blue-950/20 p-4 rounded-lg border border-blue-200 dark:border-blue-900">
+                        <p className="whitespace-pre-wrap">{userAnswer}</p>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* 正确答案 */}
+                  {reviewingQuestion.correctAnswer && (
+                    <div className="space-y-2">
+                      <Label className="text-base font-semibold text-green-700 dark:text-green-400">正确答案</Label>
+                      <div className="bg-green-50 dark:bg-green-950/20 p-4 rounded-lg border border-green-200 dark:border-green-900">
+                        <p className="whitespace-pre-wrap text-green-900 dark:text-green-100">{reviewingQuestion.correctAnswer}</p>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* 详细解析 */}
+                  {reviewingQuestion.detailedExplanation && (
+                    <div className="space-y-2">
+                      <Label className="text-base font-semibold">详细解析</Label>
+                      <div className="bg-muted p-4 rounded-lg">
+                        <p className="whitespace-pre-wrap">{reviewingQuestion.detailedExplanation}</p>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* 错误分析 */}
+                  {reviewingQuestion.errorAnalysis && (
+                    <div className="space-y-2">
+                      <Label className="text-base font-semibold text-orange-700 dark:text-orange-400">错误分析</Label>
+                      <div className="bg-orange-50 dark:bg-orange-950/20 p-4 rounded-lg border border-orange-200 dark:border-orange-900">
+                        <p className="whitespace-pre-wrap text-orange-900 dark:text-orange-100">{reviewingQuestion.errorAnalysis}</p>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* 完成复习按钮 */}
+                  <div className="flex gap-2 pt-4">
+                    <Button
+                      variant="outline"
+                      onClick={() => {
+                        setShowAnswer(false);
+                        setUserAnswer("");
+                      }}
+                      className="flex-1"
+                    >
+                      重新答题
+                    </Button>
+                    <Button
+                      onClick={handleCompleteReview}
+                      disabled={markReviewedMutation.isPending}
+                      className="flex-1"
+                    >
+                      <CheckCircle2 className="h-4 w-4 mr-2" />
+                      完成复习
+                    </Button>
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </DashboardLayout>
   );
 }

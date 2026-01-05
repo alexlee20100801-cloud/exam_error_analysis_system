@@ -7,7 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { trpc } from "@/lib/trpc";
-import { Upload, Camera, FileText, Loader2, CheckCircle, AlertCircle, Download } from "lucide-react";
+import { Upload, Camera, FileText, Loader2, CheckCircle, AlertCircle, Download, Clock } from "lucide-react";
 import { ExportDialog } from "@/components/ExportDialog";
 import { ErrorExportDialog } from "@/components/ErrorExportDialog";
 import { TagManagementDialog } from "@/components/TagManagementDialog";
@@ -36,6 +36,21 @@ export default function ErrorQuestions() {
   
   // 标签数据
   const { data: allTags = [] } = trpc.tags.list.useQuery();
+  
+  // 加入复习计划mutation
+  const addToReviewMutation = trpc.reviewPlan.addToReviewPlan.useMutation({
+    onSuccess: () => {
+      toast.success("已加入复习计划");
+    },
+    onError: (error) => {
+      toast.error(`加入失败：${error.message}`);
+    },
+  });
+  
+  const handleAddToReview = (errorQuestionId: number, e: React.MouseEvent) => {
+    e.stopPropagation();
+    addToReviewMutation.mutate({ errorQuestionId });
+  };
   
   // 表单状态
   const [title, setTitle] = useState("");
@@ -591,10 +606,22 @@ export default function ErrorQuestions() {
                     </div>
                     <div className="flex items-center gap-2 flex-shrink-0">
                       {question.isAnalyzed ? (
-                        <span className="flex items-center gap-1 text-sm font-medium text-green-600 dark:text-green-400 bg-green-50 dark:bg-green-950/30 px-3 py-1.5 rounded-full">
-                          <CheckCircle className="h-4 w-4" />
-                          已分析
-                        </span>
+                        <>
+                          <span className="flex items-center gap-1 text-sm font-medium text-green-600 dark:text-green-400 bg-green-50 dark:bg-green-950/30 px-3 py-1.5 rounded-full">
+                            <CheckCircle className="h-4 w-4" />
+                            已分析
+                          </span>
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={(e) => handleAddToReview(question.id, e)}
+                            disabled={addToReviewMutation.isPending}
+                            className="hover:bg-blue-50 hover:text-blue-600 hover:border-blue-300"
+                          >
+                            <Clock className="h-4 w-4 mr-1" />
+                            加入复习
+                          </Button>
+                        </>
                       ) : (
                         <Button
                           size="sm"
