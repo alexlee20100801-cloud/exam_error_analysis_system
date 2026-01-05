@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from "recharts";
-import { ArrowLeft, Brain, AlertTriangle, TrendingUp, BookOpen, Video, Target, Lightbulb } from "lucide-react";
+import { ArrowLeft, Brain, AlertTriangle, TrendingUp, BookOpen, Video, Target, Lightbulb, GitCompare, Zap } from "lucide-react";
 import DashboardLayout from "@/components/DashboardLayout";
 import { getSubjectName } from "@shared/subjects";
 
@@ -18,6 +18,12 @@ export default function KnowledgePointDetail() {
   const { data: detail, isLoading, error } = trpc.knowledgePointDetail.getDetail.useQuery({
     knowledgePointId,
   });
+
+  // 获取错题对比分析数据
+  const { data: comparison, isLoading: comparisonLoading } = trpc.knowledgePointDetail.getErrorComparison.useQuery(
+    { knowledgePointId },
+    { enabled: !!detail && detail.errors.length >= 2 } // 只有当错题数>=2时才请求
+  );
 
   if (isLoading) {
     return (
@@ -156,6 +162,90 @@ export default function KnowledgePointDetail() {
                     <li key={index} className="flex items-start gap-2 text-sm">
                       <div className="mt-1 h-5 w-5 rounded-full bg-green-100 text-green-700 flex items-center justify-center text-xs font-medium flex-shrink-0">
                         ✓
+                      </div>
+                      <span className="leading-relaxed">{suggestion}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
+        {/* 错题对比分析 */}
+        {comparison && comparison.totalErrors >= 2 && (
+          <Card className="border-purple-200 bg-purple-50/50">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <GitCompare className="h-5 w-5 text-purple-600" />
+                错题横向对比分析
+              </CardTitle>
+              <CardDescription>
+                AI自动识别{comparison.totalErrors}道错题的错误类型并生成专项练习建议
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              {/* 整体错误模式 */}
+              <div className="p-4 bg-white rounded-lg border">
+                <h3 className="font-semibold mb-2 flex items-center gap-2">
+                  <Brain className="h-4 w-4 text-purple-600" />
+                  整体错误模式
+                </h3>
+                <p className="text-sm leading-relaxed">{comparison.overallPattern}</p>
+              </div>
+
+              {/* 错误类型分组 */}
+              {comparison.errorGroups.length > 0 && (
+                <div className="space-y-3">
+                  <h3 className="font-semibold">错误类型分组（共{comparison.errorGroups.length}类）</h3>
+                  {comparison.errorGroups.map((group, index) => (
+                    <div key={index} className="p-4 bg-white rounded-lg border">
+                      <div className="flex items-center justify-between mb-3">
+                        <div className="flex items-center gap-2">
+                          <div className="h-8 w-8 rounded-full bg-purple-100 text-purple-700 flex items-center justify-center text-sm font-medium">
+                            {group.count}
+                          </div>
+                          <div>
+                            <h4 className="font-semibold">{group.errorTypeName}</h4>
+                            <p className="text-xs text-muted-foreground">{group.count}道错题</p>
+                          </div>
+                        </div>
+                      </div>
+                      <p className="text-sm text-muted-foreground mb-3">
+                        <span className="font-medium">共同模式：</span>{group.commonPattern}
+                      </p>
+                      <div className="space-y-2">
+                        {group.errors.map((error) => (
+                          <div
+                            key={error.id}
+                            className="p-2 bg-gray-50 rounded text-sm hover:bg-gray-100 transition-colors cursor-pointer"
+                            onClick={() => setLocation(`/error-questions/${error.id}`)}
+                          >
+                            <div className="font-medium">{error.title}</div>
+                            {error.errorAnalysis && (
+                              <div className="text-xs text-muted-foreground mt-1">
+                                {error.errorAnalysis}
+                              </div>
+                            )}
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {/* 专项练习建议 */}
+              <div className="p-4 bg-white rounded-lg border">
+                <h3 className="font-semibold mb-3 flex items-center gap-2">
+                  <Zap className="h-4 w-4 text-orange-600" />
+                  举一反三·专项练习建议
+                </h3>
+                <ul className="space-y-2">
+                  {comparison.targetedSuggestions.map((suggestion, index) => (
+                    <li key={index} className="flex items-start gap-2 text-sm">
+                      <div className="mt-1 h-5 w-5 rounded-full bg-orange-100 text-orange-700 flex items-center justify-center text-xs font-medium flex-shrink-0">
+                        {index + 1}
                       </div>
                       <span className="leading-relaxed">{suggestion}</span>
                     </li>
