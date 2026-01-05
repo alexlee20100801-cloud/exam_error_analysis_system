@@ -11,7 +11,7 @@ import ErrorQuestionDetail from "./pages/ErrorQuestionDetail";
 import PracticeQuestions from "./pages/PracticeQuestions";
 import Practice from "./pages/Practice";
 import LearningReport from "./pages/LearningReport";
-import Videos from "./pages/Videos";
+import VideoLearning from "./pages/VideoLearning";
 import ReviewPlan from "./pages/ReviewPlan";
 
 function Router() {
@@ -24,8 +24,8 @@ function Router() {
       <Route path="/practice-questions/:errorQuestionId" component={PracticeQuestions} />
       <Route path={"/practice"} component={Practice} />
       <Route path={"/report"} component={LearningReport} />
-      <Route path={"/videos"} component={Videos} />
-      <Route path={"/review"} component={ReviewPlan} />
+          <Route path="/videos" component={VideoLearning} />
+          <Route path={"/review"} component={ReviewPlan} />
       <Route path={"/404"} component={NotFound} />
       <Route component={NotFound} />
     </Switch>

@@ -436,7 +436,11 @@ export default function ErrorQuestionDetail() {
               <CardDescription>观看相关知识点讲解视频</CardDescription>
             </CardHeader>
             <CardContent>
-              <Button variant="outline" className="w-full">
+              <Button 
+                variant="outline" 
+                className="w-full"
+                onClick={() => setLocation(`/videos?questionId=${questionId}`)}
+              >
                 查找学习视频
               </Button>
             </CardContent>
