@@ -14,6 +14,9 @@ import { TagManagementDialog } from "@/components/TagManagementDialog";
 import { TagSelector } from "@/components/TagSelector";
 import { useState } from "react";
 import { toast } from "sonner";
+import { usePullToRefresh } from "@/hooks/usePullToRefresh";
+import { useIsMobile } from "@/hooks/useMobile";
+import { RefreshCw } from "lucide-react";
 import { useLocation, useSearch } from "wouter";
 import { SCHOOL_LEVELS, SUBJECTS, type SchoolLevel, type Subject } from "../../../shared/subjects";
 
@@ -34,6 +37,7 @@ export default function ErrorQuestions() {
   const [selectedSubject, setSelectedSubject] = useState<Subject | "all">("all");
   const [selectedSemester, setSelectedSemester] = useState<"all" | "first" | "second">("all");
   const [showFavoriteOnly, setShowFavoriteOnly] = useState(false);
+  const isMobile = useIsMobile();
   
   // 标签数据
   const { data: allTags = [] } = trpc.tags.list.useQuery();
@@ -89,10 +93,22 @@ export default function ErrorQuestions() {
   const utils = trpc.useUtils();
   
   // 根据筛选条件动态查询
-  const { data: allQuestions, isLoading: isLoadingAll } = trpc.errorQuestions.list.useQuery(
+  const { data: allQuestions, isLoading: isLoadingAll, refetch: refetchAll } = trpc.errorQuestions.list.useQuery(
     { limit: 50 },
     { enabled: selectedLevel === "all" && selectedSubject === "all" }
   );
+  
+  // 下拉刷新
+  const handleRefresh = async () => {
+    await refetchAll();
+    toast.success("刷新成功");
+  };
+  
+  const { ref: pullToRefreshRef, pullState } = usePullToRefresh<HTMLDivElement>({
+    onRefresh: handleRefresh,
+    threshold: 80,
+    disabled: !isMobile,
+  });
   
   const { data: levelQuestions, isLoading: isLoadingLevel } = trpc.errorQuestions.listBySchoolLevel.useQuery(
     { schoolLevel: selectedLevel as SchoolLevel, limit: 50 },
@@ -280,7 +296,24 @@ export default function ErrorQuestions() {
 
   return (
     <DashboardLayout>
-      <div className="space-y-6">
+      <div ref={pullToRefreshRef} className="space-y-6 relative">
+        {/* 下拉刷新提示 */}
+        {isMobile && (pullState.isPulling || pullState.isRefreshing) && (
+          <div 
+            className="fixed top-0 left-1/2 transform -translate-x-1/2 z-50 transition-all duration-200"
+            style={{ 
+              top: `${Math.min(pullState.pullDistance, 80)}px`,
+              opacity: pullState.progress 
+            }}
+          >
+            <div className="bg-primary text-primary-foreground px-4 py-2 rounded-full flex items-center gap-2 shadow-lg">
+              <RefreshCw className={`h-4 w-4 ${pullState.isRefreshing ? 'animate-spin' : ''}`} />
+              <span className="text-sm font-medium">
+                {pullState.isRefreshing ? '刷新中...' : pullState.progress >= 1 ? '释放刷新' : '下拉刷新'}
+              </span>
+            </div>
+          </div>
+        )}
         {/* 页面标题和操作按钮 */}
         <div className="flex justify-between items-center">
           <div>

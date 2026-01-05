@@ -28,6 +28,9 @@ import { Streamdown } from "streamdown";
 import { VoicePlayer } from "@/components/VoicePlayer";
 import { TagSelector } from "@/components/TagSelector";
 import { useState } from "react";
+import { useSwipeGesture } from "@/hooks/useSwipeGesture";
+import { useIsMobile } from "@/hooks/useMobile";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 
 export default function ErrorQuestionDetail() {
   const { user, loading: authLoading } = useAuth();
@@ -36,6 +39,40 @@ export default function ErrorQuestionDetail() {
   
   const questionId = params?.id ? parseInt(params.id) : 0;
   const [showVoicePlayer, setShowVoicePlayer] = useState(false);
+  const isMobile = useIsMobile();
+  
+  // 获取所有错题ID列表用于切换
+  const { data: allQuestions = [] } = trpc.errorQuestions.list.useQuery(
+    { limit: 1000 },
+    { enabled: isMobile }
+  );
+  const currentIndex = allQuestions.findIndex((q: any) => q.id === questionId);
+  const hasPrevious = currentIndex > 0;
+  const hasNext = currentIndex >= 0 && currentIndex < allQuestions.length - 1;
+  
+  const goToPrevious = () => {
+    if (hasPrevious) {
+      const prevQuestion = allQuestions[currentIndex - 1];
+      setLocation(`/error-questions/${prevQuestion.id}`);
+      toast.info("已切换到上一题");
+    }
+  };
+  
+  const goToNext = () => {
+    if (hasNext) {
+      const nextQuestion = allQuestions[currentIndex + 1];
+      setLocation(`/error-questions/${nextQuestion.id}`);
+      toast.info("已切换到下一题");
+    }
+  };
+  
+  // 手势识别
+  const { ref: swipeRef, swipeState } = useSwipeGesture<HTMLDivElement>({
+    onSwipeLeft: goToNext,
+    onSwipeRight: goToPrevious,
+    minSwipeDistance: 80,
+    preventDefaultTouchMove: true,
+  });
   
   // 获取错题标签
   const { data: questionTags = [] } = trpc.tags.getErrorQuestionTags.useQuery(
@@ -145,7 +182,32 @@ export default function ErrorQuestionDetail() {
 
   return (
     <DashboardLayout>
-      <div className="container py-8 max-w-6xl">
+      <div ref={swipeRef} className="container py-8 max-w-6xl relative">
+        {/* 移动端滑动提示 */}
+        {isMobile && swipeState.isSwiping && (
+          <div className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-50 pointer-events-none">
+            <div className="bg-black/80 text-white px-6 py-4 rounded-full flex items-center gap-3 backdrop-blur-sm">
+              {swipeState.direction === "left" && hasNext && (
+                <>
+                  <ChevronRight className="h-6 w-6" />
+                  <span className="text-sm font-medium">下一题</span>
+                </>
+              )}
+              {swipeState.direction === "right" && hasPrevious && (
+                <>
+                  <ChevronLeft className="h-6 w-6" />
+                  <span className="text-sm font-medium">上一题</span>
+                </>
+              )}
+              {swipeState.direction === "left" && !hasNext && (
+                <span className="text-sm font-medium">已是最后一题</span>
+              )}
+              {swipeState.direction === "right" && !hasPrevious && (
+                <span className="text-sm font-medium">已是第一题</span>
+              )}
+            </div>
+          </div>
+        )}
         {/* 面包屑导航 */}
         <div className="flex items-center gap-2 text-sm text-muted-foreground mb-4">
           <button 

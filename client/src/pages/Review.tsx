@@ -6,13 +6,15 @@ import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Clock, CheckCircle2, Calendar, Bell, BookOpen, TrendingUp, Sparkles, Eye, Play, Star } from "lucide-react";
+import { Clock, CheckCircle2, Calendar, Bell, BookOpen, TrendingUp, Sparkles, Eye, Play, Star, ChevronLeft, ChevronRight } from "lucide-react";
 import DashboardLayout from "@/components/DashboardLayout";
 import { getSubjectName } from "@shared/subjects";
 import { toast } from "sonner";
 
 import { useState } from "react";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { useSwipeGesture } from "@/hooks/useSwipeGesture";
+import { useIsMobile } from "@/hooks/useMobile";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 
@@ -21,9 +23,43 @@ export default function Review() {
   const [reviewingQuestion, setReviewingQuestion] = useState<any>(null);
   const [userAnswer, setUserAnswer] = useState("");
   const [showAnswer, setShowAnswer] = useState(false);
+  const isMobile = useIsMobile();
 
   // 获取待复习错题
   const { data: dueReviews, isLoading: dueLoading, refetch: refetchDue } = trpc.reviewPlan.getDueReviews.useQuery();
+  
+  // 复习列表中的切换逻辑
+  const currentReviewIndex = dueReviews?.findIndex((r: any) => r.id === reviewingQuestion?.id) ?? -1;
+  const hasPreviousReview = currentReviewIndex > 0;
+  const hasNextReview = currentReviewIndex >= 0 && currentReviewIndex < (dueReviews?.length ?? 0) - 1;
+  
+  const goToPreviousReview = () => {
+    if (hasPreviousReview && dueReviews) {
+      const prevReview = dueReviews[currentReviewIndex - 1];
+      setReviewingQuestion(prevReview);
+      setUserAnswer("");
+      setShowAnswer(false);
+      toast.info("已切换到上一题");
+    }
+  };
+  
+  const goToNextReview = () => {
+    if (hasNextReview && dueReviews) {
+      const nextReview = dueReviews[currentReviewIndex + 1];
+      setReviewingQuestion(nextReview);
+      setUserAnswer("");
+      setShowAnswer(false);
+      toast.info("已切换到下一题");
+    }
+  };
+  
+  // 手势识别
+  const { ref: dialogSwipeRef, swipeState: dialogSwipeState } = useSwipeGesture<HTMLDivElement>({
+    onSwipeLeft: goToNextReview,
+    onSwipeRight: goToPreviousReview,
+    minSwipeDistance: 80,
+    preventDefaultTouchMove: true,
+  });
 
   // 获取所有复习计划
   const { data: allPlans, isLoading: plansLoading, refetch: refetchPlans } = trpc.reviewPlan.getAllReviewPlans.useQuery();
@@ -390,6 +426,32 @@ export default function Review() {
       {/* 复习答题对话框 */}
       <Dialog open={!!reviewingQuestion} onOpenChange={(open) => !open && setReviewingQuestion(null)}>
         <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
+          <div ref={dialogSwipeRef}>
+            {/* 移动端滑动提示 */}
+            {isMobile && dialogSwipeState.isSwiping && (
+              <div className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-50 pointer-events-none">
+                <div className="bg-black/80 text-white px-6 py-4 rounded-full flex items-center gap-3 backdrop-blur-sm">
+                  {dialogSwipeState.direction === "left" && hasNextReview && (
+                    <>
+                      <ChevronRight className="h-6 w-6" />
+                      <span className="text-sm font-medium">下一题</span>
+                    </>
+                  )}
+                  {dialogSwipeState.direction === "right" && hasPreviousReview && (
+                    <>
+                      <ChevronLeft className="h-6 w-6" />
+                      <span className="text-sm font-medium">上一题</span>
+                    </>
+                  )}
+                  {dialogSwipeState.direction === "left" && !hasNextReview && (
+                    <span className="text-sm font-medium">已是最后一题</span>
+                  )}
+                  {dialogSwipeState.direction === "right" && !hasPreviousReview && (
+                    <span className="text-sm font-medium">已是第一题</span>
+                  )}
+                </div>
+              </div>
+            )}
           <DialogHeader>
             <div className="flex items-center justify-between">
               <DialogTitle className="flex items-center gap-2">
@@ -520,6 +582,7 @@ export default function Review() {
               )}
             </div>
           )}
+          </div>
         </DialogContent>
       </Dialog>
     </DashboardLayout>
