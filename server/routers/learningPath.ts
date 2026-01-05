@@ -42,6 +42,24 @@ export const learningPathRouter = router({
     }),
 
   /**
+   * 获取节点题目
+   */
+  getNodeQuestions: protectedProcedure
+    .input(
+      z.object({
+        pathId: z.number(),
+        nodeId: z.string(),
+      })
+    )
+    .query(async ({ ctx, input }) => {
+      return await learningPathService.getNodeQuestions(
+        input.nodeId,
+        input.pathId,
+        ctx.user.id
+      );
+    }),
+
+  /**
    * 完成节点
    */
   completeNode: protectedProcedure

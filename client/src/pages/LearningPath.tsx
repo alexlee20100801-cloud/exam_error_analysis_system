@@ -1,9 +1,10 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useAuth } from "@/_core/hooks/useAuth";
 import { trpc } from "@/lib/trpc";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import {
   Dialog,
@@ -26,7 +27,8 @@ import {
   Target,
   Sparkles,
   ArrowRight,
-  BookOpen
+  BookOpen,
+  XCircle
 } from "lucide-react";
 
 // 常量定义
@@ -95,14 +97,28 @@ export default function LearningPath() {
   const [showGenerateDialog, setShowGenerateDialog] = useState(false);
   const [selectedSubject, setSelectedSubject] = useState("");
   const [selectedPathId, setSelectedPathId] = useState<number | null>(null);
+  const [selectedNode, setSelectedNode] = useState<any | null>(null);
+  const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
+  const [userAnswer, setUserAnswer] = useState("");
+  const [showResult, setShowResult] = useState(false);
+  const [questionResults, setQuestionResults] = useState<Record<number, boolean>>({});
 
   // 获取所有学习路径
   const { data: paths, refetch: refetchPaths } = trpc.learningPath.getAll.useQuery();
 
   // 获取路径详情
-  const { data: pathDetail } = trpc.learningPath.getDetail.useQuery(
+  const { data: pathDetail, refetch: refetchDetail } = trpc.learningPath.getDetail.useQuery(
     { pathId: selectedPathId! },
     { enabled: !!selectedPathId }
+  );
+
+  // 获取节点题目
+  const { data: nodeQuestions } = trpc.learningPath.getNodeQuestions.useQuery(
+    {
+      pathId: selectedPathId!,
+      nodeId: selectedNode?.id || "",
+    },
+    { enabled: !!selectedPathId && !!selectedNode }
   );
 
   // 生成学习路径
@@ -121,13 +137,27 @@ export default function LearningPath() {
   // 完成节点
   const completeNodeMutation = trpc.learningPath.completeNode.useMutation({
     onSuccess: () => {
-      toast.success("节点完成！");
+      toast.success("节点完成！已解锁下一节点");
+      setSelectedNode(null);
+      setCurrentQuestionIndex(0);
+      setQuestionResults({});
       refetchPaths();
+      refetchDetail();
     },
     onError: (error) => {
       toast.error(`操作失败：${error.message}`);
     },
   });
+
+  // 重置答题状态
+  useEffect(() => {
+    if (selectedNode) {
+      setCurrentQuestionIndex(0);
+      setUserAnswer("");
+      setShowResult(false);
+      setQuestionResults({});
+    }
+  }, [selectedNode]);
 
   const handleGenerate = () => {
     if (!selectedSubject || !user?.grade) {
@@ -141,15 +171,47 @@ export default function LearningPath() {
     });
   };
 
-  const handleCompleteNode = (nodeId: string) => {
-    if (!selectedPathId) return;
-
-    completeNodeMutation.mutate({
-      pathId: selectedPathId,
-      nodeId,
-      score: 80, // 默认分数，实际应该根据练习结果
-    });
+  const handleStartNode = (node: any) => {
+    setSelectedNode(node);
   };
+
+  const handleSubmitAnswer = () => {
+    if (!nodeQuestions || !nodeQuestions[currentQuestionIndex]) return;
+
+    const currentQuestion = nodeQuestions[currentQuestionIndex];
+    const isCorrect = userAnswer.trim().toLowerCase() === currentQuestion.answer.trim().toLowerCase();
+
+    setQuestionResults(prev => ({
+      ...prev,
+      [currentQuestionIndex]: isCorrect,
+    }));
+    setShowResult(true);
+  };
+
+  const handleNextQuestion = () => {
+    if (!nodeQuestions) return;
+
+    if (currentQuestionIndex < nodeQuestions.length - 1) {
+      setCurrentQuestionIndex(prev => prev + 1);
+      setUserAnswer("");
+      setShowResult(false);
+    } else {
+      // 所有题目完成，计算得分
+      const correctCount = Object.values(questionResults).filter(Boolean).length + (questionResults[currentQuestionIndex] ? 1 : 0);
+      const score = Math.round((correctCount / nodeQuestions.length) * 100);
+
+      if (!selectedPathId || !selectedNode) return;
+
+      completeNodeMutation.mutate({
+        pathId: selectedPathId,
+        nodeId: selectedNode.id,
+        score,
+      });
+    }
+  };
+
+  const completedQuestionsCount = Object.keys(questionResults).length;
+  const totalQuestions = nodeQuestions?.length || 0;
 
   return (
     <div className="container py-8">
@@ -353,7 +415,7 @@ export default function LearningPath() {
                                 {isAvailable && (
                                   <Button
                                     size="sm"
-                                    onClick={() => handleCompleteNode(node.id)}
+                                    onClick={() => handleStartNode(node)}
                                   >
                                     {node.status === "in_progress" ? "继续学习" : "开始学习"}
                                     <ArrowRight className="h-4 w-4 ml-1" />
@@ -441,6 +503,143 @@ export default function LearningPath() {
               {generateMutation.isPending ? "生成中..." : "开始生成"}
             </Button>
           </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* 节点答题对话框 */}
+      <Dialog open={!!selectedNode} onOpenChange={(open) => !open && setSelectedNode(null)}>
+        <DialogContent className="max-w-3xl max-h-[80vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Target className="h-5 w-5 text-primary" />
+              {selectedNode?.knowledgePointName}
+            </DialogTitle>
+            <DialogDescription>
+              难度：{selectedNode && DIFFICULTIES[selectedNode.difficulty as keyof typeof DIFFICULTIES]} |
+              题目进度：{completedQuestionsCount}/{totalQuestions}
+            </DialogDescription>
+          </DialogHeader>
+
+          {nodeQuestions && nodeQuestions.length > 0 ? (
+            <div className="space-y-6 py-4">
+              {/* 题目内容 */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-lg">
+                    题目 {currentQuestionIndex + 1} / {nodeQuestions.length}
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="prose max-w-none">
+                    <p className="text-base font-medium">
+                      {nodeQuestions[currentQuestionIndex].content}
+                    </p>
+                  </div>
+
+                  {/* 答案输入 */}
+                  {!showResult && (
+                    <div className="space-y-2">
+                      <Label>你的答案</Label>
+                      <Textarea
+                        value={userAnswer}
+                        onChange={(e) => setUserAnswer(e.target.value)}
+                        placeholder="请输入你的答案..."
+                        rows={4}
+                        className="resize-none"
+                      />
+                      <Button
+                        onClick={handleSubmitAnswer}
+                        disabled={!userAnswer.trim()}
+                        className="w-full"
+                      >
+                        提交答案
+                      </Button>
+                    </div>
+                  )}
+
+                  {/* 结果展示 */}
+                  {showResult && (
+                    <div className="space-y-4">
+                      <div
+                        className={`p-4 rounded-lg border-2 ${
+                          questionResults[currentQuestionIndex]
+                            ? "bg-green-50 border-green-200"
+                            : "bg-red-50 border-red-200"
+                        }`}
+                      >
+                        <div className="flex items-center gap-2 mb-2">
+                          {questionResults[currentQuestionIndex] ? (
+                            <>
+                              <CheckCircle2 className="h-5 w-5 text-green-600" />
+                              <span className="font-semibold text-green-900">回答正确！</span>
+                            </>
+                          ) : (
+                            <>
+                              <XCircle className="h-5 w-5 text-red-600" />
+                              <span className="font-semibold text-red-900">回答错误</span>
+                            </>
+                          )}
+                        </div>
+                        <div className="space-y-2">
+                          <div>
+                            <span className="text-sm font-medium">你的答案：</span>
+                            <span className="text-sm ml-2">{userAnswer}</span>
+                          </div>
+                          <div>
+                            <span className="text-sm font-medium">正确答案：</span>
+                            <span className="text-sm ml-2 text-green-700 font-medium">
+                              {nodeQuestions[currentQuestionIndex].answer}
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* 解析 */}
+                      {nodeQuestions[currentQuestionIndex].explanation && (
+                        <div className="p-4 bg-blue-50 rounded-lg border border-blue-200">
+                          <div className="flex items-start gap-2">
+                            <BookOpen className="h-5 w-5 text-blue-600 mt-0.5" />
+                            <div>
+                              <div className="font-semibold text-blue-900 mb-1">题目解析</div>
+                              <p className="text-sm text-blue-800">
+                                {nodeQuestions[currentQuestionIndex].explanation}
+                              </p>
+                            </div>
+                          </div>
+                        </div>
+                      )}
+
+                      <Button onClick={handleNextQuestion} className="w-full">
+                        {currentQuestionIndex < nodeQuestions.length - 1
+                          ? "下一题"
+                          : "完成节点"}
+                        <ArrowRight className="h-4 w-4 ml-2" />
+                      </Button>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+
+              {/* 题目进度条 */}
+              <div className="space-y-2">
+                <div className="flex justify-between text-sm text-muted-foreground">
+                  <span>练习进度</span>
+                  <span>
+                    {completedQuestionsCount}/{totalQuestions} 题
+                  </span>
+                </div>
+                <Progress
+                  value={(completedQuestionsCount / totalQuestions) * 100}
+                  className="h-2"
+                />
+              </div>
+            </div>
+          ) : (
+            <div className="py-8 text-center text-muted-foreground">
+              <BookOpen className="h-12 w-12 mx-auto mb-3 opacity-50" />
+              <p>暂无推荐题目</p>
+            </div>
+          )}
         </DialogContent>
       </Dialog>
     </div>

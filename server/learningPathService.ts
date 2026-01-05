@@ -193,7 +193,7 @@ export async function generateLearningPath(
     }
   }
 
-  // 5. 为每个节点推荐题目
+  // 5. 为每个节点推荐题目（优先推荐相关知识点的题目）
   for (const node of nodes) {
     // 从题库中查找相关题目
     const questions = await db
@@ -328,6 +328,34 @@ export async function getLearningPathDetail(
     progress: path.totalNodes > 0 ? (path.completedNodes / path.totalNodes) * 100 : 0,
     createdAt: path.createdAt,
   };
+}
+
+/**
+ * 获取节点的题目详情
+ */
+export async function getNodeQuestions(nodeId: string, pathId: number, userId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not initialized");
+
+  // 获取路径详情
+  const pathDetail = await getLearningPathDetail(pathId, userId);
+  if (!pathDetail) throw new Error("Learning path not found");
+
+  // 找到对应节点
+  const node = pathDetail.nodes.find((n) => n.id === nodeId);
+  if (!node) throw new Error("Node not found");
+
+  // 获取题目详情
+  if (!node.recommendedQuestions || node.recommendedQuestions.length === 0) {
+    return [];
+  }
+
+  const questions = await db
+    .select()
+    .from(schema.questionBank)
+    .where(inArray(schema.questionBank.id, node.recommendedQuestions));
+
+  return questions;
 }
 
 /**
