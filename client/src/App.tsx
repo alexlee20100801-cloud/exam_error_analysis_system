@@ -45,6 +45,7 @@ import PushConfigs from "@/pages/admin/PushConfigs";
 import PushConfigForm from "@/pages/admin/PushConfigForm";
 import PushRecords from "./pages/admin/PushRecords";
 import SmartPaperGenerator from "./pages/admin/SmartPaperGenerator";
+import BulkGeneration from "./pages/admin/BulkGeneration";
 import { PWAInstallPrompt } from "@/components/PWAInstallPrompt";
 import { MobileBottomNav } from "@/components/MobileBottomNav";
 
@@ -93,6 +94,7 @@ function Router() {
       <Route path="/admin/push-configs/:id/edit" component={PushConfigForm} />
             <Route path="/admin/push-records" component={PushRecords} />
             <Route path="/admin/smart-paper" component={SmartPaperGenerator} />
+      <Route path="/admin/bulk-generation" component={BulkGeneration} />
       <Route component={NotFound} />
     </Switch>
   );

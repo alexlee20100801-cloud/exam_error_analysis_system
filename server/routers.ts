@@ -47,6 +47,7 @@ import { userSubscriptionRouter } from "./routers/userSubscription";
 import { pushConfigRouter } from "./routers/push-config";
 import { userPushRouter } from "./routers/user-push";
 import { smartPaperRouter } from "./routers/smart-paper";
+import { bulkGenerationRouter } from "./routers/bulk-generation";
 
 export const appRouter = router({
   system: systemRouter,
@@ -168,6 +169,9 @@ export const appRouter = router({
   
   // 智能组卷
   smartPaper: smartPaperRouter,
+  
+  // AI题库批量生成（仅管理员）
+  bulkGeneration: bulkGenerationRouter,
 });
 
 export type AppRouter = typeof appRouter;
