@@ -219,3 +219,10 @@ const pushes = await trpc.userPush.getMyPushes.query({
 ### 测试
 - [x] 编写组卷算法单元测试
 - [x] 测试各种组卷场景
+
+
+## Vite HMR WebSocket连接修复
+
+### 配置优化
+- [x] 修改vite.config.ts配置HMR WebSocket
+- [x] 测试HMR热更新功能

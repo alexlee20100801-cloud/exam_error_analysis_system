@@ -39,6 +39,9 @@ export default defineConfig({
     hmr: {
       protocol: "wss",
       clientPort: 443,
+      host: process.env.VITE_HMR_HOST || undefined,
+      timeout: 30000,
+      overlay: true,
     },
     fs: {
       strict: true,
