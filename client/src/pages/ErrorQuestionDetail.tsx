@@ -119,6 +119,19 @@ export default function ErrorQuestionDetail() {
     },
   });
 
+  // 生成专项练习mutation
+  const generatePracticeMutation = trpc.practicePools.generateFromError.useMutation({
+    onSuccess: (data) => {
+      if (data.success) {
+        toast.success(`已生成${data.generatedCount}道专项练习题！`);
+        setLocation("/practice-pool");
+      }
+    },
+    onError: (error) => {
+      toast.error(`生成失败：${error.message}`);
+    },
+  });
+
   const utils = trpc.useUtils();
 
   if (authLoading || questionLoading) {
@@ -297,6 +310,15 @@ export default function ErrorQuestionDetail() {
             >
               <Sparkles className="mr-2 h-4 w-4" />
               {analyzeDetailedMutation.isPending ? "分析中..." : "AI深度分析"}
+            </Button>
+            <Button
+              variant="default"
+              onClick={() => generatePracticeMutation.mutate({ errorQuestionId: questionId, count: 3 })}
+              disabled={generatePracticeMutation.isPending}
+              size="lg"
+            >
+              <Target className="mr-2 h-4 w-4" />
+              {generatePracticeMutation.isPending ? "生成中..." : "生成专项练习"}
             </Button>
           </div>
         </div>
