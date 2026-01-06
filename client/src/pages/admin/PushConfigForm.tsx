@@ -100,6 +100,10 @@ export default function PushConfigForm() {
   const [resourceUrls, setResourceUrls] = useState("");
   const [customMessage, setCustomMessage] = useState("");
 
+  // 验证错误状态
+  const [errors, setErrors] = useState<Record<string, string>>({});
+  const [touched, setTouched] = useState<Record<string, boolean>>({});
+
   // 获取配置详情（编辑模式）
   const { data: config } = trpc.pushConfig.get.useQuery(
     { id: configId! },
@@ -163,8 +167,84 @@ export default function PushConfigForm() {
     }
   }, [config]);
 
+  // 验证函数
+  const validateForm = (): boolean => {
+    const newErrors: Record<string, string> = {};
+
+    // 必填字段验证
+    if (!title.trim()) {
+      newErrors.title = "请输入推送标题";
+    }
+
+    if (!pushType) {
+      newErrors.pushType = "请选择推送类型";
+    }
+
+    if (!frequency) {
+      newErrors.frequency = "请选择推送频率";
+    }
+
+    if (!pushTime) {
+      newErrors.pushTime = "请设置推送时间";
+    }
+
+    if (channels.length === 0) {
+      newErrors.channels = "请至少选择一个推送渠道";
+    }
+
+    // 学段与年级匹配验证
+    if (schoolLevel && selectedGrades.length > 0) {
+      const isJunior = schoolLevel === "junior";
+      const hasInvalidGrades = selectedGrades.some((grade) =>
+        isJunior ? grade.startsWith("senior") : grade.startsWith("junior")
+      );
+      if (hasInvalidGrades) {
+        newErrors.grades = `选择的年级与学段（${schoolLevel === "junior" ? "初中" : "高中"}）不匹配`;
+      }
+    }
+
+    // 推送内容配置验证
+    if (pushType === "question" && !questionIds.trim()) {
+      newErrors.questionIds = "请输入题目ID列表";
+    }
+
+    if (pushType === "knowledge" && !knowledgePointIds.trim()) {
+      newErrors.knowledgePointIds = "请输入知识点ID列表";
+    }
+
+    if (pushType === "resource" && !resourceUrls.trim()) {
+      newErrors.resourceUrls = "请输入学习资源URL列表";
+    }
+
+    // ID格式验证
+    if (questionIds.trim()) {
+      const ids = questionIds.split(",");
+      const hasInvalidId = ids.some((id) => isNaN(parseInt(id.trim())));
+      if (hasInvalidId) {
+        newErrors.questionIds = "题目ID必须是数字，用逗号分隔";
+      }
+    }
+
+    if (knowledgePointIds.trim()) {
+      const ids = knowledgePointIds.split(",");
+      const hasInvalidId = ids.some((id) => isNaN(parseInt(id.trim())));
+      if (hasInvalidId) {
+        newErrors.knowledgePointIds = "知识点ID必须是数字，用逗号分隔";
+      }
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+
+    // 验证表单
+    if (!validateForm()) {
+      alert("请修正表单错误后再提交");
+      return;
+    }
 
     const data = {
       title,
@@ -253,10 +333,19 @@ export default function PushConfigForm() {
               <Input
                 id="title"
                 value={title}
-                onChange={(e) => setTitle(e.target.value)}
+                onChange={(e) => {
+                  setTitle(e.target.value);
+                  if (errors.title) {
+                    setErrors((prev) => ({ ...prev, title: "" }));
+                  }
+                }}
+                onBlur={() => setTouched((prev) => ({ ...prev, title: true }))}
                 placeholder="例如：初中数学知识点每日推送"
-                required
+                className={errors.title && touched.title ? "border-red-500" : ""}
               />
+              {errors.title && touched.title && (
+                <p className="text-sm text-red-500 mt-1">{errors.title}</p>
+              )}
             </div>
 
             <div className="space-y-2">
@@ -324,7 +413,12 @@ export default function PushConfigForm() {
                     <Checkbox
                       id={`channel-${option.value}`}
                       checked={channels.includes(option.value)}
-                      onCheckedChange={() => toggleChannel(option.value)}
+                      onCheckedChange={() => {
+                        toggleChannel(option.value);
+                        if (errors.channels) {
+                          setErrors((prev) => ({ ...prev, channels: "" }));
+                        }
+                      }}
                     />
                     <Label htmlFor={`channel-${option.value}`} className="cursor-pointer">
                       {option.label}
@@ -332,6 +426,9 @@ export default function PushConfigForm() {
                   </div>
                 ))}
               </div>
+              {errors.channels && (
+                <p className="text-sm text-red-500 mt-1">{errors.channels}</p>
+              )}
             </div>
           </CardContent>
         </Card>
@@ -367,12 +464,20 @@ export default function PushConfigForm() {
                     key={option.value}
                     variant={selectedGrades.includes(option.value) ? "default" : "outline"}
                     className="cursor-pointer"
-                    onClick={() => toggleGrade(option.value)}
+                    onClick={() => {
+                      toggleGrade(option.value);
+                      if (errors.grades) {
+                        setErrors((prev) => ({ ...prev, grades: "" }));
+                      }
+                    }}
                   >
                     {option.label}
                   </Badge>
                 ))}
               </div>
+              {errors.grades && (
+                <p className="text-sm text-red-500 mt-1">{errors.grades}</p>
+              )}
             </div>
 
             <div className="space-y-2">
@@ -437,38 +542,68 @@ export default function PushConfigForm() {
           <CardContent className="space-y-4">
             {pushType === "question" && (
               <div className="space-y-2">
-                <Label htmlFor="questionIds">题目ID列表</Label>
+                <Label htmlFor="questionIds">题目ID列表 *</Label>
                 <Input
                   id="questionIds"
                   value={questionIds}
-                  onChange={(e) => setQuestionIds(e.target.value)}
+                  onChange={(e) => {
+                    setQuestionIds(e.target.value);
+                    if (errors.questionIds) {
+                      setErrors((prev) => ({ ...prev, questionIds: "" }));
+                    }
+                  }}
+                  onBlur={() => setTouched((prev) => ({ ...prev, questionIds: true }))}
                   placeholder="输入题目ID，用逗号分隔，例如：1,2,3"
+                  className={errors.questionIds && touched.questionIds ? "border-red-500" : ""}
                 />
+                {errors.questionIds && touched.questionIds && (
+                  <p className="text-sm text-red-500 mt-1">{errors.questionIds}</p>
+                )}
               </div>
             )}
 
             {pushType === "knowledge" && (
               <div className="space-y-2">
-                <Label htmlFor="knowledgePointIds">知识点ID列表</Label>
+                <Label htmlFor="knowledgePointIds">知识点ID列表 *</Label>
                 <Input
                   id="knowledgePointIds"
                   value={knowledgePointIds}
-                  onChange={(e) => setKnowledgePointIds(e.target.value)}
+                  onChange={(e) => {
+                    setKnowledgePointIds(e.target.value);
+                    if (errors.knowledgePointIds) {
+                      setErrors((prev) => ({ ...prev, knowledgePointIds: "" }));
+                    }
+                  }}
+                  onBlur={() => setTouched((prev) => ({ ...prev, knowledgePointIds: true }))}
                   placeholder="输入知识点ID，用逗号分隔，例如：1,2,3"
+                  className={errors.knowledgePointIds && touched.knowledgePointIds ? "border-red-500" : ""}
                 />
+                {errors.knowledgePointIds && touched.knowledgePointIds && (
+                  <p className="text-sm text-red-500 mt-1">{errors.knowledgePointIds}</p>
+                )}
               </div>
             )}
 
             {pushType === "resource" && (
               <div className="space-y-2">
-                <Label htmlFor="resourceUrls">学习资源URL列表</Label>
+                <Label htmlFor="resourceUrls">学习资源URL列表 *</Label>
                 <Textarea
                   id="resourceUrls"
                   value={resourceUrls}
-                  onChange={(e) => setResourceUrls(e.target.value)}
+                  onChange={(e) => {
+                    setResourceUrls(e.target.value);
+                    if (errors.resourceUrls) {
+                      setErrors((prev) => ({ ...prev, resourceUrls: "" }));
+                    }
+                  }}
+                  onBlur={() => setTouched((prev) => ({ ...prev, resourceUrls: true }))}
                   placeholder="每行输入一个资源URL"
                   rows={5}
+                  className={errors.resourceUrls && touched.resourceUrls ? "border-red-500" : ""}
                 />
+                {errors.resourceUrls && touched.resourceUrls && (
+                  <p className="text-sm text-red-500 mt-1">{errors.resourceUrls}</p>
+                )}
               </div>
             )}
 
