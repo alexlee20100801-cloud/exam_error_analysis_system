@@ -68,6 +68,7 @@ function SubjectReportCard({ subject }: { subject: string }) {
 export default function LearningReport() {
   const { user, loading: authLoading } = useAuth();
   const [exportDialogOpen, setExportDialogOpen] = useState(false);
+  const [exportingCalendar, setExportingCalendar] = useState(false);
 
   // 获取学习总览数据
   const { data: overview, isLoading: overviewLoading } = trpc.learningStats.getOverview.useQuery(
@@ -112,6 +113,37 @@ export default function LearningReport() {
     undefined,
     { enabled: !!user }
   );
+
+  // 导出日历
+  const exportCalendarMutation = trpc.aiLearningAdvice.exportCalendar.useMutation();
+
+  const handleExportCalendar = async () => {
+    try {
+      setExportingCalendar(true);
+      const result = await exportCalendarMutation.mutateAsync();
+      
+      if (result.success && result.data) {
+        // 创建Blob并下载
+        const blob = new Blob([result.data.content], { type: "text/calendar;charset=utf-8" });
+        const url = window.URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.href = url;
+        link.download = result.data.fileName;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        window.URL.revokeObjectURL(url);
+        
+        // 显示成功提示
+        alert("复习计划已导出！请将.ics文件导入到你的日历应用。");
+      }
+    } catch (error) {
+      console.error("导出日历失败:", error);
+      alert("导出失败，请稍后重试。");
+    } finally {
+      setExportingCalendar(false);
+    }
+  };
 
   if (authLoading) {
     return (
@@ -207,11 +239,26 @@ export default function LearningReport() {
         ) : aiAdvice && aiAdvice.data ? (
           <Card className="border-2 border-primary/20 bg-gradient-to-br from-primary/5 to-transparent">
             <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Sparkles className="h-5 w-5 text-primary" />
-                AI个性化学习建议
-              </CardTitle>
-              <CardDescription>基于你的错题数据智能生成</CardDescription>
+              <div className="flex items-center justify-between">
+                <div>
+                  <CardTitle className="flex items-center gap-2">
+                    <Sparkles className="h-5 w-5 text-primary" />
+                    AI个性化学习建议
+                  </CardTitle>
+                  <CardDescription>基于你的错题数据智能生成</CardDescription>
+                </div>
+                {aiAdvice.data.reviewPlan.length > 0 && (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={handleExportCalendar}
+                    disabled={exportingCalendar}
+                  >
+                    <Calendar className="mr-2 h-4 w-4" />
+                    {exportingCalendar ? "导出中..." : "导出到日历"}
+                  </Button>
+                )}
+              </div>
             </CardHeader>
             <CardContent className="space-y-6">
               {/* 总体评估 */}
