@@ -14,7 +14,7 @@ const execAsync = promisify(exec);
  */
 
 export interface EnhancedExportFilter {
-  userId: number;
+  userId: string;
   subjects?: string[];
   grades?: string[];
   knowledgePointIds?: number[];

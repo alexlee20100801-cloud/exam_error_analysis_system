@@ -10,7 +10,7 @@ import { eq, and, sql } from "drizzle-orm";
 /**
  * 获取错题学科分布数据（饼图）
  */
-export async function getSubjectDistribution(userId: number) {
+export async function getSubjectDistribution(userId: string) {
   const db = await getDb();
   if (!db) throw new Error("数据库不可用");
 
@@ -30,7 +30,7 @@ export async function getSubjectDistribution(userId: number) {
 /**
  * 获取错题难度分布数据（柱状图）
  */
-export async function getDifficultyDistribution(userId: number) {
+export async function getDifficultyDistribution(userId: string) {
   const db = await getDb();
   if (!db) throw new Error("数据库不可用");
 
@@ -51,7 +51,7 @@ export async function getDifficultyDistribution(userId: number) {
  * 获取知识点掌握度数据（雷达图）
  * 基于错题关联的知识点，计算掌握度
  */
-export async function getKnowledgePointMastery(userId: number, limit: number = 8) {
+export async function getKnowledgePointMastery(userId: string, limit: number = 8) {
   const db = await getDb();
   if (!db) throw new Error("数据库不可用");
 
@@ -115,7 +115,7 @@ export async function getKnowledgePointMastery(userId: number, limit: number = 8
 /**
  * 获取错题统计总览
  */
-export async function getErrorQuestionOverview(userId: number) {
+export async function getErrorQuestionOverview(userId: string) {
   const db = await getDb();
   if (!db) throw new Error("数据库不可用");
 

@@ -1,0 +1,8 @@
+{
+  "query": "ALTER TABLE error_questions \nADD COLUMN voice_explanation VARCHAR(500) AFTER explanation,\nADD COLUMN detailed_explanation TEXT AFTER voice_explanation;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway03.us-east-1.prod.aws.tidbcloud.com --port 4000 --user Lfr9xqjx7LpxUD9.1efa314e7813 --database Yh4Z4ZSitSFdPWYxtKkkQS --execute ALTER TABLE error_questions \nADD COLUMN voice_explanation VARCHAR(500) AFTER explanation,\nADD COLUMN detailed_explanation TEXT AFTER voice_explanation;",
+  "returncode": 1,
+  "logs": [
+    "ERROR 1054 (42S22) at line 1: Unknown column 'explanation' in 'error_questions'"
+  ]
+}

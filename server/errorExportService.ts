@@ -9,7 +9,7 @@ import path from "path";
 const execAsync = promisify(exec);
 
 export interface ExportFilter {
-  userId: number;
+  userId: string;
   subjects?: string[];
   grades?: string[];
   knowledgePointIds?: number[];

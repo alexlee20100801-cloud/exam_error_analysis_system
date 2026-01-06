@@ -22,7 +22,7 @@ export async function getKnowledgePointInfo(knowledgePointId: number) {
 /**
  * 获取知识点相关的所有错题
  */
-export async function getKnowledgePointErrors(userId: number, knowledgePointId: number) {
+export async function getKnowledgePointErrors(userId: string, knowledgePointId: number) {
   const db = await getDb();
   if (!db) return [];
 
@@ -43,7 +43,7 @@ export async function getKnowledgePointErrors(userId: number, knowledgePointId: 
 /**
  * 获取知识点的练习记录
  */
-export async function getKnowledgePointPractices(userId: number, knowledgePointId: number) {
+export async function getKnowledgePointPractices(userId: string, knowledgePointId: number) {
   const db = await getDb();
   if (!db) return [];
 
@@ -65,7 +65,7 @@ export async function getKnowledgePointPractices(userId: number, knowledgePointI
 /**
  * 获取知识点的学习进度
  */
-export async function getKnowledgePointProgress(userId: number, knowledgePointId: number) {
+export async function getKnowledgePointProgress(userId: string, knowledgePointId: number) {
   const db = await getDb();
   if (!db) return null;
 
@@ -86,7 +86,7 @@ export async function getKnowledgePointProgress(userId: number, knowledgePointId
 /**
  * 获取知识点的掌握度趋势（按周统计）
  */
-export async function getKnowledgePointMasteryTrend(userId: number, knowledgePointId: number, weeks: number = 8) {
+export async function getKnowledgePointMasteryTrend(userId: string, knowledgePointId: number, weeks: number = 8) {
   const db = await getDb();
   if (!db) return [];
 
@@ -121,7 +121,7 @@ export async function getKnowledgePointMasteryTrend(userId: number, knowledgePoi
 /**
  * AI分析知识点的易错原因
  */
-export async function analyzeCommonMistakes(userId: number, knowledgePointId: number) {
+export async function analyzeCommonMistakes(userId: string, knowledgePointId: number) {
   const db = await getDb();
   if (!db) return null;
 
@@ -227,7 +227,7 @@ ${errorSummary}
 /**
  * 获取知识点的完整详情数据
  */
-export async function getKnowledgePointFullDetail(userId: number, knowledgePointId: number) {
+export async function getKnowledgePointFullDetail(userId: string, knowledgePointId: number) {
   const [info, errors, practices, progress, masteryTrend, aiAnalysis] = await Promise.all([
     getKnowledgePointInfo(knowledgePointId),
     getKnowledgePointErrors(userId, knowledgePointId),

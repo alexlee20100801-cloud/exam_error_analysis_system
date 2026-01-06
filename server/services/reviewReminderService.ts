@@ -33,7 +33,7 @@ export function calculateNextReviewDate(reviewCount: number): Date {
  * 创建学习提醒
  */
 export async function createReviewReminder(
-  userId: number,
+  userId: string,
   questionId: number,
   questionType: "error_question" | "practice_question"
 ): Promise<{ success: boolean; reminderId?: number; message: string }> {
@@ -90,7 +90,7 @@ export async function createReviewReminder(
 /**
  * 获取用户的待复习列表
  */
-export async function getPendingReviews(userId: number) {
+export async function getPendingReviews(userId: string) {
   const db = await getDb();
   if (!db) throw new Error("数据库不可用");
 
@@ -143,7 +143,7 @@ export async function getPendingReviews(userId: number) {
  * 获取所有提醒列表（包括未到期的）
  */
 export async function getAllReminders(
-  userId: number,
+  userId: string,
   status?: "pending" | "completed" | "skipped" | "deleted"
 ) {
   const db = await getDb();
@@ -196,7 +196,7 @@ export async function getAllReminders(
  */
 export async function markAsReviewed(
   reminderId: number,
-  userId: number,
+  userId: string,
   masteryLevel?: number,
   timeSpent?: number,
   notes?: string
@@ -265,7 +265,7 @@ export async function markAsReviewed(
  */
 export async function skipReminder(
   reminderId: number,
-  userId: number
+  userId: string
 ): Promise<{ success: boolean; message: string }> {
   const db = await getDb();
   if (!db) return { success: false, message: "数据库不可用" };
@@ -315,7 +315,7 @@ export async function skipReminder(
  */
 export async function deleteReminder(
   reminderId: number,
-  userId: number
+  userId: string
 ): Promise<{ success: boolean; message: string }> {
   const db = await getDb();
   if (!db) return { success: false, message: "数据库不可用" };
@@ -349,7 +349,7 @@ export async function deleteReminder(
 /**
  * 获取复习历史
  */
-export async function getReviewHistory(userId: number, reminderId?: number) {
+export async function getReviewHistory(userId: string, reminderId?: number) {
   const db = await getDb();
   if (!db) throw new Error("数据库不可用");
 
@@ -370,7 +370,7 @@ export async function getReviewHistory(userId: number, reminderId?: number) {
 /**
  * 获取提醒统计
  */
-export async function getReminderStats(userId: number) {
+export async function getReminderStats(userId: string) {
   const db = await getDb();
   if (!db) throw new Error("数据库不可用");
 

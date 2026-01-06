@@ -1,0 +1,9 @@
+{
+  "query": "CREATE TABLE IF NOT EXISTS `annotations` (\n  `id` int PRIMARY KEY AUTO_INCREMENT,\n  `user_id` varchar(255) NOT NULL,\n  `item_type` enum('error_question', 'practice_pool', 'question_bank', 'real_exam') NOT NULL,\n  `item_id` int NOT NULL,\n  `image_url` varchar(500) NOT NULL,\n  `annotation_type` enum('marker', 'arrow', 'text', 'highlight', 'rectangle', 'circle') NOT NULL,\n  `annotation_data` json,\n  `color` varchar(50) DEFAULT '#FF0000',\n  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,\n  `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,\n  KEY `user_item_idx` (`user_id`, `item_type`, `item_id`)\n)",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway03.us-east-1.prod.aws.tidbcloud.com --port 4000 --user Lfr9xqjx7LpxUD9.1efa314e7813 --database Yh4Z4ZSitSFdPWYxtKkkQS --execute CREATE TABLE IF NOT EXISTS `annotations` (\n  `id` int PRIMARY KEY AUTO_INCREMENT,\n  `user_id` varchar(255) NOT NULL,\n  `item_type` enum('error_question', 'practice_pool', 'question_bank', 'real_exam') NOT NULL,\n  `item_id` int NOT NULL,\n  `image_url` varchar(500) NOT NULL,\n  `annotation_type` enum('marker', 'arrow', 'text', 'highlight', 'rectangle', 'circle') NOT NULL,\n  `annotation_data` json,\n  `color` varchar(50) DEFAULT '#FF0000',\n  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,\n  `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,\n  KEY `user_item_idx` (`user_id`, `item_type`, `item_id`)\n)",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 1732
+}

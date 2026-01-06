@@ -30,7 +30,7 @@ export interface SimilarPracticeRecommendation {
  * @param limit 推荐数量限制
  */
 export async function getSimilarPractices(
-  userId: number,
+  userId: string,
   currentPracticePoolId: number,
   limit: number = 5
 ): Promise<SimilarPracticeRecommendation[]> {
@@ -173,7 +173,7 @@ export async function getSimilarPractices(
  * @param limit 推荐数量
  */
 export async function getPopularPractices(
-  userId: number,
+  userId: string,
   subject: string,
   grade: string,
   limit: number = 5

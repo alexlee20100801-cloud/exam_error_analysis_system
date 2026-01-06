@@ -179,7 +179,7 @@ async function calculateSimilarity(
  */
 export async function recommendSimilarQuestions(
   errorQuestionId: number,
-  userId: number,
+  userId: string,
   limit: number = 5
 ): Promise<SimilarQuestion[]> {
   try {
@@ -261,7 +261,7 @@ export async function recommendSimilarQuestions(
  */
 export async function updateQuestionKnowledgePoints(
   questionId: number,
-  userId: number
+  userId: string
 ): Promise<boolean> {
   try {
     const db = await getDb();

@@ -40,6 +40,9 @@ import { reminderSettingsRouter } from "./routers/reminderSettings";
 import { documentUploadRouter } from "./routes/documentUpload";
 import { symbolCorrectionRouter } from "./routers/symbolCorrection";
 import { enhancedExportRouter } from "./routers/enhancedExport";
+import { annotationsRouter } from "./routers/annotations";
+import { chartDataExtractionRouter } from "./routers/chartDataExtraction";
+import { comparisonLearningRouter } from "./routers/comparisonLearning";
 
 export const appRouter = router({
   system: systemRouter,
@@ -66,6 +69,15 @@ export const appRouter = router({
   
   // 增强导出
   enhancedExport: enhancedExportRouter,
+  
+  // 图表标注
+  annotations: annotationsRouter,
+  
+  // 图表数据提取
+  chartDataExtraction: chartDataExtractionRouter,
+  
+  // 对比学习
+  comparisonLearning: comparisonLearningRouter,
   
   // 错题统计
   errorQuestionStats: errorQuestionStatsRouter,

@@ -15,7 +15,7 @@ import { generatePracticeQuestions } from '../practiceGenerationService';
  * @param count 生成题目数量（默认3道）
  */
 export async function generatePracticeFromError(
-  userId: number,
+  userId: string,
   errorQuestionId: number,
   count: number = 3
 ) {
@@ -122,7 +122,7 @@ export async function generatePracticeFromError(
  * @param status 状态筛选（可选）
  */
 export async function getUserPracticePool(
-  userId: number,
+  userId: string,
   status?: 'pending' | 'completed' | 'skipped'
 ) {
   const db = await getDb();
@@ -161,7 +161,7 @@ export async function getUserPracticePool(
  * @param errorQuestionId 错题ID
  */
 export async function getPracticeByErrorQuestion(
-  userId: number,
+  userId: string,
   errorQuestionId: number
 ) {
   const db = await getDb();
@@ -192,7 +192,7 @@ export async function getPracticeByErrorQuestion(
  * @param score 得分
  */
 export async function completePractice(
-  userId: number,
+  userId: string,
   practicePoolId: number,
   score: number
 ) {
@@ -271,7 +271,7 @@ export async function completePractice(
  * @param limit 处理的错题数量限制
  */
 export async function batchGeneratePracticeForUser(
-  userId: number,
+  userId: string,
   limit: number = 10
 ) {
   const db = await getDb();
@@ -323,7 +323,7 @@ export async function batchGeneratePracticeForUser(
  * 获取专项练习统计
  * @param userId 用户ID
  */
-export async function getPracticeStats(userId: number) {
+export async function getPracticeStats(userId: string) {
   const db = await getDb();
   if (!db) throw new Error('Database not available');
 

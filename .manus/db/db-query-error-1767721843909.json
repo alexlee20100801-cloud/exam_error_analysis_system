@@ -1,0 +1,8 @@
+{
+  "query": "ALTER TABLE achievements \nADD COLUMN code VARCHAR(100) NOT NULL UNIQUE AFTER userId,\nADD COLUMN requirement JSON AFTER icon;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway03.us-east-1.prod.aws.tidbcloud.com --port 4000 --user Lfr9xqjx7LpxUD9.1efa314e7813 --database Yh4Z4ZSitSFdPWYxtKkkQS --execute ALTER TABLE achievements \nADD COLUMN code VARCHAR(100) NOT NULL UNIQUE AFTER userId,\nADD COLUMN requirement JSON AFTER icon;",
+  "returncode": 1,
+  "logs": [
+    "ERROR 8200 (HY000) at line 1: unsupported add column 'code' constraint UNIQUE KEY when altering 'Yh4Z4ZSitSFdPWYxtKkkQS.achievements'"
+  ]
+}

@@ -41,7 +41,7 @@ export interface LearningTimeTrend {
  * 获取用户的知识点掌握度数据（用于雷达图）
  */
 export async function getKnowledgePointMasteryData(
-  userId: number,
+  userId: string,
   subject?: string,
   limit: number = 10
 ): Promise<KnowledgePointMastery[]> {
@@ -90,7 +90,7 @@ export async function getKnowledgePointMasteryData(
 /**
  * 获取错题分布数据（用于饼图）
  */
-export async function getErrorDistributionData(userId: number): Promise<ErrorDistribution[]> {
+export async function getErrorDistributionData(userId: string): Promise<ErrorDistribution[]> {
   const db = await getDb();
   if (!db) {
     return [];
@@ -123,7 +123,7 @@ export async function getErrorDistributionData(userId: number): Promise<ErrorDis
  * 获取学习时长趋势数据（用于折线图）
  */
 export async function getLearningTimeTrendData(
-  userId: number,
+  userId: string,
   days: number = 30
 ): Promise<LearningTimeTrend[]> {
   const db = await getDb();
@@ -209,7 +209,7 @@ export interface LearningOverview {
   weakKnowledgePoints: number;
 }
 
-export async function getLearningOverview(userId: number): Promise<LearningOverview> {
+export async function getLearningOverview(userId: string): Promise<LearningOverview> {
   const db = await getDb();
   if (!db) {
     return {

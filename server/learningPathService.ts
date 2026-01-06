@@ -30,7 +30,7 @@ export interface LearningPathData {
 /**
  * 分析用户的薄弱知识点
  */
-async function analyzeWeakKnowledgePoints(userId: number, subject?: string) {
+async function analyzeWeakKnowledgePoints(userId: string, subject?: string) {
   const db = await getDb();
   if (!db) throw new Error("Database not initialized");
 
@@ -118,7 +118,7 @@ function calculateAvgDifficulty(difficulties: string[]): number {
  * 生成学习路径
  */
 export async function generateLearningPath(
-  userId: number,
+  userId: string,
   subject: string,
   grade: string
 ): Promise<number> {
@@ -247,7 +247,7 @@ export async function generateLearningPath(
  * 获取用户的学习路径
  */
 export async function getUserLearningPaths(
-  userId: number
+  userId: string
 ): Promise<LearningPathData[]> {
   const db = await getDb();
   if (!db) throw new Error("Database not initialized");
@@ -277,7 +277,7 @@ export async function getUserLearningPaths(
  */
 export async function getLearningPathDetail(
   pathId: number,
-  userId: number
+  userId: string
 ): Promise<LearningPathData | null> {
   const db = await getDb();
   if (!db) throw new Error("Database not initialized");
@@ -333,7 +333,7 @@ export async function getLearningPathDetail(
 /**
  * 获取节点的题目详情
  */
-export async function getNodeQuestions(nodeId: string, pathId: number, userId: number) {
+export async function getNodeQuestions(nodeId: string, pathId: number, userId: string) {
   const db = await getDb();
   if (!db) throw new Error("Database not initialized");
 
@@ -361,7 +361,7 @@ export async function getNodeQuestions(nodeId: string, pathId: number, userId: n
 /**
  * 获取学习路径的统计数据
  */
-export async function getPathStatistics(pathId: number, userId: number) {
+export async function getPathStatistics(pathId: number, userId: string) {
   const db = await getDb();
   if (!db) throw new Error("Database not initialized");
 
@@ -449,7 +449,7 @@ export async function getPathStatistics(pathId: number, userId: number) {
 export async function completePathNode(
   pathId: number,
   nodeId: string,
-  userId: number,
+  userId: string,
   score: number
 ): Promise<void> {
   const db = await getDb();

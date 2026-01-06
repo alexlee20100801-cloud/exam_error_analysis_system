@@ -58,7 +58,7 @@ export interface ErrorComparisonResult {
 /**
  * AI分析错题并进行分类
  */
-export async function analyzeAndClassifyErrors(userId: number, knowledgePointId: number): Promise<ErrorComparisonResult> {
+export async function analyzeAndClassifyErrors(userId: string, knowledgePointId: number): Promise<ErrorComparisonResult> {
   // 获取该知识点的所有错题
   const errors = await getKnowledgePointErrors(userId, knowledgePointId);
 

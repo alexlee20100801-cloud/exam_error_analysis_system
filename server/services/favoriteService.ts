@@ -15,7 +15,7 @@ export type QuestionType = "error_question" | "practice_question" | "question";
  * @param note 收藏备注
  */
 export async function addToFavorites(
-  userId: number,
+  userId: string,
   questionId: number,
   questionType: QuestionType,
   note?: string
@@ -66,7 +66,7 @@ export async function addToFavorites(
  * @param questionType 题目类型
  */
 export async function removeFromFavorites(
-  userId: number,
+  userId: string,
   questionId: number,
   questionType: QuestionType
 ) {
@@ -96,7 +96,7 @@ export async function removeFromFavorites(
  * @param questionType 题目类型
  */
 export async function isFavorited(
-  userId: number,
+  userId: string,
   questionId: number,
   questionType: QuestionType
 ): Promise<boolean> {
@@ -124,7 +124,7 @@ export async function isFavorited(
  * @param items 题目列表
  */
 export async function checkFavoritesStatus(
-  userId: number,
+  userId: string,
   items: Array<{ questionId: number; questionType: QuestionType }>
 ): Promise<Record<string, boolean>> {
   const db = await getDb();
@@ -146,7 +146,7 @@ export async function checkFavoritesStatus(
  * @param questionType 题目类型筛选（可选）
  */
 export async function getFavorites(
-  userId: number,
+  userId: string,
   questionType?: QuestionType
 ) {
   const db = await getDb();
@@ -206,7 +206,7 @@ export async function getFavorites(
  * 获取收藏统计
  * @param userId 用户ID
  */
-export async function getFavoriteStats(userId: number) {
+export async function getFavoriteStats(userId: string) {
   const db = await getDb();
   if (!db) throw new Error("Database not available");
 

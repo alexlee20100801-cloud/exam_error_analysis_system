@@ -10,7 +10,7 @@ describe("学习提醒功能测试", () => {
   let testErrorQuestionId: number;
   let testReminderId: number;
 
-  const createTestContext = (userId: number): Context => ({
+  const createTestContext = (userId: string): Context => ({
     user: {
       id: userId,
       openId: "test-open-id",

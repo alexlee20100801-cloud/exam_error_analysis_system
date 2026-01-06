@@ -6,7 +6,7 @@ import { getDueReviews, getReviewStats } from "./reviewPlanService";
  * 注意：当前使用notifyOwner向项目所有者发送通知
  * 在实际应用中，应该使用用户级别的通知API
  */
-export async function sendReviewReminder(userId: number): Promise<boolean> {
+export async function sendReviewReminder(userId: string): Promise<boolean> {
   try {
     // 获取待复习错题
     const dueReviews = await getDueReviews(userId);
@@ -54,7 +54,7 @@ ${dueReviews.length > 5 ? `\n还有 ${dueReviews.length - 5} 道错题待复习.
  * 检查并发送复习提醒（定时任务调用）
  * 可以通过schedule工具设置定时任务
  */
-export async function checkAndSendReviewReminders(userId: number): Promise<void> {
+export async function checkAndSendReviewReminders(userId: string): Promise<void> {
   try {
     const stats = await getReviewStats(userId);
 
@@ -79,7 +79,7 @@ export async function checkAndSendReviewReminders(userId: number): Promise<void>
 /**
  * 生成复习提醒摘要（用于前端展示）
  */
-export async function getReviewReminderSummary(userId: number) {
+export async function getReviewReminderSummary(userId: string) {
   try {
     const dueReviews = await getDueReviews(userId);
     const stats = await getReviewStats(userId);

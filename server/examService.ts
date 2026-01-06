@@ -1,6 +1,6 @@
 import { getDb } from "./db";
-import { exams } from "../drizzle/schema";
-import type { InsertExam } from "../drizzle/schema";
+import { examCalendar as exams } from "../drizzle/schema";
+import { examCalendar as exams, type InsertExamCalendar as InsertExam } from "../drizzle/schema";
 import { eq, and, gte, desc } from "drizzle-orm";
 
 /**
@@ -21,7 +21,7 @@ export async function createExam(examData: InsertExam) {
 /**
  * 更新考试
  */
-export async function updateExam(userId: number, examId: number, examData: Partial<InsertExam>) {
+export async function updateExam(userId: string, examId: number, examData: Partial<InsertExam>) {
   const db = await getDb();
   if (!db) throw new Error("Database connection failed");
 
@@ -31,7 +31,7 @@ export async function updateExam(userId: number, examId: number, examData: Parti
 /**
  * 删除考试
  */
-export async function deleteExam(userId: number, examId: number) {
+export async function deleteExam(userId: string, examId: number) {
   const db = await getDb();
   if (!db) throw new Error("Database connection failed");
 
@@ -41,7 +41,7 @@ export async function deleteExam(userId: number, examId: number) {
 /**
  * 获取用户的所有考试
  */
-export async function getUserExams(userId: number) {
+export async function getUserExams(userId: string) {
   const db = await getDb();
   if (!db) throw new Error("Database connection failed");
 
@@ -53,7 +53,7 @@ export async function getUserExams(userId: number) {
 /**
  * 获取即将到来的考试（未来30天内）
  */
-export async function getUpcomingExams(userId: number) {
+export async function getUpcomingExams(userId: string) {
   const db = await getDb();
   if (!db) throw new Error("Database connection failed");
 
@@ -72,7 +72,7 @@ export async function getUpcomingExams(userId: number) {
 /**
  * 获取单个考试详情
  */
-export async function getExamById(userId: number, examId: number) {
+export async function getExamById(userId: string, examId: number) {
   const db = await getDb();
   if (!db) throw new Error("Database connection failed");
 

@@ -61,7 +61,7 @@ async function sendWechatTemplateMessage(
  * 发送复习任务提醒微信消息
  */
 export async function sendReviewTaskReminderWechat(
-  userId: number,
+  userId: string,
   taskInfo: {
     subject: string;
     knowledgePoint?: string;
@@ -122,7 +122,7 @@ export async function sendReviewTaskReminderWechat(
  * 2. 用户扫码后，微信服务器会推送事件到你的服务器
  * 3. 在事件处理中完成用户绑定
  */
-export async function generateWechatBindQRCode(userId: number): Promise<{
+export async function generateWechatBindQRCode(userId: string): Promise<{
   qrCodeUrl: string;
   ticket: string;
 } | null> {
@@ -148,7 +148,7 @@ export async function generateWechatBindQRCode(userId: number): Promise<{
  * 绑定微信账号
  */
 export async function bindWechatAccount(
-  userId: number,
+  userId: string,
   wechatOpenId: string,
   wechatNickname: string
 ): Promise<boolean> {
@@ -179,7 +179,7 @@ export async function bindWechatAccount(
 /**
  * 解绑微信账号
  */
-export async function unbindWechatAccount(userId: number): Promise<boolean> {
+export async function unbindWechatAccount(userId: string): Promise<boolean> {
   const db = await getDb();
   if (!db) {
     console.error("[WechatService] Database not available");

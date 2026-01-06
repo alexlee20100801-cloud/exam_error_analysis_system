@@ -66,7 +66,7 @@ async function sendEmail(to: string, subject: string, html: string): Promise<boo
  * 发送复习任务提醒邮件
  */
 export async function sendReviewTaskReminderEmail(
-  userId: number,
+  userId: string,
   taskInfo: {
     subject: string;
     knowledgePoint?: string;

@@ -13,7 +13,7 @@ export type ExportFormat = "pdf" | "word";
  * 导出选项
  */
 export interface ExportOptions {
-  userId: number;
+  userId: string;
   format: ExportFormat;
   questionType?: "error_question" | "practice_question" | "question";
 }
@@ -35,7 +35,7 @@ interface QuestionData {
  * 获取收藏的题目数据
  */
 async function getFavoriteQuestions(
-  userId: number,
+  userId: string,
   questionType?: "error_question" | "practice_question" | "question"
 ): Promise<QuestionData[]> {
   const db = await getDb();

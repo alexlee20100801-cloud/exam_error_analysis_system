@@ -10,7 +10,7 @@ import type { SchoolLevel, Subject } from "../shared/subjects";
 /**
  * 按板块统计错题数量
  */
-export async function getErrorQuestionCountByLevel(userId: number) {
+export async function getErrorQuestionCountByLevel(userId: string) {
   const db = await getDb();
   if (!db) return { junior: 0, senior: 0 };
 
@@ -44,7 +44,7 @@ export async function getErrorQuestionCountByLevel(userId: number) {
  * 按学科统计错题数量
  */
 export async function getErrorQuestionCountBySubject(
-  userId: number,
+  userId: string,
   schoolLevel?: SchoolLevel
 ) {
   const db = await getDb();
@@ -77,7 +77,7 @@ export async function getErrorQuestionCountBySubject(
 /**
  * 获取板块和学科的完整统计信息
  */
-export async function getFullStatistics(userId: number) {
+export async function getFullStatistics(userId: string) {
   const levelCounts = await getErrorQuestionCountByLevel(userId);
   const allSubjectCounts = await getErrorQuestionCountBySubject(userId);
   const juniorSubjectCounts = await getErrorQuestionCountBySubject(userId, "junior");

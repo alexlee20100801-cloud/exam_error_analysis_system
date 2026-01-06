@@ -4,7 +4,7 @@ import { getPathStatistics } from "./learningPathService";
 /**
  * 生成个性化学习建议
  */
-export async function generateLearningAdvice(pathId: number, userId: number) {
+export async function generateLearningAdvice(pathId: number, userId: string) {
   // 获取统计数据
   const statistics = await getPathStatistics(pathId, userId);
 

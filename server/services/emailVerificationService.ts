@@ -15,7 +15,7 @@ function generateVerificationToken(): string {
  * 创建邮箱验证令牌
  */
 export async function createEmailVerificationToken(
-  userId: number,
+  userId: string,
   email: string
 ): Promise<string> {
   try {
@@ -208,7 +208,7 @@ export async function verifyEmailToken(token: string): Promise<{
  * 重新发送验证邮件
  */
 export async function resendVerificationEmail(
-  userId: number,
+  userId: string,
   email: string,
   userName?: string
 ): Promise<void> {
@@ -239,7 +239,7 @@ export async function resendVerificationEmail(
 /**
  * 检查邮箱是否已被验证
  */
-export async function isEmailVerified(userId: number): Promise<boolean> {
+export async function isEmailVerified(userId: string): Promise<boolean> {
   try {
     const db = await getDb();
     if (!db) throw new Error("Database not initialized");
