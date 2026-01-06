@@ -857,3 +857,139 @@ export const emailTemplates = mysqlTable("email_templates", {
 });
 export type EmailTemplate = typeof emailTemplates.$inferSelect;
 export type InsertEmailTemplate = typeof emailTemplates.$inferInsert;
+
+/**
+ * 套餐计划表 - 存储不同的订阅套餐
+ */
+export const subscriptionPlans = mysqlTable("subscription_plans", {
+  id: int("id").autoincrement().primaryKey(),
+  // 套餐名称
+  name: varchar("name", { length: 100 }).notNull(),
+  // 套餐描述
+  description: text("description"),
+  // 价格（分）
+  price: int("price").notNull(),
+  // 货币类型
+  currency: varchar("currency", { length: 10 }).notNull().default("CNY"),
+  // 有效期（天）
+  durationDays: int("duration_days").notNull(),
+  // 功能权限列表（JSON数组）
+  features: json("features").$type<string[]>().notNull(),
+  // 最大错题数量（-1表示无限制）
+  maxErrorQuestions: int("max_error_questions").notNull().default(-1),
+  // 最大AI分析次数（-1表示无限制）
+  maxAiAnalysis: int("max_ai_analysis").notNull().default(-1),
+  // 是否启用
+  isActive: boolean("is_active").notNull().default(true),
+  // 排序顺序
+  sortOrder: int("sort_order").notNull().default(0),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().onUpdateNow().notNull(),
+});
+export type SubscriptionPlan = typeof subscriptionPlans.$inferSelect;
+export type InsertSubscriptionPlan = typeof subscriptionPlans.$inferInsert;
+
+/**
+ * 订单表 - 存储所有订单信息
+ */
+export const orders = mysqlTable("orders", {
+  id: int("id").autoincrement().primaryKey(),
+  // 订单号（唯一）
+  orderNo: varchar("order_no", { length: 64 }).notNull().unique(),
+  // 用户ID（可为空，支付前可能未注册）
+  userId: int("user_id"),
+  // 套餐ID
+  planId: int("plan_id").notNull(),
+  // 订单金额（分）
+  amount: int("amount").notNull(),
+  // 货币类型
+  currency: varchar("currency", { length: 10 }).notNull().default("CNY"),
+  // 支付方式（stripe, wechat, alipay）
+  paymentMethod: mysqlEnum("payment_method", ["stripe", "wechat", "alipay"]),
+  // 订单状态
+  status: mysqlEnum("status", ["pending", "paid", "cancelled", "refunded", "expired"]).notNull().default("pending"),
+  // 支付时间
+  paidAt: timestamp("paid_at"),
+  // 第三方支付订单号
+  thirdPartyOrderNo: varchar("third_party_order_no", { length: 255 }),
+  // 购买人信息（JSON）
+  buyerInfo: json("buyer_info").$type<{
+    email?: string;
+    phone?: string;
+    name?: string;
+  }>(),
+  // 过期时间（未支付订单的过期时间）
+  expiresAt: timestamp("expires_at"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().onUpdateNow().notNull(),
+});
+export type Order = typeof orders.$inferSelect;
+export type InsertOrder = typeof orders.$inferInsert;
+
+/**
+ * 用户订阅表 - 存储用户的订阅关系
+ */
+export const userSubscriptions = mysqlTable("user_subscriptions", {
+  id: int("id").autoincrement().primaryKey(),
+  // 用户ID
+  userId: int("user_id").notNull(),
+  // 套餐ID
+  planId: int("plan_id").notNull(),
+  // 订单ID
+  orderId: int("order_id").notNull(),
+  // 订阅开始时间
+  startDate: timestamp("start_date").notNull(),
+  // 订阅结束时间
+  endDate: timestamp("end_date").notNull(),
+  // 订阅状态
+  status: mysqlEnum("status", ["active", "expired", "cancelled"]).notNull().default("active"),
+  // 已使用的AI分析次数
+  usedAiAnalysis: int("used_ai_analysis").notNull().default(0),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().onUpdateNow().notNull(),
+});
+export type UserSubscription = typeof userSubscriptions.$inferSelect;
+export type InsertUserSubscription = typeof userSubscriptions.$inferInsert;
+
+/**
+ * 支付配置表 - 存储支付方式的配置信息
+ */
+export const paymentConfigs = mysqlTable("payment_configs", {
+  id: int("id").autoincrement().primaryKey(),
+  // 支付方式
+  paymentMethod: mysqlEnum("payment_method", ["stripe", "wechat", "alipay"]).notNull().unique(),
+  // 是否启用
+  isEnabled: boolean("is_enabled").notNull().default(false),
+  // 配置信息（加密存储，JSON格式）
+  config: text("config").notNull(),
+  // 最后修改人
+  lastModifiedBy: int("last_modified_by"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().onUpdateNow().notNull(),
+});
+export type PaymentConfig = typeof paymentConfigs.$inferSelect;
+export type InsertPaymentConfig = typeof paymentConfigs.$inferInsert;
+
+/**
+ * 账号凭证表 - 存储自动生成的账号密码
+ */
+export const accountCredentials = mysqlTable("account_credentials", {
+  id: int("id").autoincrement().primaryKey(),
+  // 用户ID
+  userId: int("user_id").notNull().unique(),
+  // 登录账号（邮箱或手机号）
+  loginAccount: varchar("login_account", { length: 320 }).notNull().unique(),
+  // 初始密码（加密存储）
+  initialPassword: varchar("initial_password", { length: 255 }).notNull(),
+  // 是否已修改密码
+  passwordChanged: boolean("password_changed").notNull().default(false),
+  // 凭证发送方式（email, sms）
+  deliveryMethod: mysqlEnum("delivery_method", ["email", "sms"]).notNull(),
+  // 凭证发送状态
+  deliveryStatus: mysqlEnum("delivery_status", ["pending", "sent", "failed"]).notNull().default("pending"),
+  // 凭证发送时间
+  sentAt: timestamp("sent_at"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+export type AccountCredential = typeof accountCredentials.$inferSelect;
+export type InsertAccountCredential = typeof accountCredentials.$inferInsert;

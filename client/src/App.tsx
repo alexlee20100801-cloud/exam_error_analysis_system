@@ -36,6 +36,10 @@ import ReviewReminders from "@/pages/ReviewReminders";
 import AdminSMTPSettings from "@/pages/AdminSMTPSettings";
 import { AdminEmailTemplates } from "@/pages/AdminEmailTemplates";
 import VerifyEmail from "@/pages/VerifyEmail";
+import { SubscriptionPlans } from "@/pages/SubscriptionPlans";
+import { Payment } from "@/pages/Payment";
+import { AdminOrders } from "@/pages/AdminOrders";
+import { AdminSubscriptionPlans } from "@/pages/AdminSubscriptionPlans";
 import { PWAInstallPrompt } from "@/components/PWAInstallPrompt";
 import { MobileBottomNav } from "@/components/MobileBottomNav";
 
@@ -74,6 +78,10 @@ function Router() {
       <Route path="/admin/smtp-settings" component={AdminSMTPSettings} />
       <Route path="/admin/email-templates" component={AdminEmailTemplates} />
       <Route path="/verify-email/:token" component={VerifyEmail} />
+      <Route path="/subscription-plans" component={SubscriptionPlans} />
+      <Route path="/payment/:orderNo" component={Payment} />
+      <Route path="/admin/orders" component={AdminOrders} />
+      <Route path="/admin/subscription-plans" component={AdminSubscriptionPlans} />
       <Route component={NotFound} />
     </Switch>
   );

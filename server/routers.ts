@@ -40,6 +40,9 @@ import { reminderSettingsRouter } from "./routers/reminderSettings";
 import { smtpConfigRouter } from "./routers/smtpConfig";
 import { emailVerificationRouter } from "./routers/emailVerification";
 import { emailTemplateRouter } from "./routers/emailTemplate";
+import { paymentRouter } from "./routers/payment";
+import { subscriptionPlanRouter } from "./routers/subscriptionPlan";
+import { userSubscriptionRouter } from "./routers/userSubscription";
 
 export const appRouter = router({
   system: systemRouter,
@@ -146,6 +149,11 @@ export const appRouter = router({
   
   // 邮件模板管理
   emailTemplate: emailTemplateRouter,
+  
+  // 支付和订单
+  payment: paymentRouter,
+  subscriptionPlan: subscriptionPlanRouter,
+  userSubscription: userSubscriptionRouter,
 });
 
 export type AppRouter = typeof appRouter;

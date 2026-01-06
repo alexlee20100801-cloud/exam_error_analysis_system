@@ -204,6 +204,13 @@
       "when": 1767696622422,
       "tag": "0028_lumpy_nico_minoru",
       "breakpoints": true
+    },
+    {
+      "idx": 29,
+      "version": "5",
+      "when": 1767697783454,
+      "tag": "0029_strange_blindfold",
+      "breakpoints": true
     }
   ]
 }
