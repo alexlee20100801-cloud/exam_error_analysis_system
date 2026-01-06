@@ -41,6 +41,9 @@ import { Payment } from "@/pages/Payment";
 import { AdminOrders } from "@/pages/AdminOrders";
 import { AdminSubscriptionPlans } from "@/pages/AdminSubscriptionPlans";
 import AdminPaymentConfig from "@/pages/AdminPaymentConfig";
+import PushConfigs from "@/pages/admin/PushConfigs";
+import PushConfigForm from "@/pages/admin/PushConfigForm";
+import PushRecords from "@/pages/admin/PushRecords";
 import { PWAInstallPrompt } from "@/components/PWAInstallPrompt";
 import { MobileBottomNav } from "@/components/MobileBottomNav";
 
@@ -83,7 +86,12 @@ function Router() {
       <Route path="/payment/:orderNo" component={Payment} />
       <Route path="/admin/orders" component={AdminOrders} />
       <Route path={"/admin/subscription-plans"} component={AdminSubscriptionPlans} />
-      <Route path={"/admin/payment-config"} component={AdminPaymentConfig} />     <Route component={NotFound} />
+      <Route path={"/admin/payment-config"} component={AdminPaymentConfig} />
+      <Route path="/admin/push-configs" component={PushConfigs} />
+      <Route path="/admin/push-configs/new" component={PushConfigForm} />
+      <Route path="/admin/push-configs/:id/edit" component={PushConfigForm} />
+      <Route path="/admin/push-records" component={PushRecords} />
+      <Route component={NotFound} />
     </Switch>
   );
 }
