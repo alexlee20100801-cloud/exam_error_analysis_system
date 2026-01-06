@@ -7,9 +7,11 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { trpc } from "@/lib/trpc";
-import { Upload, Camera, FileText, Loader2, CheckCircle, AlertCircle, Download, Clock, Star } from "lucide-react";
+import { Upload, Camera, FileText, Loader2, CheckCircle, AlertCircle, Download, Clock, Star, Trash2, FileDown } from "lucide-react";
+import { Checkbox } from "@/components/ui/checkbox";
 import { ExportDialog } from "@/components/ExportDialog";
 import { ErrorExportDialog } from "@/components/ErrorExportDialog";
+import { EnhancedExportDialog } from "@/components/EnhancedExportDialog";
 import { TagManagementDialog } from "@/components/TagManagementDialog";
 import { TagSelector } from "@/components/TagSelector";
 import { useState } from "react";
@@ -31,6 +33,7 @@ export default function ErrorQuestions() {
   const [uploadMethod, setUploadMethod] = useState<"photo" | "manual">("photo");
   const [exportDialogOpen, setExportDialogOpen] = useState(false);
   const [errorExportDialogOpen, setErrorExportDialogOpen] = useState(false);
+  const [enhancedExportDialogOpen, setEnhancedExportDialogOpen] = useState(false);
   const [tagManagementDialogOpen, setTagManagementDialogOpen] = useState(false);
   const [selectedTagIds, setSelectedTagIds] = useState<number[]>([]);
   const [selectedLevel, setSelectedLevel] = useState<SchoolLevel | "all">(
@@ -39,6 +42,9 @@ export default function ErrorQuestions() {
   const [selectedSubject, setSelectedSubject] = useState<Subject | "all">("all");
   const [selectedSemester, setSelectedSemester] = useState<"all" | "first" | "second">("all");
   const [showFavoriteOnly, setShowFavoriteOnly] = useState(false);
+  const [selectedQuestionIds, setSelectedQuestionIds] = useState<number[]>([]);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [questionToDelete, setQuestionToDelete] = useState<number | null>(null);
   const isMobile = useIsMobile();
   
   // 标签数据
@@ -79,6 +85,75 @@ export default function ErrorQuestions() {
   const handleToggleFavorite = (questionId: number, e: React.MouseEvent) => {
     e.stopPropagation();
     toggleFavoriteMutation.mutate({ questionId });
+  };
+
+  // 删除单个错题
+  const deleteMutation = trpc.errorQuestions.delete.useMutation({
+    onSuccess: () => {
+      toast.success("删除成功");
+      utils.errorQuestions.list.invalidate();
+      utils.errorQuestions.listBySchoolLevel.invalidate();
+      utils.errorQuestions.listBySchoolLevelAndSubject.invalidate();
+      setDeleteDialogOpen(false);
+      setQuestionToDelete(null);
+    },
+    onError: (error) => {
+      toast.error(`删除失败：${error.message}`);
+    },
+  });
+
+  // 批量删除错题
+  const batchDeleteMutation = trpc.errorQuestions.batchDelete.useMutation({
+    onSuccess: (data) => {
+      toast.success(`成功删除${data.successCount}道错题${data.failCount > 0 ? `，${data.failCount}道失败` : ''}`);
+      utils.errorQuestions.list.invalidate();
+      utils.errorQuestions.listBySchoolLevel.invalidate();
+      utils.errorQuestions.listBySchoolLevelAndSubject.invalidate();
+      setSelectedQuestionIds([]);
+      setDeleteDialogOpen(false);
+    },
+    onError: (error) => {
+      toast.error(`批量删除失败：${error.message}`);
+    },
+  });
+
+  const handleDeleteClick = (questionId: number, e: React.MouseEvent) => {
+    e.stopPropagation();
+    setQuestionToDelete(questionId);
+    setDeleteDialogOpen(true);
+  };
+
+  const handleBatchDeleteClick = () => {
+    if (selectedQuestionIds.length === 0) {
+      toast.error("请先选择要删除的错题");
+      return;
+    }
+    setQuestionToDelete(null);
+    setDeleteDialogOpen(true);
+  };
+
+  const handleConfirmDelete = () => {
+    if (questionToDelete) {
+      deleteMutation.mutate({ questionId: questionToDelete });
+    } else if (selectedQuestionIds.length > 0) {
+      batchDeleteMutation.mutate({ questionIds: selectedQuestionIds });
+    }
+  };
+
+  const handleSelectQuestion = (questionId: number, checked: boolean) => {
+    if (checked) {
+      setSelectedQuestionIds([...selectedQuestionIds, questionId]);
+    } else {
+      setSelectedQuestionIds(selectedQuestionIds.filter(id => id !== questionId));
+    }
+  };
+
+  const handleSelectAll = (checked: boolean) => {
+    if (checked && errorQuestions) {
+      setSelectedQuestionIds(errorQuestions.map(q => q.id));
+    } else {
+      setSelectedQuestionIds([]);
+    }
   };
   
   // 表单状态
@@ -331,6 +406,10 @@ export default function ErrorQuestions() {
               <FileText className="mr-2 h-4 w-4" />
               导出PDF
             </Button>
+            <Button variant="outline" size="lg" onClick={() => setEnhancedExportDialogOpen(true)}>
+              <FileDown className="mr-2 h-4 w-4" />
+              增强导出
+            </Button>
             <Dialog open={uploadDialogOpen} onOpenChange={setUploadDialogOpen}>            <DialogTrigger asChild>
               <Button size="lg">
                 <Upload className="mr-2 h-4 w-4" />
@@ -525,6 +604,47 @@ export default function ErrorQuestions() {
           subjects: selectedSubject !== "all" ? [selectedSubject] : undefined,
         }}
       />
+      <EnhancedExportDialog 
+        open={enhancedExportDialogOpen} 
+        onOpenChange={setEnhancedExportDialogOpen}
+        defaultFilters={{
+          subjects: selectedSubject !== "all" ? [selectedSubject] : undefined,
+        }}
+      />
+      
+      {/* 删除确认对话框 */}
+      <Dialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>确认删除</DialogTitle>
+            <DialogDescription>
+              {questionToDelete 
+                ? "确定要删除这道错题吗？此操作不可恢复。" 
+                : `确定要删除选中的 ${selectedQuestionIds.length} 道错题吗？此操作不可恢复。`
+              }
+            </DialogDescription>
+          </DialogHeader>
+          <div className="flex justify-end gap-2 mt-4">
+            <Button 
+              variant="outline" 
+              onClick={() => setDeleteDialogOpen(false)}
+              disabled={deleteMutation.isPending || batchDeleteMutation.isPending}
+            >
+              取消
+            </Button>
+            <Button 
+              variant="destructive" 
+              onClick={handleConfirmDelete}
+              disabled={deleteMutation.isPending || batchDeleteMutation.isPending}
+            >
+              {(deleteMutation.isPending || batchDeleteMutation.isPending) && (
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              )}
+              确认删除
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
 
         {/* 板块和学科筛选器 */}
         <Card>
@@ -643,11 +763,31 @@ export default function ErrorQuestions() {
                 </Select>
               </div>
               
-              {/* 统计信息 */}
-              <div className="flex items-end">
+              {/* 统计信息和批量操作 */}
+              <div className="flex items-end gap-4">
                 <div className="text-sm text-muted-foreground">
                   共 <span className="font-semibold text-foreground">{errorQuestions?.length || 0}</span> 道错题
+                  {selectedQuestionIds.length > 0 && (
+                    <span className="ml-2 text-primary font-semibold">
+                      （已选择 {selectedQuestionIds.length} 道）
+                    </span>
+                  )}
                 </div>
+                {selectedQuestionIds.length > 0 && (
+                  <Button 
+                    variant="destructive" 
+                    size="sm"
+                    onClick={handleBatchDeleteClick}
+                    disabled={batchDeleteMutation.isPending}
+                  >
+                    {batchDeleteMutation.isPending ? (
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    ) : (
+                      <Trash2 className="mr-2 h-4 w-4" />
+                    )}
+                    批量删除
+                  </Button>
+                )}
               </div>
             </div>
           </CardContent>
@@ -660,16 +800,38 @@ export default function ErrorQuestions() {
             <p className="text-muted-foreground">加载中...</p>
           </div>
         ) : errorQuestions && errorQuestions.length > 0 ? (
-          <div className="grid gap-4">
+          <div className="space-y-4">
+            {/* 全选复选框 */}
+            <div className="flex items-center gap-2 px-2">
+              <Checkbox
+                checked={errorQuestions.length > 0 && selectedQuestionIds.length === errorQuestions.length}
+                onCheckedChange={handleSelectAll}
+                id="select-all"
+              />
+              <Label htmlFor="select-all" className="text-sm font-medium cursor-pointer">
+                全选
+              </Label>
+            </div>
+            
             {errorQuestions.map((question) => (
               <Card 
                 key={question.id} 
-                className="hover:shadow-lg hover:border-primary/50 transition-all duration-200 cursor-pointer group"
-                onClick={() => setLocation(`/error-questions/${question.id}`)}
+                className="hover:shadow-lg hover:border-primary/50 transition-all duration-200 group"
               >
                 <CardHeader>
                   <div className="flex justify-between items-start gap-4">
-                    <div className="flex-1 min-w-0">
+                    {/* 复选框 */}
+                    <div className="flex items-start pt-1" onClick={(e) => e.stopPropagation()}>
+                      <Checkbox
+                        checked={selectedQuestionIds.includes(question.id)}
+                        onCheckedChange={(checked) => handleSelectQuestion(question.id, checked as boolean)}
+                        id={`question-${question.id}`}
+                      />
+                    </div>
+                    <div 
+                      className="flex-1 min-w-0 cursor-pointer"
+                      onClick={() => setLocation(`/error-questions/${question.id}`)}
+                    >
                       <div className="flex items-center gap-2 mb-2">
                         <CardTitle className="text-lg group-hover:text-primary transition-colors truncate">
                           {question.title}
@@ -678,9 +840,6 @@ export default function ErrorQuestions() {
                           <span className="flex-shrink-0 px-2 py-0.5 text-xs font-medium bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400 rounded-full">
                             已掌握
                           </span>
-                        )}
-                        {question.isFavorite && (
-                          <Star className="h-4 w-4 fill-yellow-400 text-yellow-400 flex-shrink-0" />
                         )}
                       </div>
                       <CardDescription className="flex items-center gap-2 flex-wrap">
@@ -705,6 +864,28 @@ export default function ErrorQuestions() {
                       </CardDescription>
                     </div>
                     <div className="flex items-center gap-2 flex-shrink-0">
+                      {/* 收藏按钮 */}
+                      <Button
+                        size="icon"
+                        variant="ghost"
+                        onClick={(e) => handleToggleFavorite(question.id, e)}
+                        disabled={toggleFavoriteMutation.isPending}
+                        className="h-8 w-8"
+                      >
+                        <Star className={`h-4 w-4 ${question.isFavorite ? 'fill-yellow-400 text-yellow-400' : 'text-muted-foreground'}`} />
+                      </Button>
+                      
+                      {/* 删除按钮 */}
+                      <Button
+                        size="icon"
+                        variant="ghost"
+                        onClick={(e) => handleDeleteClick(question.id, e)}
+                        disabled={deleteMutation.isPending}
+                        className="h-8 w-8 hover:bg-destructive/10 hover:text-destructive"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                      
                       {question.isAnalyzed ? (
                         <>
                           <span className="flex items-center gap-1 text-sm font-medium text-green-600 dark:text-green-400 bg-green-50 dark:bg-green-950/30 px-3 py-1.5 rounded-full">

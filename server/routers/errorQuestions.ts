@@ -380,6 +380,44 @@ export const errorQuestionsRouter = router({
     }),
 
   /**
+   * 批量删除错题
+   */
+  batchDelete: protectedProcedure
+    .input(z.object({
+      questionIds: z.array(z.number()),
+    }))
+    .mutation(async ({ ctx, input }) => {
+      const db = await getDb();
+      if (!db) throw new Error("数据库连接失败");
+
+      let successCount = 0;
+      let failCount = 0;
+
+      // 逐个验证并删除
+      for (const questionId of input.questionIds) {
+        try {
+          const question = await getErrorQuestionById(questionId);
+          if (question && question.userId === ctx.user.id) {
+            await db
+              .delete(errorQuestions)
+              .where(eq(errorQuestions.id, questionId));
+            successCount++;
+          } else {
+            failCount++;
+          }
+        } catch (error) {
+          failCount++;
+        }
+      }
+
+      return {
+        success: true,
+        successCount,
+        failCount,
+      };
+    }),
+
+  /**
    * 更新错题笔记
    */
   updateNotes: protectedProcedure

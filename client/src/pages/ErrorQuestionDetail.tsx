@@ -29,6 +29,7 @@ import { LatexText } from "@/components/LatexPreview";
 import { VoicePlayer } from "@/components/VoicePlayer";
 import { TagSelector } from "@/components/TagSelector";
 import { SimilarQuestionsSection } from "@/components/SimilarQuestionsSection";
+import { ChartVisualization } from "@/components/ChartVisualization";
 import { NoteEditor } from "@/components/NoteEditor";
 import { useState } from "react";
 import { useSwipeGesture } from "@/hooks/useSwipeGesture";
@@ -386,17 +387,23 @@ export default function ErrorQuestionDetail() {
               题目内容
             </CardTitle>
           </CardHeader>
-          <CardContent>
+          <CardContent className="space-y-4">
             {question.imageUrl && (
               <img
                 src={question.imageUrl}
                 alt="题目图片"
-                className="w-full max-w-2xl rounded-lg border mb-4"
+                className="w-full max-w-2xl rounded-lg border"
               />
             )}
             <LatexText text={question.content} className="prose max-w-none dark:prose-invert" />
           </CardContent>
         </Card>
+
+        {/* 图表可视化 */}
+        <ChartVisualization 
+          content={question.content} 
+          imageUrl={question.imageUrl || undefined}
+        />
 
         {/* 答案对比 */}
         <div className="grid md:grid-cols-2 gap-4 mb-6">
