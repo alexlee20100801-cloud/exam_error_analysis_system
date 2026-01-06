@@ -21,7 +21,7 @@ import {
 } from "@/components/ui/sidebar";
 import { getLoginUrl } from "@/const";
 import { useIsMobile } from "@/hooks/useMobile";
-import { LayoutDashboard, LogOut, PanelLeft, Users, BookOpen, GraduationCap, School, Trophy, Video, Calendar, BarChart3, Clock, UserCircle, FileText, Database, FileQuestion, Route, Settings, Timer, Target, Heart, Bell } from "lucide-react";
+import { LayoutDashboard, LogOut, PanelLeft, Users, BookOpen, GraduationCap, School, Trophy, Video, Calendar, BarChart3, Clock, UserCircle, FileText, Database, FileQuestion, Route, Settings, Timer, Target, Heart, Bell, Upload } from "lucide-react";
 import { trpc } from "@/lib/trpc";
 import { Badge } from "@/components/ui/badge";
 import { CSSProperties, useEffect, useRef, useState } from "react";
@@ -35,6 +35,7 @@ const menuItems = [
   { id: "error-questions", icon: BookOpen, label: "错题本", path: "/error-questions", isCore: true },
   { id: "junior-errors", icon: School, label: "初中错题", path: "/error-questions?level=junior", indent: true, schoolLevel: "junior" },
   { id: "senior-errors", icon: GraduationCap, label: "高中错题", path: "/error-questions?level=senior", indent: true, schoolLevel: "senior" },
+  { id: "document-upload", icon: Upload, label: "多格式上传", path: "/document-upload", indent: true },
   { id: "ai-exam", icon: FileText, label: "AI试卷生成", path: "/exam-generator" },
   { id: "practice", icon: FileQuestion, label: "真题练习", path: "/real-exam-practice" },
   { id: "ai-practice", icon: BookOpen, label: "AI真题练习", path: "/question-practice" },
