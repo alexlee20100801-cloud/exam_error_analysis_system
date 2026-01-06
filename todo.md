@@ -176,3 +176,7 @@ const pushes = await trpc.userPush.getMyPushes.query({
 - [x] 手动执行推送功能
 - [x] 推送记录查看和筛选
 - [x] 推送详情查看
+
+
+## Bug修复
+- [x] 修复推送配置表单中Select组件的空值错误

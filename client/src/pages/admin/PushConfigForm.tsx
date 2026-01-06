@@ -350,7 +350,6 @@ export default function PushConfigForm() {
                   <SelectValue placeholder="选择学段" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">全部</SelectItem>
                   {schoolLevelOptions.map((option) => (
                     <SelectItem key={option.value} value={option.value}>
                       {option.label}
@@ -399,7 +398,6 @@ export default function PushConfigForm() {
                   <SelectValue placeholder="选择订阅状态" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">全部</SelectItem>
                   {subscriptionStatusOptions.map((option) => (
                     <SelectItem key={option.value} value={option.value}>
                       {option.label}
