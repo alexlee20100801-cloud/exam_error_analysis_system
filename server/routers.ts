@@ -47,6 +47,7 @@ import { chartAnnotationsRouter } from "./routers/chartAnnotations";
 import { annotationTemplatesRouter } from "./routers/annotationTemplates";
 import { aiAnnotationRouter } from "./routers/aiAnnotation";
 import { collaborativeLearningRouter } from "./routers/collaborativeLearning";
+import { aiAnnotationFeedbackRouter } from "./routers/aiAnnotationFeedback";
 
 export const appRouter = router({
   system: systemRouter,
@@ -92,6 +93,9 @@ export const appRouter = router({
   
   // 协作学习
   collaborativeLearning: collaborativeLearningRouter,
+  
+  // AI标注反馈
+  aiAnnotationFeedback: aiAnnotationFeedbackRouter,
   
   // 错题统计
   errorQuestionStats: errorQuestionStatsRouter,

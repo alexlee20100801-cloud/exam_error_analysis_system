@@ -1,0 +1,9 @@
+{
+  "query": "CREATE TABLE IF NOT EXISTS `chart_type_templates` (\n  `id` INT PRIMARY KEY AUTO_INCREMENT,\n  `chart_type` VARCHAR(100) NOT NULL UNIQUE,\n  `name` VARCHAR(255) NOT NULL,\n  `category` ENUM('math_function', 'geometry', 'physics', 'chemistry', 'data_visualization') NOT NULL,\n  `description` TEXT,\n  `feature_patterns` JSON,\n  `recognition_prompt` TEXT,\n  `accuracy_rate` DECIMAL(5, 2) DEFAULT 0,\n  `feedback_count` INT DEFAULT 0,\n  `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,\n  `updated_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP NOT NULL,\n  INDEX `category_idx` (`category`)\n)",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway03.us-east-1.prod.aws.tidbcloud.com --port 4000 --user Lfr9xqjx7LpxUD9.1efa314e7813 --database Yh4Z4ZSitSFdPWYxtKkkQS --execute CREATE TABLE IF NOT EXISTS `chart_type_templates` (\n  `id` INT PRIMARY KEY AUTO_INCREMENT,\n  `chart_type` VARCHAR(100) NOT NULL UNIQUE,\n  `name` VARCHAR(255) NOT NULL,\n  `category` ENUM('math_function', 'geometry', 'physics', 'chemistry', 'data_visualization') NOT NULL,\n  `description` TEXT,\n  `feature_patterns` JSON,\n  `recognition_prompt` TEXT,\n  `accuracy_rate` DECIMAL(5, 2) DEFAULT 0,\n  `feedback_count` INT DEFAULT 0,\n  `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,\n  `updated_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP NOT NULL,\n  INDEX `category_idx` (`category`)\n)",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 1641
+}

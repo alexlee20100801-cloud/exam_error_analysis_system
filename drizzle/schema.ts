@@ -1027,3 +1027,49 @@ export const annotationLikes = mysqlTable('annotation_likes', {
 }));
 
 export type InsertAnnotationLike = typeof annotationLikes.$inferInsert;
+
+// AI标注反馈表
+export const aiAnnotationFeedback = mysqlTable('ai_annotation_feedback', {
+  id: int('id').primaryKey().autoincrement(),
+  userId: varchar('user_id', { length: 255 }).notNull(),
+  annotationId: int('annotation_id').notNull(), // 关联chartAnnotations表
+  imageUrl: varchar('image_url', { length: 500 }).notNull(),
+  chartType: varchar('chart_type', { length: 100 }), // 图表类型（如：quadratic_function, trigonometric_function）
+  rating: int('rating').notNull(), // 评分 1-5星
+  feedbackType: mysqlEnum('feedback_type', ['accurate', 'partially_accurate', 'inaccurate', 'missing_features']).notNull(),
+  improvementSuggestion: text('improvement_suggestion'), // 改进建议
+  aiAnnotations: json('ai_annotations').$type<any[]>(), // AI生成的标注数据（用于分析）
+  userCorrectedAnnotations: json('user_corrected_annotations').$type<any[]>(), // 用户修正后的标注数据
+  confidence: decimal('confidence', { precision: 5, scale: 2 }), // AI标注的置信度
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+}, (table) => ({
+  userIdIdx: index('user_id_idx').on(table.userId),
+  annotationIdIdx: index('annotation_id_idx').on(table.annotationId),
+  chartTypeIdx: index('chart_type_idx').on(table.chartType),
+  ratingIdx: index('rating_idx').on(table.rating),
+}));
+
+export type InsertAiAnnotationFeedback = typeof aiAnnotationFeedback.$inferInsert;
+
+// 图表类型识别模板表
+export const chartTypeTemplates = mysqlTable('chart_type_templates', {
+  id: int('id').primaryKey().autoincrement(),
+  chartType: varchar('chart_type', { length: 100 }).notNull().unique(), // 图表类型标识
+  name: varchar('name', { length: 255 }).notNull(), // 图表类型名称
+  category: mysqlEnum('category', ['math_function', 'geometry', 'physics', 'chemistry', 'data_visualization']).notNull(),
+  description: text('description'),
+  featurePatterns: json('feature_patterns').$type<{
+    keyPoints?: string[]; // 关键点类型（如：vertex, axis_of_symmetry）
+    curveCharacteristics?: string[]; // 曲线特征
+    coordinateFeatures?: string[]; // 坐标系特征
+  }>(),
+  recognitionPrompt: text('recognition_prompt'), // LLM识别提示词
+  accuracyRate: decimal('accuracy_rate', { precision: 5, scale: 2 }).default('0'), // 识别准确率
+  feedbackCount: int('feedback_count').default(0), // 收到的反馈数量
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+  updatedAt: timestamp('updated_at').defaultNow().onUpdateNow().notNull(),
+}, (table) => ({
+  categoryIdx: index('category_idx').on(table.category),
+}));
+
+export type InsertChartTypeTemplate = typeof chartTypeTemplates.$inferInsert;
