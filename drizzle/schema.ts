@@ -697,3 +697,49 @@ export const reviewHistory = mysqlTable("review_history", {
 });
 export type ReviewHistory = typeof reviewHistory.$inferSelect;
 export type InsertReviewHistory = typeof reviewHistory.$inferInsert;
+
+/**
+ * AI学习建议历史表 - 保存每次生成的AI建议
+ */
+export const aiAdviceHistory = mysqlTable("ai_advice_history", {
+  id: int("id").autoincrement().primaryKey(),
+  userId: int("user_id").notNull(),
+  // AI建议内容（JSON格式）
+  adviceData: json("advice_data").$type<{
+    overallAssessment: string;
+    learningTips: Array<{title: string; content: string; priority: string}>;
+    reviewPlan: Array<{subject: string; knowledgePoint?: string; reason: string; suggestedTime: string; priority: number}>;
+    weaknesses: Array<{area: string; severity: string; recommendation: string}>;
+    encouragement: string;
+  }>().notNull(),
+  // 统计信息
+  totalErrorQuestions: int("total_error_questions").notNull().default(0),
+  masteryRate: int("mastery_rate").notNull().default(0), // 掌握率（0-100）
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+export type AiAdviceHistory = typeof aiAdviceHistory.$inferSelect;
+export type InsertAiAdviceHistory = typeof aiAdviceHistory.$inferInsert;
+
+/**
+ * 复习任务表 - 基于AI建议生成的复习任务
+ */
+export const reviewTasks = mysqlTable("review_tasks", {
+  id: int("id").autoincrement().primaryKey(),
+  userId: int("user_id").notNull(),
+  adviceHistoryId: int("advice_history_id").notNull(), // 关联的AI建议历史ID
+  // 任务信息
+  subject: varchar("subject", { length: 50 }).notNull(),
+  knowledgePoint: varchar("knowledge_point", { length: 200 }),
+  reason: text("reason").notNull(),
+  suggestedTime: varchar("suggested_time", { length: 50 }).notNull(),
+  priority: int("priority").notNull().default(0),
+  // 完成状态
+  completed: boolean("completed").notNull().default(false),
+  completedAt: timestamp("completed_at"),
+  // 时间信息
+  scheduledDate: timestamp("scheduled_date"), // 计划复习日期
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().onUpdateNow().notNull(),
+});
+export type ReviewTask = typeof reviewTasks.$inferSelect;
+export type InsertReviewTask = typeof reviewTasks.$inferInsert;

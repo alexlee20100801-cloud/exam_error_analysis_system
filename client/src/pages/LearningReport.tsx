@@ -108,11 +108,18 @@ export default function LearningReport() {
     { enabled: !!user }
   );
 
-  // 获取AI学习建议
-  const { data: aiAdvice, isLoading: aiAdviceLoading } = trpc.aiLearningAdvice.generate.useQuery(
-    undefined,
-    { enabled: !!user }
-  );
+  // AI学习建议
+  const { data: aiAdvice, isLoading: aiAdviceLoading } = trpc.aiLearningAdvice.generate.useQuery();
+  
+  // 复习任务
+  const { data: latestTasks, refetch: refetchTasks } = trpc.reviewTasks.getLatest.useQuery();
+  const { data: completionStats, refetch: refetchStats } = trpc.reviewTasks.getStats.useQuery();
+  const toggleTaskMutation = trpc.reviewTasks.toggle.useMutation({
+    onSuccess: () => {
+      refetchTasks();
+      refetchStats();
+    },
+  });
 
   // 导出日历
   const exportCalendarMutation = trpc.aiLearningAdvice.exportCalendar.useMutation();
@@ -273,7 +280,7 @@ export default function LearningReport() {
                   学习建议
                 </h3>
                 <div className="space-y-2">
-                  {aiAdvice.data.learningTips.map((tip, index) => (
+                  {aiAdvice.data.learningTips.map((tip: any, index: number) => (
                     <div
                       key={index}
                       className={`p-3 rounded-lg border ${
@@ -296,28 +303,42 @@ export default function LearningReport() {
                 </div>
               </div>
 
-              {/* 复习计划 */}
-              {aiAdvice.data.reviewPlan.length > 0 && (
+              {/* 复习计划 - 带复选框 */}
+              {latestTasks?.data?.tasks && latestTasks.data.tasks.length > 0 && (
                 <div>
                   <h3 className="text-sm font-semibold mb-3 flex items-center gap-2">
                     <Calendar className="h-4 w-4 text-blue-500" />
                     智能复习计划
                   </h3>
                   <div className="space-y-2">
-                    {aiAdvice.data.reviewPlan.slice(0, 5).map((plan, index) => (
-                      <div key={index} className="flex items-start gap-3 p-3 bg-muted/50 rounded-lg">
+                    {latestTasks.data.tasks.slice(0, 5).map((task) => (
+                      <div key={task.id} className="flex items-start gap-3 p-3 bg-muted/50 rounded-lg hover:bg-muted transition-colors">
+                        <input
+                          type="checkbox"
+                          checked={task.completed}
+                          onChange={() => toggleTaskMutation.mutate({ taskId: task.id })}
+                          className="mt-1 h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary cursor-pointer"
+                        />
                         <div className="flex-shrink-0 w-6 h-6 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-xs font-bold">
-                          {plan.priority}
+                          {task.priority}
                         </div>
                         <div className="flex-1">
                           <div className="flex items-center gap-2">
-                            <h4 className="text-sm font-medium">{plan.subject}</h4>
-                            {plan.knowledgePoint && (
-                              <span className="text-xs text-muted-foreground">· {plan.knowledgePoint}</span>
+                            <h4 className={`text-sm font-medium ${task.completed ? 'line-through text-muted-foreground' : ''}`}>
+                              {task.subject}
+                            </h4>
+                            {task.knowledgePoint && (
+                              <span className={`text-xs ${task.completed ? 'text-muted-foreground/70' : 'text-muted-foreground'}`}>
+                                · {task.knowledgePoint}
+                              </span>
                             )}
                           </div>
-                          <p className="text-xs text-muted-foreground mt-1">{plan.reason}</p>
-                          <p className="text-xs text-primary mt-1">建议时间：{plan.suggestedTime}</p>
+                          <p className={`text-xs mt-1 ${task.completed ? 'text-muted-foreground/70' : 'text-muted-foreground'}`}>
+                            {task.reason}
+                          </p>
+                          <p className={`text-xs mt-1 ${task.completed ? 'text-muted-foreground/70' : 'text-primary'}`}>
+                            建议时间：{task.suggestedTime}
+                          </p>
                         </div>
                       </div>
                     ))}
@@ -333,7 +354,7 @@ export default function LearningReport() {
                     薄弱点诊断
                   </h3>
                   <div className="space-y-2">
-                    {aiAdvice.data.weaknesses.map((weakness, index) => (
+                    {aiAdvice.data.weaknesses.map((weakness: any, index: number) => (
                       <div
                         key={index}
                         className={`p-3 rounded-lg border ${
@@ -545,6 +566,72 @@ export default function LearningReport() {
             </div>
           </CardContent>
         </Card>
+
+        {/* 复习完成率统计 */}
+        {completionStats?.data && completionStats.data.totalTasks > 0 && (
+          <Card className="border-2 border-green-200 dark:border-green-900">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <CheckCircle2 className="h-5 w-5 text-green-500" />
+                复习任务完成情况
+              </CardTitle>
+              <CardDescription>查看你的复习计划执行情况</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-6">
+                {/* 总体完成率 */}
+                <div>
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-sm font-medium">总体完成率</span>
+                    <span className="text-2xl font-bold text-green-600">
+                      {completionStats.data.completionRate}%
+                    </span>
+                  </div>
+                  <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-4">
+                    <div
+                      className="bg-green-500 h-4 rounded-full transition-all duration-500"
+                      style={{ width: `${completionStats.data.completionRate}%` }}
+                    />
+                  </div>
+                  <p className="text-xs text-muted-foreground mt-2">
+                    已完成 {completionStats.data.completedTasks} / {completionStats.data.totalTasks} 个任务
+                  </p>
+                </div>
+
+                {/* 分学科完成率 */}
+                {completionStats.data.subjectStats.length > 0 && (
+                  <div>
+                    <h3 className="text-sm font-medium mb-3">分学科完成情况</h3>
+                    <div className="space-y-3">
+                      {completionStats.data.subjectStats.map((stat: any) => (
+                        <div key={stat.subject}>
+                          <div className="flex items-center justify-between mb-1">
+                            <span className="text-sm">{stat.subject}</span>
+                            <span className="text-sm font-medium">
+                              {stat.completed}/{stat.total} ({stat.completionRate}%)
+                            </span>
+                          </div>
+                          <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+                            <div
+                              className={`h-2 rounded-full transition-all duration-500 ${
+                                stat.completionRate >= 80
+                                  ? 'bg-green-500'
+                                  : stat.completionRate >= 50
+                                  ? 'bg-yellow-500'
+                                  : 'bg-red-500'
+                              }`}
+                              style={{ width: `${stat.completionRate}%` }}
+                            />
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            </CardContent>
+          </Card>
+        )}
 
         {/* 错题本数据可视化 */}
         <Card>

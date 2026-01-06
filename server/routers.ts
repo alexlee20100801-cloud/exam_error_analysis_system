@@ -35,6 +35,7 @@ import { favoritesRouter } from "./routers/favorites";
 import { reviewRemindersRouter } from "./routers/reviewReminders";
 import { errorQuestionStatsRouter } from "./routers/errorQuestionStats";
 import { aiLearningAdviceRouter } from "./routers/aiLearningAdvice";
+import { reviewTasksRouter } from "./routers/reviewTasks";
 
 export const appRouter = router({
   system: systemRouter,
@@ -58,6 +59,7 @@ export const appRouter = router({
   
   // AI学习建议
   aiLearningAdvice: aiLearningAdviceRouter,
+  reviewTasks: reviewTasksRouter,
   
   // 收藏管理
   favorites: favoritesRouter,

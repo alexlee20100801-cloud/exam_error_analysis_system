@@ -1,4 +1,5 @@
 import { invokeLLM } from "../_core/llm";
+import { saveAdviceAndCreateTasks } from "./reviewTaskService";
 import {
   getSubjectDistribution,
   getDifficultyDistribution,
@@ -224,12 +225,31 @@ ${statsSummary.knowledgePointMastery.map((k) => `- ${k.knowledgePoint}：掌握�
     }
 
     const advice: LearningAdvice = JSON.parse(content);
+    
+    // 保存AI建议并创建复习任务
+    await saveAdviceAndCreateTasks(
+      userId,
+      advice,
+      overview.totalErrors,
+      overview.masteryRate
+    );
+    
     return advice;
   } catch (error) {
     console.error("生成学习建议失败:", error);
     
     // 返回基于规则的默认建议
-    return generateRuleBasedAdvice(overview, subjectDist, difficultyDist, knowledgeMastery);
+    const fallbackAdvice = generateRuleBasedAdvice(overview, subjectDist, difficultyDist, knowledgeMastery);
+    
+    // 保存默认建议并创建任务
+    await saveAdviceAndCreateTasks(
+      userId,
+      fallbackAdvice,
+      overview.totalErrors,
+      overview.masteryRate
+    );
+    
+    return fallbackAdvice;
   }
 }
 
