@@ -31,6 +31,9 @@ import { TagSelector } from "@/components/TagSelector";
 import { SimilarQuestionsSection } from "@/components/SimilarQuestionsSection";
 import { ChartVisualization } from "@/components/ChartVisualization";
 import { NoteEditor } from "@/components/NoteEditor";
+import { ChartAnnotationTool } from "@/components/ChartAnnotationTool";
+import { ChartOCRExtractor } from "@/components/ChartOCRExtractor";
+import { ComparisonView } from "@/components/ComparisonView";
 import { useState } from "react";
 import { useSwipeGesture } from "@/hooks/useSwipeGesture";
 import { useIsMobile } from "@/hooks/useMobile";
@@ -455,12 +458,13 @@ export default function ErrorQuestionDetail() {
         {/* AI分析结果 */}
         {question.isAnalyzed && question.detailedAnalysis ? (
           <Tabs defaultValue="overview" className="mb-6">
-            <TabsList className="grid w-full grid-cols-5">
+            <TabsList className="grid w-full grid-cols-6">
               <TabsTrigger value="overview">总览</TabsTrigger>
               <TabsTrigger value="keypoints">考点解读</TabsTrigger>
               <TabsTrigger value="mistakes">易错分析</TabsTrigger>
               <TabsTrigger value="solving">解题思路</TabsTrigger>
               <TabsTrigger value="advice">学习建议</TabsTrigger>
+              <TabsTrigger value="chart">图表学习</TabsTrigger>
             </TabsList>
 
             {/* 总览 */}
@@ -632,6 +636,98 @@ export default function ErrorQuestionDetail() {
                   </div>
                 </CardContent>
               </Card>
+            </TabsContent>
+
+            {/* 图表学习 */}
+            <TabsContent value="chart" className="space-y-6">
+              {/* 图表标注工具 */}
+              {question.imageUrl && (
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                      </svg>
+                      图表标注工具
+                    </CardTitle>
+                    <CardDescription>
+                      在图表上添加箭头、文字、标记等，帮助理解图表内容
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <ChartAnnotationTool
+                      imageUrl={question.imageUrl}
+                      onSave={(annotations) => {
+                        toast.success("标注已保存");
+                      }}
+                    />
+                  </CardContent>
+                </Card>
+              )}
+
+              {/* OCR数据提取 */}
+              {question.imageUrl && (
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                      </svg>
+                      OCR数据提取
+                    </CardTitle>
+                    <CardDescription>
+                      AI识别图表中的表格和数据，转换为可编辑格式
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <ChartOCRExtractor
+                      imageUrl={question.imageUrl}
+                      errorQuestionId={questionId}
+                      onSave={(data) => {
+                        toast.success("数据提取成功");
+                      }}
+                    />
+                  </CardContent>
+                </Card>
+              )}
+
+              {/* 对比学习模式 */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                    </svg>
+                    对比学习模式
+                  </CardTitle>
+                  <CardDescription>
+                    与相似题目的图表进行对比学习，AI生成对比分析
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <ComparisonView
+                    items={[
+                      {
+                        id: questionId,
+                        title: question.title || "当前题目",
+                        content: question.content,
+                        imageUrl: question.imageUrl || undefined,
+                        subject: question.subject,
+                        difficulty: question.difficulty || "medium",
+                      }
+                    ]}
+                  />
+                </CardContent>
+              </Card>
+
+              {!question.imageUrl && (
+                <Alert>
+                  <AlertCircle className="h-4 w-4" />
+                  <AlertDescription>
+                    此错题暂无图片，无法使用图表学习功能。您可以在编辑错题时上传图片。
+                  </AlertDescription>
+                </Alert>
+              )}
             </TabsContent>
           </Tabs>
         ) : question.isAnalyzed ? (

@@ -197,8 +197,8 @@ export function ChartAnnotationTool({
     ctx.stroke();
   };
 
-  // 获取鼠标在画布上的位置
-  const getMousePos = (e: React.MouseEvent<HTMLCanvasElement>): Point => {
+  // 获取鼠标/触摸在画布上的位置
+  const getMousePos = (e: React.MouseEvent<HTMLCanvasElement> | React.TouchEvent<HTMLCanvasElement>): Point => {
     const canvas = canvasRef.current;
     if (!canvas) return { x: 0, y: 0 };
 
@@ -206,13 +206,31 @@ export function ChartAnnotationTool({
     const scaleX = canvas.width / rect.width;
     const scaleY = canvas.height / rect.height;
 
+    let clientX: number, clientY: number;
+    
+    if ('touches' in e) {
+      // 触摸事件
+      if (e.touches.length === 0) {
+        // 使用changedTouches（用于touchend事件）
+        clientX = e.changedTouches[0]?.clientX || 0;
+        clientY = e.changedTouches[0]?.clientY || 0;
+      } else {
+        clientX = e.touches[0].clientX;
+        clientY = e.touches[0].clientY;
+      }
+    } else {
+      // 鼠标事件
+      clientX = e.clientX;
+      clientY = e.clientY;
+    }
+
     return {
-      x: (e.clientX - rect.left) * scaleX,
-      y: (e.clientY - rect.top) * scaleY,
+      x: (clientX - rect.left) * scaleX,
+      y: (clientY - rect.top) * scaleY,
     };
   };
 
-  // 开始绘制
+  // 开始绘制（鼠标）
   const handleMouseDown = (e: React.MouseEvent<HTMLCanvasElement>) => {
     if (readOnly) return;
 
@@ -250,7 +268,56 @@ export function ChartAnnotationTool({
     });
   };
 
-  // 绘制中
+  // 开始绘制（触摸）
+  const handleTouchStart = (e: React.TouchEvent<HTMLCanvasElement>) => {
+    if (readOnly) return;
+    e.preventDefault();
+
+    const pos = getMousePos(e);
+
+    if (currentTool === "text") {
+      setTextPosition(pos);
+      setShowTextInput(true);
+      return;
+    }
+
+    if (currentTool === "eraser") {
+      const clickedAnnotation = annotations.find((ann) =>
+        ann.points.some(
+          (p) => Math.sqrt(Math.pow(p.x - pos.x, 2) + Math.pow(p.y - pos.y, 2)) < 20
+        )
+      );
+      if (clickedAnnotation) {
+        const newAnnotations = annotations.filter((ann) => ann.id !== clickedAnnotation.id);
+        setAnnotations(newAnnotations);
+        addToHistory(newAnnotations);
+        toast.success("标注已删除");
+      }
+      return;
+    }
+
+    setIsDrawing(true);
+    setCurrentAnnotation({
+      id: Date.now().toString(),
+      type: currentTool,
+      points: [pos],
+      color,
+      lineWidth,
+    });
+  };
+
+  // 结束绘制（触摸）
+  const handleTouchEnd = () => {
+    if (!isDrawing || !currentAnnotation || readOnly) return;
+
+    const newAnnotations = [...annotations, currentAnnotation];
+    setAnnotations(newAnnotations);
+    addToHistory(newAnnotations);
+    setIsDrawing(false);
+    setCurrentAnnotation(null);
+  };
+
+  // 绘制中（鼠标）
   const handleMouseMove = (e: React.MouseEvent<HTMLCanvasElement>) => {
     if (!isDrawing || !currentAnnotation || readOnly) return;
 
@@ -269,7 +336,35 @@ export function ChartAnnotationTool({
     }
   };
 
-  // 结束绘制
+  // 绘制中（触摸）
+  const handleTouchMove = (e: React.TouchEvent<HTMLCanvasElement>) => {
+    if (!isDrawing || !currentAnnotation || readOnly) return;
+    e.preventDefault();
+
+    const pos = getMousePos(e);
+
+    if (currentTool === "pen") {
+      setCurrentAnnotation({
+        ...currentAnnotation,
+        points: [...currentAnnotation.points, pos],
+      });
+    } else {
+      setCurrentAnnotation({
+        ...currentAnnotation,
+        points: [currentAnnotation.points[0], pos],
+      });
+    }
+
+    redrawCanvas();
+    if (currentAnnotation) {
+      drawAnnotation(
+        canvasRef.current?.getContext("2d")!,
+        { ...currentAnnotation, points: currentTool === "pen" ? [...currentAnnotation.points, pos] : [currentAnnotation.points[0], pos] }
+      );
+    }
+  };
+
+  // 结束绘制（鼠标）
   const handleMouseUp = () => {
     if (!isDrawing || !currentAnnotation || readOnly) return;
 
@@ -384,7 +479,7 @@ export function ChartAnnotationTool({
         {!readOnly && (
           <>
             {/* 工具栏 */}
-            <div className="flex flex-wrap gap-2">
+            <div className="flex flex-wrap gap-2 md:gap-2 sm:gap-1">
               {tools.map((tool) => {
                 const Icon = tool.icon;
                 return (
@@ -433,7 +528,7 @@ export function ChartAnnotationTool({
             <Separator />
 
             {/* 操作按钮 */}
-            <div className="flex flex-wrap gap-2">
+            <div className="flex flex-wrap gap-2 md:gap-2 sm:gap-1">
               <Button
                 variant="outline"
                 size="sm"
@@ -480,7 +575,10 @@ export function ChartAnnotationTool({
             onMouseMove={handleMouseMove}
             onMouseUp={handleMouseUp}
             onMouseLeave={handleMouseUp}
-            className="max-w-full h-auto cursor-crosshair"
+            onTouchStart={handleTouchStart}
+            onTouchMove={handleTouchMove}
+            onTouchEnd={handleTouchEnd}
+            className="max-w-full h-auto cursor-crosshair touch-none"
             style={{ display: "block" }}
           />
 
