@@ -25,6 +25,7 @@ import {
 import { useLocation, useRoute } from "wouter";
 import { toast } from "sonner";
 import { Streamdown } from "streamdown";
+import { LatexText } from "@/components/LatexPreview";
 import { VoicePlayer } from "@/components/VoicePlayer";
 import { TagSelector } from "@/components/TagSelector";
 import { SimilarQuestionsSection } from "@/components/SimilarQuestionsSection";
@@ -370,7 +371,7 @@ export default function ErrorQuestionDetail() {
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <Streamdown>{question.correctAnswer}</Streamdown>
+                <LatexText text={question.correctAnswer} className="prose prose-sm max-w-none dark:prose-invert" />
               </CardContent>
             </Card>
           )}

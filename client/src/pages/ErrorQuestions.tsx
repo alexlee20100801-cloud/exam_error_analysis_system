@@ -18,6 +18,7 @@ import { usePullToRefresh } from "@/hooks/usePullToRefresh";
 import { useIsMobile } from "@/hooks/useMobile";
 import { RefreshCw } from "lucide-react";
 import { VoiceInputButtonEnhanced } from "@/components/VoiceInputButtonEnhanced";
+import { LatexEditor } from "@/components/LatexEditor";
 import { useLocation, useSearch } from "wouter";
 import { SCHOOL_LEVELS, SUBJECTS, type SchoolLevel, type Subject } from "../../../shared/subjects";
 
@@ -481,11 +482,10 @@ export default function ErrorQuestions() {
                         mode="advanced"
                       />
                     </div>
-                    <Textarea
-                      id="content"
-                      placeholder="输入完整的题目内容，或点击语音输入按钮..."
+                    <LatexEditor
                       value={content}
-                      onChange={(e) => setContent(e.target.value)}
+                      onChange={setContent}
+                      placeholder="输入完整的题目内容，或点击语音输入按钮...支持LaTeX公式"
                       rows={8}
                     />
                   </div>

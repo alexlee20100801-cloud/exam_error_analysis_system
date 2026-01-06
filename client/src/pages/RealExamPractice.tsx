@@ -17,6 +17,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
 import { BookOpen, Heart, Clock, CheckCircle2, XCircle, School, Calendar, Sparkles, TrendingUp } from "lucide-react";
+import { LatexText } from "@/components/LatexPreview";
 
 // 常量定义
 const SUBJECTS = {
@@ -427,7 +428,7 @@ export default function RealExamPractice() {
           <div className="space-y-4">
             {/* 题目内容 */}
             <div className="bg-muted/50 p-4 rounded-lg">
-              <p className="whitespace-pre-wrap">{selectedQuestion?.content}</p>
+              <LatexText text={selectedQuestion?.content || ''} className="prose prose-sm max-w-none dark:prose-invert" />
             </div>
 
             {/* 答案输入 */}
@@ -475,17 +476,17 @@ export default function RealExamPractice() {
 
                 <div className="bg-blue-50 p-4 rounded-lg border border-blue-200">
                   <p className="font-medium text-blue-900 mb-2">正确答案：</p>
-                  <p className="text-blue-800 whitespace-pre-wrap">
-                    {selectedQuestion?.answer}
-                  </p>
+                  <div className="text-blue-800">
+                    <LatexText text={selectedQuestion?.answer || ''} className="prose prose-sm max-w-none" />
+                  </div>
                 </div>
 
                 {selectedQuestion?.explanation && (
                   <div className="bg-muted/50 p-4 rounded-lg">
                     <p className="font-medium mb-2">解析：</p>
-                    <p className="text-muted-foreground whitespace-pre-wrap">
-                      {selectedQuestion.explanation}
-                    </p>
+                    <div className="text-muted-foreground">
+                      <LatexText text={selectedQuestion.explanation} className="prose prose-sm max-w-none dark:prose-invert" />
+                    </div>
                   </div>
                 )}
               </div>
