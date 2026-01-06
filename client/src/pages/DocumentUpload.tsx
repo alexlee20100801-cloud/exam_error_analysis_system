@@ -13,6 +13,7 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Badge } from '@/components/ui/badge';
 import { ImageCropper } from '@/components/ImageCropper';
 import { Progress } from '@/components/ui/progress';
+import { LatexText } from '@/components/LatexPreview';
 
 // 学科映射
 const SUBJECT_MAP: Record<string, string> = {
@@ -574,11 +575,19 @@ export default function DocumentUpload() {
                       已保存
                     </Badge>
                   )}
-                  {question.parsedContent && (
-                    <Badge variant="outline">
-                      置信度: {(question.parsedContent.confidence * 100).toFixed(0)}%
-                    </Badge>
-                  )}
+                  <div className="flex gap-2">
+                    {question.parsedContent && (
+                      <Badge variant="outline">
+                        置信度: {(question.parsedContent.confidence * 100).toFixed(0)}%
+                      </Badge>
+                    )}
+                    {question.parsedContent?.hasFormulas && (
+                      <Badge variant="secondary" className="gap-1">
+                        <FileCheck className="h-3 w-3" />
+                        包含公式
+                      </Badge>
+                    )}
+                  </div>
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
@@ -687,10 +696,17 @@ export default function DocumentUpload() {
                     onChange={(e) =>
                       updateQuestionFormData(question.id, { content: e.target.value })
                     }
-                    placeholder="完整的题目内容"
+                    placeholder="完整的题目内容（公式已自动转换为LaTeX格式）"
                     rows={4}
                     disabled={question.saved}
+                    className="font-mono text-sm"
                   />
+                  {question.formData.content && (
+                    <div className="p-3 bg-muted rounded-md">
+                      <p className="text-xs text-muted-foreground mb-2">预览：</p>
+                      <LatexText text={question.formData.content} className="prose dark:prose-invert max-w-none text-sm" />
+                    </div>
+                  )}
                 </div>
 
                 <div className="grid grid-cols-2 gap-4">
@@ -701,10 +717,17 @@ export default function DocumentUpload() {
                       onChange={(e) =>
                         updateQuestionFormData(question.id, { userAnswer: e.target.value })
                       }
-                      placeholder="你当时的答案"
+                      placeholder="你当时的答案（公式已自动转换为LaTeX格式）"
                       rows={3}
                       disabled={question.saved}
+                      className="font-mono text-sm"
                     />
+                    {question.formData.userAnswer && (
+                      <div className="p-2 bg-muted rounded-md">
+                        <p className="text-xs text-muted-foreground mb-1">预览：</p>
+                        <LatexText text={question.formData.userAnswer} className="prose dark:prose-invert max-w-none text-sm" />
+                      </div>
+                    )}
                   </div>
 
                   <div className="space-y-2">
@@ -714,10 +737,17 @@ export default function DocumentUpload() {
                       onChange={(e) =>
                         updateQuestionFormData(question.id, { correctAnswer: e.target.value })
                       }
-                      placeholder="标准答案"
+                      placeholder="标准答案（公式已自动转换为LaTeX格式）"
                       rows={3}
                       disabled={question.saved}
+                      className="font-mono text-sm"
                     />
+                    {question.formData.correctAnswer && (
+                      <div className="p-2 bg-muted rounded-md">
+                        <p className="text-xs text-muted-foreground mb-1">预览：</p>
+                        <LatexText text={question.formData.correctAnswer} className="prose dark:prose-invert max-w-none text-sm" />
+                      </div>
+                    )}
                   </div>
                 </div>
 
@@ -728,10 +758,17 @@ export default function DocumentUpload() {
                     onChange={(e) =>
                       updateQuestionFormData(question.id, { explanation: e.target.value })
                     }
-                    placeholder="题目的详细解析和解题思路"
+                    placeholder="题目的详细解析和解题思路（公式已自动转换为LaTeX格式）"
                     rows={3}
                     disabled={question.saved}
+                    className="font-mono text-sm"
                   />
+                  {question.formData.explanation && (
+                    <div className="p-3 bg-muted rounded-md">
+                      <p className="text-xs text-muted-foreground mb-2">预览：</p>
+                      <LatexText text={question.formData.explanation} className="prose dark:prose-invert max-w-none text-sm" />
+                    </div>
+                  )}
                 </div>
 
                 {!question.saved && (
