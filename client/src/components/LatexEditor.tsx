@@ -3,7 +3,7 @@
  * 支持实时预览和常用公式快捷插入
  */
 
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { Textarea } from './ui/textarea';
 import { Button } from './ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs';
@@ -22,6 +22,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from './ui/popover';
+import { LatexHelpPanel } from './LatexHelpPanel';
 
 interface LatexEditorProps {
   value: string;
@@ -87,7 +88,79 @@ export function LatexEditor({
   rows = 6,
 }: LatexEditorProps) {
   const [showPreview, setShowPreview] = useState(true);
+  const [isMobile, setIsMobile] = useState(false);
+  const [syntaxError, setSyntaxError] = useState<string | null>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+
+  // 检测移动设备
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
+
+  // 检查LaTeX语法错误
+  useEffect(() => {
+    if (!value) {
+      setSyntaxError(null);
+      return;
+    }
+
+    // 检查常见错误
+    const errors: string[] = [];
+
+    // 1. 检查未闭合的$
+    const dollarCount = (value.match(/\$/g) || []).length;
+    if (dollarCount % 2 !== 0) {
+      errors.push('未闭合的 $ 符号');
+    }
+
+    // 2. 检查未闭合的花括号
+    let braceCount = 0;
+    for (const char of value) {
+      if (char === '{') braceCount++;
+      if (char === '}') braceCount--;
+      if (braceCount < 0) {
+        errors.push('花括号不匹配');
+        break;
+      }
+    }
+    if (braceCount > 0) {
+      errors.push('未闭合的花括号 {');
+    }
+
+    // 3. 检查\begin和\end匹配
+    const beginMatches = value.match(/\\begin\{(\w+)\}/g) || [];
+    const endMatches = value.match(/\\end\{(\w+)\}/g) || [];
+    if (beginMatches.length !== endMatches.length) {
+      errors.push('\\begin 和 \\end 不匹配');
+    }
+
+    // 4. 检查常见未定义命令
+    const commonCommands = [
+      'frac', 'sqrt', 'sum', 'int', 'lim', 'prod',
+      'alpha', 'beta', 'gamma', 'delta', 'theta', 'pi',
+      'sin', 'cos', 'tan', 'log', 'ln',
+      'leq', 'geq', 'neq', 'approx', 'infty',
+      'left', 'right', 'begin', 'end',
+    ];
+    const commandMatches = value.match(/\\(\w+)/g) || [];
+    for (const match of commandMatches) {
+      const command = match.slice(1); // 移除\
+      if (!commonCommands.includes(command) && command.length > 1) {
+        // 这可能是自定义命令，不报错，只是提示
+      }
+    }
+
+    if (errors.length > 0) {
+      setSyntaxError(errors[0]); // 只显示第一个错误
+    } else {
+      setSyntaxError(null);
+    }
+  }, [value]);
 
   // 插入LaTeX符号
   const insertLatex = (latex: string) => {
@@ -186,9 +259,22 @@ export function LatexEditor({
         </div>
       </div>
 
+      {/* 语法错误提示 */}
+      {syntaxError && (
+        <div className="bg-destructive/10 border border-destructive/30 rounded-md p-3 text-sm text-destructive">
+          <strong>语法错误：</strong> {syntaxError}
+          <div className="mt-1 text-xs">
+            建议：检查括号和符号是否成对出现
+          </div>
+        </div>
+      )}
+
+      {/* LaTeX语法帮助面板 */}
+      <LatexHelpPanel />
+
       {/* 编辑器和预览 */}
       {showPreview ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className={`grid grid-cols-1 ${isMobile ? '' : 'md:grid-cols-2'} gap-4`}>
           {/* 编辑区 */}
           <div>
             <label className="text-sm font-medium mb-2 block">编辑</label>
@@ -205,7 +291,7 @@ export function LatexEditor({
           {/* 预览区 */}
           <div>
             <label className="text-sm font-medium mb-2 block">预览</label>
-            <div className="border rounded-md p-3 min-h-[150px] bg-muted/30">
+            <div className={`border rounded-md p-3 min-h-[150px] bg-muted/30 ${isMobile ? 'text-base' : ''}`}>
               {value ? (
                 <LatexText text={value} className="prose prose-sm max-w-none" />
               ) : (
