@@ -51,6 +51,7 @@ const menuItems = [
 
 const adminMenuItems = [
   { id: "question-bank", icon: Database, label: "题库管理", path: "/admin/question-bank" },
+  { id: "smart-paper", icon: FileText, label: "AI智能组卷", path: "/admin/smart-paper" },
   { id: "task-management", icon: Timer, label: "定时任务", path: "/admin/tasks" },
   { id: "push-configs", icon: Send, label: "推送配置", path: "/admin/push-configs" },
   { id: "push-records", icon: Bell, label: "推送记录", path: "/admin/push-records" },

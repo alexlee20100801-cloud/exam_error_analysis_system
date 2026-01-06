@@ -46,6 +46,7 @@ import { subscriptionPlanRouter } from "./routers/subscriptionPlan";
 import { userSubscriptionRouter } from "./routers/userSubscription";
 import { pushConfigRouter } from "./routers/push-config";
 import { userPushRouter } from "./routers/user-push";
+import { smartPaperRouter } from "./routers/smart-paper";
 
 export const appRouter = router({
   system: systemRouter,
@@ -164,6 +165,9 @@ export const appRouter = router({
   
   // 用户推送记录
   userPush: userPushRouter,
+  
+  // 智能组卷
+  smartPaper: smartPaperRouter,
 });
 
 export type AppRouter = typeof appRouter;
