@@ -38,6 +38,7 @@ import { aiLearningAdviceRouter } from "./routers/aiLearningAdvice";
 import { reviewTasksRouter } from "./routers/reviewTasks";
 import { reminderSettingsRouter } from "./routers/reminderSettings";
 import { documentUploadRouter } from "./routes/documentUpload";
+import { symbolCorrectionRouter } from "./routers/symbolCorrection";
 
 export const appRouter = router({
   system: systemRouter,
@@ -58,6 +59,9 @@ export const appRouter = router({
   
   // 文档上传和解析
   documentUpload: documentUploadRouter,
+  
+  // 符号校正
+  symbolCorrection: symbolCorrectionRouter,
   
   // 错题统计
   errorQuestionStats: errorQuestionStatsRouter,

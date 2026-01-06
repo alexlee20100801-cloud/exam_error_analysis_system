@@ -6,6 +6,7 @@
 import { invokeLLM } from "./_core/llm";
 import { getDb } from "./db";
 import { questions, type InsertQuestion } from "../drizzle/schema";
+import { correctSymbolsHybrid } from './symbolCorrectionService.js';
 
 // 学科中文名称映射
 const subjectNames: Record<string, string> = {
@@ -171,7 +172,24 @@ export async function generateQuestionsForGradeAndSubject(
     const content = response.choices[0].message.content;
     const contentStr = typeof content === 'string' ? content : JSON.stringify(content);
     const result = JSON.parse(contentStr || '{"questions":[]}');
-    const generatedQuestions: InsertQuestion[] = result.questions.map((q: any) => ({
+    
+    // 对生成的题目内容进行符号校正
+    const questionsWithCorrection = await Promise.all(
+      result.questions.map(async (q: any) => {
+        const contentCorrection = await correctSymbolsHybrid(q.content, subjectName);
+        const explanationCorrection = await correctSymbolsHybrid(q.explanation, subjectName);
+        const answerCorrection = await correctSymbolsHybrid(q.correctAnswer, subjectName);
+        
+        return {
+          ...q,
+          content: contentCorrection.correctedText,
+          explanation: explanationCorrection.correctedText,
+          correctAnswer: answerCorrection.correctedText,
+        };
+      })
+    );
+    
+    const generatedQuestions: InsertQuestion[] = questionsWithCorrection.map((q: any) => ({
       title: q.title,
       content: q.content,
       subject: subject as any,
