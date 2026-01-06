@@ -23,6 +23,8 @@ import {
   Trash2,
 } from "lucide-react";
 import { toast } from "sonner";
+import { AnnotationTemplateSelector } from "./AnnotationTemplateSelector";
+import { AIAnnotationAssistant } from "./AIAnnotationAssistant";
 
 type AnnotationType = "arrow" | "text" | "rect" | "circle" | "pen" | "eraser";
 
@@ -478,6 +480,52 @@ export function ChartAnnotationTool({
       <CardContent className="space-y-4">
         {!readOnly && (
           <>
+            {/* 模板和AI辅助 */}
+            <div className="flex flex-wrap gap-2 mb-4">
+              <AnnotationTemplateSelector
+                onApplyTemplate={(templateAnnotations) => {
+                  // 转换模板标注格式为组件标注格式
+                  const converted = templateAnnotations.map((ann: any) => ({
+                    id: Date.now().toString() + Math.random(),
+                    type: ann.type === "highlight" ? "rect" : ann.type,
+                    points: [
+                      { x: ann.x, y: ann.y },
+                      { x: ann.endX || ann.x + (ann.width || 0), y: ann.endY || ann.y + (ann.height || 0) },
+                    ],
+                    text: ann.text,
+                    color: ann.color,
+                    lineWidth: 2,
+                  }));
+                  const newAnnotations = [...annotations, ...converted];
+                  setAnnotations(newAnnotations);
+                  addToHistory(newAnnotations);
+                  toast.success("已应用模板");
+                }}
+              />
+              <AIAnnotationAssistant
+                imageUrl={imageUrl}
+                onAcceptAnnotations={(aiAnnotations) => {
+                  const converted = aiAnnotations.map((ann: any) => ({
+                    id: Date.now().toString() + Math.random(),
+                    type: ann.type === "highlight" ? "rect" : ann.type,
+                    points: [
+                      { x: ann.x, y: ann.y },
+                      { x: ann.endX || ann.x + (ann.width || 0), y: ann.endY || ann.y + (ann.height || 0) },
+                    ],
+                    text: ann.text,
+                    color: ann.color,
+                    lineWidth: 2,
+                  }));
+                  const newAnnotations = [...annotations, ...converted];
+                  setAnnotations(newAnnotations);
+                  addToHistory(newAnnotations);
+                  toast.success("已应用AI标注");
+                }}
+              />
+            </div>
+
+            <Separator />
+
             {/* 工具栏 */}
             <div className="flex flex-wrap gap-2 md:gap-2 sm:gap-1">
               {tools.map((tool) => {

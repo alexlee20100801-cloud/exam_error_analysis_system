@@ -36,6 +36,8 @@ import ReviewReminders from "@/pages/ReviewReminders";
 import DocumentUpload from "@/pages/DocumentUpload";
 import ChartLearningDemo from "@/pages/ChartLearningDemo";
 import BatchOperationsPage from "@/pages/BatchOperationsPage";
+import AnnotationCommunity from "@/pages/AnnotationCommunity";
+import AnnotationDetail from "@/pages/AnnotationDetail";
 import { PWAInstallPrompt } from "@/components/PWAInstallPrompt";
 import { MobileBottomNav } from "@/components/MobileBottomNav";
 
@@ -74,6 +76,8 @@ function Router() {
       <Route path="/document-upload" component={DocumentUpload} />
       <Route path="/chart-learning-demo" component={ChartLearningDemo} />
       <Route path="/batch-operations" component={BatchOperationsPage} />
+      <Route path="/community/annotations" component={AnnotationCommunity} />
+      <Route path="/annotation/:id" component={AnnotationDetail} />
       <Route component={NotFound} />
     </Switch>
   );

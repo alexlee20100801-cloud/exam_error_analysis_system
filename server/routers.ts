@@ -44,6 +44,9 @@ import { annotationsRouter } from "./routers/annotations";
 import { chartDataExtractionRouter } from "./routers/chartDataExtraction";
 import { comparisonLearningRouter } from "./routers/comparisonLearning";
 import { chartAnnotationsRouter } from "./routers/chartAnnotations";
+import { annotationTemplatesRouter } from "./routers/annotationTemplates";
+import { aiAnnotationRouter } from "./routers/aiAnnotation";
+import { collaborativeLearningRouter } from "./routers/collaborativeLearning";
 
 export const appRouter = router({
   system: systemRouter,
@@ -80,6 +83,15 @@ export const appRouter = router({
   
   // 对比学习
   comparisonLearning: comparisonLearningRouter,
+  
+  // 标注模板
+  annotationTemplates: annotationTemplatesRouter,
+  
+  // AI辅助标注
+  aiAnnotation: aiAnnotationRouter,
+  
+  // 协作学习
+  collaborativeLearning: collaborativeLearningRouter,
   
   // 错题统计
   errorQuestionStats: errorQuestionStatsRouter,

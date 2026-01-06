@@ -946,3 +946,84 @@ export const chartDataExtractions = mysqlTable('chart_data_extractions', {
 }));
 
 export type InsertChartDataExtraction = typeof chartDataExtractions.$inferInsert;
+
+// 标注模板表
+export const annotationTemplates = mysqlTable('annotation_templates', {
+  id: int('id').primaryKey().autoincrement(),
+  name: varchar('name', { length: 255 }).notNull(),
+  category: mysqlEnum('category', [
+    'coordinate_system',
+    'function_graph',
+    'geometry',
+    'physics_experiment',
+    'chemistry_apparatus',
+    'data_chart',
+    'custom'
+  ]).notNull(),
+  description: text('description'),
+  thumbnailUrl: varchar('thumbnail_url', { length: 500 }),
+  annotations: json('annotations').$type<any[]>().notNull(),
+  subject: mysqlEnum('subject', ['chinese', 'math', 'english', 'physics', 'chemistry', 'biology', 'politics', 'history', 'geography']).notNull(),
+  isPublic: boolean('is_public').default(true).notNull(),
+  createdBy: varchar('created_by', { length: 255 }).notNull(),
+  usageCount: int('usage_count').default(0).notNull(),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+  updatedAt: timestamp('updated_at').defaultNow().onUpdateNow().notNull(),
+}, (table) => ({
+  categoryIdx: index('category_idx').on(table.category),
+  subjectIdx: index('subject_idx').on(table.subject),
+  createdByIdx: index('created_by_idx').on(table.createdBy),
+}));
+
+export type InsertAnnotationTemplate = typeof annotationTemplates.$inferInsert;
+
+// 分享的标注表
+export const sharedAnnotations = mysqlTable('shared_annotations', {
+  id: int('id').primaryKey().autoincrement(),
+  userId: varchar('user_id', { length: 255 }).notNull(),
+  errorQuestionId: int('error_question_id').notNull(),
+  title: varchar('title', { length: 500 }).notNull(),
+  description: text('description'),
+  imageUrl: varchar('image_url', { length: 500 }).notNull(),
+  annotations: json('annotations').$type<any[]>().notNull(),
+  subject: mysqlEnum('subject', ['chinese', 'math', 'english', 'physics', 'chemistry', 'biology', 'politics', 'history', 'geography']).notNull(),
+  grade: mysqlEnum('grade', ['grade7', 'grade8', 'grade9', 'grade10', 'grade11', 'grade12']).notNull(),
+  likeCount: int('like_count').default(0).notNull(),
+  viewCount: int('view_count').default(0).notNull(),
+  isPublic: boolean('is_public').default(true).notNull(),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+  updatedAt: timestamp('updated_at').defaultNow().onUpdateNow().notNull(),
+}, (table) => ({
+  userIdIdx: index('user_id_idx').on(table.userId),
+  subjectGradeIdx: index('subject_grade_idx').on(table.subject, table.grade),
+}));
+
+export type InsertSharedAnnotation = typeof sharedAnnotations.$inferInsert;
+
+// 标注评论表
+export const annotationComments = mysqlTable('annotation_comments', {
+  id: int('id').primaryKey().autoincrement(),
+  sharedAnnotationId: int('shared_annotation_id').notNull(),
+  userId: varchar('user_id', { length: 255 }).notNull(),
+  content: text('content').notNull(),
+  parentCommentId: int('parent_comment_id'),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+  updatedAt: timestamp('updated_at').defaultNow().onUpdateNow().notNull(),
+}, (table) => ({
+  sharedAnnotationIdIdx: index('shared_annotation_id_idx').on(table.sharedAnnotationId),
+  userIdIdx: index('user_id_idx').on(table.userId),
+}));
+
+export type InsertAnnotationComment = typeof annotationComments.$inferInsert;
+
+// 标注点赞表
+export const annotationLikes = mysqlTable('annotation_likes', {
+  id: int('id').primaryKey().autoincrement(),
+  sharedAnnotationId: int('shared_annotation_id').notNull(),
+  userId: varchar('user_id', { length: 255 }).notNull(),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+}, (table) => ({
+  uniqueLike: uniqueIndex('unique_like').on(table.sharedAnnotationId, table.userId),
+}));
+
+export type InsertAnnotationLike = typeof annotationLikes.$inferInsert;
