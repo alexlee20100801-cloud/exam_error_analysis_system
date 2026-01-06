@@ -28,6 +28,7 @@ import RealExamPractice from "@/pages/RealExamPractice";
 import LearningPath from "@/pages/LearningPath";
 import Settings from "@/pages/Settings";
 import { QuestionPractice } from "@/pages/QuestionPractice";
+import TaskManagement from "@/pages/TaskManagement";
 import { PWAInstallPrompt } from "@/components/PWAInstallPrompt";
 import { MobileBottomNav } from "@/components/MobileBottomNav";
 
@@ -58,6 +59,7 @@ function Router() {
       <Route path="/real-exam-practice" component={RealExamPractice} />
       <Route path="/learning-path" component={LearningPath} />
       <Route path="/settings" component={Settings} />
+      <Route path="/admin/tasks" component={TaskManagement} />
       <Route component={NotFound} />
     </Switch>
   );

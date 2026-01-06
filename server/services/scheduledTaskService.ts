@@ -362,6 +362,11 @@ export async function triggerTask(taskName: string) {
 
   const taskData = task[0];
 
+  // 检查任务是否启用
+  if (!taskData.isEnabled) {
+    throw new Error('任务未启用');
+  }
+
   // 根据任务类型执行
   switch (taskData.taskType) {
     case 'generate_questions':
@@ -377,7 +382,7 @@ export async function triggerTask(taskName: string) {
       throw new Error(`Unknown task type: ${taskData.taskType}`);
   }
 
-  return { success: true, message: `Task ${taskName} executed successfully` };
+  return { success: true, message: `任务 ${taskName} 触发成功` };
 }
 
 /**
