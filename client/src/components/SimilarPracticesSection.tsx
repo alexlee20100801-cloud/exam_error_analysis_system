@@ -3,6 +3,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { trpc } from "@/lib/trpc";
 import { Lightbulb, ArrowRight, Target, TrendingUp } from "lucide-react";
+import { FavoriteButton } from "@/components/FavoriteButton";
 import { useLocation } from "wouter";
 
 interface SimilarPracticesSectionProps {
@@ -117,15 +118,22 @@ export function SimilarPracticesSection({ practicePoolId }: SimilarPracticesSect
               </div>
 
               {/* 操作按钮 */}
-              <Button
-                size="sm"
-                variant="ghost"
-                onClick={() => setLocation(`/practice/${rec.practicePoolId}`)}
-                className="flex-shrink-0"
-              >
-                <span className="hidden sm:inline">去练习</span>
-                <ArrowRight className="h-4 w-4 sm:ml-2" />
-              </Button>
+              <div className="flex flex-col gap-2 flex-shrink-0">
+                <FavoriteButton
+                  questionId={rec.practiceQuestion?.id || 0}
+                  questionType="practice_question"
+                  size="sm"
+                  showText={false}
+                />
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  onClick={() => setLocation(`/practice/${rec.practicePoolId}`)}
+                >
+                  <span className="hidden sm:inline">去练习</span>
+                  <ArrowRight className="h-4 w-4 sm:ml-2" />
+                </Button>
+              </div>
             </div>
           ))}
         </div>

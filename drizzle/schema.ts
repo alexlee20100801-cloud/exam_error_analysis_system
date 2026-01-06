@@ -647,3 +647,17 @@ export const practicePools = mysqlTable("practice_pools", {
 });
 export type PracticePool = typeof practicePools.$inferSelect;
 export type InsertPracticePool = typeof practicePools.$inferInsert;
+
+/**
+ * 收藏表 - 用户收藏的题目
+ */
+export const favorites = mysqlTable("favorites", {
+  id: int("id").autoincrement().primaryKey(),
+  userId: int("user_id").notNull(),
+  questionId: int("question_id").notNull(), // 题目ID
+  questionType: mysqlEnum("question_type", ["error_question", "practice_question", "question"]).notNull(), // 题目类型
+  note: text("note"), // 收藏备注
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+export type Favorite = typeof favorites.$inferSelect;
+export type InsertFavorite = typeof favorites.$inferInsert;

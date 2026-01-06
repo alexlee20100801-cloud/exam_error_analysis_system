@@ -31,6 +31,7 @@ import { QuestionPractice } from "@/pages/QuestionPractice";
 import TaskManagement from "@/pages/TaskManagement";
 import PracticePool from "@/pages/PracticePool";
 import PracticeDetail from "@/pages/PracticeDetail";
+import MyFavorites from "@/pages/MyFavorites";
 import { PWAInstallPrompt } from "@/components/PWAInstallPrompt";
 import { MobileBottomNav } from "@/components/MobileBottomNav";
 
@@ -64,6 +65,7 @@ function Router() {
       <Route path="/admin/tasks" component={TaskManagement} />
       <Route path="/practice-pool" component={PracticePool} />
       <Route path="/practice/:id" component={PracticeDetail} />
+      <Route path="/favorites" component={MyFavorites} />
       <Route component={NotFound} />
     </Switch>
   );

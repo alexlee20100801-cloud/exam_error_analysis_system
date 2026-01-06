@@ -141,6 +141,13 @@
       "when": 1767683261932,
       "tag": "0019_strong_darwin",
       "breakpoints": true
+    },
+    {
+      "idx": 20,
+      "version": "5",
+      "when": 1767687871964,
+      "tag": "0020_small_thunderbird",
+      "breakpoints": true
     }
   ]
 }

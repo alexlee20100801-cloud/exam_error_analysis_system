@@ -69,3 +69,14 @@
 - [x] 集成到练习详情页底部
 - [x] 实现快速跳转功能
 - [x] 编写单元测试验证推荐算法
+
+## 新增功能：题目收藏功能
+- [x] 设计收藏表schema（userId, questionId, questionType, collectedAt）
+- [x] 创建收藏服务（addToFavorites, removeFromFavorites, getFavorites）
+- [x] 添加收藏API接口（favorites.add, favorites.remove, favorites.list）
+- [x] 开发收藏按钮组件（显示收藏状态、支持一键收藏/取消）
+- [x] 集成到推荐卡片组件
+- [x] 创建个人题库页面（展示所有收藏的题目）
+- [x] 实现收藏状态实时同步
+- [x] 集成到侧边栏菜单
+- [x] 编写单元测试验证收藏功能
