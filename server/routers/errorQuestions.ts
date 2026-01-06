@@ -343,4 +343,50 @@ export const errorQuestionsRouter = router({
         count: questions.length,
       };
     }),
+
+  /**
+   * 更新错题笔记
+   */
+  updateNotes: protectedProcedure
+    .input(
+      z.object({
+        questionId: z.number(),
+        userNotes: z.string().optional(),
+        noteImages: z.array(z.string()).optional(),
+      })
+    )
+    .mutation(async ({ ctx, input }) => {
+      const db = await getDb();
+      if (!db) throw new Error("数据库连接失败");
+
+      // 验证错题属于当前用户
+      const questions = await db
+        .select()
+        .from(errorQuestions)
+        .where(
+          and(
+            eq(errorQuestions.id, input.questionId),
+            eq(errorQuestions.userId, ctx.user.id)
+          )
+        )
+        .limit(1);
+
+      if (questions.length === 0) {
+        throw new Error("错题不存在或无权访问");
+      }
+
+      // 更新笔记
+      await db
+        .update(errorQuestions)
+        .set({
+          userNotes: input.userNotes,
+          noteImages: input.noteImages,
+          updatedAt: new Date(),
+        })
+        .where(eq(errorQuestions.id, input.questionId));
+
+      return {
+        success: true,
+      };
+    }),
 });

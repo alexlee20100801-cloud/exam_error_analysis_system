@@ -28,6 +28,7 @@ import { Streamdown } from "streamdown";
 import { VoicePlayer } from "@/components/VoicePlayer";
 import { TagSelector } from "@/components/TagSelector";
 import { SimilarQuestionsSection } from "@/components/SimilarQuestionsSection";
+import { NoteEditor } from "@/components/NoteEditor";
 import { useState } from "react";
 import { useSwipeGesture } from "@/hooks/useSwipeGesture";
 import { useIsMobile } from "@/hooks/useMobile";
@@ -569,6 +570,15 @@ export default function ErrorQuestionDetail() {
             </AlertDescription>
           </Alert>
         )}
+
+        {/* 我的笔记 */}
+        <div className="mb-6">
+          <NoteEditor
+            questionId={questionId}
+            initialNotes={question.userNotes || ""}
+            initialImages={(question.noteImages as string[]) || []}
+          />
+        </div>
 
         {/* 错题标签 */}
         <Card className="mb-6">

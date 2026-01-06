@@ -83,7 +83,8 @@ export const errorQuestions = mysqlTable("error_questions", {
   knowledgePointIds: json("knowledgePointIds").$type<number[]>(), // 关联的知识点ID数组
   // 用户信息
   userAnswer: text("userAnswer"), // 用户的错误答案
-  userNotes: text("userNotes"), // 用户笔记
+  userNotes: text("userNotes"), // 用户笔记（文字）
+  noteImages: json("noteImages").$type<string[]>(), // 笔记图片URL数组
   voiceExplanation: text("voiceExplanation"), // AI语音讲解稿（缓存）
   // 状态
   isAnalyzed: boolean("isAnalyzed").default(false), // 是否已AI分析
