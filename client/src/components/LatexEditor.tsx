@@ -22,6 +22,7 @@ import {
   PopoverTrigger,
 } from './ui/popover';
 import { LatexHelpPanel } from './LatexHelpPanel';
+import { LatexFormulaTooltip } from './LatexFormulaTooltip';
 import { latexTemplateCategories } from '../lib/latexTemplates';
 import {
   getLatexHistory,
@@ -255,23 +256,29 @@ export function LatexEditor({
                 <TabsContent key={category} value={category} className="space-y-2">
                   <div className="grid grid-cols-2 gap-2">
                     {symbols.map((symbol, index) => (
-                      <Button
+                      <LatexFormulaTooltip
                         key={index}
-                        type="button"
-                        variant="outline"
-                        size="sm"
-                        className="justify-start h-auto py-2"
-                        onClick={() => insertLatex(symbol.latex)}
+                        latex={symbol.latex}
+                        label={symbol.label}
+                        description={`常用${category}符号`}
                       >
-                        <div className="flex flex-col items-start gap-1 w-full">
-                          <span className="text-xs text-muted-foreground">
-                            {symbol.label}
-                          </span>
-                          <div className="text-sm">
-                            <LatexPreview latex={symbol.display} displayMode={false} />
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="sm"
+                          className="justify-start h-auto py-2 w-full"
+                          onClick={() => insertLatex(symbol.latex)}
+                        >
+                          <div className="flex flex-col items-start gap-1 w-full">
+                            <span className="text-xs text-muted-foreground">
+                              {symbol.label}
+                            </span>
+                            <div className="text-sm">
+                              <LatexPreview latex={symbol.display} displayMode={false} />
+                            </div>
                           </div>
-                        </div>
-                      </Button>
+                        </Button>
+                      </LatexFormulaTooltip>
                     ))}
                   </div>
                 </TabsContent>
@@ -301,26 +308,32 @@ export function LatexEditor({
                 <TabsContent key={category.title} value={category.title} className="space-y-2">
                   <div className="space-y-2">
                     {category.templates.map((template, index) => (
-                      <Button
+                      <LatexFormulaTooltip
                         key={index}
-                        type="button"
-                        variant="outline"
-                        size="sm"
-                        className="justify-start h-auto py-3 w-full"
-                        onClick={() => insertLatex(template.latex)}
+                        latex={template.latex}
+                        label={template.label}
+                        description={template.description}
                       >
-                        <div className="flex flex-col items-start gap-1 w-full">
-                          <div className="flex items-center justify-between w-full">
-                            <span className="text-sm font-medium">{template.label}</span>
-                            <span className="text-xs text-muted-foreground">
-                              {template.description}
-                            </span>
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="sm"
+                          className="justify-start h-auto py-3 w-full"
+                          onClick={() => insertLatex(template.latex)}
+                        >
+                          <div className="flex flex-col items-start gap-1 w-full">
+                            <div className="flex items-center justify-between w-full">
+                              <span className="text-sm font-medium">{template.label}</span>
+                              <span className="text-xs text-muted-foreground">
+                                {template.description}
+                              </span>
+                            </div>
+                            <div className="text-sm w-full">
+                              <LatexPreview latex={template.display} displayMode={false} />
+                            </div>
                           </div>
-                          <div className="text-sm w-full">
-                            <LatexPreview latex={template.display} displayMode={false} />
-                          </div>
-                        </div>
-                      </Button>
+                        </Button>
+                      </LatexFormulaTooltip>
                     ))}
                   </div>
                 </TabsContent>
@@ -367,24 +380,30 @@ export function LatexEditor({
                       key={index}
                       className="flex items-center gap-2 p-2 rounded hover:bg-muted group"
                     >
-                      <Button
-                        type="button"
-                        variant="ghost"
-                        size="sm"
-                        className="flex-1 justify-start h-auto py-2"
-                        onClick={() => insertLatex(item.latex)}
+                      <LatexFormulaTooltip
+                        latex={item.latex}
+                        label={`历史公式 #${index + 1}`}
+                        description={`使用 ${item.usageCount} 次，${formatHistoryTime(item.timestamp)}`}
                       >
-                        <div className="flex flex-col items-start gap-1 w-full">
-                          <div className="text-sm">
-                            <LatexPreview latex={item.latex} displayMode={false} />
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="sm"
+                          className="flex-1 justify-start h-auto py-2"
+                          onClick={() => insertLatex(item.latex)}
+                        >
+                          <div className="flex flex-col items-start gap-1 w-full">
+                            <div className="text-sm">
+                              <LatexPreview latex={item.latex} displayMode={false} />
+                            </div>
+                            <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                              <span>使用 {item.usageCount} 次</span>
+                              <span>•</span>
+                              <span>{formatHistoryTime(item.timestamp)}</span>
+                            </div>
                           </div>
-                          <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                            <span>使用 {item.usageCount} 次</span>
-                            <span>•</span>
-                            <span>{formatHistoryTime(item.timestamp)}</span>
-                          </div>
-                        </div>
-                      </Button>
+                        </Button>
+                      </LatexFormulaTooltip>
                       <Button
                         type="button"
                         variant="ghost"
