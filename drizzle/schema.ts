@@ -598,7 +598,7 @@ export type InsertQuestion = typeof questions.$inferInsert;
 export const scheduledTasks = mysqlTable("scheduled_tasks", {
   id: int("id").autoincrement().primaryKey(),
   taskName: varchar("task_name", { length: 100 }).notNull().unique(),
-  taskType: mysqlEnum("task_type", ["generate_questions", "send_reminders", "cleanup"]).notNull(),
+  taskType: mysqlEnum("task_type", ["generate_questions", "send_reminders", "cleanup", "check_review_task_reminders"]).notNull(),
   cronExpression: varchar("cron_expression", { length: 50 }).notNull(), // 如：0 2 * * * (每天凌晨2点)
   isEnabled: boolean("is_enabled").notNull().default(true),
   lastExecutedAt: timestamp("last_executed_at"),
@@ -743,3 +743,41 @@ export const reviewTasks = mysqlTable("review_tasks", {
 });
 export type ReviewTask = typeof reviewTasks.$inferSelect;
 export type InsertReviewTask = typeof reviewTasks.$inferInsert;
+
+/**
+ * 用户提醒设置表 - 存储用户的复习任务提醒偏好
+ */
+export const userReminderSettings = mysqlTable("user_reminder_settings", {
+  id: int("id").autoincrement().primaryKey(),
+  userId: int("user_id").notNull().unique(),
+  // 是否启用提醒
+  enabled: boolean("enabled").notNull().default(true),
+  // 提醒时间点（JSON数组，单位：分钟）
+  // 例如：[1440, 180, 60] 表示提前1天3小时1小时
+  reminderMinutes: json("reminder_minutes").$type<number[]>().notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().onUpdateNow().notNull(),
+});
+export type UserReminderSetting = typeof userReminderSettings.$inferSelect;
+export type InsertUserReminderSetting = typeof userReminderSettings.$inferInsert;
+
+/**
+ * 复习任务提醒记录表 - 记录每次发送的提醒
+ */
+export const reviewTaskReminders = mysqlTable("review_task_reminders", {
+  id: int("id").autoincrement().primaryKey(),
+  userId: int("user_id").notNull(),
+  taskId: int("task_id").notNull(), // 关联的复习任务ID
+  // 提醒信息
+  reminderType: mysqlEnum("reminder_type", ["one_day_before", "three_hours_before", "one_hour_before", "custom"]).notNull(),
+  reminderMinutes: int("reminder_minutes").notNull(), // 提前多少分钟提醒
+  scheduledTime: timestamp("scheduled_time").notNull(), // 计划发送时间
+  // 发送状态
+  sent: boolean("sent").notNull().default(false),
+  sentAt: timestamp("sent_at"),
+  // 提醒内容
+  message: text("message").notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+export type ReviewTaskReminder = typeof reviewTaskReminders.$inferSelect;
+export type InsertReviewTaskReminder = typeof reviewTaskReminders.$inferInsert;

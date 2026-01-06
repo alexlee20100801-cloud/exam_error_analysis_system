@@ -123,6 +123,10 @@ export default function LearningReport() {
 
   // 导出日历
   const exportCalendarMutation = trpc.aiLearningAdvice.exportCalendar.useMutation();
+  
+  // 提醒设置
+  const { data: reminderSettings } = trpc.reminderSettings.getSettings.useQuery();
+  const updateReminderSettingsMutation = trpc.reminderSettings.updateSettings.useMutation();
 
   const handleExportCalendar = async () => {
     try {
@@ -255,15 +259,42 @@ export default function LearningReport() {
                   <CardDescription>基于你的错题数据智能生成</CardDescription>
                 </div>
                 {aiAdvice.data.reviewPlan.length > 0 && (
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={handleExportCalendar}
-                    disabled={exportingCalendar}
-                  >
-                    <Calendar className="mr-2 h-4 w-4" />
-                    {exportingCalendar ? "导出中..." : "导出到日历"}
-                  </Button>
+                  <div className="flex items-center gap-3">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={handleExportCalendar}
+                      disabled={exportingCalendar}
+                    >
+                      <Calendar className="mr-2 h-4 w-4" />
+                      {exportingCalendar ? "导出中..." : "导出到日历"}
+                    </Button>
+                    
+                    <div className="flex items-center gap-2 text-sm">
+                      <input
+                        type="checkbox"
+                        id="reminder-enabled"
+                        checked={reminderSettings?.data?.enabled ?? true}
+                        onChange={async (e) => {
+                          const enabled = e.target.checked;
+                          try {
+                            await updateReminderSettingsMutation.mutateAsync({
+                              enabled,
+                              reminderMinutes: reminderSettings?.data?.reminderMinutes ?? [1440, 180, 60],
+                            });
+                            alert(enabled ? "已开启提醒！系统将在复习任务到期前自动发送提醒" : "已关闭提醒");
+                          } catch (error) {
+                            console.error("更新提醒设置失败:", error);
+                            alert("设置失败，请稍后重试");
+                          }
+                        }}
+                        className="h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary cursor-pointer"
+                      />
+                      <label htmlFor="reminder-enabled" className="cursor-pointer text-muted-foreground hover:text-foreground transition-colors">
+                        开启任务提醒
+                      </label>
+                    </div>
+                  </div>
                 )}
               </div>
             </CardHeader>

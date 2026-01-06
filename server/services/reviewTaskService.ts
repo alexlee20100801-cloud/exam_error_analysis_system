@@ -1,5 +1,6 @@
 import { getDb } from "../db";
 import { aiAdviceHistory, reviewTasks } from "../../drizzle/schema";
+import { createRemindersForTask, cancelRemindersForCompletedTask } from "./reviewTaskReminderService";
 import { eq, and, desc } from "drizzle-orm";
 import type { LearningAdvice } from "./aiLearningAdviceService";
 
@@ -42,7 +43,17 @@ export async function saveAdviceAndCreateTasks(
       scheduledDate: parseSuggestedTimeToDate(plan.suggestedTime),
     }));
 
-    await db.insert(reviewTasks).values(tasks);
+    const [result] = await db.insert(reviewTasks).values(tasks);
+    
+    // 为每个任务创建提醒
+    const firstInsertId = Number(result.insertId);
+    for (let i = 0; i < tasks.length; i++) {
+      const taskId = firstInsertId + i;
+      const task = tasks[i];
+      if (task.scheduledDate) {
+        await createRemindersForTask(userId, taskId, task.scheduledDate);
+      }
+    }
   }
 
   return adviceHistoryId;
@@ -160,6 +171,11 @@ export async function toggleTaskCompletion(taskId: number, userId: number) {
       completedAt,
     })
     .where(eq(reviewTasks.id, taskId));
+
+  // 如果任务被标记为完成，取消未发送的提醒
+  if (newCompleted) {
+    await cancelRemindersForCompletedTask(taskId);
+  }
 
   return {
     taskId,

@@ -1,0 +1,1 @@
+ALTER TABLE `user_reminder_settings` MODIFY COLUMN `reminder_minutes` json NOT NULL;

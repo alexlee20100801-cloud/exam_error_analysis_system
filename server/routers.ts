@@ -36,6 +36,7 @@ import { reviewRemindersRouter } from "./routers/reviewReminders";
 import { errorQuestionStatsRouter } from "./routers/errorQuestionStats";
 import { aiLearningAdviceRouter } from "./routers/aiLearningAdvice";
 import { reviewTasksRouter } from "./routers/reviewTasks";
+import { reminderSettingsRouter } from "./routers/reminderSettings";
 
 export const appRouter = router({
   system: systemRouter,
@@ -60,6 +61,7 @@ export const appRouter = router({
   // AI学习建议
   aiLearningAdvice: aiLearningAdviceRouter,
   reviewTasks: reviewTasksRouter,
+  reminderSettings: reminderSettingsRouter,
   
   // 收藏管理
   favorites: favoritesRouter,

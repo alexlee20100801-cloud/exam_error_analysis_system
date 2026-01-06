@@ -4,6 +4,7 @@ import { scheduledTasks, taskExecutionLogs, questions } from '../../drizzle/sche
 import { eq, sql } from 'drizzle-orm';
 import { generatePracticeQuestions } from '../practiceGenerationService';
 import { sendDueReminders } from './reviewReminderService';
+import { checkAndSendReminders } from './reviewTaskReminderService';
 
 /**
  * 定时任务调度服务
@@ -65,6 +66,9 @@ function registerTask(task: typeof scheduledTasks.$inferSelect) {
         break;
       case 'send_reminders':
         taskFunction = () => executeSendRemindersTask(task.id);
+        break;
+      case 'check_review_task_reminders':
+        taskFunction = () => executeCheckReviewTaskRemindersTask(task.id);
         break;
       case 'cleanup':
         taskFunction = () => executeCleanupTask(task.id);
@@ -276,8 +280,81 @@ async function executeSendRemindersTask(taskId: number) {
 }
 
 /**
+ * 执行复习任务提醒检查
+ * 检查并发送到期的复习任务提醒
+ */
+async function executeCheckReviewTaskRemindersTask(taskId: number) {
+  const startTime = Date.now();
+  let itemsProcessed = 0;
+  let errorMessage: string | null = null;
+
+  try {
+    const db = await getDb();
+    if (!db) throw new Error('Database not available');
+    
+    console.log('[CheckReviewTaskReminders] Task started');
+
+    await db
+      .update(scheduledTasks)
+      .set({
+        lastStatus: 'running',
+        lastExecutedAt: new Date(),
+      })
+      .where(eq(scheduledTasks.id, taskId));
+
+    // 检查并发送到期的提醒
+    const result = await checkAndSendReminders();
+    itemsProcessed = result.sent;
+    
+    console.log(`[CheckReviewTaskReminders] Checked ${result.checked} reminders, sent ${result.sent}`);
+
+    await db
+      .update(scheduledTasks)
+      .set({
+        lastStatus: 'success',
+        executionCount: sql`${scheduledTasks.executionCount} + 1`,
+      })
+      .where(eq(scheduledTasks.id, taskId));
+
+    console.log(`[CheckReviewTaskReminders] Task completed. Sent ${itemsProcessed} reminders`);
+  } catch (error: any) {
+    errorMessage = error.message || 'Unknown error';
+    console.error('[CheckReviewTaskReminders] Task failed:', error);
+
+    const db = await getDb();
+    if (db) {
+      await db
+        .update(scheduledTasks)
+        .set({
+          lastStatus: 'failed',
+          lastErrorMessage: errorMessage,
+        })
+        .where(eq(scheduledTasks.id, taskId));
+    }
+  } finally {
+    const db = await getDb();
+    if (db) {
+      const duration = Date.now() - startTime;
+      await db.insert(taskExecutionLogs).values({
+        taskId,
+        status: errorMessage ? 'failed' : 'success',
+        startedAt: new Date(startTime),
+        completedAt: new Date(),
+        duration,
+        itemsProcessed,
+        errorMessage,
+        details: {
+          taskType: 'check_review_task_reminders',
+          timestamp: new Date().toISOString(),
+        },
+      });
+    }
+  }
+}
+
+/**
  * 执行清理任务
- * 清理过期数据、临时文件等
+ * 清理过期数据、日志等
  */
 async function executeCleanupTask(taskId: number) {
   const startTime = Date.now();
