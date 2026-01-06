@@ -34,6 +34,7 @@ import { practicePoolsRouter } from "./routers/practicePools";
 import { favoritesRouter } from "./routers/favorites";
 import { reviewRemindersRouter } from "./routers/reviewReminders";
 import { errorQuestionStatsRouter } from "./routers/errorQuestionStats";
+import { aiLearningAdviceRouter } from "./routers/aiLearningAdvice";
 
 export const appRouter = router({
   system: systemRouter,
@@ -54,6 +55,9 @@ export const appRouter = router({
   
   // 错题统计
   errorQuestionStats: errorQuestionStatsRouter,
+  
+  // AI学习建议
+  aiLearningAdvice: aiLearningAdviceRouter,
   
   // 收藏管理
   favorites: favoritesRouter,

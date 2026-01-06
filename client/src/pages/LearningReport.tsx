@@ -10,7 +10,12 @@ import {
   Target, 
   TrendingUp,
   BookOpen,
-  FileText
+  FileText,
+  Lightbulb,
+  CheckCircle2,
+  AlertTriangle,
+  Calendar,
+  Sparkles
 } from "lucide-react";
 import { useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
@@ -102,6 +107,12 @@ export default function LearningReport() {
     { enabled: !!user }
   );
 
+  // 获取AI学习建议
+  const { data: aiAdvice, isLoading: aiAdviceLoading } = trpc.aiLearningAdvice.generate.useQuery(
+    undefined,
+    { enabled: !!user }
+  );
+
   if (authLoading) {
     return (
       <DashboardLayout>
@@ -189,6 +200,118 @@ export default function LearningReport() {
           open={exportDialogOpen}
           onOpenChange={setExportDialogOpen}
         />
+
+        {/* AI学习建议 */}
+        {aiAdviceLoading ? (
+          <Skeleton className="h-96" />
+        ) : aiAdvice && aiAdvice.data ? (
+          <Card className="border-2 border-primary/20 bg-gradient-to-br from-primary/5 to-transparent">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Sparkles className="h-5 w-5 text-primary" />
+                AI个性化学习建议
+              </CardTitle>
+              <CardDescription>基于你的错题数据智能生成</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              {/* 总体评估 */}
+              <div className="p-4 bg-blue-50 dark:bg-blue-950/20 rounded-lg border border-blue-200 dark:border-blue-900">
+                <p className="text-sm text-blue-900 dark:text-blue-100">{aiAdvice.data.overallAssessment}</p>
+              </div>
+
+              {/* 学习建议 */}
+              <div>
+                <h3 className="text-sm font-semibold mb-3 flex items-center gap-2">
+                  <Lightbulb className="h-4 w-4 text-yellow-500" />
+                  学习建议
+                </h3>
+                <div className="space-y-2">
+                  {aiAdvice.data.learningTips.map((tip, index) => (
+                    <div
+                      key={index}
+                      className={`p-3 rounded-lg border ${
+                        tip.priority === "high"
+                          ? "bg-red-50 dark:bg-red-950/20 border-red-200 dark:border-red-900"
+                          : tip.priority === "medium"
+                          ? "bg-yellow-50 dark:bg-yellow-950/20 border-yellow-200 dark:border-yellow-900"
+                          : "bg-green-50 dark:bg-green-950/20 border-green-200 dark:border-green-900"
+                      }`}
+                    >
+                      <div className="flex items-start gap-2">
+                        <CheckCircle2 className="h-4 w-4 mt-0.5 flex-shrink-0" />
+                        <div className="flex-1">
+                          <h4 className="text-sm font-medium">{tip.title}</h4>
+                          <p className="text-xs text-muted-foreground mt-1">{tip.content}</p>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* 复习计划 */}
+              {aiAdvice.data.reviewPlan.length > 0 && (
+                <div>
+                  <h3 className="text-sm font-semibold mb-3 flex items-center gap-2">
+                    <Calendar className="h-4 w-4 text-blue-500" />
+                    智能复习计划
+                  </h3>
+                  <div className="space-y-2">
+                    {aiAdvice.data.reviewPlan.slice(0, 5).map((plan, index) => (
+                      <div key={index} className="flex items-start gap-3 p-3 bg-muted/50 rounded-lg">
+                        <div className="flex-shrink-0 w-6 h-6 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-xs font-bold">
+                          {plan.priority}
+                        </div>
+                        <div className="flex-1">
+                          <div className="flex items-center gap-2">
+                            <h4 className="text-sm font-medium">{plan.subject}</h4>
+                            {plan.knowledgePoint && (
+                              <span className="text-xs text-muted-foreground">· {plan.knowledgePoint}</span>
+                            )}
+                          </div>
+                          <p className="text-xs text-muted-foreground mt-1">{plan.reason}</p>
+                          <p className="text-xs text-primary mt-1">建议时间：{plan.suggestedTime}</p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* 薄弱点诊断 */}
+              {aiAdvice.data.weaknesses.length > 0 && (
+                <div>
+                  <h3 className="text-sm font-semibold mb-3 flex items-center gap-2">
+                    <AlertTriangle className="h-4 w-4 text-orange-500" />
+                    薄弱点诊断
+                  </h3>
+                  <div className="space-y-2">
+                    {aiAdvice.data.weaknesses.map((weakness, index) => (
+                      <div
+                        key={index}
+                        className={`p-3 rounded-lg border ${
+                          weakness.severity === "critical"
+                            ? "bg-red-50 dark:bg-red-950/20 border-red-200 dark:border-red-900"
+                            : weakness.severity === "moderate"
+                            ? "bg-orange-50 dark:bg-orange-950/20 border-orange-200 dark:border-orange-900"
+                            : "bg-yellow-50 dark:bg-yellow-950/20 border-yellow-200 dark:border-yellow-900"
+                        }`}
+                      >
+                        <h4 className="text-sm font-medium">{weakness.area}</h4>
+                        <p className="text-xs text-muted-foreground mt-1">{weakness.recommendation}</p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* 激励语 */}
+              <div className="p-4 bg-gradient-to-r from-primary/10 to-transparent rounded-lg border border-primary/20">
+                <p className="text-sm text-center font-medium text-primary">{aiAdvice.data.encouragement}</p>
+              </div>
+            </CardContent>
+          </Card>
+        ) : null}
 
         {/* 学习总览卡片 */}
         {overviewLoading ? (
