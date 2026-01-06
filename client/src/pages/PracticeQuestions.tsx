@@ -19,6 +19,7 @@ import { useLocation, useRoute } from "wouter";
 import { useState } from "react";
 import { toast } from "sonner";
 import { Streamdown } from "streamdown";
+import { LatexText } from "@/components/LatexPreview";
 
 export default function PracticeQuestions() {
   const { user, loading: authLoading } = useAuth();
@@ -221,9 +222,7 @@ export default function PracticeQuestions() {
           </CardHeader>
           <CardContent className="space-y-4">
             {/* 题目内容 */}
-            <div className="prose max-w-none">
-              <Streamdown>{currentQuestion.content}</Streamdown>
-            </div>
+            <LatexText text={currentQuestion.content} className="prose max-w-none dark:prose-invert" />
 
             {/* 答题区域 */}
             <div className="space-y-2">
@@ -300,12 +299,12 @@ export default function PracticeQuestions() {
 
                 <div className="bg-muted/50 p-4 rounded-lg">
                   <h4 className="font-semibold mb-2">标准答案：</h4>
-                  <Streamdown>{currentQuestion.answer}</Streamdown>
+                  <LatexText text={currentQuestion.answer} className="prose prose-sm max-w-none dark:prose-invert" />
                 </div>
 
                 <div className="bg-muted/50 p-4 rounded-lg">
                   <h4 className="font-semibold mb-2">详细解析：</h4>
-                  <Streamdown>{currentQuestion.explanation}</Streamdown>
+                  <LatexText text={currentQuestion.explanation} className="prose prose-sm max-w-none dark:prose-invert" />
                 </div>
               </div>
             )}

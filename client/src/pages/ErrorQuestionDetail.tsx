@@ -340,9 +340,7 @@ export default function ErrorQuestionDetail() {
                 className="w-full max-w-2xl rounded-lg border mb-4"
               />
             )}
-            <div className="prose max-w-none">
-              <Streamdown>{question.content}</Streamdown>
-            </div>
+            <LatexText text={question.content} className="prose max-w-none dark:prose-invert" />
           </CardContent>
         </Card>
 
@@ -357,7 +355,7 @@ export default function ErrorQuestionDetail() {
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <Streamdown>{question.userAnswer}</Streamdown>
+                <LatexText text={question.userAnswer} className="prose prose-sm max-w-none dark:prose-invert" />
               </CardContent>
             </Card>
           )}
@@ -401,7 +399,7 @@ export default function ErrorQuestionDetail() {
                   <p className="text-lg font-medium mb-2">
                     {JSON.parse(question.detailedAnalysis).errorType}
                   </p>
-                  <Streamdown>{JSON.parse(question.detailedAnalysis).errorAnalysis}</Streamdown>
+                  <LatexText text={JSON.parse(question.detailedAnalysis).errorAnalysis} className="prose prose-sm max-w-none dark:prose-invert" />
                 </CardContent>
               </Card>
 
@@ -426,7 +424,7 @@ export default function ErrorQuestionDetail() {
                       </Badge>
                     ))}
                   </div>
-                  <Streamdown>{JSON.parse(question.detailedAnalysis).knowledgeGraph}</Streamdown>
+                  <LatexText text={JSON.parse(question.detailedAnalysis).knowledgeGraph} className="prose prose-sm max-w-none dark:prose-invert" />
                 </CardContent>
               </Card>
             </TabsContent>
@@ -455,7 +453,7 @@ export default function ErrorQuestionDetail() {
                   <Separator />
                   <div>
                     <h4 className="font-semibold mb-2">详细解读：</h4>
-                    <Streamdown>{JSON.parse(question.detailedAnalysis).keyPointsExplanation}</Streamdown>
+                    <LatexText text={JSON.parse(question.detailedAnalysis).keyPointsExplanation} className="prose prose-sm max-w-none dark:prose-invert" />
                   </div>
                 </CardContent>
               </Card>
@@ -488,7 +486,7 @@ export default function ErrorQuestionDetail() {
                   <Separator />
                   <div>
                     <h4 className="font-semibold mb-2">深度分析：</h4>
-                    <Streamdown>{JSON.parse(question.detailedAnalysis).mistakesAnalysis}</Streamdown>
+                    <LatexText text={JSON.parse(question.detailedAnalysis).mistakesAnalysis} className="prose prose-sm max-w-none dark:prose-invert" />
                   </div>
                 </CardContent>
               </Card>
@@ -518,7 +516,7 @@ export default function ErrorQuestionDetail() {
                   <Separator />
                   <div>
                     <h4 className="font-semibold mb-2">解题策略：</h4>
-                    <Streamdown>{JSON.parse(question.detailedAnalysis).solvingStrategy}</Streamdown>
+                    <LatexText text={JSON.parse(question.detailedAnalysis).solvingStrategy} className="prose prose-sm max-w-none dark:prose-invert" />
                   </div>
                   <Separator />
                   <div>
@@ -548,12 +546,12 @@ export default function ErrorQuestionDetail() {
                 <CardContent className="space-y-4">
                   <div>
                     <h4 className="font-semibold mb-2">学习建议：</h4>
-                    <Streamdown>{JSON.parse(question.detailedAnalysis).studyAdvice}</Streamdown>
+                    <LatexText text={JSON.parse(question.detailedAnalysis).studyAdvice} className="prose prose-sm max-w-none dark:prose-invert" />
                   </div>
                   <Separator />
                   <div>
                     <h4 className="font-semibold mb-2">练习方向：</h4>
-                    <Streamdown>{JSON.parse(question.detailedAnalysis).practiceDirection}</Streamdown>
+                    <LatexText text={JSON.parse(question.detailedAnalysis).practiceDirection} className="prose prose-sm max-w-none dark:prose-invert" />
                   </div>
                 </CardContent>
               </Card>
@@ -571,7 +569,7 @@ export default function ErrorQuestionDetail() {
               {question.errorAnalysis && (
                 <div>
                   <h4 className="font-semibold mb-2">错误分析：</h4>
-                  <Streamdown>{question.errorAnalysis}</Streamdown>
+                  <LatexText text={question.errorAnalysis} className="prose prose-sm max-w-none dark:prose-invert" />
                 </div>
               )}
               {question.detailedExplanation && (
@@ -579,7 +577,7 @@ export default function ErrorQuestionDetail() {
                   <Separator />
                   <div>
                     <h4 className="font-semibold mb-2">详细解析：</h4>
-                    <Streamdown>{question.detailedExplanation}</Streamdown>
+                    <LatexText text={question.detailedExplanation} className="prose prose-sm max-w-none dark:prose-invert" />
                   </div>
                 </>
               )}

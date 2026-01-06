@@ -663,3 +663,26 @@
 - [x] 实现按标签筛选功能（多标签AND/OR筛选）
 - [x] 在历史记录和模板库中显示标签徽章
 - [x] 创建标签快速筛选栏
+
+
+## 修复AI错题分析中特殊符号显示问题
+
+### 问题诊断
+- [x] 检查错题详情页面的AI分析展示组件
+- [x] 检查是否使用了LatexText组件渲染AI分析内容
+- [x] 检查AI分析服务返回的内容格式
+- [x] 定位特殊符号显示不正确的具体位置
+
+### 修复方案
+- [x] 在错题详情页的AI分析区域集成LatexText组件
+- [x] 确保AI分析的所有文本字段都使用LatexText渲染
+- [x] 修复detailedAnalysis各个Tab页的内容渲染
+- [x] 修复题目内容和用户答案的渲染
+- [x] 修复练习题页面的题目、答案、解析渲染
+- [x] 编写单元测试验证LatexText组件使用
+
+### 测试验证
+- [x] 验证ErrorQuestionDetail页面使用LatexText渲染AI分析
+- [x] 验证PracticeQuestions页面使用LatexText渲染题目和答案
+- [x] 验证不再使用Streamdown渲染题目内容
+- [x] 验证CSS类名正确应用（prose、dark:prose-invert）
