@@ -27,6 +27,7 @@ import QuestionBankManagement from "@/pages/QuestionBankManagement";
 import RealExamPractice from "@/pages/RealExamPractice";
 import LearningPath from "@/pages/LearningPath";
 import Settings from "@/pages/Settings";
+import { QuestionPractice } from "@/pages/QuestionPractice";
 import { PWAInstallPrompt } from "@/components/PWAInstallPrompt";
 import { MobileBottomNav } from "@/components/MobileBottomNav";
 
@@ -39,6 +40,7 @@ function Router() {
       <Route path="/error-questions/:id" component={ErrorQuestionDetail} />
       <Route path="/practice-questions/:errorQuestionId" component={PracticeQuestions} />
       <Route path={"/practice"} component={Practice} />
+      <Route path={"/question-practice"} component={QuestionPractice} />
       <Route path={"/report"} component={LearningReport} />
           <Route path="/videos" component={VideoLearning} />
         <Route path="/review-plan" component={ReviewPlan} />

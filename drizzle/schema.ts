@@ -557,3 +557,37 @@ export const learningPathProgress = mysqlTable("learning_path_progress", {
 
 export type LearningPathProgress = typeof learningPathProgress.$inferSelect;
 export type InsertLearningPathProgress = typeof learningPathProgress.$inferInsert;
+
+/**
+ * 真题题库表 - AI每日自动生成的练习题目
+ */
+export const questions = mysqlTable("questions", {
+  id: int("id").autoincrement().primaryKey(),
+  title: varchar("title", { length: 500 }).notNull(),
+  content: text("content").notNull(),
+  subject: mysqlEnum("subject", subjectEnum).notNull(),
+  grade: mysqlEnum("grade", ["junior1", "junior2", "junior3", "senior1", "senior2", "senior3"]).notNull(),
+  semester: mysqlEnum("semester", semesterEnum),
+  difficulty: mysqlEnum("difficulty", ["easy", "medium", "hard"]).notNull(),
+  // 题目类型：选择题、填空题、解答题等
+  questionType: mysqlEnum("questionType", ["choice", "fillBlank", "shortAnswer", "essay"]).notNull(),
+  // 选择题选项（JSON格式）
+  options: json("options").$type<string[]>(),
+  // 正确答案
+  correctAnswer: text("correctAnswer").notNull(),
+  // 详细解析
+  explanation: text("explanation"),
+  // 知识点标签
+  knowledgePoints: json("knowledgePoints").$type<string[]>(),
+  // AI生成时间
+  generatedAt: timestamp("generatedAt").defaultNow().notNull(),
+  // 是否已发布（管理员审核后发布）
+  isPublished: boolean("isPublished").default(true).notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type Question = typeof questions.$inferSelect;
+export type InsertQuestion = typeof questions.$inferInsert;
+
+

@@ -37,6 +37,7 @@ const menuItems = [
   { id: "senior-errors", icon: GraduationCap, label: "高中错题", path: "/error-questions?level=senior", indent: true, schoolLevel: "senior" },
   { id: "ai-exam", icon: FileText, label: "AI试卷生成", path: "/exam-generator" },
   { id: "practice", icon: FileQuestion, label: "真题练习", path: "/real-exam-practice" },
+  { id: "ai-practice", icon: BookOpen, label: "AI真题练习", path: "/question-practice" },
   { id: "learning-path", icon: Route, label: "学习路径", path: "/learning-path" },
   { id: "report", icon: BarChart3, label: "学习报告", path: "/learning-report" },
   { id: "review", icon: Clock, label: "复习提醒", path: "/review" },

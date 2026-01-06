@@ -28,6 +28,7 @@ import { learningPathRouter } from "./routers/learningPath";
 import { semesterRouter } from "./routers/semesterRouter";
 import { userSettingsRouter } from "./routers/userSettings";
 import { similarQuestionsRouter } from "./routers/similarQuestions";
+import { questionsRouter } from "./routers/questions";
 
 export const appRouter = router({
   system: systemRouter,
@@ -102,6 +103,9 @@ export const appRouter = router({
   // 用户设置
   userSettings: userSettingsRouter,
   similarQuestions: similarQuestionsRouter,
+  
+  // 真题练习
+  questions: questionsRouter,
 });
 
 export type AppRouter = typeof appRouter;
