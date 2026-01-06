@@ -21,7 +21,7 @@ import {
 } from "@/components/ui/sidebar";
 import { getLoginUrl } from "@/const";
 import { useIsMobile } from "@/hooks/useMobile";
-import { LayoutDashboard, LogOut, PanelLeft, Users, BookOpen, GraduationCap, School, Trophy, Video, Calendar, BarChart3, Clock, UserCircle, FileText, Database, FileQuestion, Route, Settings, Timer, Target, Heart, Bell, Upload } from "lucide-react";
+import { LayoutDashboard, LogOut, PanelLeft, Users, BookOpen, GraduationCap, School, Trophy, Video, Calendar, BarChart3, Clock, UserCircle, FileText, Database, FileQuestion, Route, Settings, Timer, Target, Heart, Bell, Upload, Shield, Folder } from "lucide-react";
 import { trpc } from "@/lib/trpc";
 import { Badge } from "@/components/ui/badge";
 import { CSSProperties, useEffect, useRef, useState } from "react";
@@ -29,31 +29,95 @@ import { useLocation } from "wouter";
 import { DashboardLayoutSkeleton } from './DashboardLayoutSkeleton';
 import { Button } from "./ui/button";
 
-// 菜单项配置（包含id字段用于匹配配置）
-const menuItems = [
-  { id: "dashboard", icon: LayoutDashboard, label: "学习概览", path: "/", isCore: true },
-  { id: "error-questions", icon: BookOpen, label: "错题本", path: "/error-questions", isCore: true },
-  { id: "junior-errors", icon: School, label: "初中错题", path: "/error-questions?level=junior", indent: true, schoolLevel: "junior" },
-  { id: "senior-errors", icon: GraduationCap, label: "高中错题", path: "/error-questions?level=senior", indent: true, schoolLevel: "senior" },
-  { id: "document-upload", icon: Upload, label: "多格式上传", path: "/document-upload", indent: true },
-  { id: "ai-exam", icon: FileText, label: "AI试卷生成", path: "/exam-generator" },
-  { id: "practice", icon: FileQuestion, label: "真题练习", path: "/real-exam-practice" },
-  { id: "ai-practice", icon: BookOpen, label: "AI真题练习", path: "/question-practice" },
-  { id: "practice-pool", icon: Target, label: "专项练习", path: "/practice-pool" },
-  { id: "favorites", icon: Heart, label: "我的题库", path: "/favorites" },
-  { id: "reminders", icon: Bell, label: "学习提醒", path: "/reminders" },
-  { id: "learning-path", icon: Route, label: "学习路径", path: "/learning-path" },
-  { id: "report", icon: BarChart3, label: "学习报告", path: "/learning-report" },
-  { id: "review", icon: Clock, label: "复习提醒", path: "/review" },
-  { id: "calendar", icon: Calendar, label: "学习日历", path: "/study-calendar" },
-  { id: "video", icon: Video, label: "视频学习", path: "/videos" },
-  { id: "achievements", icon: Trophy, label: "学习成就", path: "/achievements" },
+// 菜单分组配置
+interface MenuGroup {
+  id: string;
+  label?: string;
+  items: MenuItem[];
+  adminOnly?: boolean;
+}
+
+interface MenuItem {
+  id: string;
+  icon: any;
+  label: string;
+  path: string;
+  isCore?: boolean;
+  indent?: boolean;
+  schoolLevel?: 'junior' | 'senior';
+}
+
+// 核心学习功能
+const coreMenuGroup: MenuGroup = {
+  id: 'core',
+  label: '核心功能',
+  items: [
+    { id: "dashboard", icon: LayoutDashboard, label: "学习概览", path: "/", isCore: true },
+    { id: "error-questions", icon: BookOpen, label: "错题本", path: "/error-questions", isCore: true },
+    { id: "junior-errors", icon: School, label: "初中错题", path: "/error-questions?level=junior", indent: true, schoolLevel: "junior" },
+    { id: "senior-errors", icon: GraduationCap, label: "高中错题", path: "/error-questions?level=senior", indent: true, schoolLevel: "senior" },
+    { id: "document-upload", icon: Upload, label: "多格式上传", path: "/document-upload", indent: true },
+  ]
+};
+
+// 练习与测试
+const practiceMenuGroup: MenuGroup = {
+  id: 'practice',
+  label: '练习测试',
+  items: [
+    { id: "ai-exam", icon: FileText, label: "AI试卷生成", path: "/exam-generator" },
+    { id: "practice", icon: FileQuestion, label: "真题练习", path: "/real-exam-practice" },
+    { id: "ai-practice", icon: BookOpen, label: "AI题目练习", path: "/question-practice" },
+    { id: "practice-pool", icon: Target, label: "专项练习", path: "/practice-pool" },
+  ]
+};
+
+// 学习工具
+const toolsMenuGroup: MenuGroup = {
+  id: 'tools',
+  label: '学习工具',
+  items: [
+    { id: "favorites", icon: Heart, label: "我的收藏", path: "/favorites" },
+    { id: "reminders", icon: Bell, label: "学习提醒", path: "/reminders" },
+    { id: "learning-path", icon: Route, label: "学习路径", path: "/learning-path" },
+    { id: "video", icon: Video, label: "视频学习", path: "/videos" },
+  ]
+};
+
+// 数据分析
+const analyticsMenuGroup: MenuGroup = {
+  id: 'analytics',
+  label: '数据分析',
+  items: [
+    { id: "report", icon: BarChart3, label: "学习报告", path: "/learning-report" },
+    { id: "calendar", icon: Calendar, label: "学习日历", path: "/study-calendar" },
+    { id: "achievements", icon: Trophy, label: "学习成就", path: "/achievements" },
+  ]
+};
+
+// 后台管理（仅管理员）
+const adminMenuGroup: MenuGroup = {
+  id: 'admin',
+  label: '后台管理',
+  adminOnly: true,
+  items: [
+    { id: "question-bank", icon: Database, label: "题库管理", path: "/admin/question-bank" },
+    { id: "task-management", icon: Timer, label: "定时任务管理", path: "/admin/tasks" },
+  ]
+};
+
+// 所有菜单分组
+const menuGroups: MenuGroup[] = [
+  coreMenuGroup,
+  practiceMenuGroup,
+  toolsMenuGroup,
+  analyticsMenuGroup,
+  adminMenuGroup,
 ];
 
-const adminMenuItems = [
-  { id: "question-bank", icon: Database, label: "题库管理", path: "/admin/question-bank" },
-  { id: "task-management", icon: Timer, label: "定时任务", path: "/admin/tasks" },
-];
+// 为了兼容性，保留扁平化的menuItems
+const menuItems = menuGroups.flatMap(group => group.items);
+const adminMenuItems = adminMenuGroup.items;
 
 const settingsMenuItem = {
   id: "settings",
@@ -153,22 +217,32 @@ function DashboardLayoutContent({
   // 获取用户设置
   const { data: settings } = trpc.userSettings.getSettings.useQuery();
   
-  // 过滤菜单项
-  const filteredMenuItems = menuItems.filter(item => {
-    // 核心功能不过滤
-    if (item.isCore) return true;
-    
-    // 检查用户是否禁用了该菜单项
-    if (settings?.disabledMenuItems?.includes(item.id)) return false;
-    
-    // 根据板块过滤（初中/高中）
-    if (item.schoolLevel && settings?.grade) {
-      const userSchoolLevel = settings.grade.startsWith('junior') ? 'junior' : 'senior';
-      if (item.schoolLevel !== userSchoolLevel) return false;
-    }
-    
-    return true;
-  });
+  // 过滤菜单分组
+  const filteredMenuGroups = menuGroups
+    .filter(group => {
+      // 如果是管理员分组，只对管理员显示
+      if (group.adminOnly && user?.role !== 'admin') return false;
+      return true;
+    })
+    .map(group => ({
+      ...group,
+      items: group.items.filter(item => {
+        // 核心功能不过滤
+        if (item.isCore) return true;
+        
+        // 检查用户是否禁用了该菜单项
+        if (settings?.disabledMenuItems?.includes(item.id)) return false;
+        
+        // 根据板块过滤（初中/高中）
+        if (item.schoolLevel && settings?.grade) {
+          const userSchoolLevel = settings.grade.startsWith('junior') ? 'junior' : 'senior';
+          if (item.schoolLevel !== userSchoolLevel) return false;
+        }
+        
+        return true;
+      })
+    }))
+    .filter(group => group.items.length > 0); // 过滤掉空分组
 
   useEffect(() => {
     if (isCollapsed) {
@@ -236,40 +310,57 @@ function DashboardLayoutContent({
           </SidebarHeader>
 
           <SidebarContent className="gap-0">
-            <SidebarMenu className="px-2 py-1">
-              {filteredMenuItems.map(item => {
-                const isActive = location === item.path || (item.path.includes('?') && location.startsWith(item.path.split('?')[0]));
+            {filteredMenuGroups.map((group, groupIndex) => (
+              <div key={group.id}>
+                {/* 分组标题 */}
+                {!isCollapsed && group.label && (
+                  <div className="px-4 py-2 text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+                    {group.label}
+                  </div>
+                )}
                 
-                // 获取对应板块的错题数量
-                let badgeCount: number | undefined;
-                if (item.path.includes('level=junior')) {
-                  badgeCount = levelStats?.junior;
-                } else if (item.path.includes('level=senior')) {
-                  badgeCount = levelStats?.senior;
-                }
+                {/* 分组菜单项 */}
+                <SidebarMenu className="px-2 py-1">
+                  {group.items.map(item => {
+                    const isActive = location === item.path || (item.path.includes('?') && location.startsWith(item.path.split('?')[0]));
+                    
+                    // 获取对应板块的错题数量
+                    let badgeCount: number | undefined;
+                    if (item.path.includes('level=junior')) {
+                      badgeCount = levelStats?.junior;
+                    } else if (item.path.includes('level=senior')) {
+                      badgeCount = levelStats?.senior;
+                    }
+                    
+                    return (
+                      <SidebarMenuItem key={item.path}>
+                        <SidebarMenuButton
+                          isActive={isActive}
+                          onClick={() => setLocation(item.path)}
+                          tooltip={item.label}
+                          className={`h-10 transition-all font-normal ${item.indent ? 'pl-8' : ''}`}
+                        >
+                          <item.icon
+                            className={`h-4 w-4 ${isActive ? "text-primary" : ""} ${item.path.includes('level=junior') ? 'text-blue-500' : ''} ${item.path.includes('level=senior') ? 'text-purple-500' : ''}`}
+                          />
+                          <span className="flex-1">{item.label}</span>
+                          {badgeCount !== undefined && badgeCount > 0 && !isCollapsed && (
+                            <Badge variant="secondary" className="ml-auto text-xs px-1.5 py-0.5">
+                              {badgeCount}
+                            </Badge>
+                          )}
+                        </SidebarMenuButton>
+                      </SidebarMenuItem>
+                    );
+                  })}
+                </SidebarMenu>
                 
-                return (
-                  <SidebarMenuItem key={item.path}>
-                    <SidebarMenuButton
-                      isActive={isActive}
-                      onClick={() => setLocation(item.path)}
-                      tooltip={item.label}
-                      className={`h-10 transition-all font-normal ${item.indent ? 'pl-8' : ''}`}
-                    >
-                      <item.icon
-                        className={`h-4 w-4 ${isActive ? "text-primary" : ""} ${item.path.includes('level=junior') ? 'text-blue-500' : ''} ${item.path.includes('level=senior') ? 'text-purple-500' : ''}`}
-                      />
-                      <span className="flex-1">{item.label}</span>
-                      {badgeCount !== undefined && badgeCount > 0 && !isCollapsed && (
-                        <Badge variant="secondary" className="ml-auto text-xs px-1.5 py-0.5">
-                          {badgeCount}
-                        </Badge>
-                      )}
-                    </SidebarMenuButton>
-                  </SidebarMenuItem>
-                );
-              })}
-            </SidebarMenu>
+                {/* 分组分隔线 */}
+                {groupIndex < filteredMenuGroups.length - 1 && (
+                  <div className="mx-4 my-2 border-t" />
+                )}
+              </div>
+            ))}
             
             {/* 设置菜单 */}
             <SidebarMenu className="px-2 py-1 mt-2 border-t pt-2">
@@ -287,34 +378,7 @@ function DashboardLayoutContent({
                 </SidebarMenuButton>
               </SidebarMenuItem>
             </SidebarMenu>
-            
-            {/* 管理员菜单 */}
-            {user?.role === "admin" && (
-              <SidebarMenu className="px-2 py-1 mt-2 border-t pt-2">
-                <div className="px-2 py-1 text-xs font-semibold text-muted-foreground">
-                  管理功能
-                </div>
-                {adminMenuItems.map(item => {
-                  const isActive = location === item.path;
-                  
-                  return (
-                    <SidebarMenuItem key={item.path}>
-                      <SidebarMenuButton
-                        isActive={isActive}
-                        onClick={() => setLocation(item.path)}
-                        tooltip={item.label}
-                        className="h-10 transition-all font-normal"
-                      >
-                        <item.icon
-                          className={`h-4 w-4 ${isActive ? "text-primary" : ""}`}
-                        />
-                        <span className="flex-1">{item.label}</span>
-                      </SidebarMenuButton>
-                    </SidebarMenuItem>
-                  );
-                })}
-              </SidebarMenu>
-            )}
+
           </SidebarContent>
 
           <SidebarFooter className="p-3">

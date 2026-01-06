@@ -53,29 +53,29 @@
   --chart-3: oklch(0.75 0.15 50); /* 活力橙 */
   --chart-4: oklch(0.6 0.18 240);
   --chart-5: oklch(0.5 0.2 240);
-  --radius: 0.65rem;
-  --background: oklch(0.98 0.01 240); /* 浅蓝背景 */
-  --foreground: oklch(0.25 0.02 240);
+  --radius: 0.75rem; /* 增加圆角 */
+  --background: oklch(0.97 0.01 240); /* 浅蓝背景 */
+  --foreground: oklch(0.2 0.02 240); /* 加深文字 */
   --card: oklch(1 0 0);
-  --card-foreground: oklch(0.25 0.02 240);
+  --card-foreground: oklch(0.2 0.02 240);
   --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.25 0.02 240);
-  --secondary: oklch(0.92 0.02 240);
-  --secondary-foreground: oklch(0.25 0.02 240);
-  --muted: oklch(0.95 0.01 240);
-  --muted-foreground: oklch(0.5 0.02 240);
+  --popover-foreground: oklch(0.2 0.02 240);
+  --secondary: oklch(0.94 0.02 240); /* 提亮次要色 */
+  --secondary-foreground: oklch(0.2 0.02 240);
+  --muted: oklch(0.96 0.01 240); /* 提亮静音色 */
+  --muted-foreground: oklch(0.45 0.02 240); /* 加深静音文字 */
   --accent: oklch(0.75 0.15 50); /* 活力橙 */
   --accent-foreground: oklch(1 0 0);
   --destructive: oklch(0.6 0.22 25);
   --destructive-foreground: oklch(1 0 0);
-  --border: oklch(0.9 0.01 240);
-  --input: oklch(0.9 0.01 240);
+  --border: oklch(0.92 0.01 240); /* 提亮边框 */
+  --input: oklch(0.92 0.01 240);
   --ring: oklch(0.55 0.18 240);
-  --sidebar: oklch(0.985 0 0);
-  --sidebar-foreground: oklch(0.25 0.02 240);
-  --sidebar-accent: oklch(0.95 0.01 240);
-  --sidebar-accent-foreground: oklch(0.25 0.02 240);
-  --sidebar-border: oklch(0.9 0.01 240);
+  --sidebar: oklch(0.99 0 0); /* 更亮的侧边栏背景 */
+  --sidebar-foreground: oklch(0.2 0.02 240);
+  --sidebar-accent: oklch(0.96 0.01 240); /* 提亮侧边栏hover背景 */
+  --sidebar-accent-foreground: oklch(0.2 0.02 240);
+  --sidebar-border: oklch(0.92 0.01 240);
   --sidebar-ring: oklch(0.55 0.18 240);
 }
 
@@ -233,5 +233,110 @@
       user-select: text;
       -webkit-user-select: text;
     }
+  }
+}
+
+@layer components {
+  /* 卡片阴影增强 */
+  .card-enhanced {
+    box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.05), 0 1px 2px -1px rgb(0 0 0 / 0.05);
+    transition: box-shadow 0.2s ease-in-out, transform 0.2s ease-in-out;
+  }
+  
+  .card-enhanced:hover {
+    box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.08), 0 2px 4px -2px rgb(0 0 0 / 0.08);
+    transform: translateY(-1px);
+  }
+  
+  /* 按钮交互增强 */
+  .button-enhanced {
+    transition: all 0.15s ease-in-out;
+  }
+  
+  .button-enhanced:active {
+    transform: scale(0.98);
+  }
+  
+  /* 菜单分组标题样式 */
+  .menu-group-title {
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--muted-foreground);
+    padding: 0.5rem 1rem;
+  }
+  
+  /* 侧边栏菜单项增强 */
+  .sidebar-menu-item {
+    position: relative;
+    border-radius: var(--radius-md);
+    transition: all 0.15s ease-in-out;
+  }
+  
+  .sidebar-menu-item:hover {
+    background-color: var(--sidebar-accent);
+  }
+  
+  .sidebar-menu-item.active {
+    background-color: var(--sidebar-accent);
+    font-weight: 500;
+  }
+  
+  .sidebar-menu-item.active::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 3px;
+    height: 60%;
+    background-color: var(--primary);
+    border-radius: 0 2px 2px 0;
+  }
+  
+  /* 加载动画优化 */
+  @keyframes shimmer {
+    0% {
+      background-position: -1000px 0;
+    }
+    100% {
+      background-position: 1000px 0;
+    }
+  }
+  
+  .skeleton {
+    animation: shimmer 2s infinite linear;
+    background: linear-gradient(
+      to right,
+      var(--muted) 0%,
+      var(--muted-foreground) / 10% 50%,
+      var(--muted) 100%
+    );
+    background-size: 1000px 100%;
+  }
+  
+  /* 平滑滚动 */
+  .smooth-scroll {
+    scroll-behavior: smooth;
+  }
+  
+  /* 自定义滚动条 */
+  .custom-scrollbar::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+  
+  .custom-scrollbar::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  
+  .custom-scrollbar::-webkit-scrollbar-thumb {
+    background: var(--muted-foreground) / 20%;
+    border-radius: 4px;
+  }
+  
+  .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: var(--muted-foreground) / 30%;
   }
 }
