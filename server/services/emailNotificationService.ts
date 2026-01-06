@@ -39,7 +39,7 @@ function createTransporter() {
 /**
  * 发送邮件
  */
-async function sendEmail(to: string, subject: string, html: string): Promise<boolean> {
+export async function sendEmail(to: string, subject: string, html: string): Promise<boolean> {
   const transporter = createTransporter();
   if (!transporter) {
     console.log("[EmailService] Skipping email send (SMTP not configured)");

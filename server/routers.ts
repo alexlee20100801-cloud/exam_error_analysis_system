@@ -44,6 +44,8 @@ import { paymentConfigRouter } from "./routers/paymentConfig";
 import { paymentRouter } from "./routers/payment";
 import { subscriptionPlanRouter } from "./routers/subscriptionPlan";
 import { userSubscriptionRouter } from "./routers/userSubscription";
+import { pushConfigRouter } from "./routers/push-config";
+import { userPushRouter } from "./routers/user-push";
 
 export const appRouter = router({
   system: systemRouter,
@@ -156,6 +158,12 @@ export const appRouter = router({
   subscriptionPlan: subscriptionPlanRouter,
   userSubscription: userSubscriptionRouter,
   paymentConfig: paymentConfigRouter,
+  
+  // 推送配置管理
+  pushConfig: pushConfigRouter,
+  
+  // 用户推送记录
+  userPush: userPushRouter,
 });
 
 export type AppRouter = typeof appRouter;

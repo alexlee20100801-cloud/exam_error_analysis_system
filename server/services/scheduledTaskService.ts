@@ -5,6 +5,8 @@ import { eq, sql } from 'drizzle-orm';
 import { generatePracticeQuestions } from '../practiceGenerationService';
 import { sendDueReminders } from './reviewReminderService';
 import { checkAndSendReminders } from './reviewTaskReminderService';
+import { getDuePushConfigs } from './push-config.service';
+import { executePushTask } from './push-execution.service';
 
 /**
  * 定时任务调度服务
@@ -69,6 +71,9 @@ function registerTask(task: typeof scheduledTasks.$inferSelect) {
         break;
       case 'check_review_task_reminders':
         taskFunction = () => executeCheckReviewTaskRemindersTask(task.id);
+        break;
+      case 'execute_push_tasks':
+        taskFunction = () => executeScheduledPushTasks(task.id);
         break;
       case 'cleanup':
         taskFunction = () => executeCleanupTask(task.id);
@@ -353,8 +358,95 @@ async function executeCheckReviewTaskRemindersTask(taskId: number) {
 }
 
 /**
+ * 执行定时推送任务
+ * 检查并执行到期的推送配置
+ */
+async function executeScheduledPushTasks(taskId: number) {
+  const startTime = Date.now();
+  let itemsProcessed = 0;
+  let errorMessage: string | null = null;
+
+  try {
+    const db = await getDb();
+    if (!db) throw new Error('Database not available');
+    
+    console.log('[ExecutePushTasks] Task started');
+
+    await db
+      .update(scheduledTasks)
+      .set({
+        lastStatus: 'running',
+        lastExecutedAt: new Date(),
+      })
+      .where(eq(scheduledTasks.id, taskId));
+
+    // 获取到期的推送配置
+    const dueConfigs = await getDuePushConfigs();
+    console.log(`[ExecutePushTasks] Found ${dueConfigs.length} due push configs`);
+
+    // 执行每个推送配置
+    for (const config of dueConfigs) {
+      try {
+        console.log(`[ExecutePushTasks] Executing push config ${config.id}: ${config.title}`);
+        const result = await executePushTask(config.id);
+        if (result.success) {
+          itemsProcessed += result.successCount;
+          console.log(`[ExecutePushTasks] Push config ${config.id} completed. Sent ${result.successCount} pushes`);
+        } else {
+          console.error(`[ExecutePushTasks] Push config ${config.id} failed:`, result.error);
+        }
+      } catch (error) {
+        console.error(`[ExecutePushTasks] Error executing push config ${config.id}:`, error);
+      }
+    }
+
+    await db
+      .update(scheduledTasks)
+      .set({
+        lastStatus: 'success',
+        executionCount: sql`${scheduledTasks.executionCount} + 1`,
+      })
+      .where(eq(scheduledTasks.id, taskId));
+
+    console.log(`[ExecutePushTasks] Task completed. Processed ${dueConfigs.length} configs, sent ${itemsProcessed} pushes`);
+  } catch (error: any) {
+    errorMessage = error.message || 'Unknown error';
+    console.error('[ExecutePushTasks] Task failed:', error);
+
+    const db = await getDb();
+    if (db) {
+      await db
+        .update(scheduledTasks)
+        .set({
+          lastStatus: 'failed',
+          lastErrorMessage: errorMessage,
+        })
+        .where(eq(scheduledTasks.id, taskId));
+    }
+  } finally {
+    const db = await getDb();
+    if (db) {
+      const duration = Date.now() - startTime;
+      await db.insert(taskExecutionLogs).values({
+        taskId,
+        status: errorMessage ? 'failed' : 'success',
+        startedAt: new Date(startTime),
+        completedAt: new Date(),
+        duration,
+        itemsProcessed,
+        errorMessage,
+        details: {
+          taskType: 'execute_push_tasks',
+          timestamp: new Date().toISOString(),
+        },
+      });
+    }
+  }
+}
+
+/**
  * 执行清理任务
- * 清理过期数据、日志等
+ * 清理过期数据、临时文件等
  */
 async function executeCleanupTask(taskId: number) {
   const startTime = Date.now();

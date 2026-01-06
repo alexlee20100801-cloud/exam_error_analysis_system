@@ -218,6 +218,20 @@
       "when": 1767698948234,
       "tag": "0030_unusual_silver_sable",
       "breakpoints": true
+    },
+    {
+      "idx": 31,
+      "version": "5",
+      "when": 1767699192934,
+      "tag": "0031_hard_gladiator",
+      "breakpoints": true
+    },
+    {
+      "idx": 32,
+      "version": "5",
+      "when": 1767699533790,
+      "tag": "0032_loud_charles_xavier",
+      "breakpoints": true
     }
   ]
 }

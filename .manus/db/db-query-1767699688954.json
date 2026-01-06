@@ -1,0 +1,9 @@
+{
+  "query": "CREATE TABLE IF NOT EXISTS `user_push_receipts` (\n  `id` int AUTO_INCREMENT NOT NULL,\n  `push_record_id` int NOT NULL,\n  `user_id` int NOT NULL,\n  `title` varchar(200) NOT NULL,\n  `content` text NOT NULL,\n  `push_type` enum('question','knowledge','resource') NOT NULL,\n  `channel` enum('system','email','wechat') NOT NULL,\n  `status` enum('sent','failed','read') NOT NULL DEFAULT 'sent',\n  `is_read` boolean NOT NULL DEFAULT false,\n  `read_at` timestamp,\n  `is_clicked` boolean NOT NULL DEFAULT false,\n  `clicked_at` timestamp,\n  `related_content_id` int,\n  `error_message` text,\n  `created_at` timestamp NOT NULL DEFAULT (now()),\n  CONSTRAINT `user_push_receipts_id` PRIMARY KEY(`id`)\n);",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway03.us-east-1.prod.aws.tidbcloud.com --port 4000 --user Lfr9xqjx7LpxUD9.1efa314e7813 --database Yh4Z4ZSitSFdPWYxtKkkQS --execute CREATE TABLE IF NOT EXISTS `user_push_receipts` (\n  `id` int AUTO_INCREMENT NOT NULL,\n  `push_record_id` int NOT NULL,\n  `user_id` int NOT NULL,\n  `title` varchar(200) NOT NULL,\n  `content` text NOT NULL,\n  `push_type` enum('question','knowledge','resource') NOT NULL,\n  `channel` enum('system','email','wechat') NOT NULL,\n  `status` enum('sent','failed','read') NOT NULL DEFAULT 'sent',\n  `is_read` boolean NOT NULL DEFAULT false,\n  `read_at` timestamp,\n  `is_clicked` boolean NOT NULL DEFAULT false,\n  `clicked_at` timestamp,\n  `related_content_id` int,\n  `error_message` text,\n  `created_at` timestamp NOT NULL DEFAULT (now()),\n  CONSTRAINT `user_push_receipts_id` PRIMARY KEY(`id`)\n);",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 1666
+}

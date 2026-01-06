@@ -601,7 +601,7 @@ export type InsertQuestion = typeof questions.$inferInsert;
 export const scheduledTasks = mysqlTable("scheduled_tasks", {
   id: int("id").autoincrement().primaryKey(),
   taskName: varchar("task_name", { length: 100 }).notNull().unique(),
-  taskType: mysqlEnum("task_type", ["generate_questions", "send_reminders", "cleanup", "check_review_task_reminders"]).notNull(),
+  taskType: mysqlEnum("task_type", ["generate_questions", "send_reminders", "cleanup", "check_review_task_reminders", "execute_push_tasks"]).notNull(),
   cronExpression: varchar("cron_expression", { length: 50 }).notNull(), // 如：0 2 * * * (每天凌晨2点)
   isEnabled: boolean("is_enabled").notNull().default(true),
   lastExecutedAt: timestamp("last_executed_at"),
@@ -1019,3 +1019,117 @@ export const paymentCallbackLogs = mysqlTable("payment_callback_logs", {
 });
 export type PaymentCallbackLog = typeof paymentCallbackLogs.$inferSelect;
 export type InsertPaymentCallbackLog = typeof paymentCallbackLogs.$inferInsert;
+
+/**
+ * 推送配置表 - 管理员配置的推送规则
+ */
+export const pushConfigs = mysqlTable("push_configs", {
+  id: int("id").autoincrement().primaryKey(),
+  // 推送名称
+  title: varchar("title", { length: 200 }).notNull(),
+  // 推送描述
+  description: text("description"),
+  // 推送类型（question: 题目推送, knowledge: 知识点推送, resource: 学习资源推送）
+  pushType: mysqlEnum("push_type", ["question", "knowledge", "resource"]).notNull(),
+  // 目标用户筛选条件（JSON格式）
+  targetFilters: json("target_filters").$type<{
+    schoolLevel?: "junior" | "senior"; // 学段
+    grades?: string[]; // 年级
+    subjects?: string[]; // 学科
+    planIds?: number[]; // 套餐ID
+    subscriptionStatus?: "active" | "expired" | "cancelled"; // 订阅状态
+  }>().notNull(),
+  // 推送内容配置（JSON格式）
+  contentConfig: json("content_config").$type<{
+    questionIds?: number[]; // 题目ID列表
+    knowledgePointIds?: number[]; // 知识点ID列表
+    resourceUrls?: string[]; // 资源URL列表
+    customMessage?: string; // 自定义消息
+  }>().notNull(),
+  // 推送频率（daily: 每日, weekly: 每周, monthly: 每月, once: 一次性）
+  frequency: mysqlEnum("frequency", ["daily", "weekly", "monthly", "once"]).notNull(),
+  // 推送时间（格式：HH:mm）
+  pushTime: varchar("push_time", { length: 5 }).notNull().default("09:00"),
+  // 推送渠道（system: 系统通知, email: 邮件, wechat: 微信）
+  channels: json("channels").$type<string[]>().notNull().default(["system"]),
+  // 是否启用
+  isEnabled: boolean("is_enabled").notNull().default(true),
+  // 下次推送时间
+  nextPushTime: timestamp("next_push_time"),
+  // 最后推送时间
+  lastPushTime: timestamp("last_push_time"),
+  // 创建人
+  createdBy: int("created_by").notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().onUpdateNow().notNull(),
+});
+export type PushConfig = typeof pushConfigs.$inferSelect;
+export type InsertPushConfig = typeof pushConfigs.$inferInsert;
+
+/**
+ * 推送记录表 - 记录每次推送的执行情况
+ */
+export const pushRecords = mysqlTable("push_records", {
+  id: int("id").autoincrement().primaryKey(),
+  // 推送配置ID
+  configId: int("config_id").notNull(),
+  // 推送标题
+  title: varchar("title", { length: 200 }).notNull(),
+  // 推送内容
+  content: text("content").notNull(),
+  // 目标用户数量
+  targetUserCount: int("target_user_count").notNull(),
+  // 成功推送数量
+  successCount: int("success_count").notNull().default(0),
+  // 失败推送数量
+  failedCount: int("failed_count").notNull().default(0),
+  // 推送状态
+  status: mysqlEnum("status", ["pending", "processing", "completed", "failed"]).notNull().default("pending"),
+  // 推送渠道
+  channels: json("channels").$type<string[]>().notNull(),
+  // 错误信息
+  errorMessage: text("error_message"),
+  // 推送开始时间
+  startedAt: timestamp("started_at"),
+  // 推送完成时间
+  completedAt: timestamp("completed_at"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+export type PushRecord = typeof pushRecords.$inferSelect;
+export type InsertPushRecord = typeof pushRecords.$inferInsert;
+
+/**
+ * 用户推送接收记录表 - 记录每个用户接收推送的详细信息
+ */
+export const userPushReceipts = mysqlTable("user_push_receipts", {
+  id: int("id").autoincrement().primaryKey(),
+  // 推送记录ID
+  pushRecordId: int("push_record_id").notNull(),
+  // 用户ID
+  userId: int("user_id").notNull(),
+  // 推送标题
+  title: varchar("title", { length: 200 }).notNull(),
+  // 推送内容
+  content: text("content").notNull(),
+  // 推送类型
+  pushType: mysqlEnum("push_type", ["question", "knowledge", "resource"]).notNull(),
+  // 推送渠道
+  channel: mysqlEnum("channel", ["system", "email", "wechat"]).notNull(),
+  // 推送状态
+  status: mysqlEnum("status", ["sent", "failed", "read"]).notNull().default("sent"),
+  // 是否已读
+  isRead: boolean("is_read").notNull().default(false),
+  // 阅读时间
+  readAt: timestamp("read_at"),
+  // 是否已点击
+  isClicked: boolean("is_clicked").notNull().default(false),
+  // 点击时间
+  clickedAt: timestamp("clicked_at"),
+  // 关联内容ID（题目ID、知识点ID等）
+  relatedContentId: int("related_content_id"),
+  // 错误信息
+  errorMessage: text("error_message"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+export type UserPushReceipt = typeof userPushReceipts.$inferSelect;
+export type InsertUserPushReceipt = typeof userPushReceipts.$inferInsert;
