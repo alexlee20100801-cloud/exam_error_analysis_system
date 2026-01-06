@@ -3,9 +3,10 @@
  * 提供常用公式语法速查表
  */
 
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { Button } from './ui/button';
-import { ChevronDown, ChevronUp, HelpCircle } from 'lucide-react';
+import { Input } from './ui/input';
+import { ChevronDown, ChevronUp, HelpCircle, Search, X } from 'lucide-react';
 import { LatexPreview } from './LatexPreview';
 import {
   Collapsible,
@@ -244,6 +245,26 @@ const latexHelp: LatexCategory[] = [
 
 export function LatexHelpPanel() {
   const [isOpen, setIsOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+
+  // 搜索过滤
+  const filteredCategories = useMemo(() => {
+    if (!searchQuery.trim()) {
+      return latexHelp;
+    }
+
+    const lowerQuery = searchQuery.toLowerCase();
+    return latexHelp
+      .map(category => ({
+        ...category,
+        examples: category.examples.filter(
+          example =>
+            example.description.toLowerCase().includes(lowerQuery) ||
+            example.code.toLowerCase().includes(lowerQuery)
+        ),
+      }))
+      .filter(category => category.examples.length > 0);
+  }, [searchQuery]);
 
   return (
     <Collapsible open={isOpen} onOpenChange={setIsOpen}>
@@ -260,6 +281,34 @@ export function LatexHelpPanel() {
       </CollapsibleTrigger>
       <CollapsibleContent className="mt-4 space-y-4">
         <div className="rounded-lg border bg-card p-4 space-y-4">
+          {/* 搜索框 */}
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <Input
+              type="text"
+              placeholder="搜索公式、符号或关键词..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="pl-9 pr-9"
+            />
+            {searchQuery && (
+              <button
+                onClick={() => setSearchQuery('')}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+              >
+                <X className="h-4 w-4" />
+              </button>
+            )}
+          </div>
+
+          {/* 搜索结果提示 */}
+          {searchQuery && (
+            <div className="text-sm text-muted-foreground">
+              {filteredCategories.length > 0
+                ? `找到 ${filteredCategories.reduce((sum, cat) => sum + cat.examples.length, 0)} 个结果`
+                : '未找到匹配结果'}
+            </div>
+          )}
           <div className="space-y-2">
             <h4 className="text-sm font-semibold">基本用法</h4>
             <ul className="text-sm text-muted-foreground space-y-1">
@@ -270,7 +319,7 @@ export function LatexHelpPanel() {
             </ul>
           </div>
 
-          {latexHelp.map((category, categoryIndex) => (
+          {filteredCategories.map((category, categoryIndex) => (
             <div key={categoryIndex} className="space-y-2">
               <h4 className="text-sm font-semibold">{category.title}</h4>
               <div className="space-y-2">

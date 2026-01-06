@@ -12,10 +12,9 @@ import {
   Eye,
   EyeOff,
   Type,
-  Sigma,
-  Radical,
-  Superscript,
-  Subscript,
+  History,
+  Trash2,
+  BookTemplate,
 } from 'lucide-react';
 import {
   Popover,
@@ -23,6 +22,14 @@ import {
   PopoverTrigger,
 } from './ui/popover';
 import { LatexHelpPanel } from './LatexHelpPanel';
+import { latexTemplateCategories } from '../lib/latexTemplates';
+import {
+  getLatexHistory,
+  addToLatexHistory,
+  clearLatexHistory,
+  removeFromLatexHistory,
+  formatHistoryTime,
+} from '../lib/latexHistory';
 
 interface LatexEditorProps {
   value: string;
@@ -90,6 +97,7 @@ export function LatexEditor({
   const [showPreview, setShowPreview] = useState(true);
   const [isMobile, setIsMobile] = useState(false);
   const [syntaxError, setSyntaxError] = useState<string | null>(null);
+  const [latexHistory, setLatexHistory] = useState(getLatexHistory());
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   // 检测移动设备
@@ -177,12 +185,30 @@ export function LatexEditor({
     const newValue = before + '$' + latex + '$' + after;
     onChange(newValue);
 
+    // 添加到历史记录
+    addToLatexHistory(latex);
+    setLatexHistory(getLatexHistory());
+
     // 设置光标位置
     setTimeout(() => {
       const newCursorPos = start + latex.length + 2;
       textarea.focus();
       textarea.setSelectionRange(newCursorPos, newCursorPos);
     }, 0);
+  };
+
+  // 清除历史记录
+  const handleClearHistory = () => {
+    if (confirm('确定要清除所有历史记录吗？')) {
+      clearLatexHistory();
+      setLatexHistory([]);
+    }
+  };
+
+  // 删除单条历史记录
+  const handleRemoveHistory = (latex: string) => {
+    removeFromLatexHistory(latex);
+    setLatexHistory(getLatexHistory());
   };
 
   return (
@@ -213,7 +239,7 @@ export function LatexEditor({
           <PopoverTrigger asChild>
             <Button type="button" variant="outline" size="sm">
               <Type className="h-4 w-4 mr-1" />
-              插入公式
+              基础符号
             </Button>
           </PopoverTrigger>
           <PopoverContent className="w-[500px] max-h-[400px] overflow-y-auto">
@@ -251,6 +277,128 @@ export function LatexEditor({
                 </TabsContent>
               ))}
             </Tabs>
+          </PopoverContent>
+        </Popover>
+
+        {/* 学科模板库 */}
+        <Popover>
+          <PopoverTrigger asChild>
+            <Button type="button" variant="outline" size="sm">
+              <BookTemplate className="h-4 w-4 mr-1" />
+              学科模板
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent className="w-[600px] max-h-[500px] overflow-y-auto">
+            <Tabs defaultValue={latexTemplateCategories[0]?.title}>
+              <TabsList className="grid w-full grid-cols-4">
+                {latexTemplateCategories.map((category) => (
+                  <TabsTrigger key={category.title} value={category.title} className="text-xs">
+                    {category.icon} {category.title}
+                  </TabsTrigger>
+                ))}
+              </TabsList>
+              {latexTemplateCategories.map((category) => (
+                <TabsContent key={category.title} value={category.title} className="space-y-2">
+                  <div className="space-y-2">
+                    {category.templates.map((template, index) => (
+                      <Button
+                        key={index}
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        className="justify-start h-auto py-3 w-full"
+                        onClick={() => insertLatex(template.latex)}
+                      >
+                        <div className="flex flex-col items-start gap-1 w-full">
+                          <div className="flex items-center justify-between w-full">
+                            <span className="text-sm font-medium">{template.label}</span>
+                            <span className="text-xs text-muted-foreground">
+                              {template.description}
+                            </span>
+                          </div>
+                          <div className="text-sm w-full">
+                            <LatexPreview latex={template.display} displayMode={false} />
+                          </div>
+                        </div>
+                      </Button>
+                    ))}
+                  </div>
+                </TabsContent>
+              ))}
+            </Tabs>
+          </PopoverContent>
+        </Popover>
+
+        {/* 历史记录 */}
+        <Popover>
+          <PopoverTrigger asChild>
+            <Button type="button" variant="outline" size="sm">
+              <History className="h-4 w-4 mr-1" />
+              历史记录
+              {latexHistory.length > 0 && (
+                <span className="ml-1 text-xs">({latexHistory.length})</span>
+              )}
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent className="w-[500px] max-h-[400px] overflow-y-auto">
+            <div className="space-y-2">
+              <div className="flex items-center justify-between">
+                <h4 className="text-sm font-semibold">最近使用的公式</h4>
+                {latexHistory.length > 0 && (
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    onClick={handleClearHistory}
+                  >
+                    <Trash2 className="h-3 w-3 mr-1" />
+                    清空
+                  </Button>
+                )}
+              </div>
+              {latexHistory.length === 0 ? (
+                <p className="text-sm text-muted-foreground text-center py-4">
+                  暂无历史记录
+                </p>
+              ) : (
+                <div className="space-y-1">
+                  {latexHistory.map((item, index) => (
+                    <div
+                      key={index}
+                      className="flex items-center gap-2 p-2 rounded hover:bg-muted group"
+                    >
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        className="flex-1 justify-start h-auto py-2"
+                        onClick={() => insertLatex(item.latex)}
+                      >
+                        <div className="flex flex-col items-start gap-1 w-full">
+                          <div className="text-sm">
+                            <LatexPreview latex={item.latex} displayMode={false} />
+                          </div>
+                          <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                            <span>使用 {item.usageCount} 次</span>
+                            <span>•</span>
+                            <span>{formatHistoryTime(item.timestamp)}</span>
+                          </div>
+                        </div>
+                      </Button>
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        className="opacity-0 group-hover:opacity-100"
+                        onClick={() => handleRemoveHistory(item.latex)}
+                      >
+                        <Trash2 className="h-3 w-3" />
+                      </Button>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
           </PopoverContent>
         </Popover>
 
