@@ -22,11 +22,11 @@ interface ExportDialogProps {
 
 export function ExportDialog({ open, onOpenChange }: ExportDialogProps) {
   const [format, setFormat] = useState<"pdf" | "word">("pdf");
-  const [subject, setSubject] = useState<string>("all");
-  const [grade, setGrade] = useState<string>("all");
+  const [subject, setSubject] = useState<string>("");
+  const [grade, setGrade] = useState<string>("");
   const [startDate, setStartDate] = useState<Date | undefined>();
   const [endDate, setEndDate] = useState<Date | undefined>();
-  const [isMastered, setIsMastered] = useState<string>("all");
+  const [isMastered, setIsMastered] = useState<string>("");
 
   // 获取导出统计信息
   const { data: stats } = trpc.export.getExportStats.useQuery();
@@ -56,11 +56,11 @@ export function ExportDialog({ open, onOpenChange }: ExportDialogProps) {
   const handleExport = () => {
     exportMutation.mutate({
       format,
-      subject: subject === "all" ? undefined : subject,
-      grade: grade === "all" ? undefined : grade,
+      subject: subject || undefined,
+      grade: grade || undefined,
       startDate: startDate?.toISOString(),
       endDate: endDate?.toISOString(),
-      isMastered: isMastered === "all" ? undefined : isMastered === "true",
+      isMastered: isMastered === "" ? undefined : isMastered === "true",
     });
   };
 
@@ -115,7 +115,7 @@ export function ExportDialog({ open, onOpenChange }: ExportDialogProps) {
                 <SelectValue placeholder="全部学科" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">全部学科</SelectItem>
+                <SelectItem value="">全部学科</SelectItem>
                 <SelectItem value="math">数学</SelectItem>
                 <SelectItem value="chinese">语文</SelectItem>
                 <SelectItem value="english">英语</SelectItem>
@@ -137,7 +137,7 @@ export function ExportDialog({ open, onOpenChange }: ExportDialogProps) {
                 <SelectValue placeholder="全部年级" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">全部年级</SelectItem>
+                <SelectItem value="">全部年级</SelectItem>
                 <SelectItem value="junior1">初一</SelectItem>
                 <SelectItem value="junior2">初二</SelectItem>
                 <SelectItem value="junior3">初三</SelectItem>
@@ -186,7 +186,7 @@ export function ExportDialog({ open, onOpenChange }: ExportDialogProps) {
                 <SelectValue placeholder="全部状态" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">全部状态</SelectItem>
+                <SelectItem value="">全部状态</SelectItem>
                 <SelectItem value="false">未掌握</SelectItem>
                 <SelectItem value="true">已掌握</SelectItem>
               </SelectContent>

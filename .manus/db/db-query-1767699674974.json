@@ -1,9 +1,0 @@
-{
-  "query": "CREATE TABLE IF NOT EXISTS `push_configs` (\n  `id` int AUTO_INCREMENT NOT NULL,\n  `title` varchar(200) NOT NULL,\n  `description` text,\n  `push_type` enum('question','knowledge','resource') NOT NULL,\n  `target_filters` json NOT NULL,\n  `content_config` json NOT NULL,\n  `frequency` enum('daily','weekly','monthly','once') NOT NULL,\n  `push_time` varchar(5) NOT NULL DEFAULT '09:00',\n  `channels` json NOT NULL,\n  `is_enabled` boolean NOT NULL DEFAULT true,\n  `next_push_time` timestamp,\n  `last_push_time` timestamp,\n  `created_by` int NOT NULL,\n  `created_at` timestamp NOT NULL DEFAULT (now()),\n  `updated_at` timestamp NOT NULL DEFAULT (now()) ON UPDATE CURRENT_TIMESTAMP,\n  CONSTRAINT `push_configs_id` PRIMARY KEY(`id`)\n);",
-  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway03.us-east-1.prod.aws.tidbcloud.com --port 4000 --user Lfr9xqjx7LpxUD9.1efa314e7813 --database Yh4Z4ZSitSFdPWYxtKkkQS --execute CREATE TABLE IF NOT EXISTS `push_configs` (\n  `id` int AUTO_INCREMENT NOT NULL,\n  `title` varchar(200) NOT NULL,\n  `description` text,\n  `push_type` enum('question','knowledge','resource') NOT NULL,\n  `target_filters` json NOT NULL,\n  `content_config` json NOT NULL,\n  `frequency` enum('daily','weekly','monthly','once') NOT NULL,\n  `push_time` varchar(5) NOT NULL DEFAULT '09:00',\n  `channels` json NOT NULL,\n  `is_enabled` boolean NOT NULL DEFAULT true,\n  `next_push_time` timestamp,\n  `last_push_time` timestamp,\n  `created_by` int NOT NULL,\n  `created_at` timestamp NOT NULL DEFAULT (now()),\n  `updated_at` timestamp NOT NULL DEFAULT (now()) ON UPDATE CURRENT_TIMESTAMP,\n  CONSTRAINT `push_configs_id` PRIMARY KEY(`id`)\n);",
-  "rows": [],
-  "messages": [],
-  "stdout": "",
-  "stderr": "",
-  "execution_time_ms": 1664
-}

@@ -1,9 +1,0 @@
-{
-  "query": "CREATE TABLE IF NOT EXISTS `push_records` (\n  `id` int AUTO_INCREMENT NOT NULL,\n  `config_id` int NOT NULL,\n  `title` varchar(200) NOT NULL,\n  `content` text NOT NULL,\n  `target_user_count` int NOT NULL,\n  `success_count` int NOT NULL DEFAULT 0,\n  `failed_count` int NOT NULL DEFAULT 0,\n  `status` enum('pending','processing','completed','failed') NOT NULL DEFAULT 'pending',\n  `channels` json NOT NULL,\n  `error_message` text,\n  `started_at` timestamp,\n  `completed_at` timestamp,\n  `created_at` timestamp NOT NULL DEFAULT (now()),\n  CONSTRAINT `push_records_id` PRIMARY KEY(`id`)\n);",
-  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway03.us-east-1.prod.aws.tidbcloud.com --port 4000 --user Lfr9xqjx7LpxUD9.1efa314e7813 --database Yh4Z4ZSitSFdPWYxtKkkQS --execute CREATE TABLE IF NOT EXISTS `push_records` (\n  `id` int AUTO_INCREMENT NOT NULL,\n  `config_id` int NOT NULL,\n  `title` varchar(200) NOT NULL,\n  `content` text NOT NULL,\n  `target_user_count` int NOT NULL,\n  `success_count` int NOT NULL DEFAULT 0,\n  `failed_count` int NOT NULL DEFAULT 0,\n  `status` enum('pending','processing','completed','failed') NOT NULL DEFAULT 'pending',\n  `channels` json NOT NULL,\n  `error_message` text,\n  `started_at` timestamp,\n  `completed_at` timestamp,\n  `created_at` timestamp NOT NULL DEFAULT (now()),\n  CONSTRAINT `push_records_id` PRIMARY KEY(`id`)\n);",
-  "rows": [],
-  "messages": [],
-  "stdout": "",
-  "stderr": "",
-  "execution_time_ms": 1686
-}

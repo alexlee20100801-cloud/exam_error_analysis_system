@@ -37,18 +37,7 @@ import { errorQuestionStatsRouter } from "./routers/errorQuestionStats";
 import { aiLearningAdviceRouter } from "./routers/aiLearningAdvice";
 import { reviewTasksRouter } from "./routers/reviewTasks";
 import { reminderSettingsRouter } from "./routers/reminderSettings";
-import { smtpConfigRouter } from "./routers/smtpConfig";
-import { emailVerificationRouter } from "./routers/emailVerification";
-import { emailTemplateRouter } from "./routers/emailTemplate";
-import { paymentConfigRouter } from "./routers/paymentConfig";
-import { paymentRouter } from "./routers/payment";
-import { subscriptionPlanRouter } from "./routers/subscriptionPlan";
-import { userSubscriptionRouter } from "./routers/userSubscription";
-import { pushConfigRouter } from "./routers/push-config";
-import { userPushRouter } from "./routers/user-push";
-import { smartPaperRouter } from "./routers/smart-paper";
-import { bulkGenerationRouter } from "./routers/bulk-generation";
-import { questionReviewRouter } from "./routers/question-review";
+import { documentUploadRouter } from "./routes/documentUpload";
 
 export const appRouter = router({
   system: systemRouter,
@@ -67,6 +56,9 @@ export const appRouter = router({
   // 错题管理
   errorQuestions: errorQuestionsRouter,
   
+  // 文档上传和解析
+  documentUpload: documentUploadRouter,
+  
   // 错题统计
   errorQuestionStats: errorQuestionStatsRouter,
   
@@ -74,12 +66,6 @@ export const appRouter = router({
   aiLearningAdvice: aiLearningAdviceRouter,
   reviewTasks: reviewTasksRouter,
   reminderSettings: reminderSettingsRouter,
-  
-  // SMTP配置管理（仅管理员）
-  smtpConfig: smtpConfigRouter,
-  
-  // 邮箱验证
-  emailVerification: emailVerificationRouter,
   
   // 收藏管理
   favorites: favoritesRouter,
@@ -152,30 +138,6 @@ export const appRouter = router({
   
   // 专项练习池
   practicePools: practicePoolsRouter,
-  
-  // 邮件模板管理
-  emailTemplate: emailTemplateRouter,
-  
-  // 支付和订单
-  payment: paymentRouter,
-  subscriptionPlan: subscriptionPlanRouter,
-  userSubscription: userSubscriptionRouter,
-  paymentConfig: paymentConfigRouter,
-  
-  // 推送配置管理
-  pushConfig: pushConfigRouter,
-  
-  // 用户推送记录
-  userPush: userPushRouter,
-  
-  // 智能组卷
-  smartPaper: smartPaperRouter,
-  
-  // AI题库批量生成
-  bulkGeneration: bulkGenerationRouter,
-  
-  // 题目审核管理
-  questionReview: questionReviewRouter,
 });
 
 export type AppRouter = typeof appRouter;

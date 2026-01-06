@@ -33,21 +33,7 @@ import PracticePool from "@/pages/PracticePool";
 import PracticeDetail from "@/pages/PracticeDetail";
 import MyFavorites from "@/pages/MyFavorites";
 import ReviewReminders from "@/pages/ReviewReminders";
-import AdminSMTPSettings from "@/pages/AdminSMTPSettings";
-import { AdminEmailTemplates } from "@/pages/AdminEmailTemplates";
-import VerifyEmail from "@/pages/VerifyEmail";
-import { SubscriptionPlans } from "@/pages/SubscriptionPlans";
-import { Payment } from "@/pages/Payment";
-import { AdminOrders } from "@/pages/AdminOrders";
-import { AdminSubscriptionPlans } from "@/pages/AdminSubscriptionPlans";
-import AdminPaymentConfig from "@/pages/AdminPaymentConfig";
-import PushConfigs from "@/pages/admin/PushConfigs";
-import PushConfigForm from "@/pages/admin/PushConfigForm";
-import PushRecords from "./pages/admin/PushRecords";
-import SmartPaperGenerator from "./pages/admin/SmartPaperGenerator";
-import BulkGeneration from "./pages/admin/BulkGeneration";
-import QuestionReview from "./pages/admin/QuestionReview";
-import QuestionReviewDetail from "./pages/admin/QuestionReviewDetail";
+import DocumentUpload from "@/pages/DocumentUpload";
 import { PWAInstallPrompt } from "@/components/PWAInstallPrompt";
 import { MobileBottomNav } from "@/components/MobileBottomNav";
 
@@ -83,22 +69,7 @@ function Router() {
       <Route path="/practice/:id" component={PracticeDetail} />
       <Route path="/favorites" component={MyFavorites} />
       <Route path="/reminders" component={ReviewReminders} />
-      <Route path="/admin/smtp-settings" component={AdminSMTPSettings} />
-      <Route path="/admin/email-templates" component={AdminEmailTemplates} />
-      <Route path="/verify-email/:token" component={VerifyEmail} />
-      <Route path="/subscription-plans" component={SubscriptionPlans} />
-      <Route path="/payment/:orderNo" component={Payment} />
-      <Route path="/admin/orders" component={AdminOrders} />
-      <Route path={"/admin/subscription-plans"} component={AdminSubscriptionPlans} />
-      <Route path={"/admin/payment-config"} component={AdminPaymentConfig} />
-      <Route path="/admin/push-configs" component={PushConfigs} />
-      <Route path="/admin/push-configs/new" component={PushConfigForm} />
-      <Route path="/admin/push-configs/:id/edit" component={PushConfigForm} />
-            <Route path="/admin/push-records" component={PushRecords} />
-            <Route path="/admin/smart-paper" component={SmartPaperGenerator} />
-      <Route path="/admin/bulk-generation" component={BulkGeneration} />
-      <Route path="/admin/question-review" component={QuestionReview} />
-      <Route path="/admin/question-review/:id" component={QuestionReviewDetail} />
+      <Route path="/document-upload" component={DocumentUpload} />
       <Route component={NotFound} />
     </Switch>
   );

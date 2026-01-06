@@ -1,1 +1,0 @@
-ALTER TABLE `scheduled_tasks` MODIFY COLUMN `task_type` enum('generate_questions','send_reminders','cleanup','check_review_task_reminders','execute_push_tasks') NOT NULL;

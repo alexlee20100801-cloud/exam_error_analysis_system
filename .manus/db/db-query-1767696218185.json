@@ -1,9 +1,0 @@
-{
-  "query": "CREATE TABLE IF NOT EXISTS `email_templates` (\n  `id` int AUTO_INCREMENT NOT NULL,\n  `template_type` varchar(100) NOT NULL UNIQUE,\n  `name` varchar(200) NOT NULL,\n  `description` text,\n  `subject` varchar(500) NOT NULL,\n  `html_content` text NOT NULL,\n  `available_variables` json,\n  `is_default` boolean NOT NULL DEFAULT false,\n  `is_active` boolean NOT NULL DEFAULT true,\n  `last_modified_by` int,\n  `created_at` timestamp NOT NULL DEFAULT (now()),\n  `updated_at` timestamp NOT NULL DEFAULT (now()) ON UPDATE CURRENT_TIMESTAMP,\n  CONSTRAINT `email_templates_id` PRIMARY KEY(`id`)\n);",
-  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway03.us-east-1.prod.aws.tidbcloud.com --port 4000 --user Lfr9xqjx7LpxUD9.1efa314e7813 --database Yh4Z4ZSitSFdPWYxtKkkQS --execute CREATE TABLE IF NOT EXISTS `email_templates` (\n  `id` int AUTO_INCREMENT NOT NULL,\n  `template_type` varchar(100) NOT NULL UNIQUE,\n  `name` varchar(200) NOT NULL,\n  `description` text,\n  `subject` varchar(500) NOT NULL,\n  `html_content` text NOT NULL,\n  `available_variables` json,\n  `is_default` boolean NOT NULL DEFAULT false,\n  `is_active` boolean NOT NULL DEFAULT true,\n  `last_modified_by` int,\n  `created_at` timestamp NOT NULL DEFAULT (now()),\n  `updated_at` timestamp NOT NULL DEFAULT (now()) ON UPDATE CURRENT_TIMESTAMP,\n  CONSTRAINT `email_templates_id` PRIMARY KEY(`id`)\n);",
-  "rows": [],
-  "messages": [],
-  "stdout": "",
-  "stderr": "",
-  "execution_time_ms": 1690
-}

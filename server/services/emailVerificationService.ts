@@ -3,7 +3,6 @@ import { emailVerificationTokens, users } from "../../drizzle/schema";
 import { eq, and } from "drizzle-orm";
 import crypto from "crypto";
 import { getSMTPConfig } from "./smtpConfigService";
-import { renderTemplate, EMAIL_TEMPLATE_TYPES } from "./emailTemplateService";
 
 /**
  * 生成验证令牌（UUID）
@@ -46,61 +45,6 @@ export async function createEmailVerificationToken(
  * 发送验证邮件
  */
 export async function sendVerificationEmail(
-  email: string,
-  token: string,
-  userName?: string
-): Promise<void> {
-  try {
-    const smtpConfig = await getSMTPConfig();
-    if (!smtpConfig) {
-      throw new Error("SMTP配置未设置，请先配置邮件服务器");
-    }
-
-    const nodemailer = await import("nodemailer");
-    const transporter = nodemailer.createTransport({
-      host: smtpConfig.host,
-      port: smtpConfig.port,
-      secure: smtpConfig.secure,
-      auth: {
-        user: smtpConfig.user,
-        pass: smtpConfig.password,
-      },
-    });
-
-    // 构建验证链接（使用当前域名）
-    const verificationUrl = `${process.env.VITE_FRONTEND_FORGE_API_URL || "http://localhost:3000"}/verify-email/${token}`;
-
-    // 使用模板系统渲染邮件
-    const rendered = await renderTemplate(EMAIL_TEMPLATE_TYPES.EMAIL_VERIFICATION, {
-      userName: userName || "用户",
-      userEmail: email,
-      verificationUrl,
-      expiryHours: "24",
-      systemName: "深圳初高中错题分析学习系统",
-    });
-
-    if (!rendered) {
-      throw new Error("邮件模板未找到");
-    }
-
-    const mailOptions = {
-      from: `"${smtpConfig.fromName}" <${smtpConfig.fromEmail}>`,
-      to: email,
-      subject: rendered.subject,
-      html: rendered.htmlContent,
-    };
-
-    await transporter.sendMail(mailOptions);
-  } catch (error) {
-    console.error("Failed to send verification email:", error);
-    throw new Error("发送验证邮件失败");
-  }
-}
-
-/**
- * 发送验证邮件（旧版，保留以防模板未初始化）
- */
-export async function sendVerificationEmailLegacy(
   email: string,
   token: string,
   userName?: string
