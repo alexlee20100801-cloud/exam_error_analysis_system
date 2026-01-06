@@ -828,3 +828,32 @@ export const emailVerificationTokens = mysqlTable("email_verification_tokens", {
 });
 export type EmailVerificationToken = typeof emailVerificationTokens.$inferSelect;
 export type InsertEmailVerificationToken = typeof emailVerificationTokens.$inferInsert;
+
+/**
+ * 邮件模板表 - 存储可自定义的邮件模板
+ */
+export const emailTemplates = mysqlTable("email_templates", {
+  id: int("id").autoincrement().primaryKey(),
+  // 模板类型（唯一标识）
+  templateType: varchar("template_type", { length: 100 }).notNull().unique(),
+  // 模板名称
+  name: varchar("name", { length: 200 }).notNull(),
+  // 模板描述
+  description: text("description"),
+  // 邮件主题（支持变量）
+  subject: varchar("subject", { length: 500 }).notNull(),
+  // 邮件内容（HTML格式，支持变量）
+  htmlContent: text("html_content").notNull(),
+  // 可用变量列表（JSON数组）
+  availableVariables: json("available_variables").$type<string[]>(),
+  // 是否为系统默认模板
+  isDefault: boolean("is_default").notNull().default(false),
+  // 是否启用
+  isActive: boolean("is_active").notNull().default(true),
+  // 最后修改人
+  lastModifiedBy: int("last_modified_by"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().onUpdateNow().notNull(),
+});
+export type EmailTemplate = typeof emailTemplates.$inferSelect;
+export type InsertEmailTemplate = typeof emailTemplates.$inferInsert;

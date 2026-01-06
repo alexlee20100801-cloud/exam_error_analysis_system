@@ -53,6 +53,7 @@ const adminMenuItems = [
   { id: "question-bank", icon: Database, label: "题库管理", path: "/admin/question-bank" },
   { id: "task-management", icon: Timer, label: "定时任务", path: "/admin/tasks" },
   { id: "smtp-settings", icon: Mail, label: "SMTP配置", path: "/admin/smtp-settings" },
+  { id: "email-templates", icon: FileText, label: "邮件模板", path: "/admin/email-templates" },
 ];
 
 const settingsMenuItem = {

@@ -39,6 +39,7 @@ import { reviewTasksRouter } from "./routers/reviewTasks";
 import { reminderSettingsRouter } from "./routers/reminderSettings";
 import { smtpConfigRouter } from "./routers/smtpConfig";
 import { emailVerificationRouter } from "./routers/emailVerification";
+import { emailTemplateRouter } from "./routers/emailTemplate";
 
 export const appRouter = router({
   system: systemRouter,
@@ -142,6 +143,9 @@ export const appRouter = router({
   
   // 专项练习池
   practicePools: practicePoolsRouter,
+  
+  // 邮件模板管理
+  emailTemplate: emailTemplateRouter,
 });
 
 export type AppRouter = typeof appRouter;
