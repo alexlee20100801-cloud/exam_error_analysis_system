@@ -3,6 +3,7 @@ import { getDb } from '../db';
 import { scheduledTasks, taskExecutionLogs, questions } from '../../drizzle/schema';
 import { eq, sql } from 'drizzle-orm';
 import { generatePracticeQuestions } from '../practiceGenerationService';
+import { sendDueReminders } from './reviewReminderService';
 
 /**
  * 定时任务调度服务
@@ -223,10 +224,11 @@ async function executeSendRemindersTask(taskId: number) {
       })
       .where(eq(scheduledTasks.id, taskId));
 
-    // TODO: 实现发送提醒逻辑
-    // 1. 查询到期的复习提醒
-    // 2. 查询需要提醒的学习目标
-    // 3. 发送通知
+    // 发送到期的复习提醒
+    const result = await sendDueReminders();
+    itemsProcessed = result.notifiedCount;
+    
+    console.log(`[SendReminders] Sent ${itemsProcessed} reminders`);
 
     await db
       .update(scheduledTasks)
@@ -237,6 +239,7 @@ async function executeSendRemindersTask(taskId: number) {
       .where(eq(scheduledTasks.id, taskId));
 
     console.log(`[SendReminders] Task completed. Sent ${itemsProcessed} reminders`);
+    itemsProcessed = itemsProcessed || 0; // 确保有值
   } catch (error: any) {
     errorMessage = error.message || 'Unknown error';
     console.error('[SendReminders] Task failed:', error);

@@ -21,7 +21,7 @@ import {
 } from "@/components/ui/sidebar";
 import { getLoginUrl } from "@/const";
 import { useIsMobile } from "@/hooks/useMobile";
-import { LayoutDashboard, LogOut, PanelLeft, Users, BookOpen, GraduationCap, School, Trophy, Video, Calendar, BarChart3, Clock, UserCircle, FileText, Database, FileQuestion, Route, Settings, Timer, Target, Heart } from "lucide-react";
+import { LayoutDashboard, LogOut, PanelLeft, Users, BookOpen, GraduationCap, School, Trophy, Video, Calendar, BarChart3, Clock, UserCircle, FileText, Database, FileQuestion, Route, Settings, Timer, Target, Heart, Bell } from "lucide-react";
 import { trpc } from "@/lib/trpc";
 import { Badge } from "@/components/ui/badge";
 import { CSSProperties, useEffect, useRef, useState } from "react";
@@ -40,6 +40,7 @@ const menuItems = [
   { id: "ai-practice", icon: BookOpen, label: "AI真题练习", path: "/question-practice" },
   { id: "practice-pool", icon: Target, label: "专项练习", path: "/practice-pool" },
   { id: "favorites", icon: Heart, label: "我的题库", path: "/favorites" },
+  { id: "reminders", icon: Bell, label: "学习提醒", path: "/reminders" },
   { id: "learning-path", icon: Route, label: "学习路径", path: "/learning-path" },
   { id: "report", icon: BarChart3, label: "学习报告", path: "/learning-report" },
   { id: "review", icon: Clock, label: "复习提醒", path: "/review" },

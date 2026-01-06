@@ -13,6 +13,7 @@ import {
 } from "../db";
 import { extractTextFromImage, extractAndMergeTextFromImages } from "../ocrService";
 import { storagePut } from "../storage";
+import { createReviewReminder } from "../services/reviewReminderService";
 
 export const errorQuestionsRouter = router({
   /**
@@ -45,9 +46,16 @@ export const errorQuestionsRouter = router({
         reviewCount: 0,
       });
 
+      const questionId = result[0]?.insertId ? Number(result[0].insertId) : 0;
+
+      // 自动创建学习提醒
+      if (questionId > 0) {
+        await createReviewReminder(ctx.user.id, questionId, "error_question");
+      }
+
       return {
         success: true,
-        questionId: result[0]?.insertId ? Number(result[0].insertId) : 0,
+        questionId,
       };
     }),
 

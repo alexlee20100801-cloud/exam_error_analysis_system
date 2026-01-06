@@ -32,6 +32,7 @@ import { questionsRouter } from "./routers/questions";
 import { scheduledTasksRouter } from "./routers/scheduledTasks";
 import { practicePoolsRouter } from "./routers/practicePools";
 import { favoritesRouter } from "./routers/favorites";
+import { reviewRemindersRouter } from "./routers/reviewReminders";
 
 export const appRouter = router({
   system: systemRouter,
@@ -52,6 +53,9 @@ export const appRouter = router({
   
   // 收藏管理
   favorites: favoritesRouter,
+
+  // 学习提醒
+  reviewReminders: reviewRemindersRouter,
   
   // 知识点管理
   knowledgePoints: knowledgePointsRouter,

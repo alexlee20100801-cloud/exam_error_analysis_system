@@ -661,3 +661,39 @@ export const favorites = mysqlTable("favorites", {
 });
 export type Favorite = typeof favorites.$inferSelect;
 export type InsertFavorite = typeof favorites.$inferInsert;
+
+/**
+ * 学习提醒表 - 基于艾宾浩斯遗忘曲线的复习提醒
+ */
+export const reviewReminders = mysqlTable("review_reminders", {
+  id: int("id").autoincrement().primaryKey(),
+  userId: int("user_id").notNull(),
+  questionId: int("question_id").notNull(), // 题目ID
+  questionType: mysqlEnum("question_type", ["error_question", "practice_question"]).notNull(), // 题目类型
+  nextReviewDate: timestamp("next_review_date").notNull(), // 下次复习日期
+  reviewCount: int("review_count").notNull().default(0), // 已复习次数
+  status: mysqlEnum("status", ["pending", "completed", "skipped", "deleted"]).notNull().default("pending"),
+  lastReviewedAt: timestamp("last_reviewed_at"), // 最后复习时间
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().onUpdateNow().notNull(),
+});
+export type ReviewReminder = typeof reviewReminders.$inferSelect;
+export type InsertReviewReminder = typeof reviewReminders.$inferInsert;
+
+/**
+ * 复习历史表 - 记录每次复习的详细信息
+ */
+export const reviewHistory = mysqlTable("review_history", {
+  id: int("id").autoincrement().primaryKey(),
+  reminderId: int("reminder_id").notNull(),
+  userId: int("user_id").notNull(),
+  questionId: int("question_id").notNull(),
+  questionType: mysqlEnum("question_type", ["error_question", "practice_question"]).notNull(),
+  reviewedAt: timestamp("reviewed_at").notNull(), // 复习时间
+  masteryLevel: int("mastery_level"), // 复习后的掌握度（0-100）
+  timeSpent: int("time_spent"), // 复习耗时（秒）
+  notes: text("notes"), // 复习笔记
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+export type ReviewHistory = typeof reviewHistory.$inferSelect;
+export type InsertReviewHistory = typeof reviewHistory.$inferInsert;
