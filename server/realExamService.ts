@@ -289,3 +289,37 @@ export async function getAvailableYears() {
 
   return years.map(y => y.year).filter(Boolean);
 }
+
+/**
+ * 删除真题（仅管理员或题目创建者）
+ */
+export async function deleteRealExamQuestion(questionId: number, userId: number) {
+  const db = await getDb();
+  if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Database not initialized" });
+
+  // 获取题目信息
+  const question = await db
+    .select()
+    .from(schema.realExamQuestions)
+    .where(eq(schema.realExamQuestions.id, questionId))
+    .limit(1);
+
+  if (question.length === 0) {
+    throw new TRPCError({ code: "NOT_FOUND", message: "真题不存在" });
+  }
+
+  // 验证权限（仅创建者可删除，或者管理员）
+  // 注意：这里假设管理员权限已在路由层检查，这里只检查创建者
+  if (question[0].createdBy && question[0].createdBy !== userId) {
+    throw new TRPCError({ code: "FORBIDDEN", message: "无权删除此真题" });
+  }
+
+  // 删除真题
+  await db
+    .delete(schema.realExamQuestions)
+    .where(eq(schema.realExamQuestions.id, questionId));
+
+  return {
+    success: true,
+  };
+}

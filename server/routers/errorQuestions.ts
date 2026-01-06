@@ -353,6 +353,33 @@ export const errorQuestionsRouter = router({
     }),
 
   /**
+   * 删除错题
+   */
+  delete: protectedProcedure
+    .input(z.object({
+      questionId: z.number(),
+    }))
+    .mutation(async ({ ctx, input }) => {
+      const db = await getDb();
+      if (!db) throw new Error("数据库连接失败");
+
+      // 验证错题属于当前用户
+      const question = await getErrorQuestionById(input.questionId);
+      if (!question || question.userId !== ctx.user.id) {
+        throw new Error("错题不存在或无权删除");
+      }
+
+      // 删除错题（级联删除会自动处理相关记录）
+      await db
+        .delete(errorQuestions)
+        .where(eq(errorQuestions.id, input.questionId));
+
+      return {
+        success: true,
+      };
+    }),
+
+  /**
    * 更新错题笔记
    */
   updateNotes: protectedProcedure

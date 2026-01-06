@@ -166,6 +166,26 @@ export const realExamRouter = router({
     return await recommendationService.getRecommendationStats(ctx.user.id);
   }),
 
+  // 删除真题
+  deleteRealExamQuestion: protectedProcedure
+    .input(z.object({ questionId: z.number() }))
+    .mutation(async ({ ctx, input }) => {
+      return await realExamService.deleteRealExamQuestion(
+        input.questionId,
+        ctx.user.id
+      );
+    }),
+
+  // 删除试卷
+  deleteExamPaper: protectedProcedure
+    .input(z.object({ paperId: z.number() }))
+    .mutation(async ({ ctx, input }) => {
+      return await examPaperService.deleteExamPaper(
+        input.paperId,
+        ctx.user.id
+      );
+    }),
+
   // 使用AI生成题目
   generateQuestionsWithAI: protectedProcedure
     .input(

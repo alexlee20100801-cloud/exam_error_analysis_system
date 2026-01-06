@@ -159,6 +159,23 @@ export const questionsRouter = router({
     };
   }),
 
+  // 管理员：删除题目
+  delete: adminProcedure
+    .input(z.object({ id: z.number() }))
+    .mutation(async ({ input }: any) => {
+      const db = await getDb();
+      if (!db) throw new Error("数据库连接失败");
+
+      // 删除题目
+      await db
+        .delete(questions)
+        .where(eq(questions.id, input.id));
+
+      return {
+        success: true,
+      };
+    }),
+
   // 管理员：生成题目
   generate: adminProcedure
     .input(

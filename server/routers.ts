@@ -39,6 +39,7 @@ import { reviewTasksRouter } from "./routers/reviewTasks";
 import { reminderSettingsRouter } from "./routers/reminderSettings";
 import { documentUploadRouter } from "./routes/documentUpload";
 import { symbolCorrectionRouter } from "./routers/symbolCorrection";
+import { enhancedExportRouter } from "./routers/enhancedExport";
 
 export const appRouter = router({
   system: systemRouter,
@@ -62,6 +63,9 @@ export const appRouter = router({
   
   // 符号校正
   symbolCorrection: symbolCorrectionRouter,
+  
+  // 增强导出
+  enhancedExport: enhancedExportRouter,
   
   // 错题统计
   errorQuestionStats: errorQuestionStatsRouter,

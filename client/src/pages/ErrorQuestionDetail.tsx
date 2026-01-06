@@ -33,7 +33,17 @@ import { NoteEditor } from "@/components/NoteEditor";
 import { useState } from "react";
 import { useSwipeGesture } from "@/hooks/useSwipeGesture";
 import { useIsMobile } from "@/hooks/useMobile";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { ChevronLeft, ChevronRight, Trash2 } from "lucide-react";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 export default function ErrorQuestionDetail() {
   const { user, loading: authLoading } = useAuth();
@@ -42,6 +52,7 @@ export default function ErrorQuestionDetail() {
   
   const questionId = params?.id ? parseInt(params.id) : 0;
   const [showVoicePlayer, setShowVoicePlayer] = useState(false);
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const isMobile = useIsMobile();
   
   // 获取所有错题ID列表用于切换
@@ -132,6 +143,22 @@ export default function ErrorQuestionDetail() {
       toast.error(`生成失败：${error.message}`);
     },
   });
+
+  // 删除错题mutation
+  const deleteMutation = trpc.errorQuestions.delete.useMutation({
+    onSuccess: () => {
+      toast.success("错题已删除");
+      setLocation("/error-questions");
+    },
+    onError: (error) => {
+      toast.error(`删除失败：${error.message}`);
+    },
+  });
+
+  const handleDelete = () => {
+    deleteMutation.mutate({ questionId });
+    setShowDeleteDialog(false);
+  };
 
   const utils = trpc.useUtils();
 
@@ -321,7 +348,34 @@ export default function ErrorQuestionDetail() {
               <Target className="mr-2 h-4 w-4" />
               {generatePracticeMutation.isPending ? "生成中..." : "生成专项练习"}
             </Button>
+            <Button
+              variant="destructive"
+              onClick={() => setShowDeleteDialog(true)}
+              disabled={deleteMutation.isPending}
+              size="lg"
+            >
+              <Trash2 className="mr-2 h-4 w-4" />
+              删除错题
+            </Button>
           </div>
+
+          {/* 删除确认对话框 */}
+          <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>确认删除</AlertDialogTitle>
+                <AlertDialogDescription>
+                  您确定要删除这道错题吗？此操作不可恢复，将同时删除相关的AI分析、练习记录等数据。
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel>取消</AlertDialogCancel>
+                <AlertDialogAction onClick={handleDelete} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+                  确认删除
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
         </div>
 
         {/* 题目内容 */}

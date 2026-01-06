@@ -319,3 +319,36 @@ export async function generateQuestionsWithAI(params: {
   const result = JSON.parse(content);
   return result.questions;
 }
+
+/**
+ * 删除试卷（仅创建者可删除）
+ */
+export async function deleteExamPaper(paperId: number, userId: number) {
+  const db = await getDb();
+  if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Database not initialized" });
+
+  // 获取试卷信息
+  const paper = await db
+    .select()
+    .from(schema.generatedExamPapers)
+    .where(eq(schema.generatedExamPapers.id, paperId))
+    .limit(1);
+
+  if (paper.length === 0) {
+    throw new TRPCError({ code: "NOT_FOUND", message: "试卷不存在" });
+  }
+
+  // 验证权限
+  if (paper[0].userId !== userId) {
+    throw new TRPCError({ code: "FORBIDDEN", message: "无权删除此试卷" });
+  }
+
+  // 删除试卷（级联删除会自动处理相关记录）
+  await db
+    .delete(schema.generatedExamPapers)
+    .where(eq(schema.generatedExamPapers.id, paperId));
+
+  return {
+    success: true,
+  };
+}

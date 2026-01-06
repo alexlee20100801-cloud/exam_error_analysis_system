@@ -3,6 +3,7 @@ import mammoth from 'mammoth';
 import { storagePut, storageGet } from '../storage';
 import { invokeLLM } from '../_core/llm';
 import { recognizeFormulasFromImage, recognizeFormulasFromText, type Formula } from './mathFormulaRecognitionService';
+import { extractContentEnhanced, type ImageElement } from '../enhancedOcrService';
 
 /**
  * 文档解析服务
@@ -25,6 +26,8 @@ export interface ParsedContent {
   fileType: 'image' | 'word' | 'pdf';
   formulas?: Formula[]; // 识别到的公式列表
   hasFormulas?: boolean; // 是否包含公式
+  imageElements?: ImageElement[]; // 识别到的图表、图片元素
+  tables?: Array<{ content: string; position: string }>; // 识别到的表格
 }
 
 /**
@@ -40,7 +43,10 @@ export async function parseImage(imageBuffer: Buffer, mimeType: string): Promise
       mimeType
     );
 
-    // 使用LLM的视觉能力识别图片内容（带公式识别）
+    // 首先使用增强OCR识别图表、表格等元素
+    const enhancedResult = await extractContentEnhanced(imageUrl);
+    
+    // 然后使用LLM的视觉能力识别图片内容（带公式识别）
     const response = await invokeLLM({
       messages: [
         {
@@ -124,7 +130,9 @@ export async function parseImage(imageBuffer: Buffer, mimeType: string): Promise
       confidence: result.confidence || 0.8,
       fileType: 'image',
       formulas,
-      hasFormulas: result.hasFormulas || false
+      hasFormulas: result.hasFormulas || false,
+      imageElements: enhancedResult.success ? enhancedResult.imageElements : undefined,
+      tables: enhancedResult.success ? enhancedResult.tables : undefined
     };
   } catch (error) {
     console.error('图片OCR识别失败:', error);
