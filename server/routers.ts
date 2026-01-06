@@ -33,6 +33,7 @@ import { scheduledTasksRouter } from "./routers/scheduledTasks";
 import { practicePoolsRouter } from "./routers/practicePools";
 import { favoritesRouter } from "./routers/favorites";
 import { reviewRemindersRouter } from "./routers/reviewReminders";
+import { errorQuestionStatsRouter } from "./routers/errorQuestionStats";
 
 export const appRouter = router({
   system: systemRouter,
@@ -50,6 +51,9 @@ export const appRouter = router({
 
   // 错题管理
   errorQuestions: errorQuestionsRouter,
+  
+  // 错题统计
+  errorQuestionStats: errorQuestionStatsRouter,
   
   // 收藏管理
   favorites: favoritesRouter,

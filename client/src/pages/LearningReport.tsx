@@ -18,6 +18,7 @@ import { LearningReportExportDialog } from "@/components/LearningReportExportDia
 import { Download } from "lucide-react";
 import { useState } from "react";
 import { ALL_SUBJECTS, SUBJECTS, getSubjectName } from "@shared/subjects";
+import { BarChart, Bar, XAxis as RechartsXAxis, YAxis as RechartsYAxis, CartesianGrid as RechartsCartesianGrid, Tooltip as RechartsTooltip, Legend as RechartsLegend, ResponsiveContainer as RechartsResponsiveContainer } from "recharts";
 import {
   RadarChart,
   PolarGrid,
@@ -84,6 +85,20 @@ export default function LearningReport() {
   // 获取学习时长趋势数据（折线图）
   const { data: trendData, isLoading: trendLoading } = trpc.learningStats.getLearningTimeTrend.useQuery(
     { days: 30 },
+    { enabled: !!user }
+  );
+
+  // 获取错题统计数据
+  const { data: errorSubjectDist } = trpc.errorQuestionStats.getSubjectDistribution.useQuery(
+    undefined,
+    { enabled: !!user }
+  );
+  const { data: errorDifficultyDist } = trpc.errorQuestionStats.getDifficultyDistribution.useQuery(
+    undefined,
+    { enabled: !!user }
+  );
+  const { data: errorKnowledgeMastery } = trpc.errorQuestionStats.getKnowledgePointMastery.useQuery(
+    { limit: 8 },
     { enabled: !!user }
   );
 
@@ -357,6 +372,106 @@ export default function LearningReport() {
               {ALL_SUBJECTS.map((subject) => (
                 <SubjectReportCard key={subject} subject={subject} />
               ))}
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* 错题本数据可视化 */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <BarChart3 className="h-5 w-5" />
+              错题本数据分析
+            </CardTitle>
+            <CardDescription>从多个维度分析你的错题情况</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+              {/* 学科分布饼图 */}
+              <div className="space-y-2">
+                <h3 className="text-sm font-medium text-center">学科分布</h3>
+                {errorSubjectDist && errorSubjectDist.data && errorSubjectDist.data.length > 0 ? (
+                  <RechartsResponsiveContainer width="100%" height={250}>
+                    <PieChart>
+                      <Pie
+                        data={errorSubjectDist.data.map(item => ({
+                          name: subjectNames[item.subject] || item.subject,
+                          value: item.count,
+                          fill: subjectColors[item.subject] || "#999",
+                        }))}
+                        cx="50%"
+                        cy="50%"
+                        labelLine={false}
+                        label={(entry) => `${entry.name}: ${entry.value}`}
+                        outerRadius={80}
+                        dataKey="value"
+                      >
+                        {errorSubjectDist.data.map((entry, index) => (
+                          <Cell key={`cell-${index}`} fill={subjectColors[entry.subject] || "#999"} />
+                        ))}
+                      </Pie>
+                      <RechartsTooltip />
+                    </PieChart>
+                  </RechartsResponsiveContainer>
+                ) : (
+                  <div className="h-[250px] flex items-center justify-center text-muted-foreground text-sm">
+                    暂无数据
+                  </div>
+                )}
+              </div>
+
+              {/* 难度分布柱状图 */}
+              <div className="space-y-2">
+                <h3 className="text-sm font-medium text-center">难度分布</h3>
+                {errorDifficultyDist && errorDifficultyDist.data && errorDifficultyDist.data.length > 0 ? (
+                  <RechartsResponsiveContainer width="100%" height={250}>
+                    <BarChart data={errorDifficultyDist.data.map(item => ({
+                      difficulty: item.difficulty === "easy" ? "简单" : item.difficulty === "medium" ? "中等" : "困难",
+                      count: item.count,
+                    }))}>
+                      <RechartsCartesianGrid strokeDasharray="3 3" />
+                      <RechartsXAxis dataKey="difficulty" />
+                      <RechartsYAxis />
+                      <RechartsTooltip />
+                      <Bar dataKey="count" fill="#8884d8" name="错题数" />
+                    </BarChart>
+                  </RechartsResponsiveContainer>
+                ) : (
+                  <div className="h-[250px] flex items-center justify-center text-muted-foreground text-sm">
+                    暂无数据
+                  </div>
+                )}
+              </div>
+
+              {/* 知识点掌握度雷达图 */}
+              <div className="space-y-2">
+                <h3 className="text-sm font-medium text-center">知识点掌握度</h3>
+                {errorKnowledgeMastery && errorKnowledgeMastery.data && errorKnowledgeMastery.data.length > 0 ? (
+                  <ResponsiveContainer width="100%" height={250}>
+                    <RadarChart data={errorKnowledgeMastery.data.map(item => ({
+                      subject: item.knowledgePointName.length > 6 ? item.knowledgePointName.slice(0, 6) + "..." : item.knowledgePointName,
+                      value: item.masteryLevel,
+                      fullMark: 100,
+                    }))}>
+                      <PolarGrid />
+                      <PolarAngleAxis dataKey="subject" />
+                      <PolarRadiusAxis angle={90} domain={[0, 100]} />
+                      <Radar
+                        name="掌握度"
+                        dataKey="value"
+                        stroke="#82ca9d"
+                        fill="#82ca9d"
+                        fillOpacity={0.6}
+                      />
+                      <Tooltip />
+                    </RadarChart>
+                  </ResponsiveContainer>
+                ) : (
+                  <div className="h-[250px] flex items-center justify-center text-muted-foreground text-sm">
+                    暂无数据
+                  </div>
+                )}
+              </div>
             </div>
           </CardContent>
         </Card>

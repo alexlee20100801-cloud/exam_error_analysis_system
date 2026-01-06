@@ -1,7 +1,7 @@
 import DashboardLayout from "@/components/DashboardLayout";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { trpc } from "@/lib/trpc";
-import { BookOpen, Brain, Target, TrendingUp, Calendar, Video, Trophy, Flame, GraduationCap, BookMarked, Plus, Play, BarChart3, AlertCircle, Star } from "lucide-react";
+import { BookOpen, Brain, Target, TrendingUp, Calendar, Video, Trophy, Flame, GraduationCap, BookMarked, Plus, Play, BarChart3, AlertCircle, Star, Bell, Clock } from "lucide-react";
 import { SCHOOL_LEVELS, SUBJECTS } from "../../../shared/subjects";
 import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
@@ -14,6 +14,7 @@ export default function Dashboard() {
   const { data: streakData } = trpc.achievements.getCurrentStreak.useQuery();
   const { data: fullStats } = trpc.stats.getFullStats.useQuery();
   const { data: favoriteData } = trpc.errorQuestions.getFavoriteCount.useQuery();
+  const { data: reminderStats } = trpc.reviewReminders.getStats.useQuery();
 
   const totalQuestions = errorQuestions?.length || 0;
   const analyzedQuestions = errorQuestions?.filter(q => q.isAnalyzed).length || 0;
@@ -49,6 +50,39 @@ export default function Dashboard() {
             )}
           </div>
         </div>
+
+        {/* 今日待复习提醒卡片 */}
+        {reminderStats && reminderStats.stats && reminderStats.stats.pendingDue > 0 && (
+          <Card className="border-blue-200 dark:border-blue-900 bg-gradient-to-r from-blue-50 to-cyan-50 dark:from-blue-950/20 dark:to-cyan-950/20">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2 text-blue-700 dark:text-blue-400">
+                <Bell className="h-5 w-5" />
+                学习提醒
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="flex items-center justify-between">
+                <div className="space-y-1">
+                  <p className="text-sm text-blue-600 dark:text-blue-300">
+                    你有 <strong className="text-lg">{reminderStats.stats.pendingDue}</strong> 道题目到期待复习
+                  </p>
+                  {reminderStats.stats.pendingFuture > 0 && (
+                    <p className="text-xs text-blue-500 dark:text-blue-400 flex items-center gap-1">
+                      <Clock className="h-3 w-3" />
+                      另有 {reminderStats.stats.pendingFuture} 道即将到期
+                    </p>
+                  )}
+                </div>
+                <Button asChild variant="default" size="lg">
+                  <Link href="/reminders">
+                    <Play className="mr-2 h-4 w-4" />
+                    开始复习
+                  </Link>
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        )}
 
         {/* 学习建议提示 */}
         {reviewStats && reviewStats.pending > 0 && (
