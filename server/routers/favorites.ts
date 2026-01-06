@@ -8,6 +8,7 @@ import {
   getFavorites,
   getFavoriteStats,
 } from "../services/favoriteService";
+import { exportFavorites } from "../services/favoriteExportService";
 
 /**
  * 收藏路由
@@ -124,4 +125,29 @@ export const favoritesRouter = router({
       stats,
     };
   }),
+
+  /**
+   * 导出收藏题目
+   */
+  export: protectedProcedure
+    .input(
+      z.object({
+        format: z.enum(["pdf", "word"]),
+        questionType: z.enum(["error_question", "practice_question", "question"]).optional(),
+      })
+    )
+    .mutation(async ({ ctx, input }) => {
+      const buffer = await exportFavorites({
+        userId: ctx.user.id,
+        format: input.format,
+        questionType: input.questionType,
+      });
+
+      // 返回base64编码的文件数据
+      return {
+        success: true,
+        data: buffer.toString("base64"),
+        filename: `我的题库_${new Date().toISOString().split("T")[0]}.${input.format === "pdf" ? "pdf" : "docx"}`,
+      };
+    }),
 });

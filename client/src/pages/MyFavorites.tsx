@@ -4,7 +4,17 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Heart, BookOpen, AlertCircle, FileQuestion, Trash2 } from "lucide-react";
+import { Heart, BookOpen, AlertCircle, FileQuestion, Trash2, Download } from "lucide-react";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { useLocation } from "wouter";
 import { toast } from "sonner";
 
@@ -14,6 +24,8 @@ import { toast } from "sonner";
 export default function MyFavorites() {
   const [, setLocation] = useLocation();
   const [activeTab, setActiveTab] = useState<"all" | "error_question" | "practice_question" | "question">("all");
+  const [exportFormat, setExportFormat] = useState<"pdf" | "word">("pdf");
+  const [isExportDialogOpen, setIsExportDialogOpen] = useState(false);
 
   // 获取收藏统计
   const { data: statsData } = trpc.favorites.stats.useQuery();
@@ -25,6 +37,40 @@ export default function MyFavorites() {
   });
 
   // 取消收藏
+  // 导出收藏
+  const exportMutation = trpc.favorites.export.useMutation({
+    onSuccess: (result) => {
+      if (result.success) {
+        // 将base64数据转换为Blob并下载
+        const byteCharacters = atob(result.data);
+        const byteNumbers = new Array(byteCharacters.length);
+        for (let i = 0; i < byteCharacters.length; i++) {
+          byteNumbers[i] = byteCharacters.charCodeAt(i);
+        }
+        const byteArray = new Uint8Array(byteNumbers);
+        const blob = new Blob([byteArray], {
+          type: exportFormat === "pdf" ? "application/pdf" : "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+        });
+
+        // 创建下载链接
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = result.filename;
+        document.body.appendChild(a);
+        a.click();
+        window.URL.revokeObjectURL(url);
+        document.body.removeChild(a);
+
+        toast.success("导出成功！");
+        setIsExportDialogOpen(false);
+      }
+    },
+    onError: (error) => {
+      toast.error(`导出失败：${error.message}`);
+    },
+  });
+
   const removeMutation = trpc.favorites.remove.useMutation({
     onSuccess: () => {
       toast.success("已取消收藏");
@@ -39,6 +85,14 @@ export default function MyFavorites() {
     if (confirm("确定要取消收藏这道题目吗？")) {
       removeMutation.mutate({ questionId, questionType });
     }
+  };
+
+  const handleExport = () => {
+    const questionType = activeTab === "all" ? undefined : activeTab;
+    exportMutation.mutate({
+      format: exportFormat,
+      questionType,
+    });
   };
 
   const handleViewQuestion = (questionId: number, questionType: string) => {
@@ -66,14 +120,73 @@ export default function MyFavorites() {
 
   return (
     <div className="container py-8">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold mb-2 flex items-center gap-2">
-          <Heart className="h-8 w-8 text-red-500" />
-          我的题库
-        </h1>
-        <p className="text-muted-foreground">
-          收藏的题目将保存在这里，方便后续复习和练习
-        </p>
+      <div className="mb-8 flex items-start justify-between">
+        <div>
+          <h1 className="text-3xl font-bold mb-2 flex items-center gap-2">
+            <Heart className="h-8 w-8 text-red-500" />
+            我的题库
+          </h1>
+          <p className="text-muted-foreground">
+            收藏的题目将保存在这里，方便后续复习和练习
+          </p>
+        </div>
+        
+        {/* 导出按钮 */}
+        <Dialog open={isExportDialogOpen} onOpenChange={setIsExportDialogOpen}>
+          <DialogTrigger asChild>
+            <Button variant="outline" className="gap-2">
+              <Download className="h-4 w-4" />
+              导出题目
+            </Button>
+          </DialogTrigger>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>导出收藏题目</DialogTitle>
+              <DialogDescription>
+                选择导出格式，将当前筛选的题目导出为文档
+              </DialogDescription>
+            </DialogHeader>
+            
+            <div className="space-y-4 py-4">
+              <div className="space-y-2">
+                <Label>导出格式</Label>
+                <RadioGroup value={exportFormat} onValueChange={(v) => setExportFormat(v as "pdf" | "word")}>
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="pdf" id="pdf" />
+                    <Label htmlFor="pdf" className="cursor-pointer">
+                      PDF文档 (适合打印和阅读)
+                    </Label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="word" id="word" />
+                    <Label htmlFor="word" className="cursor-pointer">
+                      Word文档 (适合编辑和批注)
+                    </Label>
+                  </div>
+                </RadioGroup>
+              </div>
+              
+              <div className="bg-muted p-3 rounded-md">
+                <p className="text-sm text-muted-foreground">
+                  将导出当前筛选条件下的所有题目（
+                  {activeTab === "all" ? "全部题目" :
+                   activeTab === "error_question" ? "错题" :
+                   activeTab === "practice_question" ? "练习题" : "题库题"}
+                  ）
+                </p>
+              </div>
+            </div>
+            
+            <div className="flex justify-end gap-2">
+              <Button variant="outline" onClick={() => setIsExportDialogOpen(false)}>
+                取消
+              </Button>
+              <Button onClick={handleExport} disabled={exportMutation.isPending}>
+                {exportMutation.isPending ? "导出中..." : "开始导出"}
+              </Button>
+            </div>
+          </DialogContent>
+        </Dialog>
       </div>
 
       {/* 统计卡片 */}
