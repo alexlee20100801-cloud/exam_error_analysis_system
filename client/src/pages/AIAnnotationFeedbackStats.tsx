@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { trpc } from '@/lib/trpc';
-import { Star, TrendingUp, BarChart3, MessageSquare, Target } from 'lucide-react';
+import { Star, TrendingUp, BarChart3, MessageSquare, Target, Download } from 'lucide-react';
 import {
   Table,
   TableBody,
@@ -13,6 +13,8 @@ import {
 } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
+import { Button } from '@/components/ui/button';
+import { toast } from 'sonner';
 
 /**
  * AI标注反馈统计页面
@@ -20,6 +22,7 @@ import { Skeleton } from '@/components/ui/skeleton';
  */
 export function AIAnnotationFeedbackStats() {
   const [activeTab, setActiveTab] = useState('overview');
+  const [isExporting, setIsExporting] = useState(false);
 
   const { data: stats, isLoading: statsLoading } = trpc.aiAnnotationFeedback.getStats.useQuery();
   const { data: chartTypeAccuracy, isLoading: chartTypeLoading } =
@@ -36,13 +39,49 @@ export function AIAnnotationFeedbackStats() {
     missing_features: '缺少关键特征',
   };
 
+  // 导出CSV
+  const handleExportCSV = async () => {
+    try {
+      setIsExporting(true);
+      const result = await trpc.aiAnnotationFeedback.exportFeedbackCSV.query({});
+      
+      // 创建Blob并下载
+      const blob = new Blob([result.csvContent], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `ai_feedback_${new Date().toISOString().split('T')[0]}.csv`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+
+      toast.success('导出成功', {
+        description: 'CSV文件已下载',
+      });
+    } catch (error) {
+      console.error('导出失败:', error);
+      toast.error('导出失败', {
+        description: '请稍后重试',
+      });
+    } finally {
+      setIsExporting(false);
+    }
+  };
+
   return (
     <div className="container mx-auto py-6 space-y-6">
-      <div>
-        <h1 className="text-3xl font-bold">AI标注反馈统计</h1>
-        <p className="text-muted-foreground mt-2">
-          查看AI标注的准确率和用户反馈数据
-        </p>
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-3xl font-bold">AI标注反馈统计</h1>
+          <p className="text-muted-foreground mt-2">
+            查看AI标注的准确率和用户反馈数据
+          </p>
+        </div>
+        <Button onClick={handleExportCSV} disabled={isExporting}>
+          <Download className="h-4 w-4 mr-2" />
+          {isExporting ? '导出中...' : '导出CSV'}
+        </Button>
       </div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab}>

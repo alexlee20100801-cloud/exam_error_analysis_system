@@ -48,6 +48,7 @@ import { annotationTemplatesRouter } from "./routers/annotationTemplates";
 import { aiAnnotationRouter } from "./routers/aiAnnotation";
 import { collaborativeLearningRouter } from "./routers/collaborativeLearning";
 import { aiAnnotationFeedbackRouter } from "./routers/aiAnnotationFeedback";
+import { pointsRouter } from "./routers/points";
 
 export const appRouter = router({
   system: systemRouter,
@@ -96,6 +97,9 @@ export const appRouter = router({
   
   // AI标注反馈
   aiAnnotationFeedback: aiAnnotationFeedbackRouter,
+  
+  // 积分系统
+  points: pointsRouter,
   
   // 错题统计
   errorQuestionStats: errorQuestionStatsRouter,

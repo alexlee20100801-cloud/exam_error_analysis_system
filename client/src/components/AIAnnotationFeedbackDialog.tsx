@@ -20,6 +20,8 @@ import {
 } from '@/components/ui/select';
 import { trpc } from '@/lib/trpc';
 import { toast } from 'sonner';
+import { Coins, Trophy } from 'lucide-react';
+import { Alert, AlertDescription } from '@/components/ui/alert';
 
 interface AIAnnotationFeedbackDialogProps {
   open: boolean;
@@ -59,10 +61,26 @@ export function AIAnnotationFeedbackDialog({
   const [improvementSuggestion, setImprovementSuggestion] = useState('');
 
   const submitFeedbackMutation = trpc.aiAnnotationFeedback.submitFeedback.useMutation({
-    onSuccess: () => {
-      toast.success('感谢您的反馈！', {
-        description: '您的反馈将帮助我们改进AI标注的准确度',
-      });
+    onSuccess: (data) => {
+      // 显示奖励信息
+      if (data.rewards) {
+        const { pointsEarned, achievementsUnlocked } = data.rewards;
+        let description = `您获得了 ${pointsEarned} 积分！`;
+        
+        if (achievementsUnlocked && achievementsUnlocked.length > 0) {
+          const achievementNames = achievementsUnlocked.map((a: any) => a.name).join('、');
+          description += `\n解锁成就：${achievementNames}`;
+        }
+
+        toast.success('感谢您的反馈！', {
+          description,
+        });
+      } else {
+        toast.success('感谢您的反馈！', {
+          description: '您的反馈将帮助我们改进AI标注的准确度',
+        });
+      }
+      
       onOpenChange(false);
       // 重置表单
       setRating(0);
@@ -192,6 +210,22 @@ export function AIAnnotationFeedbackDialog({
               className="resize-none"
             />
           </div>
+
+          {/* 积分奖励提示 */}
+          <Alert className="bg-gradient-to-r from-blue-50 to-purple-50 border-blue-200">
+            <Coins className="h-4 w-4 text-blue-600" />
+            <AlertDescription className="text-sm">
+              <div className="space-y-1">
+                <div className="font-medium text-blue-900">🎁 提交反馈即可获得积分奖励！</div>
+                <ul className="text-blue-700 space-y-0.5 ml-4 list-disc">
+                  <li>基础反馈：10 积分</li>
+                  <li>高质量反馈（详细建议）：+20 积分</li>
+                  <li>提供修正标注：+15 积分</li>
+                  <li>首次反馈解锁成就奖励！</li>
+                </ul>
+              </div>
+            </AlertDescription>
+          </Alert>
         </div>
 
         <DialogFooter>

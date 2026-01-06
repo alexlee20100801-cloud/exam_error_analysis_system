@@ -10,6 +10,11 @@ import {
   getFeedbackTrend,
 } from '../services/aiAnnotationFeedbackService';
 import {
+  exportFeedbackDataToCSV,
+  exportDetailedFeedbackDataToCSV,
+  getExportStats,
+} from '../services/csvExportService';
+import {
   initializePresetTemplates,
   getAllTemplates,
   getTemplateByType,
@@ -158,5 +163,85 @@ export const aiAnnotationFeedbackRouter = router({
     )
     .query(async ({ input }) => {
       return getTemplatesByCategory(input.category);
+    }),
+
+  /**
+   * 导出反馈数据为CSV（管理员）
+   */
+  exportFeedbackCSV: protectedProcedure
+    .input(
+      z.object({
+        startDate: z.string().optional(),
+        endDate: z.string().optional(),
+        chartTypes: z.array(z.string()).optional(),
+        feedbackTypes: z.array(z.string()).optional(),
+        minRating: z.number().optional(),
+        maxRating: z.number().optional(),
+      })
+    )
+    .query(async ({ input }) => {
+      const filter = {
+        startDate: input.startDate ? new Date(input.startDate) : undefined,
+        endDate: input.endDate ? new Date(input.endDate) : undefined,
+        chartTypes: input.chartTypes,
+        feedbackTypes: input.feedbackTypes,
+        minRating: input.minRating,
+        maxRating: input.maxRating,
+      };
+      const csvContent = await exportFeedbackDataToCSV(filter);
+      return { csvContent };
+    }),
+
+  /**
+   * 导出详细反馈数据为CSV（包含JSON字段，管理员）
+   */
+  exportDetailedFeedbackCSV: protectedProcedure
+    .input(
+      z.object({
+        startDate: z.string().optional(),
+        endDate: z.string().optional(),
+        chartTypes: z.array(z.string()).optional(),
+        feedbackTypes: z.array(z.string()).optional(),
+        minRating: z.number().optional(),
+        maxRating: z.number().optional(),
+      })
+    )
+    .query(async ({ input }) => {
+      const filter = {
+        startDate: input.startDate ? new Date(input.startDate) : undefined,
+        endDate: input.endDate ? new Date(input.endDate) : undefined,
+        chartTypes: input.chartTypes,
+        feedbackTypes: input.feedbackTypes,
+        minRating: input.minRating,
+        maxRating: input.maxRating,
+      };
+      const csvContent = await exportDetailedFeedbackDataToCSV(filter);
+      return { csvContent };
+    }),
+
+  /**
+   * 获取导出统计信息
+   */
+  getExportStats: protectedProcedure
+    .input(
+      z.object({
+        startDate: z.string().optional(),
+        endDate: z.string().optional(),
+        chartTypes: z.array(z.string()).optional(),
+        feedbackTypes: z.array(z.string()).optional(),
+        minRating: z.number().optional(),
+        maxRating: z.number().optional(),
+      })
+    )
+    .query(async ({ input }) => {
+      const filter = {
+        startDate: input.startDate ? new Date(input.startDate) : undefined,
+        endDate: input.endDate ? new Date(input.endDate) : undefined,
+        chartTypes: input.chartTypes,
+        feedbackTypes: input.feedbackTypes,
+        minRating: input.minRating,
+        maxRating: input.maxRating,
+      };
+      return getExportStats(filter);
     }),
 });

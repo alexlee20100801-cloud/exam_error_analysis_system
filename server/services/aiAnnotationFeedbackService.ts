@@ -1,6 +1,7 @@
 import { getDb } from '../db';
 import { aiAnnotationFeedback, chartTypeTemplates } from '../../drizzle/schema';
 import { eq, desc, sql, and, gte } from 'drizzle-orm';
+import { handleFeedbackRewards } from './pointsService';
 
 /**
  * AI标注反馈服务
@@ -68,12 +69,28 @@ export async function submitAnnotationFeedback(input: FeedbackInput) {
     confidence: input.confidence ? input.confidence.toString() : null,
   });
 
-  // 如果有图表类型，更新该类型的反馈计数和准确率
+  // 如果有图表类型,更新该类型的反馈计数和准确率
   if (input.chartType) {
     await updateChartTypeAccuracy(input.chartType);
   }
 
-  return result;
+  // 处理积分和成就奖励
+  try {
+    const rewards = await handleFeedbackRewards(input.userId, {
+      rating: input.rating,
+      improvementSuggestion: input.improvementSuggestion,
+      userCorrectedAnnotations: input.userCorrectedAnnotations,
+    });
+
+    return {
+      ...result,
+      rewards,
+    };
+  } catch (error) {
+    console.error('处理反馈奖励失败:', error);
+    // 即使奖励失败,也返回反馈结果
+    return result;
+  }
 }
 
 /**

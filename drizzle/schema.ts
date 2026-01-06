@@ -19,6 +19,8 @@ export const users = mysqlTable('users', {
   wechatOpenId: varchar('wechat_open_id', { length: 255 }),
   wechatNickname: varchar('wechat_nickname', { length: 255 }),
   themePreference: mysqlEnum('theme_preference', ['light', 'dark', 'system']).default('system'),
+  points: int('points').default(0).notNull(),
+  totalFeedbackCount: int('total_feedback_count').default(0).notNull(),
   createdAt: timestamp('created_at').defaultNow().notNull(),
   updatedAt: timestamp('updated_at').defaultNow().onUpdateNow().notNull(),
 });
