@@ -1,0 +1,9 @@
+{
+  "query": "CREATE TABLE IF NOT EXISTS `user_similarity_cache` (\n  `id` INT PRIMARY KEY AUTO_INCREMENT,\n  `user_id_1` INT NOT NULL,\n  `user_id_2` INT NOT NULL,\n  `similarity_score` INT NOT NULL,\n  `common_behavior_count` INT NOT NULL,\n  `last_calculated_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,\n  INDEX `user_1_idx` (`user_id_1`),\n  INDEX `user_2_idx` (`user_id_2`),\n  INDEX `score_idx` (`similarity_score`)\n)",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway03.us-east-1.prod.aws.tidbcloud.com --port 4000 --user Lfr9xqjx7LpxUD9.1efa314e7813 --database Yh4Z4ZSitSFdPWYxtKkkQS --execute CREATE TABLE IF NOT EXISTS `user_similarity_cache` (\n  `id` INT PRIMARY KEY AUTO_INCREMENT,\n  `user_id_1` INT NOT NULL,\n  `user_id_2` INT NOT NULL,\n  `similarity_score` INT NOT NULL,\n  `common_behavior_count` INT NOT NULL,\n  `last_calculated_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,\n  INDEX `user_1_idx` (`user_id_1`),\n  INDEX `user_2_idx` (`user_id_2`),\n  INDEX `score_idx` (`similarity_score`)\n)",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 1629
+}

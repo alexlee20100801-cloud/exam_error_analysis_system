@@ -1,0 +1,9 @@
+{
+  "query": "CREATE TABLE IF NOT EXISTS `favorite_folders` (\n  `id` INT PRIMARY KEY AUTO_INCREMENT,\n  `user_id` INT NOT NULL,\n  `name` VARCHAR(100) NOT NULL,\n  `description` TEXT,\n  `color` VARCHAR(50),\n  `question_count` INT NOT NULL DEFAULT 0,\n  `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,\n  `updated_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,\n  INDEX `user_id_idx` (`user_id`)\n)",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway03.us-east-1.prod.aws.tidbcloud.com --port 4000 --user Lfr9xqjx7LpxUD9.1efa314e7813 --database Yh4Z4ZSitSFdPWYxtKkkQS --execute CREATE TABLE IF NOT EXISTS `favorite_folders` (\n  `id` INT PRIMARY KEY AUTO_INCREMENT,\n  `user_id` INT NOT NULL,\n  `name` VARCHAR(100) NOT NULL,\n  `description` TEXT,\n  `color` VARCHAR(50),\n  `question_count` INT NOT NULL DEFAULT 0,\n  `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,\n  `updated_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,\n  INDEX `user_id_idx` (`user_id`)\n)",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 1663
+}

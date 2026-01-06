@@ -1,0 +1,9 @@
+{
+  "query": "CREATE TABLE IF NOT EXISTS `ai_question_favorites` (\n  `id` INT PRIMARY KEY AUTO_INCREMENT,\n  `user_id` INT NOT NULL,\n  `question_id` INT NOT NULL,\n  `folder_id` INT,\n  `notes` TEXT,\n  `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,\n  INDEX `user_id_idx` (`user_id`),\n  INDEX `question_id_idx` (`question_id`),\n  UNIQUE INDEX `user_question_unique_idx` (`user_id`, `question_id`)\n)",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway03.us-east-1.prod.aws.tidbcloud.com --port 4000 --user Lfr9xqjx7LpxUD9.1efa314e7813 --database Yh4Z4ZSitSFdPWYxtKkkQS --execute CREATE TABLE IF NOT EXISTS `ai_question_favorites` (\n  `id` INT PRIMARY KEY AUTO_INCREMENT,\n  `user_id` INT NOT NULL,\n  `question_id` INT NOT NULL,\n  `folder_id` INT,\n  `notes` TEXT,\n  `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,\n  INDEX `user_id_idx` (`user_id`),\n  INDEX `question_id_idx` (`question_id`),\n  UNIQUE INDEX `user_question_unique_idx` (`user_id`, `question_id`)\n)",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 1644
+}

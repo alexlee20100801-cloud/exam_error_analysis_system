@@ -53,6 +53,9 @@ import { aiQuestionCollectionRouter } from "./routers/aiQuestionCollection";
 import { questionReviewRouter } from "./routers/questionReview";
 import { questionRecommendationRouter } from "./routers/questionRecommendation";
 import { questionExportRouter } from "./routers/questionExport";
+import { aiFavoritesRouter } from "./routers/aiFavorites";
+import { collaborativeFilteringRouter } from "./routers/collaborativeFiltering";
+import { exportTemplatesRouter } from "./routers/exportTemplates";
 
 export const appRouter = router({
   system: systemRouter,
@@ -115,6 +118,15 @@ export const appRouter = router({
   
   // 收藏管理
   favorites: favoritesRouter,
+  
+  // AI题目收藏
+  aiFavorites: aiFavoritesRouter,
+  
+  // 协同过滤推荐
+  collaborativeFiltering: collaborativeFilteringRouter,
+  
+  // 导出模板管理
+  exportTemplates: exportTemplatesRouter,
 
   // 学习提醒
   reviewReminders: reviewRemindersRouter,
