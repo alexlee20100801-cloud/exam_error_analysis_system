@@ -591,3 +591,59 @@ export type Question = typeof questions.$inferSelect;
 export type InsertQuestion = typeof questions.$inferInsert;
 
 
+
+/**
+ * 定时任务配置表 - 管理系统定时任务
+ */
+export const scheduledTasks = mysqlTable("scheduled_tasks", {
+  id: int("id").autoincrement().primaryKey(),
+  taskName: varchar("task_name", { length: 100 }).notNull().unique(),
+  taskType: mysqlEnum("task_type", ["generate_questions", "send_reminders", "cleanup"]).notNull(),
+  cronExpression: varchar("cron_expression", { length: 50 }).notNull(), // 如：0 2 * * * (每天凌晨2点)
+  isEnabled: boolean("is_enabled").notNull().default(true),
+  lastExecutedAt: timestamp("last_executed_at"),
+  lastStatus: mysqlEnum("last_status", ["success", "failed", "running"]),
+  lastErrorMessage: text("last_error_message"),
+  executionCount: int("execution_count").notNull().default(0),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().onUpdateNow().notNull(),
+});
+export type ScheduledTask = typeof scheduledTasks.$inferSelect;
+export type InsertScheduledTask = typeof scheduledTasks.$inferInsert;
+
+/**
+ * 任务执行日志表 - 记录每次任务执行的详细信息
+ */
+export const taskExecutionLogs = mysqlTable("task_execution_logs", {
+  id: int("id").autoincrement().primaryKey(),
+  taskId: int("task_id").notNull(),
+  status: mysqlEnum("status", ["success", "failed"]).notNull(),
+  startedAt: timestamp("started_at").notNull(),
+  completedAt: timestamp("completed_at"),
+  duration: int("duration"), // 执行时长（毫秒）
+  itemsProcessed: int("items_processed"), // 处理的项目数量
+  errorMessage: text("error_message"),
+  details: json("details").$type<Record<string, any>>(), // 详细信息（JSON格式）
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+export type TaskExecutionLog = typeof taskExecutionLogs.$inferSelect;
+export type InsertTaskExecutionLog = typeof taskExecutionLogs.$inferInsert;
+
+/**
+ * 专项练习池表 - 错题转化的针对性练习题
+ */
+export const practicePools = mysqlTable("practice_pools", {
+  id: int("id").autoincrement().primaryKey(),
+  userId: int("user_id").notNull(),
+  sourceErrorQuestionId: int("source_error_question_id").notNull(), // 来源错题ID
+  practiceQuestionId: int("practice_question_id").notNull(), // 练习题ID（questions表）
+  knowledgePointId: int("knowledge_point_id"),
+  difficulty: mysqlEnum("difficulty", ["easy", "medium", "hard"]).notNull(),
+  status: mysqlEnum("status", ["pending", "completed", "skipped"]).notNull().default("pending"),
+  completedAt: timestamp("completed_at"),
+  score: int("score"), // 完成后的得分
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().onUpdateNow().notNull(),
+});
+export type PracticePool = typeof practicePools.$inferSelect;
+export type InsertPracticePool = typeof practicePools.$inferInsert;

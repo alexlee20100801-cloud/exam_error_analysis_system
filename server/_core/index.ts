@@ -7,6 +7,7 @@ import { registerOAuthRoutes } from "./oauth";
 import { appRouter } from "../routers";
 import { createContext } from "./context";
 import { serveStatic, setupVite } from "./vite";
+import { initializeScheduledTasks, upsertScheduledTask } from "../services/scheduledTaskService";
 
 function isPortAvailable(port: number): Promise<boolean> {
   return new Promise(resolve => {
@@ -57,8 +58,25 @@ async function startServer() {
     console.log(`Port ${preferredPort} is busy, using port ${port} instead`);
   }
 
-  server.listen(port, () => {
+  server.listen(port, async () => {
     console.log(`Server running on http://localhost:${port}/`);
+    
+    // 初始化定时任务系统
+    try {
+      // 创建默认的题目生成任务（每天凌晨2点执行）
+      await upsertScheduledTask({
+        taskName: 'daily_question_generation',
+        taskType: 'generate_questions',
+        cronExpression: '0 2 * * *', // 每天凌晨2点
+        isEnabled: true,
+      });
+      
+      // 初始化所有启用的定时任务
+      await initializeScheduledTasks();
+      console.log('[Server] Scheduled tasks initialized successfully');
+    } catch (error) {
+      console.error('[Server] Failed to initialize scheduled tasks:', error);
+    }
   });
 }
 
