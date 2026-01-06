@@ -10,6 +10,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { ArrowLeft, CheckCircle2, XCircle, Lightbulb } from "lucide-react";
 import { toast } from "sonner";
 import { SimilarPracticesSection } from "@/components/SimilarPracticesSection";
+import { LatexText } from "@/components/LatexPreview";
 
 /**
  * 专项练习详情和答题页面
@@ -119,11 +120,13 @@ export default function PracticeDetail() {
         <CardContent className="space-y-4">
           <div>
             <h4 className="font-medium mb-2">题目</h4>
-            <p className="text-sm whitespace-pre-wrap">{errorQuestion?.content}</p>
+            <LatexText text={errorQuestion?.content || ''} className="prose prose-sm max-w-none dark:prose-invert" />
           </div>
           <div>
             <h4 className="font-medium mb-2">正确答案</h4>
-            <p className="text-sm text-green-600">{errorQuestion?.correctAnswer}</p>
+            <div className="text-sm text-green-600">
+              <LatexText text={errorQuestion?.correctAnswer || ''} className="prose prose-sm max-w-none" />
+            </div>
           </div>
 
         </CardContent>
@@ -152,9 +155,9 @@ export default function PracticeDetail() {
           {/* 题目 */}
           <div>
             <h4 className="font-medium mb-3">题目</h4>
-              <p className="text-sm whitespace-pre-wrap bg-muted p-4 rounded-lg">
-              {practiceQuestion?.content || practiceQuestion?.title}
-            </p>
+              <div className="bg-muted p-4 rounded-lg">
+              <LatexText text={practiceQuestion?.content || practiceQuestion?.title || ''} className="prose prose-sm max-w-none dark:prose-invert" />
+            </div>
           </div>
 
           {/* 答题区域 */}

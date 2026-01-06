@@ -8,6 +8,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
 import { Clock, CheckCircle2, XCircle, FileText, Trophy, ArrowLeft } from "lucide-react";
 import { useLocation, useRoute } from "wouter";
+import { LatexText } from "@/components/LatexPreview";
 
 export default function ExamPaperDetail() {
   const { user } = useAuth();
@@ -203,7 +204,7 @@ export default function ExamPaperDetail() {
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="prose prose-sm max-w-none">
-                  <p className="whitespace-pre-wrap">{question.content}</p>
+                  <LatexText text={question.content} className="prose prose-sm max-w-none dark:prose-invert" />
                 </div>
 
                 <div className="space-y-2">

@@ -13,6 +13,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { BookOpen, CheckCircle2, XCircle, TrendingUp, Filter } from "lucide-react";
 import { toast } from "sonner";
+import { LatexText } from "@/components/LatexPreview";
 
 const subjectNames: Record<string, string> = {
   chinese: "语文",
@@ -282,7 +283,9 @@ export function QuestionPractice() {
               {/* 题目内容 */}
               <div>
                 <h3 className="font-semibold mb-2">题目</h3>
-                <div className="bg-muted p-4 rounded-lg whitespace-pre-wrap">{answeringQuestion?.content}</div>
+                <div className="bg-muted p-4 rounded-lg">
+                  <LatexText text={answeringQuestion?.content || ''} className="prose prose-sm max-w-none dark:prose-invert" />
+                </div>
               </div>
 
               {/* 选择题选项 */}
@@ -352,14 +355,16 @@ export function QuestionPractice() {
 
                   <div>
                     <h3 className="font-semibold mb-2">正确答案</h3>
-                    <div className="bg-green-50 p-3 rounded-lg border border-green-200">{result.correctAnswer}</div>
+                    <div className="bg-green-50 p-3 rounded-lg border border-green-200">
+                      <LatexText text={result.correctAnswer} className="prose prose-sm max-w-none" />
+                    </div>
                   </div>
 
                   {result.explanation && (
                     <div>
                       <h3 className="font-semibold mb-2">详细解析</h3>
-                      <div className="bg-blue-50 p-4 rounded-lg border border-blue-200 whitespace-pre-wrap">
-                        {result.explanation}
+                      <div className="bg-blue-50 p-4 rounded-lg border border-blue-200">
+                        <LatexText text={result.explanation} className="prose prose-sm max-w-none" />
                       </div>
                     </div>
                   )}

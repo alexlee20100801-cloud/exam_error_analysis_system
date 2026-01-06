@@ -502,3 +502,41 @@
 - [x] 测试LaTeX编辑器的交互体验
 - [x] 测试公式在不同页面的显示一致性
 - [ ] 测试移动端和桌面端的兼容性
+
+
+## LaTeX集成到练习题和AI生成题目页面
+
+### 练习题页面集成
+- [ ] 在QuestionPractice.tsx中集成LaTeX渲染
+- [ ] 在PracticeDetail.tsx中集成LaTeX渲染
+- [ ] 在PracticeQuestions.tsx中集成LaTeX渲染
+- [ ] 在专项练习页面中集成LaTeX渲染
+
+### AI生成题目页面集成
+- [ ] 在AI题目生成页面的题目展示中添加LaTeX渲染
+- [ ] 在AI题目生成页面的编辑表单中添加LaTeX编辑器
+- [ ] 确保生成的题目支持LaTeX公式
+
+### 测试验证
+- [ ] 测试练习题页面的LaTeX公式显示
+- [ ] 测试AI生成题目的LaTeX公式显示
+- [ ] 测试所有页面的LaTeX渲染一致性
+
+
+## LaTeX集成到练习题和AI生成题目页面
+
+### 练习题页面集成
+- [x] 在QuestionPractice.tsx中集成LaTeX渲染
+- [x] 在PracticeDetail.tsx中集成LaTeX渲染
+- [ ] 在PracticeQuestions.tsx中集成LaTeX渲染
+- [ ] 在专项练习页面中集成LaTeX渲染
+
+### AI生成题目页面集成
+- [x] 在AI题目生成页面的题目展示中添加LaTeX渲染（ExamPaperDetail.tsx）
+- [ ] 在AI题目生成表单中添加LaTeX编辑器
+- [x] 确保生成的题目支持LaTeX公式
+
+### 测试验证
+- [x] 测试练习题页面的LaTeX公式显示
+- [x] 测试AI生成题目的LaTeX公式显示
+- [x] 测试所有页面的LaTeX渲染一致性
