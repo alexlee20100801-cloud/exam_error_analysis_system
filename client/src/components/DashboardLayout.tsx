@@ -28,6 +28,8 @@ import { CSSProperties, useEffect, useRef, useState } from "react";
 import { useLocation } from "wouter";
 import { DashboardLayoutSkeleton } from './DashboardLayoutSkeleton';
 import { Button } from "./ui/button";
+import { useKeyboardShortcuts } from "@/hooks/useKeyboardShortcuts";
+import { KeyboardShortcutsHelp } from "@/components/KeyboardShortcutsHelp";
 
 // 菜单分组配置
 interface MenuGroup {
@@ -210,6 +212,42 @@ function DashboardLayoutContent({
   const sidebarRef = useRef<HTMLDivElement>(null);
   const activeMenuItem = menuItems.find(item => item.path === location);
   const isMobile = useIsMobile();
+  const [showShortcutsHelp, setShowShortcutsHelp] = useState(false);
+  const [showMenuSearch, setShowMenuSearch] = useState(false);
+
+  // 键盘快捷键
+  useKeyboardShortcuts([
+    {
+      key: '/',
+      ctrl: true,
+      description: '显示快捷键帮助',
+      category: '通用',
+      handler: () => setShowShortcutsHelp(true),
+    },
+    {
+      key: 'k',
+      ctrl: true,
+      description: '打开菜单搜索',
+      category: '导航',
+      handler: () => setShowMenuSearch(true),
+    },
+    {
+      key: 'n',
+      ctrl: true,
+      description: '新建错题',
+      category: '错题管理',
+      handler: () => setLocation('/document-upload'),
+    },
+    {
+      key: 'Escape',
+      description: '关闭弹窗/对话框',
+      category: '通用',
+      handler: () => {
+        setShowShortcutsHelp(false);
+        setShowMenuSearch(false);
+      },
+    },
+  ]);
   
   // 获取板块统计数据
   const { data: levelStats } = trpc.stats.getByLevel.useQuery();
@@ -447,6 +485,12 @@ function DashboardLayoutContent({
         )}
         <main className="flex-1 p-4">{children}</main>
       </SidebarInset>
+      
+      {/* 快捷键帮助对话框 */}
+      <KeyboardShortcutsHelp 
+        open={showShortcutsHelp} 
+        onOpenChange={setShowShortcutsHelp} 
+      />
     </>
   );
 }

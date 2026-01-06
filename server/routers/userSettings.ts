@@ -19,6 +19,7 @@ export const userSettingsRouter = router({
         disabledMenuItems: users.disabledMenuItems,
         school: users.school,
         region: users.region,
+        theme: users.theme,
       })
       .from(users)
       .where(eq(users.id, ctx.user.id));
@@ -29,6 +30,7 @@ export const userSettingsRouter = router({
       disabledMenuItems: (user?.disabledMenuItems as string[]) || [],
       school: user?.school || null,
       region: user?.region || null,
+      theme: user?.theme || 'system',
     };
   }),
 
@@ -99,6 +101,29 @@ export const userSettingsRouter = router({
         .set({
           school: input.school,
           region: input.region,
+        })
+        .where(eq(users.id, ctx.user.id));
+
+      return { success: true };
+    }),
+
+  /**
+   * 更新主题偏好
+   */
+  updateTheme: protectedProcedure
+    .input(
+      z.object({
+        theme: z.enum(["light", "dark", "system"]),
+      })
+    )
+    .mutation(async ({ ctx, input }) => {
+      const db = await getDb();
+      if (!db) throw new Error("Database connection failed");
+
+      await db
+        .update(users)
+        .set({
+          theme: input.theme,
         })
         .where(eq(users.id, ctx.user.id));
 

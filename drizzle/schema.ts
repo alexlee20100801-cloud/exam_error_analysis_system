@@ -21,6 +21,8 @@ export const users = mysqlTable("users", {
   region: varchar("region", { length: 100 }), // 所在地区（如：深圳市南山区）
   // 菜单偏好设置（JSON格式存储禁用的菜单项）
   disabledMenuItems: json("disabledMenuItems").$type<string[]>(),
+  // 主题偏好
+  theme: mysqlEnum("theme", ["light", "dark", "system"]).default("system"),
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
   lastSignedIn: timestamp("lastSignedIn").defaultNow().notNull(),

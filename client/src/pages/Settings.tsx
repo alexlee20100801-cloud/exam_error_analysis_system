@@ -6,10 +6,11 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
 import { trpc } from "@/lib/trpc";
-import { Settings as SettingsIcon, Save, GraduationCap, Calendar, MapPin, School } from "lucide-react";
+import { Settings as SettingsIcon, Save, GraduationCap, Calendar, MapPin, School, Palette } from "lucide-react";
 import { useState, useEffect } from "react";
 import { toast } from "sonner";
 import { getConfigurableMenuItems, type MenuItem } from "../../../shared/menuConfig";
+import { useTheme } from "@/contexts/ThemeContext";
 
 const gradeOptions = [
   { value: "junior1", label: "初一" },
@@ -34,6 +35,7 @@ export default function Settings() {
   const [school, setSchool] = useState<string>("");
   const [region, setRegion] = useState<string>("");
   const [disabledMenuItems, setDisabledMenuItems] = useState<string[]>([]);
+  const { theme, setTheme } = useTheme();
   
   // 加载设置数据
   useEffect(() => {
@@ -123,6 +125,54 @@ export default function Settings() {
           </h1>
           <p className="text-muted-foreground mt-2">管理你的个人信息和功能偏好</p>
         </div>
+        
+        {/* 主题设置 */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Palette className="h-5 w-5" />
+              主题设置
+            </CardTitle>
+            <CardDescription>
+              选择你喜欢的主题风格，系统会自动保存你的偏好
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="space-y-2">
+              <Label>外观主题</Label>
+              <Select value={theme} onValueChange={(value: any) => setTheme(value)}>
+                <SelectTrigger>
+                  <SelectValue placeholder="选择主题" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="light">
+                    <div className="flex items-center gap-2">
+                      <div className="w-4 h-4 rounded-full bg-white border-2 border-gray-300" />
+                      浅色模式
+                    </div>
+                  </SelectItem>
+                  <SelectItem value="dark">
+                    <div className="flex items-center gap-2">
+                      <div className="w-4 h-4 rounded-full bg-gray-800 border-2 border-gray-600" />
+                      深色模式
+                    </div>
+                  </SelectItem>
+                  <SelectItem value="system">
+                    <div className="flex items-center gap-2">
+                      <div className="w-4 h-4 rounded-full bg-gradient-to-r from-white to-gray-800 border-2 border-gray-400" />
+                      跟随系统
+                    </div>
+                  </SelectItem>
+                </SelectContent>
+              </Select>
+              <p className="text-sm text-muted-foreground">
+                {theme === 'system' && '当前跟随系统设置，会根据你的操作系统主题自动切换'}
+                {theme === 'light' && '当前使用浅色模式'}
+                {theme === 'dark' && '当前使用深色模式'}
+              </p>
+            </div>
+          </CardContent>
+        </Card>
         
         {/* 年级和学期设置 */}
         <Card>
