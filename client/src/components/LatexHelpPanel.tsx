@@ -6,8 +6,10 @@
 import { useState, useMemo } from 'react';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
+import { Badge } from './ui/badge';
 import { ChevronDown, ChevronUp, HelpCircle, Search, X } from 'lucide-react';
 import { LatexPreview } from './LatexPreview';
+import { latexShortcutManager } from '../lib/latexShortcuts';
 import {
   Collapsible,
   CollapsibleContent,
@@ -246,6 +248,7 @@ const latexHelp: LatexCategory[] = [
 export function LatexHelpPanel() {
   const [isOpen, setIsOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
+  const shortcuts = latexShortcutManager.getAllShortcuts();
 
   // 搜索过滤
   const filteredCategories = useMemo(() => {
@@ -342,9 +345,29 @@ export function LatexHelpPanel() {
           ))}
 
           <div className="space-y-2 pt-2 border-t">
+            <h4 className="text-sm font-semibold">快捷键列表</h4>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+              {shortcuts.slice(0, 8).map((shortcut) => (
+                <div
+                  key={shortcut.id}
+                  className="flex items-center justify-between p-2 rounded bg-muted/30 text-sm"
+                >
+                  <span className="font-medium">{shortcut.name}</span>
+                  <Badge variant="outline" className="font-mono text-xs">
+                    {shortcut.defaultKey}
+                  </Badge>
+                </div>
+              ))}
+            </div>
+            <p className="text-xs text-muted-foreground">
+              点击工具栏的“快捷键”按钮查看全部快捷键和自定义设置
+            </p>
+          </div>
+
+          <div className="space-y-2 pt-2 border-t">
             <h4 className="text-sm font-semibold">常见问题</h4>
             <ul className="text-sm text-muted-foreground space-y-1">
-              <li>• 特殊字符需要转义：{'\{'} {'\}'} \% \# \& \_</li>
+              <li>• 特殊字符需要转义：{'{'} {'}'} \% \# \& \_</li>
               <li>• 多字符上下标需要用花括号：x^{10} 而不是 x^10</li>
               <li>• 分数嵌套：\frac{'{'} 1 {'}'} {'{'} \frac{'{'} 1 {'}'} {'{'} x {'}'} {'}'}</li>
               <li>• 括号自适应大小：\left( ... \right)</li>

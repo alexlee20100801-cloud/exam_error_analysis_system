@@ -15,6 +15,9 @@ import {
   History,
   Trash2,
   BookTemplate,
+  Keyboard,
+  Tag,
+  Filter,
 } from 'lucide-react';
 import {
   Popover,
@@ -23,7 +26,17 @@ import {
 } from './ui/popover';
 import { LatexHelpPanel } from './LatexHelpPanel';
 import { LatexFormulaTooltip } from './LatexFormulaTooltip';
+import { LatexShortcutSettings } from './LatexShortcutSettings';
+import { LatexCompletionList } from './LatexCompletionList';
+import { LatexTagManager } from './LatexTagManager';
 import { latexTemplateCategories } from '../lib/latexTemplates';
+import { latexShortcutManager } from '../lib/latexShortcuts';
+import { latexTagManager, LatexTag } from '../lib/latexTags';
+import {
+  searchCompletions,
+  applyCompletionTemplate,
+  LatexCompletionItem,
+} from '../lib/latexCompletion';
 import {
   getLatexHistory,
   addToLatexHistory,
@@ -99,6 +112,21 @@ export function LatexEditor({
   const [isMobile, setIsMobile] = useState(false);
   const [syntaxError, setSyntaxError] = useState<string | null>(null);
   const [latexHistory, setLatexHistory] = useState(getLatexHistory());
+  const [showShortcutSettings, setShowShortcutSettings] = useState(false);
+  const [showTagManager, setShowTagManager] = useState(false);
+  const [selectedTags, setSelectedTags] = useState<string[]>([]);
+  const [filterMode, setFilterMode] = useState<'AND' | 'OR'>('OR');
+  
+  // 补全相关状态
+  const [showCompletion, setShowCompletion] = useState(false);
+  const [completionItems, setCompletionItems] = useState<LatexCompletionItem[]>([]);
+  const [completionIndex, setCompletionIndex] = useState(0);
+  const [completionPosition, setCompletionPosition] = useState({ top: 0, left: 0 });
+  const [currentPlaceholders, setCurrentPlaceholders] = useState<
+    Array<{ start: number; end: number; text: string }>
+  >([]);
+  const [currentPlaceholderIndex, setCurrentPlaceholderIndex] = useState(0);
+  
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   // 检测移动设备
@@ -110,6 +138,121 @@ export function LatexEditor({
     window.addEventListener('resize', checkMobile);
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
+
+  // 快捷键监听和补全逻辑
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // 如果焦点不在textarea上，不处理
+      if (document.activeElement !== textareaRef.current) return;
+
+      // 如果补全列表显示，处理补全导航
+      if (showCompletion) {
+        if (e.key === 'ArrowDown') {
+          e.preventDefault();
+          setCompletionIndex((prev) => (prev + 1) % completionItems.length);
+          return;
+        }
+        if (e.key === 'ArrowUp') {
+          e.preventDefault();
+          setCompletionIndex((prev) =>
+            prev === 0 ? completionItems.length - 1 : prev - 1
+          );
+          return;
+        }
+        if (e.key === 'Tab' || e.key === 'Enter') {
+          e.preventDefault();
+          applyCompletion(completionItems[completionIndex]);
+          return;
+        }
+        if (e.key === 'Escape') {
+          e.preventDefault();
+          setShowCompletion(false);
+          return;
+        }
+      }
+
+      // 处理参数跳转 (Ctrl+右箭头)
+      if (e.ctrlKey && e.key === 'ArrowRight' && currentPlaceholders.length > 0) {
+        e.preventDefault();
+        jumpToNextPlaceholder();
+        return;
+      }
+
+      // 构建快捷键字符串
+      const keys: string[] = [];
+      if (e.ctrlKey) keys.push('ctrl');
+      if (e.shiftKey) keys.push('shift');
+      if (e.altKey) keys.push('alt');
+      if (e.metaKey) keys.push('meta');
+      
+      const key = e.key.toLowerCase();
+      if (key !== 'control' && key !== 'shift' && key !== 'alt' && key !== 'meta') {
+        keys.push(key);
+      }
+
+      if (keys.length < 2) return;
+
+      const keyString = keys.sort().join('+');
+      const template = latexShortcutManager.getTemplateByKey(keyString);
+
+      if (template) {
+        e.preventDefault();
+        insertLatexTemplate(template);
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [value, showCompletion, completionItems, completionIndex, currentPlaceholders]);
+
+  // 监听输入触发补全
+  useEffect(() => {
+    const textarea = textareaRef.current;
+    if (!textarea) return;
+
+    const handleInput = () => {
+      const cursorPos = textarea.selectionStart;
+      const text = value.substring(0, cursorPos);
+      
+      // 查找最后一个反斜杠
+      const lastBackslash = text.lastIndexOf('\\');
+      if (lastBackslash === -1 || cursorPos - lastBackslash > 20) {
+        setShowCompletion(false);
+        return;
+      }
+
+      // 提取命令
+      const command = text.substring(lastBackslash + 1, cursorPos);
+      
+      // 如果命令为空或包含空格，不显示补全
+      if (!command || command.includes(' ')) {
+        setShowCompletion(false);
+        return;
+      }
+
+      // 搜索补全项
+      const items = searchCompletions(command);
+      if (items.length === 0) {
+        setShowCompletion(false);
+        return;
+      }
+
+      // 计算补全列表位置
+      const rect = textarea.getBoundingClientRect();
+      const lineHeight = parseInt(getComputedStyle(textarea).lineHeight);
+      setCompletionPosition({
+        top: rect.top + lineHeight + window.scrollY,
+        left: rect.left + window.scrollX,
+      });
+
+      setCompletionItems(items);
+      setCompletionIndex(0);
+      setShowCompletion(true);
+    };
+
+    textarea.addEventListener('input', handleInput);
+    return () => textarea.removeEventListener('input', handleInput);
+  }, [value]);
 
   // 检查LaTeX语法错误
   useEffect(() => {
@@ -196,6 +339,118 @@ export function LatexEditor({
       textarea.focus();
       textarea.setSelectionRange(newCursorPos, newCursorPos);
     }, 0);
+  };
+
+  // 插入LaTeX模板（支持光标位置占位符）
+  const insertLatexTemplate = (template: string) => {
+    const textarea = textareaRef.current;
+    if (!textarea) return;
+
+    const start = textarea.selectionStart;
+    const end = textarea.selectionEnd;
+    const text = value;
+    const before = text.substring(0, start);
+    const after = text.substring(end);
+
+    // 找到光标位置占位符 |
+    const cursorIndex = template.indexOf('|');
+    const cleanTemplate = template.replace('|', '');
+
+    // 插入LaTeX模板，并用$包裹
+    const newValue = before + '$' + cleanTemplate + '$' + after;
+    onChange(newValue);
+
+    // 添加到历史记录
+    addToLatexHistory(cleanTemplate);
+    setLatexHistory(getLatexHistory());
+
+    // 设置光标位置到占位符位置
+    setTimeout(() => {
+      let newCursorPos = start + 1; // $ 后面
+      if (cursorIndex !== -1) {
+        newCursorPos = start + 1 + cursorIndex;
+      } else {
+        newCursorPos = start + cleanTemplate.length + 1;
+      }
+      textarea.focus();
+      textarea.setSelectionRange(newCursorPos, newCursorPos);
+    }, 0);
+  };
+
+  // 应用补全
+  const applyCompletion = (item: LatexCompletionItem) => {
+    const textarea = textareaRef.current;
+    if (!textarea) return;
+
+    const cursorPos = textarea.selectionStart;
+    const text = value;
+    
+    // 找到反斜杠位置
+    const beforeCursor = text.substring(0, cursorPos);
+    const lastBackslash = beforeCursor.lastIndexOf('\\');
+    if (lastBackslash === -1) return;
+
+    // 应用模板
+    const { text: templateText, cursorOffset, placeholders } = applyCompletionTemplate(item.template);
+    
+    const before = text.substring(0, lastBackslash);
+    const after = text.substring(cursorPos);
+    const newValue = before + templateText + after;
+    
+    onChange(newValue);
+    setShowCompletion(false);
+
+    // 添加到历史记录
+    addToLatexHistory(templateText);
+    setLatexHistory(getLatexHistory());
+
+    // 设置占位符
+    if (placeholders.length > 0) {
+      const adjustedPlaceholders = placeholders.map((p) => ({
+        start: lastBackslash + p.start,
+        end: lastBackslash + p.end,
+        text: p.text,
+      }));
+      setCurrentPlaceholders(adjustedPlaceholders);
+      setCurrentPlaceholderIndex(0);
+
+      // 选中第一个占位符
+      setTimeout(() => {
+        textarea.focus();
+        textarea.setSelectionRange(
+          adjustedPlaceholders[0].start,
+          adjustedPlaceholders[0].end
+        );
+      }, 0);
+    } else {
+      // 没有占位符，光标移动到末尾
+      setTimeout(() => {
+        const newCursorPos = lastBackslash + templateText.length;
+        textarea.focus();
+        textarea.setSelectionRange(newCursorPos, newCursorPos);
+      }, 0);
+    }
+  };
+
+  // 跳转到下一个参数占位符
+  const jumpToNextPlaceholder = () => {
+    const textarea = textareaRef.current;
+    if (!textarea || currentPlaceholders.length === 0) return;
+
+    const nextIndex = (currentPlaceholderIndex + 1) % currentPlaceholders.length;
+    setCurrentPlaceholderIndex(nextIndex);
+
+    const placeholder = currentPlaceholders[nextIndex];
+    textarea.focus();
+    textarea.setSelectionRange(placeholder.start, placeholder.end);
+
+    // 如果跳转到最后一个后再次跳转，清除占位符
+    if (nextIndex === currentPlaceholders.length - 1) {
+      setTimeout(() => {
+        setCurrentPlaceholders([]);
+        setCurrentPlaceholderIndex(0);
+      }, 100);
+    }
   };
 
   // 清除历史记录
@@ -342,6 +597,28 @@ export function LatexEditor({
           </PopoverContent>
         </Popover>
 
+        {/* 快捷键设置 */}
+        <Button
+          type="button"
+          variant="outline"
+          size="sm"
+          onClick={() => setShowShortcutSettings(true)}
+        >
+          <Keyboard className="h-4 w-4 mr-1" />
+          快捷键
+        </Button>
+
+        {/* 标签管理 */}
+        <Button
+          type="button"
+          variant="outline"
+          size="sm"
+          onClick={() => setShowTagManager(true)}
+        >
+          <Tag className="h-4 w-4 mr-1" />
+          标签
+        </Button>
+
         {/* 历史记录 */}
         <Popover>
           <PopoverTrigger asChild>
@@ -396,10 +673,18 @@ export function LatexEditor({
                             <div className="text-sm">
                               <LatexPreview latex={item.latex} displayMode={false} />
                             </div>
-                            <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                            <div className="flex items-center gap-2 text-xs text-muted-foreground flex-wrap">
                               <span>使用 {item.usageCount} 次</span>
                               <span>•</span>
                               <span>{formatHistoryTime(item.timestamp)}</span>
+                              {latexTagManager.getFormulaTags(item.latex).map((tag) => (
+                                <span
+                                  key={tag.id}
+                                  className={`px-1.5 py-0.5 rounded text-xs text-white bg-${tag.color}-500`}
+                                >
+                                  {tag.name}
+                                </span>
+                              ))}
                             </div>
                           </div>
                         </Button>
@@ -438,6 +723,29 @@ export function LatexEditor({
 
       {/* LaTeX语法帮助面板 */}
       <LatexHelpPanel />
+
+      {/* 快捷键设置对话框 */}
+      <LatexShortcutSettings
+        open={showShortcutSettings}
+        onOpenChange={setShowShortcutSettings}
+      />
+
+      {/* 标签管理对话框 */}
+      <LatexTagManager
+        open={showTagManager}
+        onOpenChange={setShowTagManager}
+      />
+
+      {/* 补全列表 */}
+      {showCompletion && (
+        <LatexCompletionList
+          items={completionItems}
+          selectedIndex={completionIndex}
+          onSelect={applyCompletion}
+          onClose={() => setShowCompletion(false)}
+          position={completionPosition}
+        />
+      )}
 
       {/* 编辑器和预览 */}
       {showPreview ? (
