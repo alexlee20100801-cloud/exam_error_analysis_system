@@ -3,26 +3,27 @@ import { relations } from 'drizzle-orm';
 
 // 用户表
 export const users = mysqlTable('users', {
-  id: varchar('id', { length: 255 }).primaryKey(),
-  openId: varchar('open_id', { length: 255 }).notNull().unique(),
+  id: int('id').primaryKey().autoincrement(),
+  openId: varchar('openId', { length: 255 }).notNull().unique(),
   name: varchar('name', { length: 255 }).notNull(),
-  avatar: varchar('avatar', { length: 500 }),
+  email: varchar('email', { length: 255 }),
+  loginMethod: varchar('loginMethod', { length: 255 }),
   role: mysqlEnum('role', ['admin', 'user']).default('user').notNull(),
-  userType: mysqlEnum('user_type', ['student', 'parent']).default('student').notNull(),
+  createdAt: timestamp('createdAt').defaultNow().notNull(),
+  updatedAt: timestamp('updatedAt').defaultNow().onUpdateNow().notNull(),
+  lastSignedIn: timestamp('lastSignedIn').defaultNow().notNull(),
   grade: mysqlEnum('grade', ['grade7', 'grade8', 'grade9', 'grade10', 'grade11', 'grade12']),
   school: varchar('school', { length: 255 }),
+  userType: mysqlEnum('userType', ['student', 'parent']).default('student').notNull(),
   region: varchar('region', { length: 100 }),
-  currentSemester: mysqlEnum('current_semester', ['first', 'second']),
-  disabledMenuItems: json('disabled_menu_items').$type<string[]>(),
-  email: varchar('email', { length: 255 }),
+  currentSemester: mysqlEnum('currentSemester', ['first', 'second']),
+  disabledMenuItems: json('disabledMenuItems').$type<string[]>(),
   emailVerified: boolean('email_verified').default(false),
   wechatOpenId: varchar('wechat_open_id', { length: 255 }),
   wechatNickname: varchar('wechat_nickname', { length: 255 }),
-  themePreference: mysqlEnum('theme_preference', ['light', 'dark', 'system']).default('system'),
+  theme: mysqlEnum('theme', ['light', 'dark', 'system']).default('system'),
   points: int('points').default(0).notNull(),
   totalFeedbackCount: int('total_feedback_count').default(0).notNull(),
-  createdAt: timestamp('created_at').defaultNow().notNull(),
-  updatedAt: timestamp('updated_at').defaultNow().onUpdateNow().notNull(),
 });
 
 // 知识点表
@@ -46,7 +47,7 @@ export const knowledgePoints = mysqlTable('knowledge_points', {
 // 错题表
 export const errorQuestions = mysqlTable('error_questions', {
   id: int('id').primaryKey().autoincrement(),
-  userId: varchar('user_id', { length: 255 }).notNull(),
+  userId: int('user_id').notNull(),
   title: varchar('title', { length: 500 }).notNull(),
   content: text('content').notNull(),
   subject: mysqlEnum('subject', ['chinese', 'math', 'english', 'physics', 'chemistry', 'biology', 'politics', 'history', 'geography']).notNull(),
@@ -87,7 +88,7 @@ export const errorQuestions = mysqlTable('error_questions', {
 // 练习记录表
 export const practiceRecords = mysqlTable('practice_records', {
   id: int('id').primaryKey().autoincrement(),
-  userId: varchar('user_id', { length: 255 }).notNull(),
+  userId: int('user_id').notNull(),
   errorQuestionId: int('error_question_id').notNull(),
   knowledgePointId: int('knowledge_point_id'),
   isCorrect: boolean('is_correct').notNull(),
@@ -103,7 +104,7 @@ export const practiceRecords = mysqlTable('practice_records', {
 // 学习进度表
 export const learningProgress = mysqlTable('learning_progress', {
   id: int('id').primaryKey().autoincrement(),
-  userId: varchar('user_id', { length: 255 }).notNull(),
+  userId: int('user_id').notNull(),
   knowledgePointId: int('knowledge_point_id').notNull(),
   masteryLevel: decimal('mastery_level', { precision: 5, scale: 2 }).default('0').notNull(),
   practiceCount: int('practice_count').default(0),
@@ -165,7 +166,7 @@ export const videoResources = mysqlTable('video_resources', {
 // 复习计划表
 export const reviewPlans = mysqlTable('review_plans', {
   id: int('id').primaryKey().autoincrement(),
-  userId: varchar('user_id', { length: 255 }).notNull(),
+  userId: int('user_id').notNull(),
   errorQuestionId: int('error_question_id').notNull(),
   scheduledDate: timestamp('scheduled_date').notNull(),
   status: varchar('status', { length: 50 }).default('pending'),
@@ -183,7 +184,7 @@ export const reviewPlans = mysqlTable('review_plans', {
 // 成就表
 export const achievements = mysqlTable('achievements', {
   id: int('id').primaryKey().autoincrement(),
-  userId: varchar('user_id', { length: 255 }).notNull(),
+  userId: int('user_id').notNull(),
   code: varchar('code', { length: 100 }).notNull().unique(),
   type: varchar('type', { length: 100 }).notNull(),
   category: varchar('category', { length: 100 }),
@@ -206,7 +207,7 @@ export const achievements = mysqlTable('achievements', {
 // 打卡记录表
 export const checkInRecords = mysqlTable('check_in_records', {
   id: int('id').primaryKey().autoincrement(),
-  userId: varchar('user_id', { length: 255 }).notNull(),
+  userId: int('user_id').notNull(),
   checkInDate: timestamp('check_in_date').notNull(),
   createdAt: timestamp('created_at').defaultNow().notNull(),
 }, (table) => ({
@@ -216,8 +217,8 @@ export const checkInRecords = mysqlTable('check_in_records', {
 // 家长-学生关联表
 export const parentStudentRelations = mysqlTable('parent_student_relations', {
   id: int('id').primaryKey().autoincrement(),
-  parentId: varchar('parent_id', { length: 255 }).notNull(),
-  studentId: varchar('student_id', { length: 255 }).notNull(),
+  parentId: int('parent_id').notNull(),
+  studentId: int('student_id').notNull(),
   inviteCode: varchar('invite_code', { length: 20 }).notNull().unique(),
   status: mysqlEnum('status', ['pending', 'active', 'rejected']).default('pending'),
   createdAt: timestamp('created_at').defaultNow().notNull(),
@@ -230,8 +231,8 @@ export const parentStudentRelations = mysqlTable('parent_student_relations', {
 // 学习目标表
 export const learningGoals = mysqlTable('learning_goals', {
   id: int('id').primaryKey().autoincrement(),
-  studentId: varchar('student_id', { length: 255 }).notNull(),
-  parentId: varchar('parent_id', { length: 255 }).notNull(),
+  studentId: int('student_id').notNull(),
+  parentId: int('parent_id').notNull(),
   goalType: mysqlEnum('goal_type', ['error_count', 'mastery_rate', 'review_count', 'study_time']).notNull(),
   targetValue: int('target_value').notNull(),
   currentValue: int('current_value').default(0),
@@ -251,8 +252,8 @@ export const learningGoals = mysqlTable('learning_goals', {
 export const goalReminders = mysqlTable('goal_reminders', {
   id: int('id').primaryKey().autoincrement(),
   goalId: int('goal_id').notNull(),
-  parentId: varchar('parent_id', { length: 255 }).notNull(),
-  studentId: varchar('student_id', { length: 255 }).notNull(),
+  parentId: int('parent_id').notNull(),
+  studentId: int('student_id').notNull(),
   reminderType: mysqlEnum('reminder_type', ['deadline_approaching', 'progress_behind', 'goal_achieved', 'goal_failed']).notNull(),
   message: text('message').notNull(),
   isSent: boolean('is_sent').default(false),
@@ -299,7 +300,7 @@ export const realExamQuestions = mysqlTable('real_exam_questions', {
 // 真题练习记录表
 export const realExamPracticeRecords = mysqlTable('real_exam_practice_records', {
   id: int('id').primaryKey().autoincrement(),
-  userId: varchar('user_id', { length: 255 }).notNull(),
+  userId: int('user_id').notNull(),
   questionId: int('question_id').notNull(),
   userAnswer: text('user_answer'),
   isCorrect: boolean('is_correct'),
@@ -315,7 +316,7 @@ export const realExamPracticeRecords = mysqlTable('real_exam_practice_records', 
 // AI生成试卷表
 export const generatedExamPapers = mysqlTable('generated_exam_papers', {
   id: int('id').primaryKey().autoincrement(),
-  userId: varchar('user_id', { length: 255 }).notNull(),
+  userId: int('user_id').notNull(),
   title: varchar('title', { length: 500 }).notNull(),
   subject: mysqlEnum('subject', ['chinese', 'math', 'english', 'physics', 'chemistry', 'biology', 'politics', 'history', 'geography']).notNull(),
   grade: mysqlEnum('grade', ['grade7', 'grade8', 'grade9', 'grade10', 'grade11', 'grade12']).notNull(),
@@ -384,7 +385,7 @@ export const taskExecutionLogs = mysqlTable('task_execution_logs', {
 // 专项练习池表
 export const practicePools = mysqlTable('practice_pools', {
   id: int('id').primaryKey().autoincrement(),
-  userId: varchar('user_id', { length: 255 }).notNull(),
+  userId: int('user_id').notNull(),
   errorQuestionId: int('error_question_id').notNull(),
   title: varchar('title', { length: 500 }).notNull(),
   content: text('content').notNull(),
@@ -410,7 +411,7 @@ export const practicePools = mysqlTable('practice_pools', {
 // 收藏表
 export const favorites = mysqlTable('favorites', {
   id: int('id').primaryKey().autoincrement(),
-  userId: varchar('user_id', { length: 255 }).notNull(),
+  userId: int('user_id').notNull(),
   itemType: mysqlEnum('item_type', ['error_question', 'practice_pool', 'question_bank']).notNull(),
   itemId: int('item_id').notNull(),
   createdAt: timestamp('created_at').defaultNow().notNull(),
@@ -421,7 +422,7 @@ export const favorites = mysqlTable('favorites', {
 // 学习提醒表
 export const reviewReminders = mysqlTable('review_reminders', {
   id: int('id').primaryKey().autoincrement(),
-  userId: varchar('user_id', { length: 255 }).notNull(),
+  userId: int('user_id').notNull(),
   itemType: mysqlEnum('item_type', ['error_question', 'practice_pool']).notNull(),
   itemId: int('item_id').notNull(),
   scheduledDate: timestamp('scheduled_date').notNull(),
@@ -439,7 +440,7 @@ export const reviewReminders = mysqlTable('review_reminders', {
 export const reviewHistory = mysqlTable('review_history', {
   id: int('id').primaryKey().autoincrement(),
   reminderId: int('reminder_id').notNull(),
-  userId: varchar('user_id', { length: 255 }).notNull(),
+  userId: int('user_id').notNull(),
   reviewedAt: timestamp('reviewed_at').notNull(),
   reviewRound: int('review_round').notNull(),
   createdAt: timestamp('created_at').defaultNow().notNull(),
@@ -450,7 +451,7 @@ export const reviewHistory = mysqlTable('review_history', {
 // 错题复习记录表
 export const errorReviewRecords = mysqlTable('error_review_records', {
   id: int('id').primaryKey().autoincrement(),
-  userId: varchar('user_id', { length: 255 }).notNull(),
+  userId: int('user_id').notNull(),
   errorQuestionId: int('error_question_id').notNull(),
   reviewRound: int('review_round').default(1),
   lastReviewedAt: timestamp('last_reviewed_at'),
@@ -466,7 +467,7 @@ export const errorReviewRecords = mysqlTable('error_review_records', {
 // 学习路径表
 export const learningPaths = mysqlTable('learning_paths', {
   id: int('id').primaryKey().autoincrement(),
-  userId: varchar('user_id', { length: 255 }).notNull(),
+  userId: int('user_id').notNull(),
   title: varchar('title', { length: 500 }).notNull(),
   subject: mysqlEnum('subject', ['chinese', 'math', 'english', 'physics', 'chemistry', 'biology', 'politics', 'history', 'geography']).notNull(),
   grade: mysqlEnum('grade', ['grade7', 'grade8', 'grade9', 'grade10', 'grade11', 'grade12']).notNull(),
@@ -496,7 +497,7 @@ export const learningPaths = mysqlTable('learning_paths', {
 // 学习路径进度表
 export const learningPathProgress = mysqlTable('learning_path_progress', {
   id: int('id').primaryKey().autoincrement(),
-  userId: varchar('user_id', { length: 255 }).notNull(),
+  userId: int('user_id').notNull(),
   pathId: int('path_id').notNull(),
   nodeId: varchar('node_id', { length: 100 }).notNull(),
   isCompleted: boolean('is_completed').default(false),
@@ -514,7 +515,7 @@ export const learningPathProgress = mysqlTable('learning_path_progress', {
 // 考试日历表
 export const examCalendar = mysqlTable('exam_calendar', {
   id: int('id').primaryKey().autoincrement(),
-  userId: varchar('user_id', { length: 255 }).notNull(),
+  userId: int('user_id').notNull(),
   examName: varchar('exam_name', { length: 255 }).notNull(),
   examDate: timestamp('exam_date').notNull(),
   subject: mysqlEnum('subject', ['chinese', 'math', 'english', 'physics', 'chemistry', 'biology', 'politics', 'history', 'geography']),
@@ -529,7 +530,7 @@ export const examCalendar = mysqlTable('exam_calendar', {
 // 智能复习任务表
 export const smartReviewTasks = mysqlTable('smart_review_tasks', {
   id: int('id').primaryKey().autoincrement(),
-  userId: varchar('user_id', { length: 255 }).notNull(),
+  userId: int('user_id').notNull(),
   examId: int('exam_id').notNull(),
   planDate: timestamp('plan_date'),
   taskDate: timestamp('task_date').notNull(),
@@ -563,7 +564,7 @@ export const systemSettings = mysqlTable('system_settings', {
 // 邮箱验证令牌表
 export const emailVerificationTokens = mysqlTable('email_verification_tokens', {
   id: int('id').primaryKey().autoincrement(),
-  userId: varchar('user_id', { length: 255 }).notNull(),
+  userId: int('user_id').notNull(),
   email: varchar('email', { length: 255 }).notNull(),
   token: varchar('token', { length: 255 }).notNull().unique(),
   expiresAt: timestamp('expires_at').notNull(),
@@ -594,7 +595,7 @@ export const emailTemplates = mysqlTable('email_templates', {
 // 用户提醒设置表
 export const userReminderSettings = mysqlTable('user_reminder_settings', {
   id: int('id').primaryKey().autoincrement(),
-  userId: varchar('user_id', { length: 255 }).notNull().unique(),
+  userId: int('user_id').notNull().unique(),
   email: varchar('email', { length: 255 }),
   emailVerified: boolean('email_verified').default(false),
   wechatOpenId: varchar('wechat_open_id', { length: 255 }),
@@ -608,7 +609,7 @@ export const userReminderSettings = mysqlTable('user_reminder_settings', {
 // AI建议历史表
 export const aiAdviceHistory = mysqlTable('ai_advice_history', {
   id: int('id').primaryKey().autoincrement(),
-  userId: varchar('user_id', { length: 255 }).notNull(),
+  userId: int('user_id').notNull(),
   adviceContent: json('advice_content').$type<{
     overallAssessment: string;
     studyAdvice: string[];
@@ -625,7 +626,7 @@ export const aiAdviceHistory = mysqlTable('ai_advice_history', {
 export const reviewTasks = mysqlTable('review_tasks', {
   id: int('id').primaryKey().autoincrement(),
   adviceId: int('advice_id').notNull(),
-  userId: varchar('user_id', { length: 255 }).notNull(),
+  userId: int('user_id').notNull(),
   taskDescription: text('task_description').notNull(),
   priority: mysqlEnum('priority', ['high', 'medium', 'low']).notNull(),
   deadline: varchar('deadline', { length: 100 }).notNull(),
@@ -643,7 +644,7 @@ export const reviewTasks = mysqlTable('review_tasks', {
 export const reviewTaskReminders = mysqlTable('review_task_reminders', {
   id: int('id').primaryKey().autoincrement(),
   taskId: int('task_id').notNull(),
-  userId: varchar('user_id', { length: 255 }).notNull(),
+  userId: int('user_id').notNull(),
   reminderTime: timestamp('reminder_time').notNull(),
   isSent: boolean('is_sent').default(false),
   sentAt: timestamp('sent_at'),
@@ -670,7 +671,7 @@ export const packages = mysqlTable('packages', {
 // 订单表
 export const orders = mysqlTable('orders', {
   id: int('id').primaryKey().autoincrement(),
-  userId: varchar('user_id', { length: 255 }).notNull(),
+  userId: int('user_id').notNull(),
   packageId: int('package_id').notNull(),
   orderNumber: varchar('order_number', { length: 100 }).notNull().unique(),
   amount: decimal('amount', { precision: 10, scale: 2 }).notNull(),
@@ -687,7 +688,7 @@ export const orders = mysqlTable('orders', {
 // 用户订阅表
 export const userSubscriptions = mysqlTable('user_subscriptions', {
   id: int('id').primaryKey().autoincrement(),
-  userId: varchar('user_id', { length: 255 }).notNull(),
+  userId: int('user_id').notNull(),
   packageId: int('package_id').notNull(),
   orderId: int('order_id').notNull(),
   startDate: timestamp('start_date').notNull(),
@@ -716,7 +717,7 @@ export const paymentConfigs = mysqlTable('payment_configs', {
 // 账号凭证表
 export const accountCredentials = mysqlTable('account_credentials', {
   id: int('id').primaryKey().autoincrement(),
-  userId: varchar('user_id', { length: 255 }).notNull().unique(),
+  userId: int('user_id').notNull().unique(),
   username: varchar('username', { length: 255 }).notNull().unique(),
   password: varchar('password', { length: 255 }).notNull(),
   createdAt: timestamp('created_at').defaultNow().notNull(),
@@ -726,7 +727,7 @@ export const accountCredentials = mysqlTable('account_credentials', {
 // 权限记录表
 export const permissionRecords = mysqlTable('permission_records', {
   id: int('id').primaryKey().autoincrement(),
-  userId: varchar('user_id', { length: 255 }).notNull(),
+  userId: int('user_id').notNull(),
   subscriptionId: int('subscription_id').notNull(),
   permissionType: varchar('permission_type', { length: 100 }).notNull(),
   grantedAt: timestamp('granted_at').notNull(),
@@ -780,7 +781,7 @@ export const pushRecords = mysqlTable('push_records', {
 // 用户推送接收表
 export const userPushReceipts = mysqlTable('user_push_receipts', {
   id: int('id').primaryKey().autoincrement(),
-  userId: varchar('user_id', { length: 255 }).notNull(),
+  userId: int('user_id').notNull(),
   pushRecordId: int('push_record_id').notNull(),
   pushType: mysqlEnum('push_type', ['question', 'knowledge_point', 'learning_resource']).notNull(),
   content: json('content').$type<any>(),
@@ -816,7 +817,7 @@ export const questionReviews = mysqlTable('question_reviews', {
 // 图表标注表
 export const annotations = mysqlTable('annotations', {
   id: int('id').primaryKey().autoincrement(),
-  userId: varchar('user_id', { length: 255 }).notNull(),
+  userId: int('user_id').notNull(),
   itemType: mysqlEnum('item_type', ['error_question', 'practice_pool', 'question_bank', 'real_exam']).notNull(),
   itemId: int('item_id').notNull(),
   imageUrl: varchar('image_url', { length: 500 }).notNull(),
@@ -893,7 +894,7 @@ export type Annotation = typeof annotations.$inferSelect;
 // 错题标签表
 export const errorQuestionTags = mysqlTable('error_question_tags', {
   id: int('id').primaryKey().autoincrement(),
-  userId: varchar('user_id', { length: 255 }).notNull(),
+  userId: int('user_id').notNull(),
   name: varchar('name', { length: 100 }).notNull(),
   color: varchar('color', { length: 50 }).default('#3B82F6'),
   description: text('description'),
@@ -920,7 +921,7 @@ export type InsertErrorQuestionTagRelation = typeof errorQuestionTagRelations.$i
 // 图表标注表
 export const chartAnnotations = mysqlTable('chart_annotations', {
   id: int('id').primaryKey().autoincrement(),
-  userId: varchar('user_id', { length: 255 }).notNull(),
+  userId: int('user_id').notNull(),
   errorQuestionId: int('error_question_id').notNull(),
   imageUrl: varchar('image_url', { length: 500 }).notNull(),
   annotations: json('annotations').$type<any[]>(),
@@ -936,7 +937,7 @@ export type InsertChartAnnotation = typeof chartAnnotations.$inferInsert;
 // 图表数据提取表
 export const chartDataExtractions = mysqlTable('chart_data_extractions', {
   id: int('id').primaryKey().autoincrement(),
-  userId: varchar('user_id', { length: 255 }).notNull(),
+  userId: int('user_id').notNull(),
   errorQuestionId: int('error_question_id').notNull(),
   imageUrl: varchar('image_url', { length: 500 }).notNull(),
   extractedData: json('extracted_data').$type<any>(),
@@ -982,7 +983,7 @@ export type InsertAnnotationTemplate = typeof annotationTemplates.$inferInsert;
 // 分享的标注表
 export const sharedAnnotations = mysqlTable('shared_annotations', {
   id: int('id').primaryKey().autoincrement(),
-  userId: varchar('user_id', { length: 255 }).notNull(),
+  userId: int('user_id').notNull(),
   errorQuestionId: int('error_question_id').notNull(),
   title: varchar('title', { length: 500 }).notNull(),
   description: text('description'),
@@ -1006,7 +1007,7 @@ export type InsertSharedAnnotation = typeof sharedAnnotations.$inferInsert;
 export const annotationComments = mysqlTable('annotation_comments', {
   id: int('id').primaryKey().autoincrement(),
   sharedAnnotationId: int('shared_annotation_id').notNull(),
-  userId: varchar('user_id', { length: 255 }).notNull(),
+  userId: int('user_id').notNull(),
   content: text('content').notNull(),
   parentCommentId: int('parent_comment_id'),
   createdAt: timestamp('created_at').defaultNow().notNull(),
@@ -1022,7 +1023,7 @@ export type InsertAnnotationComment = typeof annotationComments.$inferInsert;
 export const annotationLikes = mysqlTable('annotation_likes', {
   id: int('id').primaryKey().autoincrement(),
   sharedAnnotationId: int('shared_annotation_id').notNull(),
-  userId: varchar('user_id', { length: 255 }).notNull(),
+  userId: int('user_id').notNull(),
   createdAt: timestamp('created_at').defaultNow().notNull(),
 }, (table) => ({
   uniqueLike: uniqueIndex('unique_like').on(table.sharedAnnotationId, table.userId),
@@ -1033,7 +1034,7 @@ export type InsertAnnotationLike = typeof annotationLikes.$inferInsert;
 // AI标注反馈表
 export const aiAnnotationFeedback = mysqlTable('ai_annotation_feedback', {
   id: int('id').primaryKey().autoincrement(),
-  userId: varchar('user_id', { length: 255 }).notNull(),
+  userId: int('user_id').notNull(),
   annotationId: int('annotation_id').notNull(), // 关联chartAnnotations表
   imageUrl: varchar('image_url', { length: 500 }).notNull(),
   chartType: varchar('chart_type', { length: 100 }), // 图表类型（如：quadratic_function, trigonometric_function）

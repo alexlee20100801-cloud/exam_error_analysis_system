@@ -49,6 +49,7 @@ import { aiAnnotationRouter } from "./routers/aiAnnotation";
 import { collaborativeLearningRouter } from "./routers/collaborativeLearning";
 import { aiAnnotationFeedbackRouter } from "./routers/aiAnnotationFeedback";
 import { pointsRouter } from "./routers/points";
+import { aiQuestionCollectionRouter } from "./routers/aiQuestionCollection";
 
 export const appRouter = router({
   system: systemRouter,
@@ -180,6 +181,9 @@ export const appRouter = router({
   
   // 专项练习池
   practicePools: practicePoolsRouter,
+  
+  // AI题目收集
+  aiQuestionCollection: aiQuestionCollectionRouter,
 });
 
 export type AppRouter = typeof appRouter;

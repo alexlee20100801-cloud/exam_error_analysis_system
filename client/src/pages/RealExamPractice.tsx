@@ -19,6 +19,7 @@ import { toast } from "sonner";
 import { BookOpen, Heart, Clock, CheckCircle2, XCircle, School, Calendar, Sparkles, TrendingUp } from "lucide-react";
 import { LatexText } from "@/components/LatexPreview";
 import { ChartVisualization } from "@/components/ChartVisualization";
+import { AIQuestionCollectionDialog } from "@/components/AIQuestionCollectionDialog";
 
 // 常量定义
 const SUBJECTS = {
@@ -61,6 +62,7 @@ export default function RealExamPractice() {
   const [userAnswer, setUserAnswer] = useState("");
   const [showResult, setShowResult] = useState(false);
   const [isCorrect, setIsCorrect] = useState(false);
+  const [showAICollectionDialog, setShowAICollectionDialog] = useState(false);
 
   // 获取智能推荐
   const { data: recommendedQuestions } = trpc.realExam.getRecommendedQuestions.useQuery({
@@ -143,14 +145,24 @@ export default function RealExamPractice() {
 
   return (
     <div className="container py-8">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold flex items-center gap-3">
-          <BookOpen className="h-8 w-8 text-blue-500" />
-          真题练习
-        </h1>
-        <p className="text-muted-foreground mt-2">
-          练习深圳地区名校真题，提升应试能力
-        </p>
+      <div className="mb-6 flex items-start justify-between">
+        <div>
+          <h1 className="text-3xl font-bold flex items-center gap-3">
+            <BookOpen className="h-8 w-8" />
+            真题练习
+          </h1>
+          <p className="text-muted-foreground mt-2">
+            练习深圳地区名校真题，提升应试能力
+          </p>
+        </div>
+        <Button
+          onClick={() => setShowAICollectionDialog(true)}
+          className="gap-2"
+          size="lg"
+        >
+          <Sparkles className="h-5 w-5" />
+          AI收集名校试题
+        </Button>
       </div>
 
       {/* 智能推荐面板 */}
@@ -254,6 +266,18 @@ export default function RealExamPractice() {
           </CardContent>
         </Card>
       )}
+
+      {/* AI收集对话框 */}
+      <AIQuestionCollectionDialog
+        open={showAICollectionDialog}
+        onOpenChange={setShowAICollectionDialog}
+        defaultSubject={filters.subject !== "all" ? filters.subject : undefined}
+        defaultGrade={filters.grade !== "all" ? filters.grade : undefined}
+        onQuestionsGenerated={(questions) => {
+          toast.success(`成功生成 ${questions.length} 道题目！请在题库中查看。`);
+          refetch();
+        }}
+      />
 
       {/* 筛选器 */}
       <Card className="mb-6">

@@ -55,7 +55,7 @@ import {
 } from '../drizzle/schema';
 import { eq, and, desc, sql, gte, lte, inArray, or, like, asc, isNull, ne } from 'drizzle-orm';
 
-export async function getUserById(id: string) {
+export async function getUserById(id: number) {
   const result = await db.select().from(users).where(eq(users.id, id)).limit(1);
   return result[0];
 }
@@ -70,13 +70,13 @@ export async function createUser(data: typeof users.$inferInsert) {
   return result;
 }
 
-export async function updateUser(id: string, data: Partial<typeof users.$inferInsert>) {
+export async function updateUser(id: number, data: Partial<typeof users.$inferInsert>) {
   const result = await db.update(users).set(data).where(eq(users.id, id));
   return result;
 }
 
 // 错题相关
-export async function getErrorQuestionsByUserId(userId: string) {
+export async function getErrorQuestionsByUserId(userId: number) {
   return await db.select().from(errorQuestions).where(eq(errorQuestions.userId, userId)).orderBy(desc(errorQuestions.createdAt));
 }
 
@@ -124,7 +124,7 @@ export async function createKnowledgePoint(data: typeof knowledgePoints.$inferIn
 }
 
 // 练习记录相关
-export async function getPracticeRecordsByUserId(userId: string) {
+export async function getPracticeRecordsByUserId(userId: number) {
   return await db.select().from(practiceRecords)
     .where(eq(practiceRecords.userId, userId))
     .orderBy(desc(practiceRecords.createdAt));
@@ -136,13 +136,13 @@ export async function createPracticeRecord(data: typeof practiceRecords.$inferIn
 }
 
 // 学习进度相关
-export async function getLearningProgressByUserId(userId: string) {
+export async function getLearningProgressByUserId(userId: number) {
   return await db.select().from(learningProgress)
     .where(eq(learningProgress.userId, userId))
     .orderBy(desc(learningProgress.masteryLevel));
 }
 
-export async function updateLearningProgress(userId: string, knowledgePointId: number, data: Partial<typeof learningProgress.$inferInsert>) {
+export async function updateLearningProgress(userId: number, knowledgePointId: number, data: Partial<typeof learningProgress.$inferInsert>) {
   const existing = await db.select().from(learningProgress)
     .where(and(
       eq(learningProgress.userId, userId),
@@ -205,7 +205,7 @@ export async function createVideoResource(data: typeof videoResources.$inferInse
 }
 
 // 复习计划相关
-export async function getReviewPlansByUserId(userId: string) {
+export async function getReviewPlansByUserId(userId: number) {
   return await db.select().from(reviewPlans)
     .where(eq(reviewPlans.userId, userId))
     .orderBy(reviewPlans.scheduledDate);
@@ -222,7 +222,7 @@ export async function updateReviewPlan(id: number, data: Partial<typeof reviewPl
 }
 
 // 成就相关
-export async function getAchievementsByUserId(userId: string) {
+export async function getAchievementsByUserId(userId: number) {
   return await db.select().from(achievements)
     .where(eq(achievements.userId, userId))
     .orderBy(desc(achievements.isUnlocked), desc(achievements.progress));
@@ -239,7 +239,7 @@ export async function updateAchievement(id: number, data: Partial<typeof achieve
 }
 
 // 打卡记录相关
-export async function getCheckInRecordsByUserId(userId: string, startDate?: Date, endDate?: Date) {
+export async function getCheckInRecordsByUserId(userId: number, startDate?: Date, endDate?: Date) {
   let query = db.select().from(checkInRecords).where(eq(checkInRecords.userId, userId));
   
   const conditions = [eq(checkInRecords.userId, userId)];
@@ -257,7 +257,7 @@ export async function createCheckInRecord(data: typeof checkInRecords.$inferInse
 }
 
 // 家长-学生关联相关
-export async function getParentStudentRelations(userId: string, userType: 'parent' | 'student') {
+export async function getParentStudentRelations(userId: number, userType: 'parent' | 'student') {
   if (userType === 'parent') {
     return await db.select().from(parentStudentRelations)
       .where(eq(parentStudentRelations.parentId, userId));
@@ -361,7 +361,7 @@ export async function batchDeleteRealExamQuestions(ids: number[]) {
 }
 
 // 真题练习记录相关
-export async function getRealExamPracticeRecordsByUserId(userId: string) {
+export async function getRealExamPracticeRecordsByUserId(userId: number) {
   return await db.select().from(realExamPracticeRecords)
     .where(eq(realExamPracticeRecords.userId, userId))
     .orderBy(desc(realExamPracticeRecords.practiceDate));
@@ -373,7 +373,7 @@ export async function createRealExamPracticeRecord(data: typeof realExamPractice
 }
 
 // AI生成试卷相关
-export async function getGeneratedExamPapersByUserId(userId: string) {
+export async function getGeneratedExamPapersByUserId(userId: number) {
   return await db.select().from(generatedExamPapers)
     .where(eq(generatedExamPapers.userId, userId))
     .orderBy(desc(generatedExamPapers.createdAt));
@@ -468,7 +468,7 @@ export async function createTaskExecutionLog(data: typeof taskExecutionLogs.$inf
 }
 
 // 专项练习池相关
-export async function getPracticePoolsByUserId(userId: string) {
+export async function getPracticePoolsByUserId(userId: number) {
   return await db.select().from(practicePools)
     .where(eq(practicePools.userId, userId))
     .orderBy(desc(practicePools.createdAt));
@@ -500,7 +500,7 @@ export async function batchDeletePracticePools(ids: number[]) {
 }
 
 // 收藏相关
-export async function getFavoritesByUserId(userId: string, itemType?: string) {
+export async function getFavoritesByUserId(userId: number, itemType?: string) {
   let query = db.select().from(favorites).where(eq(favorites.userId, userId));
   
   if (itemType) {
@@ -518,7 +518,7 @@ export async function createFavorite(data: typeof favorites.$inferInsert) {
   return result;
 }
 
-export async function deleteFavorite(userId: string, itemType: string, itemId: number) {
+export async function deleteFavorite(userId: number, itemType: string, itemId: number) {
   const result = await db.delete(favorites)
     .where(and(
       eq(favorites.userId, userId),
@@ -529,7 +529,7 @@ export async function deleteFavorite(userId: string, itemType: string, itemId: n
 }
 
 // 学习提醒相关
-export async function getReviewRemindersByUserId(userId: string) {
+export async function getReviewRemindersByUserId(userId: number) {
   return await db.select().from(reviewReminders)
     .where(eq(reviewReminders.userId, userId))
     .orderBy(reviewReminders.scheduledDate);
@@ -558,13 +558,13 @@ export async function createReviewHistory(data: typeof reviewHistory.$inferInser
 }
 
 // 错题复习记录相关
-export async function getErrorReviewRecordsByUserId(userId: string) {
+export async function getErrorReviewRecordsByUserId(userId: number) {
   return await db.select().from(errorReviewRecords)
     .where(eq(errorReviewRecords.userId, userId))
     .orderBy(desc(errorReviewRecords.lastReviewedAt));
 }
 
-export async function getErrorReviewRecordByUserAndQuestion(userId: string, errorQuestionId: number) {
+export async function getErrorReviewRecordByUserAndQuestion(userId: number, errorQuestionId: number) {
   const result = await db.select().from(errorReviewRecords)
     .where(and(
       eq(errorReviewRecords.userId, userId),
@@ -585,7 +585,7 @@ export async function updateErrorReviewRecord(id: number, data: Partial<typeof e
 }
 
 // 学习路径相关
-export async function getLearningPathsByUserId(userId: string) {
+export async function getLearningPathsByUserId(userId: number) {
   return await db.select().from(learningPaths)
     .where(eq(learningPaths.userId, userId))
     .orderBy(desc(learningPaths.createdAt));
@@ -607,7 +607,7 @@ export async function updateLearningPath(id: number, data: Partial<typeof learni
 }
 
 // 学习路径进度相关
-export async function getLearningPathProgressByUserAndPath(userId: string, pathId: number) {
+export async function getLearningPathProgressByUserAndPath(userId: number, pathId: number) {
   return await db.select().from(learningPathProgress)
     .where(and(
       eq(learningPathProgress.userId, userId),
@@ -621,7 +621,7 @@ export async function createLearningPathProgress(data: typeof learningPathProgre
   return result;
 }
 
-export async function updateLearningPathProgress(userId: string, pathId: number, nodeId: string, data: Partial<typeof learningPathProgress.$inferInsert>) {
+export async function updateLearningPathProgress(userId: number, pathId: number, nodeId: string, data: Partial<typeof learningPathProgress.$inferInsert>) {
   const result = await db.update(learningPathProgress)
     .set(data)
     .where(and(
@@ -633,7 +633,7 @@ export async function updateLearningPathProgress(userId: string, pathId: number,
 }
 
 // 考试日历相关
-export async function getExamCalendarByUserId(userId: string) {
+export async function getExamCalendarByUserId(userId: number) {
   return await db.select().from(examCalendar)
     .where(eq(examCalendar.userId, userId))
     .orderBy(examCalendar.examDate);
@@ -655,7 +655,7 @@ export async function deleteExamCalendar(id: number) {
 }
 
 // 智能复习任务相关
-export async function getSmartReviewTasksByUserAndExam(userId: string, examId: number) {
+export async function getSmartReviewTasksByUserAndExam(userId: number, examId: number) {
   return await db.select().from(smartReviewTasks)
     .where(and(
       eq(smartReviewTasks.userId, userId),
@@ -740,7 +740,7 @@ export async function updateEmailTemplate(id: number, data: Partial<typeof email
 }
 
 // 用户提醒设置相关
-export async function getUserReminderSettingsByUserId(userId: string) {
+export async function getUserReminderSettingsByUserId(userId: number) {
   const result = await db.select().from(userReminderSettings)
     .where(eq(userReminderSettings.userId, userId))
     .limit(1);
@@ -752,7 +752,7 @@ export async function createUserReminderSettings(data: typeof userReminderSettin
   return result;
 }
 
-export async function updateUserReminderSettings(userId: string, data: Partial<typeof userReminderSettings.$inferInsert>) {
+export async function updateUserReminderSettings(userId: number, data: Partial<typeof userReminderSettings.$inferInsert>) {
   const result = await db.update(userReminderSettings)
     .set(data)
     .where(eq(userReminderSettings.userId, userId));
@@ -760,7 +760,7 @@ export async function updateUserReminderSettings(userId: string, data: Partial<t
 }
 
 // AI建议历史相关
-export async function getAiAdviceHistoryByUserId(userId: string) {
+export async function getAiAdviceHistoryByUserId(userId: number) {
   return await db.select().from(aiAdviceHistory)
     .where(eq(aiAdviceHistory.userId, userId))
     .orderBy(desc(aiAdviceHistory.createdAt));
@@ -772,7 +772,7 @@ export async function createAiAdviceHistory(data: typeof aiAdviceHistory.$inferI
 }
 
 // 复习任务相关
-export async function getReviewTasksByUserId(userId: string) {
+export async function getReviewTasksByUserId(userId: number) {
   return await db.select().from(reviewTasks)
     .where(eq(reviewTasks.userId, userId))
     .orderBy(desc(reviewTasks.createdAt));
@@ -826,7 +826,7 @@ export async function updatePackage(id: number, data: Partial<typeof packages.$i
 }
 
 // 订单相关
-export async function getOrdersByUserId(userId: string) {
+export async function getOrdersByUserId(userId: number) {
   return await db.select().from(orders)
     .where(eq(orders.userId, userId))
     .orderBy(desc(orders.createdAt));
@@ -850,13 +850,13 @@ export async function updateOrder(id: number, data: Partial<typeof orders.$infer
 }
 
 // 用户订阅相关
-export async function getUserSubscriptionsByUserId(userId: string) {
+export async function getUserSubscriptionsByUserId(userId: number) {
   return await db.select().from(userSubscriptions)
     .where(eq(userSubscriptions.userId, userId))
     .orderBy(desc(userSubscriptions.createdAt));
 }
 
-export async function getActiveUserSubscription(userId: string) {
+export async function getActiveUserSubscription(userId: number) {
   const result = await db.select().from(userSubscriptions)
     .where(and(
       eq(userSubscriptions.userId, userId),
@@ -900,7 +900,7 @@ export async function updatePaymentConfig(id: number, data: Partial<typeof payme
 }
 
 // 账号凭证相关
-export async function getAccountCredentialByUserId(userId: string) {
+export async function getAccountCredentialByUserId(userId: number) {
   const result = await db.select().from(accountCredentials)
     .where(eq(accountCredentials.userId, userId))
     .limit(1);
@@ -919,7 +919,7 @@ export async function createAccountCredential(data: typeof accountCredentials.$i
   return result;
 }
 
-export async function updateAccountCredential(userId: string, data: Partial<typeof accountCredentials.$inferInsert>) {
+export async function updateAccountCredential(userId: number, data: Partial<typeof accountCredentials.$inferInsert>) {
   const result = await db.update(accountCredentials)
     .set(data)
     .where(eq(accountCredentials.userId, userId));
@@ -927,7 +927,7 @@ export async function updateAccountCredential(userId: string, data: Partial<type
 }
 
 // 权限记录相关
-export async function getPermissionRecordsByUserId(userId: string) {
+export async function getPermissionRecordsByUserId(userId: number) {
   return await db.select().from(permissionRecords)
     .where(eq(permissionRecords.userId, userId))
     .orderBy(desc(permissionRecords.grantedAt));
@@ -976,7 +976,7 @@ export async function updatePushRecord(id: number, data: Partial<typeof pushReco
 }
 
 // 用户推送接收相关
-export async function getUserPushReceiptsByUserId(userId: string) {
+export async function getUserPushReceiptsByUserId(userId: number) {
   return await db.select().from(userPushReceipts)
     .where(eq(userPushReceipts.userId, userId))
     .orderBy(desc(userPushReceipts.createdAt));
@@ -1005,7 +1005,7 @@ export async function createQuestionReview(data: typeof questionReviews.$inferIn
 }
 
 // 图表标注相关
-export async function getAnnotationsByItem(userId: string, itemType: string, itemId: number) {
+export async function getAnnotationsByItem(userId: number, itemType: string, itemId: number) {
   return await db.select().from(annotations)
     .where(and(
       eq(annotations.userId, userId),
@@ -1015,7 +1015,7 @@ export async function getAnnotationsByItem(userId: string, itemType: string, ite
     .orderBy(desc(annotations.createdAt));
 }
 
-export async function getAnnotationsByImageUrl(userId: string, imageUrl: string) {
+export async function getAnnotationsByImageUrl(userId: number, imageUrl: string) {
   return await db.select().from(annotations)
     .where(and(
       eq(annotations.userId, userId),
@@ -1063,7 +1063,7 @@ export async function upsertUser(userData: typeof users.$inferInsert) {
 }
 
 // 根据科目和年级获取错题
-export async function getErrorQuestionsBySubjectAndGrade(userId: string, subject: string, grade: string) {
+export async function getErrorQuestionsBySubjectAndGrade(userId: number, subject: string, grade: string) {
   const result = await db.select().from(errorQuestions)
     .where(and(
       eq(errorQuestions.userId, userId),
@@ -1126,14 +1126,14 @@ export async function upsertLearningProgress(data: typeof learningProgress.$infe
 }
 
 // 获取用户的学习进度
-export async function getLearningProgressByUser(userId: string) {
+export async function getLearningProgressByUser(userId: number) {
   const result = await db.select().from(learningProgress)
     .where(eq(learningProgress.userId, userId));
   return result;
 }
 
 // 根据知识点获取学习进度
-export async function getLearningProgressByKnowledgePoint(userId: string, knowledgePointId: number) {
+export async function getLearningProgressByKnowledgePoint(userId: number, knowledgePointId: number) {
   const result = await db.select().from(learningProgress)
     .where(and(
       eq(learningProgress.userId, userId),
@@ -1144,14 +1144,14 @@ export async function getLearningProgressByKnowledgePoint(userId: string, knowle
 }
 
 // 获取用户的复习计划
-export async function getReviewPlansByUser(userId: string) {
+export async function getReviewPlansByUser(userId: number) {
   const result = await db.select().from(reviewPlans)
     .where(eq(reviewPlans.userId, userId));
   return result;
 }
 
 // 获取待复习的计划
-export async function getPendingReviewPlans(userId: string) {
+export async function getPendingReviewPlans(userId: number) {
   const result = await db.select().from(reviewPlans)
     .where(and(
       eq(reviewPlans.userId, userId),

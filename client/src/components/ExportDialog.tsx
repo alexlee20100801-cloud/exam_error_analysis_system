@@ -115,7 +115,6 @@ export function ExportDialog({ open, onOpenChange }: ExportDialogProps) {
                 <SelectValue placeholder="全部学科" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">全部学科</SelectItem>
                 <SelectItem value="math">数学</SelectItem>
                 <SelectItem value="chinese">语文</SelectItem>
                 <SelectItem value="english">英语</SelectItem>
@@ -137,7 +136,6 @@ export function ExportDialog({ open, onOpenChange }: ExportDialogProps) {
                 <SelectValue placeholder="全部年级" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">全部年级</SelectItem>
                 <SelectItem value="junior1">初一</SelectItem>
                 <SelectItem value="junior2">初二</SelectItem>
                 <SelectItem value="junior3">初三</SelectItem>
@@ -186,7 +184,6 @@ export function ExportDialog({ open, onOpenChange }: ExportDialogProps) {
                 <SelectValue placeholder="全部状态" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">全部状态</SelectItem>
                 <SelectItem value="false">未掌握</SelectItem>
                 <SelectItem value="true">已掌握</SelectItem>
               </SelectContent>
