@@ -266,7 +266,6 @@ export async function recordCheckIn(
     await db.insert(checkInRecords).values({
       userId,
       checkInDate: today,
-      activityType,
     });
 
     // 检查是否解锁新成就

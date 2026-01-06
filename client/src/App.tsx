@@ -34,6 +34,7 @@ import PracticeDetail from "@/pages/PracticeDetail";
 import MyFavorites from "@/pages/MyFavorites";
 import ReviewReminders from "@/pages/ReviewReminders";
 import DocumentUpload from "@/pages/DocumentUpload";
+import ChartLearningDemo from "@/pages/ChartLearningDemo";
 import { PWAInstallPrompt } from "@/components/PWAInstallPrompt";
 import { MobileBottomNav } from "@/components/MobileBottomNav";
 
@@ -70,6 +71,7 @@ function Router() {
       <Route path="/favorites" component={MyFavorites} />
       <Route path="/reminders" component={ReviewReminders} />
       <Route path="/document-upload" component={DocumentUpload} />
+      <Route path="/chart-learning-demo" component={ChartLearningDemo} />
       <Route component={NotFound} />
     </Switch>
   );

@@ -21,8 +21,8 @@ export default function Dashboard() {
   const masteredQuestions = errorQuestions?.filter(q => q.isMastered).length || 0;
   
   const totalKnowledgePoints = progress?.length || 0;
-  const masteredKnowledgePoints = progress?.filter(p => p.status === "mastered").length || 0;
-  const learningKnowledgePoints = progress?.filter(p => p.status === "learning").length || 0;
+  const masteredKnowledgePoints = progress?.filter(p => Number(p.masteryLevel) >= 80).length || 0;
+  const learningKnowledgePoints = progress?.filter(p => Number(p.masteryLevel) > 0 && Number(p.masteryLevel) < 80).length || 0;
 
   return (
     <DashboardLayout>

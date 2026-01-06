@@ -86,7 +86,7 @@ export function TagSelector({ errorQuestionId, selectedTags = [], onTagsChange }
                       onCheckedChange={(checked) => handleToggleTag(tag.id, checked as boolean)}
                       disabled={addTagMutation.isPending || removeTagMutation.isPending}
                     />
-                    <div className="w-3 h-3 rounded-full" style={{ backgroundColor: tag.color }} />
+                    <div className="w-3 h-3 rounded-full" style={{ backgroundColor: tag.color || '#6366f1' }} />
                     <span className="text-sm flex-1">{tag.name}</span>
                     <span className="text-xs text-muted-foreground">{tag.errorCount}</span>
                   </label>

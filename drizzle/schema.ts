@@ -14,6 +14,7 @@ export const users = mysqlTable('users', {
   region: varchar('region', { length: 100 }),
   currentSemester: mysqlEnum('current_semester', ['first', 'second']),
   disabledMenuItems: json('disabled_menu_items').$type<string[]>(),
+  email: varchar('email', { length: 255 }),
   emailVerified: boolean('email_verified').default(false),
   wechatOpenId: varchar('wechat_open_id', { length: 255 }),
   wechatNickname: varchar('wechat_nickname', { length: 255 }),
@@ -165,6 +166,9 @@ export const reviewPlans = mysqlTable('review_plans', {
   userId: varchar('user_id', { length: 255 }).notNull(),
   errorQuestionId: int('error_question_id').notNull(),
   scheduledDate: timestamp('scheduled_date').notNull(),
+  status: varchar('status', { length: 50 }).default('pending'),
+  nextReviewAt: timestamp('next_review_at'),
+  nextReviewDate: timestamp('next_review_date'),
   isCompleted: boolean('is_completed').default(false),
   completedAt: timestamp('completed_at'),
   createdAt: timestamp('created_at').defaultNow().notNull(),
@@ -180,6 +184,7 @@ export const achievements = mysqlTable('achievements', {
   userId: varchar('user_id', { length: 255 }).notNull(),
   code: varchar('code', { length: 100 }).notNull().unique(),
   type: varchar('type', { length: 100 }).notNull(),
+  category: varchar('category', { length: 100 }),
   name: varchar('name', { length: 255 }).notNull(),
   description: text('description'),
   icon: varchar('icon', { length: 255 }),
@@ -387,6 +392,7 @@ export const practicePools = mysqlTable('practice_pools', {
   knowledgePointIds: json('knowledge_point_ids').$type<number[]>(),
   answer: text('answer').notNull(),
   explanation: text('explanation'),
+  status: varchar('status', { length: 50 }).default('active'),
   isCompleted: boolean('is_completed').default(false),
   completedAt: timestamp('completed_at'),
   userAnswer: text('user_answer'),
@@ -523,7 +529,13 @@ export const smartReviewTasks = mysqlTable('smart_review_tasks', {
   id: int('id').primaryKey().autoincrement(),
   userId: varchar('user_id', { length: 255 }).notNull(),
   examId: int('exam_id').notNull(),
+  planDate: timestamp('plan_date'),
   taskDate: timestamp('task_date').notNull(),
+  taskName: varchar('task_name', { length: 255 }),
+  taskType: varchar('task_type', { length: 50 }),
+  targetId: int('target_id'),
+  targetName: varchar('target_name', { length: 255 }),
+  estimatedMinutes: int('estimated_minutes'),
   knowledgePointIds: json('knowledge_point_ids').$type<number[]>(),
   errorQuestionIds: json('error_question_ids').$type<number[]>(),
   priority: mysqlEnum('priority', ['high', 'medium', 'low']).default('medium'),
@@ -553,6 +565,7 @@ export const emailVerificationTokens = mysqlTable('email_verification_tokens', {
   email: varchar('email', { length: 255 }).notNull(),
   token: varchar('token', { length: 255 }).notNull().unique(),
   expiresAt: timestamp('expires_at').notNull(),
+  status: varchar('status', { length: 50 }).default('pending'),
   isUsed: boolean('is_used').default(false),
   usedAt: timestamp('used_at'),
   createdAt: timestamp('created_at').defaultNow().notNull(),
@@ -901,3 +914,35 @@ export const errorQuestionTagRelations = mysqlTable('error_question_tag_relation
 // 类型导出
 export type InsertErrorQuestionTag = typeof errorQuestionTags.$inferInsert;
 export type InsertErrorQuestionTagRelation = typeof errorQuestionTagRelations.$inferInsert;
+
+// 图表标注表
+export const chartAnnotations = mysqlTable('chart_annotations', {
+  id: int('id').primaryKey().autoincrement(),
+  userId: varchar('user_id', { length: 255 }).notNull(),
+  errorQuestionId: int('error_question_id').notNull(),
+  imageUrl: varchar('image_url', { length: 500 }).notNull(),
+  annotations: json('annotations').$type<any[]>(),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+  updatedAt: timestamp('updated_at').defaultNow().onUpdateNow().notNull(),
+}, (table) => ({
+  userIdIdx: index('user_id_idx').on(table.userId),
+  errorQuestionIdIdx: index('error_question_id_idx').on(table.errorQuestionId),
+}));
+
+export type InsertChartAnnotation = typeof chartAnnotations.$inferInsert;
+
+// 图表数据提取表
+export const chartDataExtractions = mysqlTable('chart_data_extractions', {
+  id: int('id').primaryKey().autoincrement(),
+  userId: varchar('user_id', { length: 255 }).notNull(),
+  errorQuestionId: int('error_question_id').notNull(),
+  imageUrl: varchar('image_url', { length: 500 }).notNull(),
+  extractedData: json('extracted_data').$type<any>(),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+  updatedAt: timestamp('updated_at').defaultNow().onUpdateNow().notNull(),
+}, (table) => ({
+  userIdIdx: index('user_id_idx').on(table.userId),
+  errorQuestionIdIdx: index('error_question_id_idx').on(table.errorQuestionId),
+}));
+
+export type InsertChartDataExtraction = typeof chartDataExtractions.$inferInsert;

@@ -240,18 +240,18 @@ export default function Achievements() {
                   {filteredAchievements
                     ?.filter((a) => a.unlocked)
                     .map((item) => {
-                      const Icon = iconMap[item.achievement.icon] || Award;
+                      const Icon = iconMap[item.achievement.icon || 'Award'] || Award;
                       return (
                         <Card key={item.achievement.id} className="relative overflow-hidden">
                           <div
                             className="absolute inset-0 opacity-10"
-                            style={{ backgroundColor: item.achievement.color }}
+                            style={{ backgroundColor: item.achievement.color || '#6366f1' }}
                           />
                           <CardHeader>
                             <div className="flex items-start justify-between">
                               <div
                                 className="p-3 rounded-lg"
-                                style={{ backgroundColor: item.achievement.color + "20" }}
+                                style={{ backgroundColor: (item.achievement.color || '#6366f1') + "20" }}
                               >
                                 <Icon className="h-6 w-6" />
                               </div>
@@ -285,7 +285,7 @@ export default function Achievements() {
                   {filteredAchievements
                     ?.filter((a) => !a.unlocked)
                     .map((item) => {
-                      const Icon = iconMap[item.achievement.icon] || Award;
+                      const Icon = iconMap[item.achievement.icon || 'Award'] || Award;
                       const progressPercent = Math.floor(
                         (item.progress / item.achievement.requirement) * 100
                       );

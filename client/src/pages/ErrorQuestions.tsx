@@ -737,7 +737,7 @@ export default function ErrorQuestions() {
                     {allTags.map((tag) => (
                       <SelectItem key={tag.id} value={tag.id.toString()}>
                         <div className="flex items-center gap-2">
-                          <div className="w-3 h-3 rounded-full" style={{ backgroundColor: tag.color }} />
+                          <div className="w-3 h-3 rounded-full" style={{ backgroundColor: tag.color || '#6366f1' }} />
                           {tag.name} ({tag.errorCount})
                         </div>
                       </SelectItem>

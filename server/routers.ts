@@ -43,6 +43,7 @@ import { enhancedExportRouter } from "./routers/enhancedExport";
 import { annotationsRouter } from "./routers/annotations";
 import { chartDataExtractionRouter } from "./routers/chartDataExtraction";
 import { comparisonLearningRouter } from "./routers/comparisonLearning";
+import { chartAnnotationsRouter } from "./routers/chartAnnotations";
 
 export const appRouter = router({
   system: systemRouter,
@@ -72,6 +73,7 @@ export const appRouter = router({
   
   // 图表标注
   annotations: annotationsRouter,
+  chartAnnotations: chartAnnotationsRouter,
   
   // 图表数据提取
   chartDataExtraction: chartDataExtractionRouter,

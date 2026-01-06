@@ -46,6 +46,22 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 
+// 定义详细分析的类型
+type DetailedAnalysis = {
+  errorType?: string;
+  errorAnalysis?: string;
+  knowledgePoints?: string[];
+  knowledgeGraph?: string;
+  keyPoints?: string[];
+  keyPointsExplanation?: string;
+  commonMistakes?: string[];
+  mistakesAnalysis?: string;
+  solvingSteps?: string[];
+  solvingStrategy?: string;
+  studyAdvice?: string;
+  practiceDirection?: string;
+};
+
 export default function ErrorQuestionDetail() {
   const { user, loading: authLoading } = useAuth();
   const [, params] = useRoute("/error-questions/:id");
@@ -458,9 +474,9 @@ export default function ErrorQuestionDetail() {
                 </CardHeader>
                 <CardContent>
                   <p className="text-lg font-medium mb-2">
-                    {JSON.parse(question.detailedAnalysis).errorType}
+                    {(JSON.parse(question.detailedAnalysis as string) as DetailedAnalysis).errorType || '未分析'}
                   </p>
-                  <LatexText text={JSON.parse(question.detailedAnalysis).errorAnalysis} className="prose prose-sm max-w-none dark:prose-invert" />
+                  <LatexText text={(JSON.parse(question.detailedAnalysis as string) as DetailedAnalysis).errorAnalysis || ''} className="prose prose-sm max-w-none dark:prose-invert" />
                 </CardContent>
               </Card>
 
@@ -473,7 +489,7 @@ export default function ErrorQuestionDetail() {
                 </CardHeader>
                 <CardContent>
                   <div className="flex flex-wrap gap-2 mb-4">
-                    {JSON.parse(question.detailedAnalysis).knowledgePoints?.map((kp: any, idx: number) => (
+                    {((JSON.parse(question.detailedAnalysis as string) as DetailedAnalysis).knowledgePoints || []).map((kp: any, idx: number) => (
                       <Badge
                         key={idx}
                         variant={kp.importance === "high" ? "default" : "secondary"}
@@ -485,7 +501,7 @@ export default function ErrorQuestionDetail() {
                       </Badge>
                     ))}
                   </div>
-                  <LatexText text={JSON.parse(question.detailedAnalysis).knowledgeGraph} className="prose prose-sm max-w-none dark:prose-invert" />
+                  <LatexText text={(JSON.parse(question.detailedAnalysis as string) as DetailedAnalysis).knowledgeGraph || ''} className="prose prose-sm max-w-none dark:prose-invert" />
                 </CardContent>
               </Card>
             </TabsContent>
@@ -506,7 +522,7 @@ export default function ErrorQuestionDetail() {
                   <div>
                     <h4 className="font-semibold mb-2">核心考点列表：</h4>
                     <ul className="list-disc list-inside space-y-1">
-                      {JSON.parse(question.detailedAnalysis).keyPoints?.map((point: string, idx: number) => (
+                      {((JSON.parse(question.detailedAnalysis as string) as DetailedAnalysis).keyPoints || []).map((point: string, idx: number) => (
                         <li key={idx}>{point}</li>
                       ))}
                     </ul>
@@ -514,7 +530,7 @@ export default function ErrorQuestionDetail() {
                   <Separator />
                   <div>
                     <h4 className="font-semibold mb-2">详细解读：</h4>
-                    <LatexText text={JSON.parse(question.detailedAnalysis).keyPointsExplanation} className="prose prose-sm max-w-none dark:prose-invert" />
+                    <LatexText text={(JSON.parse(question.detailedAnalysis as string) as DetailedAnalysis).keyPointsExplanation || ''} className="prose prose-sm max-w-none dark:prose-invert" />
                   </div>
                 </CardContent>
               </Card>
@@ -538,7 +554,7 @@ export default function ErrorQuestionDetail() {
                     <AlertDescription>
                       <strong>常见易错点：</strong>
                       <ul className="list-disc list-inside mt-2 space-y-1">
-                        {JSON.parse(question.detailedAnalysis).commonMistakes?.map((mistake: string, idx: number) => (
+                        {((JSON.parse(question.detailedAnalysis as string) as DetailedAnalysis).commonMistakes || []).map((mistake: string, idx: number) => (
                           <li key={idx}>{mistake}</li>
                         ))}
                       </ul>
@@ -547,7 +563,7 @@ export default function ErrorQuestionDetail() {
                   <Separator />
                   <div>
                     <h4 className="font-semibold mb-2">深度分析：</h4>
-                    <LatexText text={JSON.parse(question.detailedAnalysis).mistakesAnalysis} className="prose prose-sm max-w-none dark:prose-invert" />
+                    <LatexText text={(JSON.parse(question.detailedAnalysis as string) as DetailedAnalysis).mistakesAnalysis || ''} className="prose prose-sm max-w-none dark:prose-invert" />
                   </div>
                 </CardContent>
               </Card>
@@ -569,7 +585,7 @@ export default function ErrorQuestionDetail() {
                   <div>
                     <h4 className="font-semibold mb-2">解题步骤：</h4>
                     <ol className="list-decimal list-inside space-y-2">
-                      {JSON.parse(question.detailedAnalysis).solvingSteps?.map((step: string, idx: number) => (
+                      {((JSON.parse(question.detailedAnalysis as string) as DetailedAnalysis).solvingSteps || []).map((step: string, idx: number) => (
                         <li key={idx} className="pl-2">{step}</li>
                       ))}
                     </ol>
@@ -577,7 +593,7 @@ export default function ErrorQuestionDetail() {
                   <Separator />
                   <div>
                     <h4 className="font-semibold mb-2">解题策略：</h4>
-                    <LatexText text={JSON.parse(question.detailedAnalysis).solvingStrategy} className="prose prose-sm max-w-none dark:prose-invert" />
+                    <LatexText text={(JSON.parse(question.detailedAnalysis as string) as DetailedAnalysis).solvingStrategy || ''} className="prose prose-sm max-w-none dark:prose-invert" />
                   </div>
                   <Separator />
                   <div>

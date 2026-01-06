@@ -193,7 +193,7 @@ export function TagManagementDialog({ open, onOpenChange }: TagManagementDialogP
                 {tags.map((tag) => (
                   <div key={tag.id} className="flex items-center justify-between p-3 border rounded-lg hover:bg-gray-50">
                     <div className="flex items-center gap-3">
-                      <div className="w-4 h-4 rounded-full" style={{ backgroundColor: tag.color }} />
+                      <div className="w-4 h-4 rounded-full" style={{ backgroundColor: tag.color || '#6366f1' }} />
                       <div>
                         <div className="font-medium">{tag.name}</div>
                         {tag.description && <div className="text-sm text-muted-foreground">{tag.description}</div>}
