@@ -1,13 +1,17 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { trpc } from "@/lib/trpc";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Loader2, Sparkles, Database, TrendingUp } from "lucide-react";
+import { Loader2, Sparkles, Database, TrendingUp, HelpCircle } from "lucide-react";
 import { toast } from "sonner";
 import { Progress } from "@/components/ui/progress";
+import { BulkGenerationWelcome } from "@/components/BulkGenerationWelcome";
+import { GenerationTemplates, type GenerationTemplate } from "@/components/GenerationTemplates";
+import { GuidedTour, type TourStep } from "@/components/GuidedTour";
+import DashboardLayout from "@/components/DashboardLayout";
 
 const SUBJECTS = [
   { value: "chinese", label: "语文" },
@@ -37,6 +41,19 @@ export default function BulkGeneration() {
   const [questionsPerKp, setQuestionsPerKp] = useState<number>(5);
   const [isGenerating, setIsGenerating] = useState(false);
   const [generationResult, setGenerationResult] = useState<any>(null);
+  
+  // 引导状态
+  const [showWelcome, setShowWelcome] = useState(false);
+  const [showTemplates, setShowTemplates] = useState(false);
+  const [isTourActive, setIsTourActive] = useState(false);
+  
+  // 检查是否首次访问
+  useEffect(() => {
+    const hasSeenWelcome = localStorage.getItem("bulk-generation-welcome-seen");
+    if (!hasSeenWelcome) {
+      setShowWelcome(true);
+    }
+  }, []);
 
   const { data: stats, refetch: refetchStats } = trpc.bulkGeneration.getStats.useQuery();
   const bulkGenerateMutation = trpc.bulkGeneration.bulkGenerate.useMutation();
@@ -102,17 +119,127 @@ export default function BulkGeneration() {
     setGrade(value);
     setSchoolLevel(value.startsWith("junior") ? "junior" : "senior");
   };
+  
+  // 引导流程处理
+  const handleStartTour = () => {
+    setShowWelcome(false);
+    setIsTourActive(true);
+  };
+  
+  const handleCompleteTour = () => {
+    setIsTourActive(false);
+    toast.success("教程完成！现在可以开始生成题目了");
+  };
+  
+  const handleSkipTour = () => {
+    setIsTourActive(false);
+  };
+  
+  const handleSelectTemplate = (template: GenerationTemplate) => {
+    // 应用模板配置
+    if (template.config.subjects.length > 0) {
+      setSubject(template.config.subjects[0]);
+    }
+    if (template.config.grades.length > 0) {
+      setGrade(template.config.grades[0]);
+      setSchoolLevel(template.config.grades[0].startsWith("junior") ? "junior" : "senior");
+    }
+    // 计算每个知识点生成题目数
+    const estimatedKps = template.config.subjects.length * template.config.grades.length * 10;
+    const questionsPerKp = Math.ceil(template.config.totalQuestions / estimatedKps);
+    setQuestionsPerKp(Math.max(1, questionsPerKp));
+    
+    setShowTemplates(false);
+    toast.success(`已应用模板：${template.name}`);
+  };
+  
+  // 引导步骤
+  const tourSteps: TourStep[] = [
+    {
+      target: "[data-tour='stats']",
+      title: "题库统计",
+      content: "这里显示当前题库的总体情况，包括题目数量、学科分布和知识点覆盖。",
+      placement: "bottom",
+    },
+    {
+      target: "[data-tour='config']",
+      title: "生成配置",
+      content: "选择年级、学科和每个知识点生成的题目数量。建议首次使用从小批量开始。",
+      placement: "right",
+    },
+    {
+      target: "[data-tour='difficulty']",
+      title: "难度分布",
+      content: "设置简单、中等、困难题目的比例，确保题库难度均衡。",
+      placement: "right",
+    },
+    {
+      target: "[data-tour='generate-btn']",
+      title: "开始生成",
+      content: "配置完成后，点击此按钮开始生成。生成过程中会实时显示进度。",
+      placement: "top",
+    },
+  ];
 
   return (
-    <div className="container py-8 max-w-7xl">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold mb-2">AI题库批量生成</h1>
-        <p className="text-muted-foreground">
-          使用AI自动生成高质量题目，快速扩充题库资源
-        </p>
-      </div>
+    <DashboardLayout>
+      <div className="container py-8 max-w-7xl">
+        {/* 欢迎引导 */}
+        <BulkGenerationWelcome
+          open={showWelcome}
+          onClose={() => setShowWelcome(false)}
+          onStartTour={handleStartTour}
+        />
+        
+        {/* 分步引导 */}
+        <GuidedTour
+          steps={tourSteps}
+          isActive={isTourActive}
+          onComplete={handleCompleteTour}
+          onSkip={handleSkipTour}
+        />
+        
+        <div className="mb-8 flex items-center justify-between">
+          <div>
+            <h1 className="text-3xl font-bold mb-2">AI题库批量生成</h1>
+            <p className="text-muted-foreground">
+              使用AI自动生成高质量题目，快速扩充题库资源
+            </p>
+          </div>
+          <div className="flex gap-2">
+            <Button
+              variant="outline"
+              onClick={() => setShowTemplates(!showTemplates)}
+            >
+              <Sparkles className="mr-2 h-4 w-4" />
+              使用模板
+            </Button>
+            <Button
+              variant="ghost"
+              onClick={() => setIsTourActive(true)}
+            >
+              <HelpCircle className="mr-2 h-4 w-4" />
+              查看引导
+            </Button>
+          </div>
+        </div>
+        
+        {/* 模板选择器 */}
+        {showTemplates && (
+          <Card className="mb-6">
+            <CardHeader>
+              <CardTitle>选择预设模板</CardTitle>
+              <CardDescription>
+                快速开始，无需复杂配置
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <GenerationTemplates onSelectTemplate={handleSelectTemplate} />
+            </CardContent>
+          </Card>
+        )}
 
-      <div className="grid gap-6 md:grid-cols-3 mb-8">
+      <div className="grid gap-6 md:grid-cols-3 mb-8" data-tour="stats">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">题库总量</CardTitle>
@@ -158,7 +285,7 @@ export default function BulkGeneration() {
       </div>
 
       <div className="grid gap-6 md:grid-cols-2">
-        <Card>
+        <Card data-tour="config">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Sparkles className="h-5 w-5" />
@@ -220,6 +347,7 @@ export default function BulkGeneration() {
               className="w-full"
               onClick={handleBulkGenerate}
               disabled={isGenerating}
+              data-tour="generate-btn"
             >
               {isGenerating && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
               开始生成
@@ -266,10 +394,10 @@ export default function BulkGeneration() {
       </div>
 
       {generationResult && (
-        <Card className="mt-6">
-          <CardHeader>
-            <CardTitle>生成结果</CardTitle>
-          </CardHeader>
+      <Card className="mb-6">
+        <CardHeader>
+          <CardTitle>生成结果</CardTitle>
+        </CardHeader>
           <CardContent className="space-y-4">
             <div className="grid gap-4 md:grid-cols-4">
               <div className="space-y-1">
@@ -350,5 +478,6 @@ export default function BulkGeneration() {
         </Card>
       )}
     </div>
+    </DashboardLayout>
   );
 }
