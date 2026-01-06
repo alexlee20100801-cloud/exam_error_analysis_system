@@ -1,8 +1,10 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { BarChart3, PieChart, LineChart, Table as TableIcon } from "lucide-react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { BarChart3, PieChart, LineChart, Table as TableIcon, ZoomIn, ZoomOut, Maximize2, Move } from "lucide-react";
 
 interface ChartData {
   type: 'table' | 'chart';
@@ -18,7 +20,7 @@ interface ChartVisualizationProps {
 
 /**
  * 图表可视化组件
- * 从题目内容中识别并展示图表和表格
+ * 从题目内容中识别并展示图表和表格，支持缩放、拖拽和全屏查看
  */
 export function ChartVisualization({ content, imageUrl }: ChartVisualizationProps) {
   const [charts, setCharts] = useState<ChartData[]>([]);
@@ -35,31 +37,9 @@ export function ChartVisualization({ content, imageUrl }: ChartVisualizationProp
   return (
     <div className="space-y-4">
       {/* 题目图片（可能包含图表） */}
-      {imageUrl && (
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-base">
-              <BarChart3 className="h-5 w-5 text-primary" />
-              题目图片
-              <Badge variant="secondary" className="ml-auto">可能包含图表</Badge>
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="relative rounded-lg border bg-muted/30 p-4">
-              <img 
-                src={imageUrl} 
-                alt="题目图片" 
-                className="max-w-full h-auto mx-auto rounded"
-              />
-            </div>
-            <p className="text-sm text-muted-foreground mt-2">
-              💡 提示：如果图片中包含图表或表格，请仔细观察数据关系
-            </p>
-          </CardContent>
-        </Card>
-      )}
+      {imageUrl && <ImageViewer imageUrl={imageUrl} />}
 
-      {/* 识别到的表格 */}
+      {/* 识别到的表格和图表 */}
       {charts.map((chart, index) => (
         <Card key={index}>
           <CardHeader>
@@ -94,20 +74,191 @@ export function ChartVisualization({ content, imageUrl }: ChartVisualizationProp
 }
 
 /**
+ * 图片查看器（支持缩放、拖拽、全屏）
+ */
+function ImageViewer({ imageUrl }: { imageUrl: string }) {
+  const [scale, setScale] = useState(1);
+  const [position, setPosition] = useState({ x: 0, y: 0 });
+  const [isDragging, setIsDragging] = useState(false);
+  const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
+  const [isFullscreen, setIsFullscreen] = useState(false);
+  const imageRef = useRef<HTMLDivElement>(null);
+
+  const handleZoomIn = () => {
+    setScale(prev => Math.min(prev + 0.25, 3));
+  };
+
+  const handleZoomOut = () => {
+    setScale(prev => Math.max(prev - 0.25, 0.5));
+  };
+
+  const handleReset = () => {
+    setScale(1);
+    setPosition({ x: 0, y: 0 });
+  };
+
+  const handleMouseDown = (e: React.MouseEvent) => {
+    if (scale > 1) {
+      setIsDragging(true);
+      setDragStart({ x: e.clientX - position.x, y: e.clientY - position.y });
+    }
+  };
+
+  const handleMouseMove = (e: React.MouseEvent) => {
+    if (isDragging && scale > 1) {
+      setPosition({
+        x: e.clientX - dragStart.x,
+        y: e.clientY - dragStart.y,
+      });
+    }
+  };
+
+  const handleMouseUp = () => {
+    setIsDragging(false);
+  };
+
+  const imageControls = (
+    <div className="flex items-center gap-2 mb-2">
+      <Button
+        variant="outline"
+        size="sm"
+        onClick={handleZoomIn}
+        disabled={scale >= 3}
+      >
+        <ZoomIn className="h-4 w-4" />
+      </Button>
+      <Button
+        variant="outline"
+        size="sm"
+        onClick={handleZoomOut}
+        disabled={scale <= 0.5}
+      >
+        <ZoomOut className="h-4 w-4" />
+      </Button>
+      <Button
+        variant="outline"
+        size="sm"
+        onClick={handleReset}
+        disabled={scale === 1 && position.x === 0 && position.y === 0}
+      >
+        重置
+      </Button>
+      <Button
+        variant="outline"
+        size="sm"
+        onClick={() => setIsFullscreen(true)}
+      >
+        <Maximize2 className="h-4 w-4" />
+      </Button>
+      {scale > 1 && (
+        <Badge variant="secondary" className="ml-auto">
+          <Move className="h-3 w-3 mr-1" />
+          可拖拽
+        </Badge>
+      )}
+      <Badge variant="outline" className={scale === 1 ? "ml-auto" : ""}>
+        {Math.round(scale * 100)}%
+      </Badge>
+    </div>
+  );
+
+  const imageElement = (
+    <div
+      ref={imageRef}
+      className={`relative rounded-lg border bg-muted/30 p-4 overflow-hidden ${
+        scale > 1 ? 'cursor-move' : 'cursor-default'
+      }`}
+      onMouseDown={handleMouseDown}
+      onMouseMove={handleMouseMove}
+      onMouseUp={handleMouseUp}
+      onMouseLeave={handleMouseUp}
+      style={{ userSelect: 'none' }}
+    >
+      <img
+        src={imageUrl}
+        alt="题目图片"
+        className="max-w-full h-auto mx-auto rounded transition-transform"
+        style={{
+          transform: `scale(${scale}) translate(${position.x / scale}px, ${position.y / scale}px)`,
+          transformOrigin: 'center',
+        }}
+        draggable={false}
+      />
+    </div>
+  );
+
+  return (
+    <>
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2 text-base">
+            <BarChart3 className="h-5 w-5 text-primary" />
+            题目图片
+            <Badge variant="secondary" className="ml-auto">可能包含图表</Badge>
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          {imageControls}
+          {imageElement}
+          <p className="text-sm text-muted-foreground mt-2">
+            💡 提示：如果图片中包含图表或表格，请仔细观察数据关系
+          </p>
+        </CardContent>
+      </Card>
+
+      {/* 全屏对话框 */}
+      <Dialog open={isFullscreen} onOpenChange={setIsFullscreen}>
+        <DialogContent className="max-w-[95vw] max-h-[95vh] p-6">
+          <DialogHeader>
+            <DialogTitle>题目图片 - 全屏查看</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            {imageControls}
+            <div
+              className={`relative rounded-lg border bg-muted/30 p-4 overflow-auto max-h-[70vh] ${
+                scale > 1 ? 'cursor-move' : 'cursor-default'
+              }`}
+              onMouseDown={handleMouseDown}
+              onMouseMove={handleMouseMove}
+              onMouseUp={handleMouseUp}
+              onMouseLeave={handleMouseUp}
+              style={{ userSelect: 'none' }}
+            >
+              <img
+                src={imageUrl}
+                alt="题目图片"
+                className="max-w-full h-auto mx-auto rounded transition-transform"
+                style={{
+                  transform: `scale(${scale}) translate(${position.x / scale}px, ${position.y / scale}px)`,
+                  transformOrigin: 'center',
+                }}
+                draggable={false}
+              />
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+    </>
+  );
+}
+
+/**
  * 表格渲染器
  */
 function TableRenderer({ data }: { data: any }) {
+  const [isFullscreen, setIsFullscreen] = useState(false);
+
   if (!data || !data.headers || !data.rows) {
     return <div className="text-sm text-muted-foreground">表格数据格式错误</div>;
   }
 
-  return (
-    <div className="rounded-lg border overflow-hidden">
+  const tableElement = (
+    <div className="rounded-lg border overflow-auto">
       <Table>
         <TableHeader>
           <TableRow className="bg-muted/50">
             {data.headers.map((header: string, i: number) => (
-              <TableHead key={i} className="font-semibold text-center">
+              <TableHead key={i} className="font-semibold text-center whitespace-nowrap">
                 {header}
               </TableHead>
             ))}
@@ -117,7 +268,7 @@ function TableRenderer({ data }: { data: any }) {
           {data.rows.map((row: string[], rowIndex: number) => (
             <TableRow key={rowIndex} className="hover:bg-muted/30">
               {row.map((cell: string, cellIndex: number) => (
-                <TableCell key={cellIndex} className="text-center">
+                <TableCell key={cellIndex} className="text-center whitespace-nowrap">
                   {cell}
                 </TableCell>
               ))}
@@ -127,13 +278,45 @@ function TableRenderer({ data }: { data: any }) {
       </Table>
     </div>
   );
+
+  return (
+    <>
+      <div className="space-y-2">
+        <div className="flex justify-end">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setIsFullscreen(true)}
+          >
+            <Maximize2 className="h-4 w-4 mr-2" />
+            全屏查看
+          </Button>
+        </div>
+        {tableElement}
+      </div>
+
+      {/* 全屏对话框 */}
+      <Dialog open={isFullscreen} onOpenChange={setIsFullscreen}>
+        <DialogContent className="max-w-[95vw] max-h-[95vh] p-6">
+          <DialogHeader>
+            <DialogTitle>表格数据 - 全屏查看</DialogTitle>
+          </DialogHeader>
+          <div className="overflow-auto max-h-[80vh]">
+            {tableElement}
+          </div>
+        </DialogContent>
+      </Dialog>
+    </>
+  );
 }
 
 /**
  * 图表渲染器（显示图表描述）
  */
 function ChartRenderer({ data, rawText }: { data: any; rawText: string }) {
-  return (
+  const [isFullscreen, setIsFullscreen] = useState(false);
+
+  const chartContent = (
     <div className="space-y-3">
       <div className="rounded-lg bg-blue-50 dark:bg-blue-950/20 border border-blue-200 dark:border-blue-900 p-4">
         <div className="flex items-start gap-3">
@@ -164,6 +347,36 @@ function ChartRenderer({ data, rawText }: { data: any; rawText: string }) {
         </div>
       )}
     </div>
+  );
+
+  return (
+    <>
+      <div className="space-y-2">
+        <div className="flex justify-end">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setIsFullscreen(true)}
+          >
+            <Maximize2 className="h-4 w-4 mr-2" />
+            全屏查看
+          </Button>
+        </div>
+        {chartContent}
+      </div>
+
+      {/* 全屏对话框 */}
+      <Dialog open={isFullscreen} onOpenChange={setIsFullscreen}>
+        <DialogContent className="max-w-[95vw] max-h-[95vh] p-6">
+          <DialogHeader>
+            <DialogTitle>图表描述 - 全屏查看</DialogTitle>
+          </DialogHeader>
+          <div className="overflow-auto max-h-[80vh]">
+            {chartContent}
+          </div>
+        </DialogContent>
+      </Dialog>
+    </>
   );
 }
 

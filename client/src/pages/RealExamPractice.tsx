@@ -18,6 +18,7 @@ import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
 import { BookOpen, Heart, Clock, CheckCircle2, XCircle, School, Calendar, Sparkles, TrendingUp } from "lucide-react";
 import { LatexText } from "@/components/LatexPreview";
+import { ChartVisualization } from "@/components/ChartVisualization";
 
 // 常量定义
 const SUBJECTS = {
@@ -428,7 +429,7 @@ export default function RealExamPractice() {
           <div className="space-y-4">
             {/* 题目内容 */}
             <div className="bg-muted/50 p-4 rounded-lg">
-              <LatexText text={selectedQuestion?.content || ''} className="prose prose-sm max-w-none dark:prose-invert" />
+              <ChartVisualization content={selectedQuestion?.content || ''} />
             </div>
 
             {/* 答案输入 */}

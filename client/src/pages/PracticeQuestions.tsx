@@ -20,6 +20,7 @@ import { useState } from "react";
 import { toast } from "sonner";
 import { Streamdown } from "streamdown";
 import { LatexText } from "@/components/LatexPreview";
+import { ChartVisualization } from "@/components/ChartVisualization";
 
 export default function PracticeQuestions() {
   const { user, loading: authLoading } = useAuth();
@@ -222,7 +223,7 @@ export default function PracticeQuestions() {
           </CardHeader>
           <CardContent className="space-y-4">
             {/* 题目内容 */}
-            <LatexText text={currentQuestion.content} className="prose max-w-none dark:prose-invert" />
+            <ChartVisualization content={currentQuestion.content} />
 
             {/* 答题区域 */}
             <div className="space-y-2">

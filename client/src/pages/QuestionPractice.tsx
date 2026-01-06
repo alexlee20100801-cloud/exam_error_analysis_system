@@ -14,6 +14,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } f
 import { BookOpen, CheckCircle2, XCircle, TrendingUp, Filter } from "lucide-react";
 import { toast } from "sonner";
 import { LatexText } from "@/components/LatexPreview";
+import { ChartVisualization } from "@/components/ChartVisualization";
 
 const subjectNames: Record<string, string> = {
   chinese: "语文",
@@ -241,7 +242,9 @@ export function QuestionPractice() {
                   <div className="flex items-start justify-between gap-4">
                     <div className="flex-1">
                       <CardTitle className="text-lg">{question.title}</CardTitle>
-                      <CardDescription className="mt-2 line-clamp-2">{question.content}</CardDescription>
+                      <CardDescription className="mt-2 line-clamp-2">
+                    <ChartVisualization content={question.content} />
+                  </CardDescription>
                     </div>
                     <Button onClick={() => handleStartQuestion(question)} size="sm" className="shrink-0">
                       开始答题
@@ -284,7 +287,7 @@ export function QuestionPractice() {
               <div>
                 <h3 className="font-semibold mb-2">题目</h3>
                 <div className="bg-muted p-4 rounded-lg">
-                  <LatexText text={answeringQuestion?.content || ''} className="prose prose-sm max-w-none dark:prose-invert" />
+                  <ChartVisualization content={answeringQuestion?.content || ''} />
                 </div>
               </div>
 
