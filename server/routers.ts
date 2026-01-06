@@ -37,6 +37,8 @@ import { errorQuestionStatsRouter } from "./routers/errorQuestionStats";
 import { aiLearningAdviceRouter } from "./routers/aiLearningAdvice";
 import { reviewTasksRouter } from "./routers/reviewTasks";
 import { reminderSettingsRouter } from "./routers/reminderSettings";
+import { smtpConfigRouter } from "./routers/smtpConfig";
+import { emailVerificationRouter } from "./routers/emailVerification";
 
 export const appRouter = router({
   system: systemRouter,
@@ -62,6 +64,12 @@ export const appRouter = router({
   aiLearningAdvice: aiLearningAdviceRouter,
   reviewTasks: reviewTasksRouter,
   reminderSettings: reminderSettingsRouter,
+  
+  // SMTP配置管理（仅管理员）
+  smtpConfig: smtpConfigRouter,
+  
+  // 邮箱验证
+  emailVerification: emailVerificationRouter,
   
   // 收藏管理
   favorites: favoritesRouter,

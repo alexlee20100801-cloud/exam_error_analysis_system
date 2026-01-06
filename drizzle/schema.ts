@@ -787,3 +787,44 @@ export const reviewTaskReminders = mysqlTable("review_task_reminders", {
 });
 export type ReviewTaskReminder = typeof reviewTaskReminders.$inferSelect;
 export type InsertReviewTaskReminder = typeof reviewTaskReminders.$inferInsert;
+
+/**
+ * 系统设置表 - 存储全局配置（如SMTP配置）
+ */
+export const systemSettings = mysqlTable("system_settings", {
+  id: int("id").autoincrement().primaryKey(),
+  // 设置键（唯一标识）
+  settingKey: varchar("setting_key", { length: 100 }).notNull().unique(),
+  // 设置值（JSON格式，加密存储敏感信息）
+  settingValue: text("setting_value").notNull(),
+  // 设置描述
+  description: text("description"),
+  // 是否加密存储
+  isEncrypted: boolean("is_encrypted").notNull().default(false),
+  // 最后修改人
+  lastModifiedBy: int("last_modified_by"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().onUpdateNow().notNull(),
+});
+export type SystemSetting = typeof systemSettings.$inferSelect;
+export type InsertSystemSetting = typeof systemSettings.$inferInsert;
+
+/**
+ * 邮箱验证令牌表 - 存储邮箱验证链接的令牌
+ */
+export const emailVerificationTokens = mysqlTable("email_verification_tokens", {
+  id: int("id").autoincrement().primaryKey(),
+  userId: int("user_id").notNull(),
+  email: varchar("email", { length: 320 }).notNull(),
+  // 验证令牌（UUID）
+  token: varchar("token", { length: 64 }).notNull().unique(),
+  // 令牌状态
+  status: mysqlEnum("status", ["pending", "verified", "expired"]).notNull().default("pending"),
+  // 过期时间（默认24小时）
+  expiresAt: timestamp("expires_at").notNull(),
+  // 验证时间
+  verifiedAt: timestamp("verified_at"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+export type EmailVerificationToken = typeof emailVerificationTokens.$inferSelect;
+export type InsertEmailVerificationToken = typeof emailVerificationTokens.$inferInsert;

@@ -42,10 +42,16 @@ export function NotificationSettingsDialog({
     },
   });
 
-  const bindEmailMutation = trpc.reminderSettings.bindEmail.useMutation({
+  const bindEmailMutation = trpc.emailVerification.sendVerification.useMutation({
     onSuccess: () => {
       alert("验证邮件已发送，请检查你的邮箱！");
       setShowEmailInput(false);
+    },
+  });
+
+  const resendVerificationMutation = trpc.emailVerification.resendVerification.useMutation({
+    onSuccess: () => {
+      alert("验证邮件已重新发送！");
     },
   });
 
@@ -177,17 +183,29 @@ export function NotificationSettingsDialog({
               </p>
 
               {userEmail ? (
-                <div className="flex items-center gap-2">
-                  <span className="text-sm text-muted-foreground">{userEmail}</span>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={handleUnbindEmail}
-                    disabled={unbindEmailMutation.isPending}
-                  >
-                    <X className="h-3 w-3 mr-1" />
-                    解绑
-                  </Button>
+                <div className="space-y-2">
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm text-muted-foreground">{userEmail}</span>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={handleUnbindEmail}
+                      disabled={unbindEmailMutation.isPending}
+                    >
+                      <X className="h-3 w-3 mr-1" />
+                      解绑
+                    </Button>
+                  </div>
+                  {!emailVerified && (
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => resendVerificationMutation.mutate({ email: userEmail })}
+                      disabled={resendVerificationMutation.isPending}
+                    >
+                      {resendVerificationMutation.isPending ? "发送中..." : "重新发送验证邮件"}
+                    </Button>
+                  )}
                 </div>
               ) : showEmailInput ? (
                 <div className="flex items-center gap-2">

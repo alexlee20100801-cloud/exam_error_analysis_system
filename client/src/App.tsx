@@ -33,6 +33,8 @@ import PracticePool from "@/pages/PracticePool";
 import PracticeDetail from "@/pages/PracticeDetail";
 import MyFavorites from "@/pages/MyFavorites";
 import ReviewReminders from "@/pages/ReviewReminders";
+import AdminSMTPSettings from "@/pages/AdminSMTPSettings";
+import VerifyEmail from "@/pages/VerifyEmail";
 import { PWAInstallPrompt } from "@/components/PWAInstallPrompt";
 import { MobileBottomNav } from "@/components/MobileBottomNav";
 
@@ -68,6 +70,8 @@ function Router() {
       <Route path="/practice/:id" component={PracticeDetail} />
       <Route path="/favorites" component={MyFavorites} />
       <Route path="/reminders" component={ReviewReminders} />
+      <Route path="/admin/smtp-settings" component={AdminSMTPSettings} />
+      <Route path="/verify-email/:token" component={VerifyEmail} />
       <Route component={NotFound} />
     </Switch>
   );

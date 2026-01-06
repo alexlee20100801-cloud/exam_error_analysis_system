@@ -21,7 +21,7 @@ import {
 } from "@/components/ui/sidebar";
 import { getLoginUrl } from "@/const";
 import { useIsMobile } from "@/hooks/useMobile";
-import { LayoutDashboard, LogOut, PanelLeft, Users, BookOpen, GraduationCap, School, Trophy, Video, Calendar, BarChart3, Clock, UserCircle, FileText, Database, FileQuestion, Route, Settings, Timer, Target, Heart, Bell } from "lucide-react";
+import { LayoutDashboard, LogOut, PanelLeft, Users, BookOpen, GraduationCap, School, Trophy, Video, Calendar, BarChart3, Clock, UserCircle, FileText, Database, FileQuestion, Route, Settings, Timer, Target, Heart, Bell, Mail } from "lucide-react";
 import { trpc } from "@/lib/trpc";
 import { Badge } from "@/components/ui/badge";
 import { CSSProperties, useEffect, useRef, useState } from "react";
@@ -52,6 +52,7 @@ const menuItems = [
 const adminMenuItems = [
   { id: "question-bank", icon: Database, label: "题库管理", path: "/admin/question-bank" },
   { id: "task-management", icon: Timer, label: "定时任务", path: "/admin/tasks" },
+  { id: "smtp-settings", icon: Mail, label: "SMTP配置", path: "/admin/smtp-settings" },
 ];
 
 const settingsMenuItem = {

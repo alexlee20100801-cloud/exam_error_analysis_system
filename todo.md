@@ -239,3 +239,30 @@
 - [x] 编写单元测试验证微信通知
 - [x] 测试多渠道通知发送
 - [x] 验证绑定和解绑功能
+
+## SMTP邮件服务配置和邮箱验证功能
+
+### 数据库设计
+- [x] 创建system_settings表存储SMTP配置
+- [x] 创建email_verification_tokens表存储验证令牌
+- [x] 推送数据库schema变更
+
+### 后端服务
+- [x] 创建SMTP配置管理服务（smtpConfigService.ts）
+- [x] 创建邮箱验证服务（emailVerificationService.ts）
+- [x] 实现验证邮件发送功能
+- [x] 实现验证令牌生成和校验
+- [x] 创建SMTP配置API路由（仅管理员）
+- [x] 创建邮箱验证API路由
+
+### 前端界面
+- [x] 开发管理员SMTP配置页面（/admin/smtp-settings）
+- [x] 优化用户邮箱绑定流程（发送验证邮件）
+- [x] 创建邮箱验证页面（/verify-email/:token）
+- [x] 在侧边栏添加管理员SMTP设置入口
+
+### 测试和验证
+- [x] 编写单元测试验证SMTP配置管理
+- [x] 编写单元测试验证邮箱验证流程
+- [x] 测试验证邮件发送和验证链接
+- [x] 验证管理员配置界面功能
