@@ -72,6 +72,7 @@
     "nodemailer": "^7.0.12",
     "pdf-lib": "^1.17.1",
     "pdf-parse": "^2.4.5",
+    "pdfkit": "^0.17.2",
     "puppeteer": "^24.34.0",
     "react": "^19.2.1",
     "react-calendar": "^6.0.0",

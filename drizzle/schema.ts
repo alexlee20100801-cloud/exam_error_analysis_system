@@ -1076,3 +1076,131 @@ export const chartTypeTemplates = mysqlTable('chart_type_templates', {
 }));
 
 export type InsertChartTypeTemplate = typeof chartTypeTemplates.$inferInsert;
+
+// ========== AI网络收集名校试题相关表 ==========
+
+// 题目来源表（记录搜索到的试题信息）
+export const questionSources = mysqlTable('question_sources', {
+  id: int('id').primaryKey().autoincrement(),
+  sourceName: varchar('source_name', { length: 500 }).notNull(), // 来源名称
+  sourceSchool: varchar('source_school', { length: 255 }).notNull(), // 学校
+  sourceUrl: varchar('source_url', { length: 1000 }), // 来源URL（如果有）
+  examYear: int('exam_year'), // 考试年份
+  examSemester: mysqlEnum('exam_semester', ['first', 'second']), // 学期
+  examType: varchar('exam_type', { length: 100 }), // 考试类型
+  subject: mysqlEnum('subject', ['chinese', 'math', 'english', 'physics', 'chemistry', 'biology', 'politics', 'history', 'geography']).notNull(),
+  grade: mysqlEnum('grade', ['grade7', 'grade8', 'grade9', 'grade10', 'grade11', 'grade12']).notNull(),
+  topicSummary: text('topic_summary'), // 题目主题摘要
+  knowledgePoints: json('knowledge_points').$type<string[]>(), // 知识点列表
+  difficulty: mysqlEnum('difficulty', ['easy', 'medium', 'hard']).notNull(),
+  relevanceScore: decimal('relevance_score', { precision: 5, scale: 2 }), // 相关性评分
+  searchQuery: text('search_query'), // 搜索关键词
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+}, (table) => ({
+  schoolSubjectIdx: index('school_subject_idx').on(table.sourceSchool, table.subject),
+  gradeSubjectIdx: index('grade_subject_idx').on(table.grade, table.subject),
+}));
+
+export type InsertQuestionSource = typeof questionSources.$inferInsert;
+
+// AI生成题目表
+export const aiGeneratedQuestions = mysqlTable('ai_generated_questions', {
+  id: int('id').primaryKey().autoincrement(),
+  sourceId: int('source_id').notNull(), // 关联questionSources表
+  title: varchar('title', { length: 500 }).notNull(),
+  content: text('content').notNull(),
+  answer: text('answer').notNull(),
+  explanation: text('explanation'),
+  questionType: mysqlEnum('question_type', ['choice', 'blank', 'short_answer', 'calculation', 'essay']).notNull(),
+  subject: mysqlEnum('subject', ['chinese', 'math', 'english', 'physics', 'chemistry', 'biology', 'politics', 'history', 'geography']).notNull(),
+  grade: mysqlEnum('grade', ['grade7', 'grade8', 'grade9', 'grade10', 'grade11', 'grade12']).notNull(),
+  difficulty: mysqlEnum('difficulty', ['easy', 'medium', 'hard']).notNull(),
+  knowledgePointIds: json('knowledge_point_ids').$type<number[]>(), // 关联知识点ID
+  generationMethod: mysqlEnum('generation_method', ['ai_inspired', 'ai_similar', 'ai_original']).notNull(), // 生成方式
+  originalityScore: decimal('originality_score', { precision: 5, scale: 2 }), // 原创度评分
+  qualityScore: decimal('quality_score', { precision: 5, scale: 2 }), // 质量评分
+  reviewStatus: mysqlEnum('review_status', ['pending', 'approved', 'rejected', 'needs_revision']).default('pending').notNull(), // 审核状态
+  reviewedBy: int('reviewed_by'), // 审核人ID
+  reviewedAt: timestamp('reviewed_at'), // 审核时间
+  reviewNotes: text('review_notes'), // 审核意见
+  isPublic: boolean('is_public').default(false).notNull(), // 是否公开
+  usageCount: int('usage_count').default(0).notNull(), // 使用次数
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+  updatedAt: timestamp('updated_at').defaultNow().onUpdateNow().notNull(),
+}, (table) => ({
+  sourceIdIdx: index('source_id_idx').on(table.sourceId),
+  subjectGradeIdx: index('subject_grade_idx').on(table.subject, table.grade),
+  reviewStatusIdx: index('review_status_idx').on(table.reviewStatus),
+  isPublicIdx: index('is_public_idx').on(table.isPublic),
+}));
+
+export type InsertAiGeneratedQuestion = typeof aiGeneratedQuestions.$inferInsert;
+
+// 题目审核记录表
+export const questionReviewRecords = mysqlTable('question_review_records', {
+  id: int('id').primaryKey().autoincrement(),
+  questionId: int('question_id').notNull(), // 关联aiGeneratedQuestions表
+  reviewerId: int('reviewer_id').notNull(), // 审核人ID
+  action: mysqlEnum('action', ['approve', 'reject', 'request_revision']).notNull(),
+  previousStatus: mysqlEnum('previous_status', ['pending', 'approved', 'rejected', 'needs_revision']).notNull(),
+  newStatus: mysqlEnum('new_status', ['pending', 'approved', 'rejected', 'needs_revision']).notNull(),
+  notes: text('notes'), // 审核意见
+  modifiedFields: json('modified_fields').$type<{
+    field: string;
+    oldValue: string;
+    newValue: string;
+  }[]>(), // 修改的字段记录
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+}, (table) => ({
+  questionIdIdx: index('question_id_idx').on(table.questionId),
+  reviewerIdIdx: index('reviewer_id_idx').on(table.reviewerId),
+}));
+
+export type InsertQuestionReviewRecord = typeof questionReviewRecords.$inferInsert;
+
+// 收集任务表
+export const collectionTasks = mysqlTable('collection_tasks', {
+  id: int('id').primaryKey().autoincrement(),
+  userId: int('user_id').notNull(), // 发起人ID
+  schools: json('schools').$type<string[]>().notNull(), // 学校列表
+  subject: mysqlEnum('subject', ['chinese', 'math', 'english', 'physics', 'chemistry', 'biology', 'politics', 'history', 'geography']).notNull(),
+  grade: mysqlEnum('grade', ['grade7', 'grade8', 'grade9', 'grade10', 'grade11', 'grade12']).notNull(),
+  examType: varchar('exam_type', { length: 100 }),
+  year: int('year'),
+  semester: mysqlEnum('semester', ['first', 'second']),
+  targetCount: int('target_count').notNull(), // 目标题目数量
+  status: mysqlEnum('status', ['pending', 'in_progress', 'completed', 'failed']).default('pending').notNull(),
+  progress: int('progress').default(0).notNull(), // 进度（已生成题目数）
+  generatedQuestionIds: json('generated_question_ids').$type<number[]>(), // 生成的题目ID列表
+  errorMessage: text('error_message'), // 错误信息
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+  completedAt: timestamp('completed_at'),
+}, (table) => ({
+  userIdIdx: index('user_id_idx').on(table.userId),
+  statusIdx: index('status_idx').on(table.status),
+}));
+
+export type InsertCollectionTask = typeof collectionTasks.$inferInsert;
+
+// 题目推荐记录表
+export const questionRecommendations = mysqlTable('question_recommendations', {
+  id: int('id').primaryKey().autoincrement(),
+  userId: int('user_id').notNull(),
+  questionId: int('question_id').notNull(), // 关联aiGeneratedQuestions表
+  recommendationReason: text('recommendation_reason'), // 推荐理由
+  matchScore: decimal('match_score', { precision: 5, scale: 2 }).notNull(), // 匹配度评分
+  basedOnErrorQuestionIds: json('based_on_error_question_ids').$type<number[]>(), // 基于的错题ID
+  weakKnowledgePoints: json('weak_knowledge_points').$type<string[]>(), // 薄弱知识点
+  isClicked: boolean('is_clicked').default(false).notNull(), // 是否点击查看
+  isPracticed: boolean('is_practiced').default(false).notNull(), // 是否已练习
+  practiceResult: mysqlEnum('practice_result', ['correct', 'incorrect', 'skipped']), // 练习结果
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+  clickedAt: timestamp('clicked_at'),
+  practicedAt: timestamp('practiced_at'),
+}, (table) => ({
+  userIdIdx: index('user_id_idx').on(table.userId),
+  questionIdIdx: index('question_id_idx').on(table.questionId),
+  userQuestionIdx: uniqueIndex('user_question_idx').on(table.userId, table.questionId),
+}));
+
+export type InsertQuestionRecommendation = typeof questionRecommendations.$inferInsert;

@@ -50,6 +50,9 @@ import { collaborativeLearningRouter } from "./routers/collaborativeLearning";
 import { aiAnnotationFeedbackRouter } from "./routers/aiAnnotationFeedback";
 import { pointsRouter } from "./routers/points";
 import { aiQuestionCollectionRouter } from "./routers/aiQuestionCollection";
+import { questionReviewRouter } from "./routers/questionReview";
+import { questionRecommendationRouter } from "./routers/questionRecommendation";
+import { questionExportRouter } from "./routers/questionExport";
 
 export const appRouter = router({
   system: systemRouter,
@@ -182,8 +185,17 @@ export const appRouter = router({
   // 专项练习池
   practicePools: practicePoolsRouter,
   
-  // AI题目收集
+  // AI收集题目
   aiQuestionCollection: aiQuestionCollectionRouter,
+  
+  // 题目审核
+  questionReview: questionReviewRouter,
+  
+  // 题目推荐
+  questionRecommendation: questionRecommendationRouter,
+  
+  // 题目导出
+  questionExport: questionExportRouter,
 });
 
 export type AppRouter = typeof appRouter;

@@ -1,0 +1,9 @@
+{
+  "query": "CREATE TABLE IF NOT EXISTS `question_recommendations` (\n  `id` INT PRIMARY KEY AUTO_INCREMENT,\n  `user_id` INT NOT NULL,\n  `question_id` INT NOT NULL,\n  `recommendation_reason` TEXT,\n  `match_score` DECIMAL(5, 2) NOT NULL,\n  `based_on_error_question_ids` JSON,\n  `weak_knowledge_points` JSON,\n  `is_clicked` BOOLEAN NOT NULL DEFAULT FALSE,\n  `is_practiced` BOOLEAN NOT NULL DEFAULT FALSE,\n  `practice_result` ENUM('correct', 'incorrect', 'skipped'),\n  `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,\n  `clicked_at` TIMESTAMP NULL,\n  `practiced_at` TIMESTAMP NULL,\n  INDEX `user_id_idx` (`user_id`),\n  INDEX `question_id_idx` (`question_id`),\n  UNIQUE INDEX `user_question_idx` (`user_id`, `question_id`)\n)",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway03.us-east-1.prod.aws.tidbcloud.com --port 4000 --user Lfr9xqjx7LpxUD9.1efa314e7813 --database Yh4Z4ZSitSFdPWYxtKkkQS --execute CREATE TABLE IF NOT EXISTS `question_recommendations` (\n  `id` INT PRIMARY KEY AUTO_INCREMENT,\n  `user_id` INT NOT NULL,\n  `question_id` INT NOT NULL,\n  `recommendation_reason` TEXT,\n  `match_score` DECIMAL(5, 2) NOT NULL,\n  `based_on_error_question_ids` JSON,\n  `weak_knowledge_points` JSON,\n  `is_clicked` BOOLEAN NOT NULL DEFAULT FALSE,\n  `is_practiced` BOOLEAN NOT NULL DEFAULT FALSE,\n  `practice_result` ENUM('correct', 'incorrect', 'skipped'),\n  `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,\n  `clicked_at` TIMESTAMP NULL,\n  `practiced_at` TIMESTAMP NULL,\n  INDEX `user_id_idx` (`user_id`),\n  INDEX `question_id_idx` (`question_id`),\n  UNIQUE INDEX `user_question_idx` (`user_id`, `question_id`)\n)",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 1634
+}

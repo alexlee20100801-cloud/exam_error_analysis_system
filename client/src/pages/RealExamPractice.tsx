@@ -20,6 +20,7 @@ import { BookOpen, Heart, Clock, CheckCircle2, XCircle, School, Calendar, Sparkl
 import { LatexText } from "@/components/LatexPreview";
 import { ChartVisualization } from "@/components/ChartVisualization";
 import { AIQuestionCollectionDialog } from "@/components/AIQuestionCollectionDialog";
+import { RecommendedQuestions } from "@/components/RecommendedQuestions";
 
 // 常量定义
 const SUBJECTS = {
@@ -164,6 +165,9 @@ export default function RealExamPractice() {
           AI收集名校试题
         </Button>
       </div>
+
+      {/* AI生成题目智能推荐 */}
+      <RecommendedQuestions subject={filters.subject !== "all" ? filters.subject : undefined} />
 
       {/* 智能推荐面板 */}
       {recommendedQuestions && recommendedQuestions.length > 0 && (

@@ -39,6 +39,7 @@ import BatchOperationsPage from "@/pages/BatchOperationsPage";
 import AnnotationCommunity from "@/pages/AnnotationCommunity";
 import AnnotationDetail from "@/pages/AnnotationDetail";
 import { AIAnnotationFeedbackStats } from "@/pages/AIAnnotationFeedbackStats";
+import QuestionReview from "@/pages/admin/QuestionReview";
 import { PWAInstallPrompt } from "@/components/PWAInstallPrompt";
 import { MobileBottomNav } from "@/components/MobileBottomNav";
 
@@ -80,6 +81,7 @@ function Router() {
       <Route path="/community/annotations" component={AnnotationCommunity} />
       <Route path="/annotation/:id" component={AnnotationDetail} />
       <Route path="/admin/annotation-feedback" component={AIAnnotationFeedbackStats} />
+      <Route path="/admin/question-review" component={QuestionReview} />
       <Route component={NotFound} />
     </Switch>
   );
