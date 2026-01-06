@@ -1,0 +1,9 @@
+{
+  "query": "CREATE TABLE IF NOT EXISTS question_reviews (\n  id INT AUTO_INCREMENT PRIMARY KEY,\n  questionId INT NOT NULL,\n  reviewerId INT NOT NULL,\n  reviewerName VARCHAR(200),\n  status ENUM('approved', 'rejected', 'needs_revision') NOT NULL,\n  accuracyScore INT,\n  difficultyScore INT,\n  clarityScore INT,\n  discriminationScore INT,\n  overallScore FLOAT,\n  notes TEXT,\n  suggestions TEXT,\n  createdAt TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP\n);",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway03.us-east-1.prod.aws.tidbcloud.com --port 4000 --user Lfr9xqjx7LpxUD9.1efa314e7813 --database Yh4Z4ZSitSFdPWYxtKkkQS --execute CREATE TABLE IF NOT EXISTS question_reviews (\n  id INT AUTO_INCREMENT PRIMARY KEY,\n  questionId INT NOT NULL,\n  reviewerId INT NOT NULL,\n  reviewerName VARCHAR(200),\n  status ENUM('approved', 'rejected', 'needs_revision') NOT NULL,\n  accuracyScore INT,\n  difficultyScore INT,\n  clarityScore INT,\n  discriminationScore INT,\n  overallScore FLOAT,\n  notes TEXT,\n  suggestions TEXT,\n  createdAt TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP\n);",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 1778
+}

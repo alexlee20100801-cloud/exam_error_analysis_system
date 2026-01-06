@@ -124,12 +124,42 @@ export const questionBank = mysqlTable("question_bank", {
   // 质量评分
   qualityScore: float("qualityScore").default(0), // 题目质量评分
   usageCount: int("usageCount").default(0), // 使用次数
+  // 审核状态
+  reviewStatus: mysqlEnum("reviewStatus", ["pending", "approved", "rejected", "needs_revision"]).default("pending"), // 审核状态
+  reviewedBy: int("reviewedBy"), // 审核人ID
+  reviewedAt: timestamp("reviewedAt"), // 审核时间
+  reviewNotes: text("reviewNotes"), // 审核意见
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
 });
 
 export type QuestionBank = typeof questionBank.$inferSelect;
 export type InsertQuestionBank = typeof questionBank.$inferInsert;
+
+/**
+ * 题目审核记录表 - 记录题目审核历史
+ */
+export const questionReviews = mysqlTable("question_reviews", {
+  id: int("id").autoincrement().primaryKey(),
+  questionId: int("questionId").notNull(), // 题目ID
+  reviewerId: int("reviewerId").notNull(), // 审核人ID
+  reviewerName: varchar("reviewerName", { length: 200 }), // 审核人姓名
+  // 审核结果
+  status: mysqlEnum("status", ["approved", "rejected", "needs_revision"]).notNull(),
+  // 质量评分（多维度）
+  accuracyScore: int("accuracyScore"), // 准确性评分 1-5
+  difficultyScore: int("difficultyScore"), // 难度适当性 1-5
+  clarityScore: int("clarityScore"), // 表述清晰度 1-5
+  discriminationScore: int("discriminationScore"), // 区分度 1-5
+  overallScore: float("overallScore"), // 综合评分 1-5
+  // 审核意见
+  notes: text("notes"), // 审核意见
+  suggestions: text("suggestions"), // 修改建议
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export type QuestionReview = typeof questionReviews.$inferSelect;
+export type InsertQuestionReview = typeof questionReviews.$inferInsert;
 
 /**
  * 练习记录表 - 用户练习历史和正确率

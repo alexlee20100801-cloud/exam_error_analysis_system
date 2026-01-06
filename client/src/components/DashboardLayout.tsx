@@ -21,7 +21,7 @@ import {
 } from "@/components/ui/sidebar";
 import { getLoginUrl } from "@/const";
 import { useIsMobile } from "@/hooks/useMobile";
-import { LayoutDashboard, LogOut, PanelLeft, Users, BookOpen, GraduationCap, School, Trophy, Video, Calendar, BarChart3, Clock, UserCircle, FileText, Database, FileQuestion, Route, Settings, Timer, Target, Heart, Bell, Mail, ShoppingCart, Package, CreditCard, Send, Sparkles } from "lucide-react";
+import { LayoutDashboard, LogOut, PanelLeft, Users, BookOpen, GraduationCap, School, Trophy, Video, Calendar, BarChart3, Clock, UserCircle, FileText, Database, FileQuestion, Route, Settings, Timer, Target, Heart, Bell, Mail, ShoppingCart, Package, CreditCard, Send, Sparkles, ClipboardCheck } from "lucide-react";
 import { trpc } from "@/lib/trpc";
 import { Badge } from "@/components/ui/badge";
 import { CSSProperties, useEffect, useRef, useState } from "react";
@@ -52,6 +52,7 @@ const menuItems = [
 const adminMenuItems = [
   { id: "question-bank", icon: Database, label: "题库管理", path: "/admin/question-bank" },
   { id: "bulk-generation", icon: Sparkles, label: "AI题库生成", path: "/admin/bulk-generation" },
+  { id: "question-review", icon: ClipboardCheck, label: "题目审核", path: "/admin/question-review" },
   { id: "smart-paper", icon: FileText, label: "AI智能组卷", path: "/admin/smart-paper" },
   { id: "task-management", icon: Timer, label: "定时任务", path: "/admin/tasks" },
   { id: "push-configs", icon: Send, label: "推送配置", path: "/admin/push-configs" },

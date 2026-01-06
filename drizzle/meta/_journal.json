@@ -232,6 +232,13 @@
       "when": 1767699533790,
       "tag": "0032_loud_charles_xavier",
       "breakpoints": true
+    },
+    {
+      "idx": 33,
+      "version": "5",
+      "when": 1767706169458,
+      "tag": "0033_great_sunfire",
+      "breakpoints": true
     }
   ]
 }
