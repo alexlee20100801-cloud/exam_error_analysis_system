@@ -15,13 +15,15 @@ import {
   CheckCircle2,
   AlertTriangle,
   Calendar,
-  Sparkles
+  Sparkles,
+  Settings
 } from "lucide-react";
 import { useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import { LearningReportExportDialog } from "@/components/LearningReportExportDialog";
 import { Download } from "lucide-react";
 import { useState } from "react";
+import { NotificationSettingsDialog } from "@/components/NotificationSettingsDialog";
 import { ALL_SUBJECTS, SUBJECTS, getSubjectName } from "@shared/subjects";
 import { BarChart, Bar, XAxis as RechartsXAxis, YAxis as RechartsYAxis, CartesianGrid as RechartsCartesianGrid, Tooltip as RechartsTooltip, Legend as RechartsLegend, ResponsiveContainer as RechartsResponsiveContainer } from "recharts";
 import {
@@ -69,6 +71,7 @@ export default function LearningReport() {
   const { user, loading: authLoading } = useAuth();
   const [exportDialogOpen, setExportDialogOpen] = useState(false);
   const [exportingCalendar, setExportingCalendar] = useState(false);
+  const [showNotificationSettings, setShowNotificationSettings] = useState(false);
 
   // 获取学习总览数据
   const { data: overview, isLoading: overviewLoading } = trpc.learningStats.getOverview.useQuery(
@@ -270,29 +273,41 @@ export default function LearningReport() {
                       {exportingCalendar ? "导出中..." : "导出到日历"}
                     </Button>
                     
-                    <div className="flex items-center gap-2 text-sm">
-                      <input
-                        type="checkbox"
-                        id="reminder-enabled"
-                        checked={reminderSettings?.data?.enabled ?? true}
-                        onChange={async (e) => {
-                          const enabled = e.target.checked;
-                          try {
-                            await updateReminderSettingsMutation.mutateAsync({
-                              enabled,
-                              reminderMinutes: reminderSettings?.data?.reminderMinutes ?? [1440, 180, 60],
-                            });
-                            alert(enabled ? "已开启提醒！系统将在复习任务到期前自动发送提醒" : "已关闭提醒");
-                          } catch (error) {
-                            console.error("更新提醒设置失败:", error);
-                            alert("设置失败，请稍后重试");
-                          }
-                        }}
-                        className="h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary cursor-pointer"
-                      />
-                      <label htmlFor="reminder-enabled" className="cursor-pointer text-muted-foreground hover:text-foreground transition-colors">
-                        开启任务提醒
-                      </label>
+                    <div className="flex items-center gap-3">
+                      <div className="flex items-center gap-2 text-sm">
+                        <input
+                          type="checkbox"
+                          id="reminder-enabled"
+                          checked={reminderSettings?.data?.enabled ?? true}
+                          onChange={async (e) => {
+                            const enabled = e.target.checked;
+                            try {
+                              await updateReminderSettingsMutation.mutateAsync({
+                                enabled,
+                                reminderMinutes: reminderSettings?.data?.reminderMinutes ?? [1440, 180, 60],
+                              });
+                              alert(enabled ? "已开启提醒！系统将在复习任务到期前自动发送提醒" : "已关闭提醒");
+                            } catch (error) {
+                              console.error("更新提醒设置失败:", error);
+                              alert("设置失败，请稍后重试");
+                            }
+                          }}
+                          className="h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary cursor-pointer"
+                        />
+                        <label htmlFor="reminder-enabled" className="cursor-pointer text-muted-foreground hover:text-foreground transition-colors">
+                          开启任务提醒
+                        </label>
+                      </div>
+                      
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => setShowNotificationSettings(true)}
+                        className="h-8 px-2"
+                      >
+                        <Settings className="h-4 w-4 mr-1" />
+                        通知设置
+                      </Button>
                     </div>
                   </div>
                 )}
@@ -808,6 +823,20 @@ export default function LearningReport() {
           </CardContent>
         </Card>
       </div>
+
+      {/* 通知设置对话框 */}
+      <NotificationSettingsDialog
+        open={showNotificationSettings}
+        onOpenChange={setShowNotificationSettings}
+        currentSettings={{
+          enabled: reminderSettings?.data?.enabled ?? true,
+          reminderMinutes: reminderSettings?.data?.reminderMinutes ?? [1440, 180, 60],
+          notificationChannels: reminderSettings?.data?.notificationChannels ?? ["system"],
+        }}
+        userEmail={user?.email ?? null}
+        emailVerified={user?.emailVerified ?? false}
+        wechatBound={!!user?.wechatOpenId}
+      />
     </DashboardLayout>
   );
 }

@@ -5,6 +5,11 @@ import {
   updateUserReminderSettings,
   getUserReminderHistory,
 } from "../services/reviewTaskReminderService";
+import { getDb } from "../db";
+import { users, userReminderSettings } from "../../drizzle/schema";
+import { eq } from "drizzle-orm";
+import { sendEmailVerification } from "../services/emailNotificationService";
+import { unbindWechatAccount, generateWechatBindQRCode } from "../services/wechatNotificationService";
 
 export const reminderSettingsRouter = router({
   /**
@@ -26,18 +31,141 @@ export const reminderSettingsRouter = router({
       z.object({
         enabled: z.boolean(),
         reminderMinutes: z.array(z.number()).min(1).max(10),
+        notificationChannels: z.array(z.enum(["system", "email", "wechat"])).optional(),
       })
     )
     .mutation(async ({ ctx, input }: any) => {
-      await updateUserReminderSettings(
-        ctx.user.id,
-        input.enabled,
-        input.reminderMinutes
-      );
+      const db = await getDb();
+      if (!db) throw new Error("数据库不可用");
+
+      // 如果指定了通知渠道，需要更新userReminderSettings
+      if (input.notificationChannels) {
+        const [existing] = await db
+          .select()
+          .from(userReminderSettings)
+          .where(eq(userReminderSettings.userId, ctx.user.id))
+          .limit(1);
+
+        if (existing) {
+          await db
+            .update(userReminderSettings)
+            .set({
+              enabled: input.enabled,
+              reminderMinutes: input.reminderMinutes as any,
+              notificationChannels: input.notificationChannels as any,
+              updatedAt: new Date(),
+            })
+            .where(eq(userReminderSettings.userId, ctx.user.id));
+        } else {
+          await db.insert(userReminderSettings).values({
+            userId: ctx.user.id,
+            enabled: input.enabled,
+            reminderMinutes: input.reminderMinutes as any,
+            notificationChannels: input.notificationChannels as any,
+          });
+        }
+      } else {
+        // 如果没有指定通知渠道，使用原有的更新逻辑
+        await updateUserReminderSettings(
+          ctx.user.id,
+          input.enabled,
+          input.reminderMinutes
+        );
+      }
 
       return {
         success: true,
         message: "提醒设置已更新",
+      };
+    }),
+
+  /**
+   * 绑定邮箱
+   */
+  bindEmail: protectedProcedure
+    .input(
+      z.object({
+        email: z.string().email(),
+      })
+    )
+    .mutation(async ({ ctx, input }: any) => {
+      const db = await getDb();
+      if (!db) throw new Error("数据库不可用");
+
+      // 更新用户邮箱
+      await db
+        .update(users)
+        .set({
+          email: input.email,
+          emailVerified: false, // 需要验证
+          updatedAt: new Date(),
+        })
+        .where(eq(users.id, ctx.user.id));
+
+      // 发送验证邮件
+      const verificationToken = `${ctx.user.id}-${Date.now()}-${Math.random().toString(36).substring(7)}`;
+      // TODO: 将token存储到数据库或Redis，设置24小时过期
+      await sendEmailVerification(input.email, verificationToken);
+
+      return {
+        success: true,
+        message: "验证邮件已发送，请检查你的邮箱",
+      };
+    }),
+
+  /**
+   * 解绑邮箱
+   */
+  unbindEmail: protectedProcedure
+    .mutation(async ({ ctx }: any) => {
+      const db = await getDb();
+      if (!db) throw new Error("数据库不可用");
+
+      await db
+        .update(users)
+        .set({
+          email: null,
+          emailVerified: false,
+          updatedAt: new Date(),
+        })
+        .where(eq(users.id, ctx.user.id));
+
+      return {
+        success: true,
+        message: "邮箱已解绑",
+      };
+    }),
+
+  /**
+   * 生成微信绑定二维码
+   */
+  generateWechatQRCode: protectedProcedure
+    .query(async ({ ctx }: any) => {
+      const qrCode = await generateWechatBindQRCode(ctx.user.id);
+
+      if (!qrCode) {
+        return {
+          success: false,
+          message: "微信功能未配置",
+        };
+      }
+
+      return {
+        success: true,
+        data: qrCode,
+      };
+    }),
+
+  /**
+   * 解绑微信
+   */
+  unbindWechat: protectedProcedure
+    .mutation(async ({ ctx }: any) => {
+      const success = await unbindWechatAccount(ctx.user.id);
+
+      return {
+        success,
+        message: success ? "微信已解绑" : "解绑失败",
       };
     }),
 

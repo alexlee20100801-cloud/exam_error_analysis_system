@@ -8,6 +8,9 @@ export const users = mysqlTable("users", {
   openId: varchar("openId", { length: 64 }).notNull().unique(),
   name: text("name"),
   email: varchar("email", { length: 320 }),
+  emailVerified: boolean("email_verified").default(false), // 邮箱是否验证
+  wechatOpenId: varchar("wechat_open_id", { length: 128 }), // 微信OpenID
+  wechatNickname: varchar("wechat_nickname", { length: 200 }), // 微信昵称
   loginMethod: varchar("loginMethod", { length: 64 }),
   role: mysqlEnum("role", ["user", "admin"]).default("user").notNull(),
   userType: mysqlEnum("userType", ["student", "parent"]).default("student").notNull(),
@@ -755,6 +758,9 @@ export const userReminderSettings = mysqlTable("user_reminder_settings", {
   // 提醒时间点（JSON数组，单位：分钟）
   // 例如：[1440, 180, 60] 表示提前1天3小时1小时
   reminderMinutes: json("reminder_minutes").$type<number[]>().notNull(),
+  // 通知渠道偏好（JSON数组）
+  // 可选值："system", "email", "wechat"
+  notificationChannels: json("notification_channels").$type<string[]>().notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().onUpdateNow().notNull(),
 });

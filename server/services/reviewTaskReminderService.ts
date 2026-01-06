@@ -1,7 +1,9 @@
 import { getDb } from "../db";
-import { userReminderSettings, reviewTaskReminders, reviewTasks } from "../../drizzle/schema";
+import { userReminderSettings, reviewTaskReminders, reviewTasks, users } from "../../drizzle/schema";
 import { eq, and, lt, lte } from "drizzle-orm";
 import { notifyOwner } from "../_core/notification";
+import { sendReviewTaskReminderEmail } from "./emailNotificationService";
+import { sendReviewTaskReminderWechat } from "./wechatNotificationService";
 
 /**
  * 默认提醒时间（分钟）
@@ -36,12 +38,14 @@ export async function getUserReminderSettings(userId: number) {
     return {
       enabled: true,
       reminderMinutes: DEFAULT_REMINDER_MINUTES,
+      notificationChannels: ["system"], // 默认只使用系统通知
     };
   }
 
   return {
     enabled: settings.enabled,
     reminderMinutes: settings.reminderMinutes as number[],
+    notificationChannels: settings.notificationChannels as string[],
   };
 }
 
@@ -70,6 +74,8 @@ export async function updateUserReminderSettings(
       .set({
         enabled,
         reminderMinutes: reminderMinutes as any,
+        // 保持原有的notificationChannels，如果没有则设置为默认值
+        notificationChannels: (existing.notificationChannels as string[]) || ["system"],
         updatedAt: new Date(),
       })
       .where(eq(userReminderSettings.userId, userId));
@@ -79,6 +85,7 @@ export async function updateUserReminderSettings(
       userId,
       enabled,
       reminderMinutes: reminderMinutes as any,
+      notificationChannels: ["system"], // 默认只使用系统通知
     });
   }
 
@@ -166,14 +173,70 @@ export async function checkAndSendReminders() {
 
   for (const reminder of pendingReminders) {
     try {
-      // 发送通知给用户（项目所有者）
-      const success = await notifyOwner({
-        title: "复习任务提醒",
-        content: reminder.message,
-      });
+      // 获取用户的通知渠道偏好
+      const settings = await getUserReminderSettings(reminder.userId);
+      const channels = settings.notificationChannels || ["system"];
 
-      if (success) {
-        // 标记为已发送
+      // 获取任务详情
+      const [task] = await db
+        .select()
+        .from(reviewTasks)
+        .where(eq(reviewTasks.id, reminder.taskId))
+        .limit(1);
+
+      if (!task) {
+        console.error(`任务不存在 (ID: ${reminder.taskId})`);
+        continue;
+      }
+
+      const taskInfo = {
+        subject: task.subject,
+        knowledgePoint: task.knowledgePoint || undefined,
+        reason: task.reason,
+        suggestedTime: task.suggestedTime,
+      };
+
+      let anySuccess = false;
+
+      // 根据用户偏好发送多渠道通知
+      for (const channel of channels) {
+        try {
+          let success = false;
+
+          switch (channel) {
+            case "system":
+              // 系统通知（发送给项目所有者）
+              success = await notifyOwner({
+                title: "复习任务提醒",
+                content: reminder.message,
+              });
+              break;
+
+            case "email":
+              // 邮件通知
+              success = await sendReviewTaskReminderEmail(reminder.userId, taskInfo);
+              break;
+
+            case "wechat":
+              // 微信通知
+              success = await sendReviewTaskReminderWechat(reminder.userId, taskInfo);
+              break;
+
+            default:
+              console.warn(`未知的通知渠道: ${channel}`);
+          }
+
+          if (success) {
+            anySuccess = true;
+            console.log(`[ReminderService] Sent via ${channel} for reminder ${reminder.id}`);
+          }
+        } catch (error) {
+          console.error(`[ReminderService] Failed to send via ${channel}:`, error);
+        }
+      }
+
+      // 只要有一个渠道发送成功，就标记为已发送
+      if (anySuccess) {
         await db
           .update(reviewTaskReminders)
           .set({
