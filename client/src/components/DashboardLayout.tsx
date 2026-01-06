@@ -21,7 +21,7 @@ import {
 } from "@/components/ui/sidebar";
 import { getLoginUrl } from "@/const";
 import { useIsMobile } from "@/hooks/useMobile";
-import { LayoutDashboard, LogOut, PanelLeft, Users, BookOpen, GraduationCap, School, Trophy, Video, Calendar, BarChart3, Clock, UserCircle, FileText, Database, FileQuestion, Route, Settings, Timer, Target, Heart, Bell, Mail, ShoppingCart, Package } from "lucide-react";
+import { LayoutDashboard, LogOut, PanelLeft, Users, BookOpen, GraduationCap, School, Trophy, Video, Calendar, BarChart3, Clock, UserCircle, FileText, Database, FileQuestion, Route, Settings, Timer, Target, Heart, Bell, Mail, ShoppingCart, Package, CreditCard } from "lucide-react";
 import { trpc } from "@/lib/trpc";
 import { Badge } from "@/components/ui/badge";
 import { CSSProperties, useEffect, useRef, useState } from "react";
@@ -56,6 +56,7 @@ const adminMenuItems = [
   { id: "email-templates", icon: FileText, label: "邮件模板", path: "/admin/email-templates" },
   { id: "orders", icon: ShoppingCart, label: "订单管理", path: "/admin/orders" },
   { id: "subscription-plans", icon: Package, label: "套餐管理", path: "/admin/subscription-plans" },
+  { id: "payment-config", icon: CreditCard, label: "支付配置", path: "/admin/payment-config" },
 ];
 
 const settingsMenuItem = {

@@ -993,3 +993,29 @@ export const accountCredentials = mysqlTable("account_credentials", {
 });
 export type AccountCredential = typeof accountCredentials.$inferSelect;
 export type InsertAccountCredential = typeof accountCredentials.$inferInsert;
+
+/**
+ * 支付回调日志表 - 记录所有支付回调请求
+ */
+export const paymentCallbackLogs = mysqlTable("payment_callback_logs", {
+  id: int("id").autoincrement().primaryKey(),
+  // 订单号
+  orderNo: varchar("order_no", { length: 64 }).notNull(),
+  // 支付方式
+  paymentMethod: mysqlEnum("payment_method", ["stripe", "wechat", "alipay"]).notNull(),
+  // 第三方订单号
+  thirdPartyOrderNo: varchar("third_party_order_no", { length: 255 }),
+  // 回调原始数据
+  rawData: text("raw_data").notNull(),
+  // 签名验证结果
+  signatureValid: boolean("signature_valid"),
+  // 处理状态
+  processStatus: mysqlEnum("process_status", ["pending", "success", "failed"]).notNull().default("pending"),
+  // 处理结果消息
+  processMessage: text("process_message"),
+  // IP地址
+  ipAddress: varchar("ip_address", { length: 45 }),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+export type PaymentCallbackLog = typeof paymentCallbackLogs.$inferSelect;
+export type InsertPaymentCallbackLog = typeof paymentCallbackLogs.$inferInsert;

@@ -1,0 +1,9 @@
+{
+  "query": "CREATE TABLE IF NOT EXISTS `payment_callback_logs` (\n  `id` int AUTO_INCREMENT PRIMARY KEY,\n  `order_no` varchar(64) NOT NULL,\n  `payment_method` enum('stripe', 'wechat', 'alipay') NOT NULL,\n  `third_party_order_no` varchar(255),\n  `raw_data` text NOT NULL,\n  `signature_valid` boolean,\n  `process_status` enum('pending', 'success', 'failed') NOT NULL DEFAULT 'pending',\n  `process_message` text,\n  `ip_address` varchar(45),\n  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP\n)",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway03.us-east-1.prod.aws.tidbcloud.com --port 4000 --user Lfr9xqjx7LpxUD9.1efa314e7813 --database Yh4Z4ZSitSFdPWYxtKkkQS --execute CREATE TABLE IF NOT EXISTS `payment_callback_logs` (\n  `id` int AUTO_INCREMENT PRIMARY KEY,\n  `order_no` varchar(64) NOT NULL,\n  `payment_method` enum('stripe', 'wechat', 'alipay') NOT NULL,\n  `third_party_order_no` varchar(255),\n  `raw_data` text NOT NULL,\n  `signature_valid` boolean,\n  `process_status` enum('pending', 'success', 'failed') NOT NULL DEFAULT 'pending',\n  `process_message` text,\n  `ip_address` varchar(45),\n  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP\n)",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 1705
+}

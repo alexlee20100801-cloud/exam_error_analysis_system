@@ -40,6 +40,7 @@ import { SubscriptionPlans } from "@/pages/SubscriptionPlans";
 import { Payment } from "@/pages/Payment";
 import { AdminOrders } from "@/pages/AdminOrders";
 import { AdminSubscriptionPlans } from "@/pages/AdminSubscriptionPlans";
+import AdminPaymentConfig from "@/pages/AdminPaymentConfig";
 import { PWAInstallPrompt } from "@/components/PWAInstallPrompt";
 import { MobileBottomNav } from "@/components/MobileBottomNav";
 
@@ -81,8 +82,8 @@ function Router() {
       <Route path="/subscription-plans" component={SubscriptionPlans} />
       <Route path="/payment/:orderNo" component={Payment} />
       <Route path="/admin/orders" component={AdminOrders} />
-      <Route path="/admin/subscription-plans" component={AdminSubscriptionPlans} />
-      <Route component={NotFound} />
+      <Route path={"/admin/subscription-plans"} component={AdminSubscriptionPlans} />
+      <Route path={"/admin/payment-config"} component={AdminPaymentConfig} />     <Route component={NotFound} />
     </Switch>
   );
 }

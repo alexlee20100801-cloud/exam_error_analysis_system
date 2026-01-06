@@ -15,6 +15,8 @@ import {
   createUserSubscription,
 } from "../services/accountProvisioningService";
 import { getPlanById } from "../services/subscriptionPlanService";
+import { createWechatNativePayment, queryWechatPayment } from "../services/wechatPayService";
+import { createAlipayQrCode, queryAlipayOrder } from "../services/alipayService";
 
 export const paymentRouter = router({
   /**
@@ -194,5 +196,141 @@ export const paymentRouter = router({
 
       const orders = await getAllOrders(input);
       return orders;
+    }),
+
+  /**
+   * 创建支付二维码
+   */
+  createPaymentQrCode: publicProcedure
+    .input(
+      z.object({
+        orderNo: z.string(),
+        paymentMethod: z.enum(["wechat", "alipay"]),
+      })
+    )
+    .mutation(async ({ input }) => {
+      const order = await getOrderByOrderNo(input.orderNo);
+
+      if (!order) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "订单不存在",
+        });
+      }
+
+      if (order.order.status !== "pending") {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "订单状态不正确",
+        });
+      }
+
+      const notifyUrl = `${process.env.VITE_FRONTEND_FORGE_API_URL || "https://api.manus.im"}/payment/callback/${input.paymentMethod}`;
+
+      try {
+        if (input.paymentMethod === "wechat") {
+          const result = await createWechatNativePayment({
+            orderNo: order.order.orderNo,
+            amount: order.order.amount,
+            description: order.plan?.name || "套餐购买",
+            notifyUrl,
+          });
+
+          return {
+            qrCode: result?.codeUrl || "",
+            paymentMethod: "wechat",
+          };
+        } else if (input.paymentMethod === "alipay") {
+          const result = await createAlipayQrCode({
+            orderNo: order.order.orderNo,
+            amount: order.order.amount,
+            subject: order.plan?.name || "套餐购买",
+            notifyUrl,
+          });
+
+          return {
+            qrCode: result?.qrCode || "",
+            paymentMethod: "alipay",
+          };
+        }
+
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "不支持的支付方式",
+        });
+      } catch (error: any) {
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: error.message || "创建支付二维码失败",
+        });
+      }
+    }),
+
+  /**
+   * 查询支付状态
+   */
+  queryPaymentStatus: publicProcedure
+    .input(
+      z.object({
+        orderNo: z.string(),
+      })
+    )
+    .query(async ({ input }) => {
+      const order = await getOrderByOrderNo(input.orderNo);
+
+      if (!order) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "订单不存在",
+        });
+      }
+
+      // 如果订单已支付，直接返回
+      if (order.order.status === "paid") {
+        return {
+          status: "paid",
+          paidAt: order.order.paidAt,
+        };
+      }
+
+      // 查询第三方支付状态
+      const paymentMethod = order.order.paymentMethod;
+
+      if (paymentMethod === "wechat") {
+        const result = await queryWechatPayment(input.orderNo);
+        if (result?.status === "SUCCESS") {
+          // 更新订单状态
+          await markOrderAsPaid({
+            orderId: order.order.id,
+            paymentMethod: "wechat",
+            thirdPartyOrderNo: result.transactionId,
+          });
+
+          return {
+            status: "paid",
+            paidAt: result.paidAt,
+          };
+        }
+      } else if (paymentMethod === "alipay") {
+        const result = await queryAlipayOrder(input.orderNo);
+        if (result?.status === "TRADE_SUCCESS" || result?.status === "TRADE_FINISHED") {
+          // 更新订单状态
+          await markOrderAsPaid({
+            orderId: order.order.id,
+            paymentMethod: "alipay",
+            thirdPartyOrderNo: result.tradeNo,
+          });
+
+          return {
+            status: "paid",
+            paidAt: result.paidAt,
+          };
+        }
+      }
+
+      return {
+        status: order.order.status,
+        paidAt: order.order.paidAt,
+      };
     }),
 });

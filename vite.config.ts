@@ -36,6 +36,10 @@ export default defineConfig({
       "localhost",
       "127.0.0.1",
     ],
+    hmr: {
+      protocol: "wss",
+      clientPort: 443,
+    },
     fs: {
       strict: true,
       deny: ["**/.*"],

@@ -40,6 +40,7 @@ import { reminderSettingsRouter } from "./routers/reminderSettings";
 import { smtpConfigRouter } from "./routers/smtpConfig";
 import { emailVerificationRouter } from "./routers/emailVerification";
 import { emailTemplateRouter } from "./routers/emailTemplate";
+import { paymentConfigRouter } from "./routers/paymentConfig";
 import { paymentRouter } from "./routers/payment";
 import { subscriptionPlanRouter } from "./routers/subscriptionPlan";
 import { userSubscriptionRouter } from "./routers/userSubscription";
@@ -154,6 +155,7 @@ export const appRouter = router({
   payment: paymentRouter,
   subscriptionPlan: subscriptionPlanRouter,
   userSubscription: userSubscriptionRouter,
+  paymentConfig: paymentConfigRouter,
 });
 
 export type AppRouter = typeof appRouter;
