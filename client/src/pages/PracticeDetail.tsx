@@ -9,6 +9,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { ArrowLeft, CheckCircle2, XCircle, Lightbulb } from "lucide-react";
 import { toast } from "sonner";
+import { SimilarPracticesSection } from "@/components/SimilarPracticesSection";
 
 /**
  * 专项练习详情和答题页面
@@ -258,6 +259,11 @@ export default function PracticeDetail() {
           )}
         </CardContent>
       </Card>
+
+      {/* 相似题推荐 */}
+      <div className="mt-8">
+        <SimilarPracticesSection practicePoolId={practiceId} />
+      </div>
     </div>
   );
 }

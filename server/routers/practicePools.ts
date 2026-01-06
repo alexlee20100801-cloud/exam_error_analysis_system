@@ -8,6 +8,7 @@ import {
   batchGeneratePracticeForUser,
   getPracticeStats,
 } from "../services/errorToPracticeService";
+import { getSimilarPractices } from "../services/similarPracticeService";
 
 /**
  * 专项练习池路由
@@ -30,6 +31,28 @@ export const practicePoolsRouter = router({
         input.count
       );
       return result;
+    }),
+
+  /**
+   * 获取相似题推荐
+   */
+  getSimilarPractices: protectedProcedure
+    .input(
+      z.object({
+        practicePoolId: z.number(),
+        limit: z.number().min(1).max(10).default(5),
+      })
+    )
+    .query(async ({ ctx, input }) => {
+      const recommendations = await getSimilarPractices(
+        ctx.user.id,
+        input.practicePoolId,
+        input.limit
+      );
+      return {
+        success: true,
+        recommendations,
+      };
     }),
 
   /**
