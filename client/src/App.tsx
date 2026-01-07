@@ -89,7 +89,7 @@ function Router() {
       <Route path="/practice-questions/:errorQuestionId" component={PracticeQuestions} />
       <Route path={"/practice"} component={Practice} />
       <Route path={"/question-practice"} component={QuestionPractice} />
-      <Route path={"/report"} component={LearningReport} />
+      <Route path={"/learning-report"} component={LearningReport} />
           <Route path="/videos" component={VideoLearning} />
         <Route path="/review-plan" component={ReviewPlan} />
       <Route path="/achievements" component={Achievements} />
