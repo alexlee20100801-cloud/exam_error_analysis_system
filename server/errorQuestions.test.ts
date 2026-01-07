@@ -43,6 +43,7 @@ describe("errorQuestions router", () => {
       content: "已知二次函数y=ax²+bx+c的图像经过点(0,3)，(1,0)，(3,0)，求该函数的解析式。",
       subject: "math",
       grade: "junior3",
+      schoolLevel: "junior",
       difficulty: "medium",
     });
 
@@ -60,6 +61,7 @@ describe("errorQuestions router", () => {
       content: "这是一道测试题目",
       subject: "math",
       grade: "junior1",
+      schoolLevel: "junior",
     });
 
     // 查询列表
@@ -79,6 +81,7 @@ describe("errorQuestions router", () => {
       content: "计算物体的加速度",
       subject: "physics",
       grade: "senior1",
+      schoolLevel: "senior",
     });
 
     // 按学科和年级筛选
@@ -104,6 +107,7 @@ describe("errorQuestions router", () => {
       content: "原内容",
       subject: "math",
       grade: "junior1",
+      schoolLevel: "junior",
     });
 
     // 更新错题
@@ -126,6 +130,7 @@ describe("errorQuestions router", () => {
       content: "题目内容",
       subject: "math",
       grade: "junior1",
+      schoolLevel: "junior",
     });
 
     // 标记为已掌握

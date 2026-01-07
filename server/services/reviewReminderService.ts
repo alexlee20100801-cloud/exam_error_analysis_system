@@ -1,6 +1,6 @@
 import { getDb } from "../db";
 import { reviewReminders, reviewHistory, errorQuestions, questions } from "../../drizzle/schema";
-import { eq, and, lte, desc } from "drizzle-orm";
+import { eq, and, lte, desc, sql } from "drizzle-orm";
 import { notifyOwner } from "../_core/notification";
 
 /**
