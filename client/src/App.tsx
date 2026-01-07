@@ -15,6 +15,7 @@ import VideoLearning from "./pages/VideoLearning";
 import ReviewPlan from "./pages/ReviewPlan";
 import Achievements from "./pages/Achievements";
 import SubjectReport from "./pages/SubjectReport";
+import NotificationConfigManagement from "./pages/NotificationConfigManagement";
 import KnowledgePointDetail from "@/pages/KnowledgePointDetail";
 import Review from "@/pages/Review";
 import StudyCalendar from "@/pages/StudyCalendar";
@@ -94,6 +95,7 @@ function Router() {
         <Route path="/review-plan" component={ReviewPlan} />
       <Route path="/achievements" component={Achievements} />
       <Route path="/subject-report/:subject" component={SubjectReport} />
+      <Route path="/notification-config" component={NotificationConfigManagement} />
       <Route path="/knowledge-point/:id" component={KnowledgePointDetail} />
       <Route path="/review" component={Review} />
       <Route path="/study-calendar" component={StudyCalendar} />

@@ -117,6 +117,7 @@ const adminMenuGroup: MenuGroup = {
     { id: "recommendation", icon: TrendingUp, label: "智能推荐管理", path: "/admin/recommendation" },
     { id: "experiments", icon: Activity, label: "实验监控仪表板", path: "/admin/experiments" },
     { id: "audit", icon: FileSearch, label: "审计报告查询", path: "/admin/audit" },
+    { id: "notification-config", icon: Bell, label: "通知配置管理", path: "/notification-config" },
   ]
 };
 

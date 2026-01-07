@@ -1,5 +1,5 @@
 import { db } from "./db";
-import { notificationLogs } from "../drizzle/schema";
+import { notificationHistory } from "../drizzle/schema";
 
 // Email validation regex
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -31,17 +31,16 @@ interface NotificationResult {
 }
 
 interface NotificationLogData {
-  userId: number;
+  userId?: number;
+  configId?: number;
   notificationType: string;
-  channel: string;
+  title: string;
+  content: string;
+  channel: "platform" | "email" | "sms";
+  recipient: string;
   status: "sent" | "failed" | "pending";
-  content?: string;
-  recipientEmail?: string;
-  recipientPhone?: string;
   errorMessage?: string;
-  retryCount?: number;
-  priority?: string;
-  metadata?: string;
+  metadata?: any;
 }
 
 /**
@@ -99,11 +98,12 @@ async function sendEmailNotification(
   if (!EMAIL_REGEX.test(recipientEmail)) {
     try {
       await createNotificationLog({
-        userId,
         notificationType: type,
+        title: getEmailSubject(type),
+        content: content,
         channel: "email",
+        recipient: recipientEmail,
         status: "failed",
-        recipientEmail,
         errorMessage: "Invalid email format",
       });
     } catch (logError) {
@@ -140,13 +140,13 @@ async function sendEmailNotification(
     const result = await response.json();
 
     await createNotificationLog({
-      userId,
       notificationType: type,
-      channel: "email",
-      status: "sent",
-      recipientEmail,
+      title: getEmailSubject(type),
       content,
-      metadata: JSON.stringify({ messageId: result.messageId }),
+      channel: "email",
+      recipient: recipientEmail,
+      status: "sent",
+      metadata: { messageId: result.messageId },
     });
 
     return {
@@ -155,11 +155,12 @@ async function sendEmailNotification(
     };
   } catch (error) {
     await createNotificationLog({
-      userId,
       notificationType: type,
+      title: getEmailSubject(type),
+      content,
       channel: "email",
+      recipient: recipientEmail,
       status: "failed",
-      recipientEmail,
       errorMessage: error instanceof Error ? error.message : "Unknown error",
     });
 
@@ -183,11 +184,12 @@ async function sendSmsNotification(
   if (!PHONE_REGEX.test(recipientPhone)) {
     try {
       await createNotificationLog({
-        userId,
         notificationType: type,
+        title: "SMS Notification",
+        content: content,
         channel: "sms",
+        recipient: recipientPhone,
         status: "failed",
-        recipientPhone,
         errorMessage: "Invalid phone format",
       });
     } catch (logError) {
@@ -232,13 +234,13 @@ async function sendSmsNotification(
     const result = await response.json();
 
     await createNotificationLog({
-      userId,
       notificationType: type,
-      channel: "sms",
-      status: "sent",
-      recipientPhone,
+      title: "SMS Notification",
       content: smsContent,
-      metadata: JSON.stringify({ messageId: result.messageId }),
+      channel: "sms",
+      recipient: recipientPhone,
+      status: "sent",
+      metadata: { messageId: result.messageId },
     });
 
     return {
@@ -247,11 +249,12 @@ async function sendSmsNotification(
     };
   } catch (error) {
     await createNotificationLog({
-      userId,
       notificationType: type,
+      title: "SMS Notification",
+      content: smsContent,
       channel: "sms",
+      recipient: recipientPhone,
       status: "failed",
-      recipientPhone,
       errorMessage: error instanceof Error ? error.message : "Unknown error",
     });
 
@@ -273,12 +276,12 @@ async function createInAppNotification(
 ): Promise<NotificationResult> {
   try {
     await createNotificationLog({
-      userId,
       notificationType: type,
-      channel: "in_app",
-      status: "sent",
+      title: "In-App Notification",
       content,
-      priority,
+      channel: "platform",
+      recipient: userId.toString(),
+      status: "sent",
     });
 
     return {
@@ -297,18 +300,16 @@ async function createInAppNotification(
  */
 export async function createNotificationLog(data: NotificationLogData) {
   const [log] = await db
-    .insert(notificationLogs)
+    .insert(notificationHistory)
     .values({
-      userId: data.userId,
-      notificationType: data.notificationType,
-      channel: data.channel,
-      status: data.status,
+      configId: data.configId,
+      notificationType: data.notificationType as any,
+      title: data.title,
       content: data.content,
-      recipientEmail: data.recipientEmail,
-      recipientPhone: data.recipientPhone,
+      channel: data.channel as any,
+      recipient: data.recipient,
+      status: data.status as any,
       errorMessage: data.errorMessage,
-      retryCount: data.retryCount || 0,
-      priority: data.priority || "normal",
       metadata: data.metadata,
       sentAt: new Date(),
     })
