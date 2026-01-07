@@ -30,6 +30,13 @@ export default function SmartScanner() {
   const [isProcessing, setIsProcessing] = useState(false);
   const [processingStep, setProcessingStep] = useState("");
   const [progress, setProgress] = useState(0);
+  const [imageProcessingStatus, setImageProcessingStatus] = useState<{
+    index: number;
+    status: 'pending' | 'processing' | 'success' | 'error';
+    imageUrl?: string;
+    ocrResult?: any;
+    error?: string;
+  }[]>([]);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const smartScanMutation = trpc.smartScanner.smartScan.useMutation();
@@ -92,21 +99,60 @@ export default function SmartScanner() {
 
         toast.success("扫描完成！");
       } else {
-        // 批量处理
+        // 批量处理 - 逐张处理并更新进度
         setProcessingStep("正在批量处理图像...");
-        const result = await batchScanMutation.mutateAsync({
-          images: selectedImages,
-          userId: user.id,
-          autoEnhance: true,
-        });
+        
+        // 初始化状态
+        const statusArray = selectedImages.map((_, index) => ({
+          index,
+          status: 'pending' as const,
+        }));
+        setImageProcessingStatus(statusArray);
 
-        setProcessedImages(result.results.map((r) => r.imageUrl));
-        setOcrResults(result.results.map((r) => r.ocrResult));
+        const results: any[] = [];
+        let successCount = 0;
+
+        for (let i = 0; i < selectedImages.length; i++) {
+          // 更新当前图片为处理中
+          setImageProcessingStatus(prev => prev.map(item =>
+            item.index === i ? { ...item, status: 'processing' } : item
+          ));
+          setProcessingStep(`正在处理第 ${i + 1}/${selectedImages.length} 张图片...`);
+          setProgress(((i + 1) / selectedImages.length) * 100);
+
+          try {
+            const result = await smartScanMutation.mutateAsync({
+              imageData: selectedImages[i],
+              userId: user.id,
+              autoEnhance: true,
+            });
+
+            results.push(result);
+            successCount++;
+
+            // 更新为成功状态
+            setImageProcessingStatus(prev => prev.map(item =>
+              item.index === i
+                ? { ...item, status: 'success', imageUrl: result.imageUrl, ocrResult: result.ocrResult }
+                : item
+            ));
+          } catch (error: any) {
+            // 更新为错误状态
+            setImageProcessingStatus(prev => prev.map(item =>
+              item.index === i
+                ? { ...item, status: 'error', error: error.message || '处理失败' }
+                : item
+            ));
+          }
+        }
+
+        setProcessedImages(results.map((r) => r.imageUrl));
+        setOcrResults(results.map((r) => r.ocrResult));
         setProgress(100);
         setProcessingStep("完成！");
 
         toast.success(
-          `批量扫描完成！成功 ${result.successCount}/${result.totalCount} 张`
+          `批量扫描完成！成功 ${successCount}/${selectedImages.length} 张`
         );
       }
     } catch (error) {
@@ -268,29 +314,97 @@ export default function SmartScanner() {
                 <div className="space-y-2">
                   <div className="flex items-center justify-between text-sm">
                     <span>{processingStep}</span>
-                    <span>{progress}%</span>
+                    <span>{Math.round(progress)}%</span>
                   </div>
                   <Progress value={progress} />
                 </div>
 
-                <div className="space-y-2 text-sm text-muted-foreground">
-                  <div className="flex items-center gap-2">
-                    <Check className="h-4 w-4 text-green-500" />
-                    <span>图像质量评估</span>
+                {/* 批量处理进度详情 */}
+                {imageProcessingStatus.length > 0 && (
+                  <div className="space-y-2">
+                    <div className="text-sm font-medium mb-2">图片处理状态</div>
+                    <div className="space-y-2 max-h-[300px] overflow-y-auto">
+                      {imageProcessingStatus.map((item) => (
+                        <div
+                          key={item.index}
+                          className="flex items-center gap-3 p-2 rounded-md border bg-card"
+                        >
+                          <div className="flex-shrink-0">
+                            {item.status === 'pending' && (
+                              <div className="h-5 w-5 rounded-full border-2 border-muted" />
+                            )}
+                            {item.status === 'processing' && (
+                              <Loader2 className="h-5 w-5 animate-spin text-blue-500" />
+                            )}
+                            {item.status === 'success' && (
+                              <Check className="h-5 w-5 text-green-500" />
+                            )}
+                            {item.status === 'error' && (
+                              <X className="h-5 w-5 text-red-500" />
+                            )}
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center justify-between">
+                              <span className="text-sm font-medium">
+                                图片 {item.index + 1}
+                              </span>
+                              {item.status === 'pending' && (
+                                <Badge variant="outline">等待中</Badge>
+                              )}
+                              {item.status === 'processing' && (
+                                <Badge variant="secondary">处理中</Badge>
+                              )}
+                              {item.status === 'success' && (
+                                <Badge variant="default">完成</Badge>
+                              )}
+                              {item.status === 'error' && (
+                                <Badge variant="destructive">失败</Badge>
+                              )}
+                            </div>
+                            {item.error && (
+                              <p className="text-xs text-red-500 mt-1">{item.error}</p>
+                            )}
+                            {item.ocrResult?.content && (
+                              <p className="text-xs text-muted-foreground mt-1 truncate">
+                                {item.ocrResult.content.substring(0, 50)}...
+                              </p>
+                            )}
+                          </div>
+                          {item.imageUrl && (
+                            <div className="flex-shrink-0">
+                              <img
+                                src={item.imageUrl}
+                                alt={`预览 ${item.index + 1}`}
+                                className="h-12 w-12 object-cover rounded border"
+                              />
+                            </div>
+                          )}
+                        </div>
+                      ))}
+                    </div>
                   </div>
-                  <div className="flex items-center gap-2">
-                    <Check className="h-4 w-4 text-green-500" />
-                    <span>自动去阴影</span>
+                )}
+
+                {imageProcessingStatus.length === 0 && (
+                  <div className="space-y-2 text-sm text-muted-foreground">
+                    <div className="flex items-center gap-2">
+                      <Check className="h-4 w-4 text-green-500" />
+                      <span>图像质量评估</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Check className="h-4 w-4 text-green-500" />
+                      <span>自动去阴影</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Check className="h-4 w-4 text-green-500" />
+                      <span>亮度对比度调整</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                      <span>OCR文字识别</span>
+                    </div>
                   </div>
-                  <div className="flex items-center gap-2">
-                    <Check className="h-4 w-4 text-green-500" />
-                    <span>亮度对比度调整</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <Loader2 className="h-4 w-4 animate-spin" />
-                    <span>OCR文字识别</span>
-                  </div>
-                </div>
+                )}
               </CardContent>
             </Card>
           )}

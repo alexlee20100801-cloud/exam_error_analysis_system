@@ -4,6 +4,9 @@ import { sql } from "drizzle-orm"
 // 导入分享功能的schema
 export { errorQuestionShares, shareAccessLogs, type ErrorQuestionShare, type NewErrorQuestionShare, type ShareAccessLog, type NewShareAccessLog } from "./share_schema";
 
+// 导入证件管理schema
+export { idCards, type IdCard, type NewIdCard } from "./id_card_schema";
+
 export const accountCredentials = mysqlTable("account_credentials", {
 	id: int().autoincrement().notNull(),
 	userId: int("user_id").notNull(),

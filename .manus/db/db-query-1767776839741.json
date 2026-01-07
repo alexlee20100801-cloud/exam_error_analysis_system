@@ -1,0 +1,9 @@
+{
+  "query": "CREATE TABLE IF NOT EXISTS `id_cards` (\n  `id` int AUTO_INCREMENT PRIMARY KEY NOT NULL,\n  `user_id` int NOT NULL,\n  `card_type` enum('id_card','student_card','driver_license','passport','other') NOT NULL,\n  `card_name` varchar(128) NOT NULL,\n  `front_image_url` varchar(500) NOT NULL,\n  `back_image_url` varchar(500),\n  `merged_image_url` varchar(500),\n  `a4_layout_image_url` varchar(500),\n  `extracted_info` json,\n  `notes` text,\n  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,\n  `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,\n  INDEX `idx_user_id` (`user_id`),\n  INDEX `idx_card_type` (`card_type`),\n  INDEX `idx_created_at` (`created_at`)\n);",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway03.us-east-1.prod.aws.tidbcloud.com --port 4000 --user Lfr9xqjx7LpxUD9.1efa314e7813 --database Yh4Z4ZSitSFdPWYxtKkkQS --execute CREATE TABLE IF NOT EXISTS `id_cards` (\n  `id` int AUTO_INCREMENT PRIMARY KEY NOT NULL,\n  `user_id` int NOT NULL,\n  `card_type` enum('id_card','student_card','driver_license','passport','other') NOT NULL,\n  `card_name` varchar(128) NOT NULL,\n  `front_image_url` varchar(500) NOT NULL,\n  `back_image_url` varchar(500),\n  `merged_image_url` varchar(500),\n  `a4_layout_image_url` varchar(500),\n  `extracted_info` json,\n  `notes` text,\n  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,\n  `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,\n  INDEX `idx_user_id` (`user_id`),\n  INDEX `idx_card_type` (`card_type`),\n  INDEX `idx_created_at` (`created_at`)\n);",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 1728
+}

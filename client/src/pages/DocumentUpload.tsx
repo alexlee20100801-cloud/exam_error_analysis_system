@@ -18,6 +18,7 @@ import { RichTextEditor } from '@/components/RichTextEditor';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { BatchImageUpload } from '@/components/BatchImageUpload';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Languages, FileText as TranslateIcon } from 'lucide-react';
 
 // 学科映射
 const SUBJECT_MAP: Record<string, string> = {
@@ -59,6 +60,11 @@ interface ParsedQuestion {
   cropIndex?: number;
   parsedContent: any;
   fileUrl: string;
+  translatedContent?: {
+    title?: string;
+    content?: string;
+    explanation?: string;
+  };
   formData: {
     title: string;
     content: string;
@@ -84,9 +90,14 @@ export default function DocumentUpload() {
   const [processingProgress, setProcessingProgress] = useState(0);
   const [editingQuestion, setEditingQuestion] = useState<ParsedQuestion | null>(null);
   const [richTextContent, setRichTextContent] = useState('');
+  const [ocrLanguage, setOcrLanguage] = useState<string>('auto');
+  const [translateTargetLang, setTranslateTargetLang] = useState<string>('zh');
+  const [isTranslating, setIsTranslating] = useState(false);
+  const [showTranslation, setShowTranslation] = useState(false);
 
   const uploadMutation = trpc.documentUpload.uploadAndParse.useMutation();
   const saveMutation = trpc.documentUpload.saveAsErrorQuestion.useMutation();
+  const translateTextMutation = trpc.smartScanner.translateText.useMutation();
 
   // 处理文件选择（支持多文件）
   const handleFileSelect = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
@@ -452,13 +463,47 @@ export default function DocumentUpload() {
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div>
-            <Input
-              type="file"
-              accept="image/jpeg,image/png,image/jpg,application/pdf,.doc,.docx"
-              onChange={handleFileSelect}
-              multiple
-            />
+          <div className="space-y-3">
+            <div className="flex gap-4 items-end">
+              <div className="flex-1">
+                <Label htmlFor="file-upload">选择文件</Label>
+                <Input
+                  id="file-upload"
+                  type="file"
+                  accept="image/jpeg,image/png,image/jpg,application/pdf,.doc,.docx"
+                  onChange={handleFileSelect}
+                  multiple
+                />
+              </div>
+              <div className="w-[200px]">
+                <Label htmlFor="ocr-language">OCR识别语言</Label>
+                <Select value={ocrLanguage} onValueChange={setOcrLanguage}>
+                  <SelectTrigger id="ocr-language">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="auto">自动检测</SelectItem>
+                    <SelectItem value="zh">中文</SelectItem>
+                    <SelectItem value="en">英语</SelectItem>
+                    <SelectItem value="ja">日语</SelectItem>
+                    <SelectItem value="ko">韩语</SelectItem>
+                    <SelectItem value="fr">法语</SelectItem>
+                    <SelectItem value="de">德语</SelectItem>
+                    <SelectItem value="es">西班牙语</SelectItem>
+                    <SelectItem value="ru">俄语</SelectItem>
+                    <SelectItem value="ar">阿拉伯语</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+            {ocrLanguage !== 'auto' && (
+              <Alert>
+                <Languages className="h-4 w-4" />
+                <AlertDescription>
+                  已选择 <strong>{ocrLanguage === 'zh' ? '中文' : ocrLanguage === 'en' ? '英语' : ocrLanguage}</strong> 作为OCR识别语言，系统将优先识别该语言的文字。
+                </AlertDescription>
+              </Alert>
+            )}
           </div>
 
           {/* 文件列表 */}
@@ -777,43 +822,159 @@ export default function DocumentUpload() {
                   )}
                 </div>
 
+                {/* 翻译功能区域 */}
+                {question.translatedContent && showTranslation && (
+                  <Alert className="mb-4">
+                    <Languages className="h-4 w-4" />
+                    <AlertDescription>
+                      <div className="space-y-2 mt-2">
+                        {question.translatedContent.title && (
+                          <div>
+                            <p className="text-xs font-semibold mb-1">翻译标题:</p>
+                            <p className="text-sm">{question.translatedContent.title}</p>
+                          </div>
+                        )}
+                        {question.translatedContent.content && (
+                          <div>
+                            <p className="text-xs font-semibold mb-1">翻译内容:</p>
+                            <p className="text-sm">{question.translatedContent.content}</p>
+                          </div>
+                        )}
+                        {question.translatedContent.explanation && (
+                          <div>
+                            <p className="text-xs font-semibold mb-1">翻译解析:</p>
+                            <p className="text-sm">{question.translatedContent.explanation}</p>
+                          </div>
+                        )}
+                      </div>
+                    </AlertDescription>
+                  </Alert>
+                )}
+
                 {!question.saved && (
-                  <div className="flex gap-2">
-                    <Button
-                      variant="outline"
-                      onClick={() => {
-                        setEditingQuestion(question);
-                        // 将当前内容转换为HTML格式
-                        const htmlContent = `
-                          <h2>题目内容</h2>
-                          <p>${question.formData.content}</p>
-                          <h3>我的答案</h3>
-                          <p>${question.formData.userAnswer || '未填写'}</p>
-                          <h3>正确答案</h3>
-                          <p>${question.formData.correctAnswer || '未填写'}</p>
-                          <h3>详细解析</h3>
-                          <p>${question.formData.explanation || '未填写'}</p>
-                        `;
-                        setRichTextContent(htmlContent);
-                      }}
-                      className="flex-1"
-                    >
-                      编辑内容
-                    </Button>
-                    <Button
-                      onClick={() => handleSaveQuestion(question)}
-                      disabled={saveMutation.isPending}
-                      className="flex-1"
-                    >
-                      {saveMutation.isPending ? (
-                        <>
-                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                          保存中...
-                        </>
-                      ) : (
-                        '保存此题目'
+                  <div className="space-y-2">
+                    {/* 翻译控制区域 */}
+                    <div className="flex gap-2 items-center">
+                      <Select
+                        value={translateTargetLang}
+                        onValueChange={setTranslateTargetLang}
+                      >
+                        <SelectTrigger className="w-[180px]">
+                          <SelectValue placeholder="选择目标语言" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="zh">中文</SelectItem>
+                          <SelectItem value="en">英语</SelectItem>
+                          <SelectItem value="ja">日语</SelectItem>
+                          <SelectItem value="ko">韩语</SelectItem>
+                          <SelectItem value="fr">法语</SelectItem>
+                          <SelectItem value="de">德语</SelectItem>
+                          <SelectItem value="es">西班牙语</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      <Button
+                        variant="outline"
+                        onClick={async () => {
+                          setIsTranslating(true);
+                          try {
+                            const translatedTitle = await translateTextMutation.mutateAsync({
+                              text: question.formData.title,
+                              targetLanguage: translateTargetLang,
+                            });
+                            const translatedContent = await translateTextMutation.mutateAsync({
+                              text: question.formData.content,
+                              targetLanguage: translateTargetLang,
+                            });
+                            const translatedExplanation = question.formData.explanation
+                              ? await translateTextMutation.mutateAsync({
+                                  text: question.formData.explanation,
+                                  targetLanguage: translateTargetLang,
+                                })
+                              : null;
+
+                            setParsedQuestions(prev => prev.map(q =>
+                              q.id === question.id
+                                ? {
+                                    ...q,
+                                    translatedContent: {
+                                      title: translatedTitle.translatedText,
+                                      content: translatedContent.translatedText,
+                                      explanation: translatedExplanation?.translatedText,
+                                    },
+                                  }
+                                : q
+                            ));
+                            setShowTranslation(true);
+                            toast.success('翻译完成');
+                          } catch (error: any) {
+                            toast.error('翻译失败', {
+                              description: error.message,
+                            });
+                          } finally {
+                            setIsTranslating(false);
+                          }
+                        }}
+                        disabled={isTranslating}
+                      >
+                        {isTranslating ? (
+                          <>
+                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                            翻译中...
+                          </>
+                        ) : (
+                          <>
+                            <TranslateIcon className="mr-2 h-4 w-4" />
+                            翻译题目
+                          </>
+                        )}
+                      </Button>
+                      {question.translatedContent && (
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => setShowTranslation(!showTranslation)}
+                        >
+                          {showTranslation ? '隐藏翻译' : '显示翻译'}
+                        </Button>
                       )}
-                    </Button>
+                    </div>
+                    <div className="flex gap-2 flex-wrap">
+                      <Button
+                        variant="outline"
+                        onClick={() => {
+                          setEditingQuestion(question);
+                          // 将当前内容转换为HTML格式
+                          const htmlContent = `
+                            <h2>题目内容</h2>
+                            <p>${question.formData.content}</p>
+                            <h3>我的答案</h3>
+                            <p>${question.formData.userAnswer || '未填写'}</p>
+                            <h3>正确答案</h3>
+                            <p>${question.formData.correctAnswer || '未填写'}</p>
+                            <h3>详细解析</h3>
+                            <p>${question.formData.explanation || '未填写'}</p>
+                          `;
+                          setRichTextContent(htmlContent);
+                        }}
+                        className="flex-1"
+                      >
+                        编辑内容
+                      </Button>
+                      <Button
+                        onClick={() => handleSaveQuestion(question)}
+                        disabled={saveMutation.isPending}
+                        className="flex-1"
+                      >
+                        {saveMutation.isPending ? (
+                          <>
+                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                            保存中...
+                          </>
+                        ) : (
+                          '保存此题目'
+                        )}
+                      </Button>
+                    </div>
                   </div>
                 )}
               </CardContent>

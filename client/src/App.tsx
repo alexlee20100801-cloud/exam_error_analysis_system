@@ -49,6 +49,7 @@ import WeaknessAnalysis from "@/pages/WeaknessAnalysis";
 import SmartExamPaper from "@/pages/SmartExamPaper";
 import PracticeHistory from "@/pages/PracticeHistory";
 import SmartScanner from "@/pages/SmartScanner";
+import IdCardManagement from "@/pages/IdCardManagement";
 
 function Router() {
   return (
@@ -86,6 +87,7 @@ function Router() {
       <Route path="/smart-exam-paper" component={SmartExamPaper} />
           <Route path="/practice-history" component={PracticeHistory} />
           <Route path="/smart-scanner" component={SmartScanner} />
+          <Route path="/id-card-management" component={IdCardManagement} />
       <Route path="/document-upload" component={DocumentUpload} />
       <Route path="/document-editor" component={DocumentEditor} />
       <Route path="/document-editor/:id" component={DocumentEditor} />
