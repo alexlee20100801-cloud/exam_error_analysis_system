@@ -9,6 +9,12 @@ import {
   executeWarmupTask,
   autoWarmupHotContent,
 } from "../services/cacheWarmupService";
+import {
+  scheduleAutoWarmupTask,
+  createDailyAutoWarmupTask,
+  isOffPeakTime,
+  getNextOffPeakTime,
+} from "../services/cacheWarmupScheduler";
 import { db } from "../db";
 import { warmupTasks, knowledgePointHotness, questionTypeHotness } from "../../drizzle/schema";
 import { eq, desc } from "drizzle-orm";
@@ -161,6 +167,58 @@ export const cacheWarmupRouter = router({
 
       return task;
     }),
+
+  /**
+   * 创建自动调度的预热任务
+   */
+  scheduleWarmupTask: protectedProcedure
+    .input(
+      z.object({
+        taskName: z.string().min(1).max(200),
+        taskType: z.enum(["knowledge_point", "question_type", "recommendation"]),
+        targetConfig: z.any(),
+        priority: z.number().min(1).max(10).default(5),
+        scheduledAt: z.date().optional(),
+      })
+    )
+    .mutation(async ({ input }) => {
+      const taskId = await scheduleAutoWarmupTask(
+        input.taskName,
+        input.taskType,
+        input.targetConfig,
+        input.priority,
+        input.scheduledAt
+      );
+      return {
+        success: true,
+        taskId,
+        message: "预热任务已创建并安排在低峰期执行",
+        nextOffPeakTime: getNextOffPeakTime(),
+      };
+    }),
+
+  /**
+   * 创建每日自动预热任务
+   */
+  createDailyTask: protectedProcedure.mutation(async () => {
+    const taskId = await createDailyAutoWarmupTask();
+    return {
+      success: true,
+      taskId,
+      message: "每日自动预热任务已创建",
+      nextOffPeakTime: getNextOffPeakTime(),
+    };
+  }),
+
+  /**
+   * 检查当前是否为低峰期
+   */
+  checkOffPeakTime: protectedProcedure.query(() => {
+    return {
+      isOffPeak: isOffPeakTime(),
+      nextOffPeakTime: getNextOffPeakTime(),
+    };
+  }),
 
   /**
    * 获取缓存预热统计数据

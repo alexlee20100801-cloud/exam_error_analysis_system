@@ -61,6 +61,9 @@ import LearningDashboard from "@/pages/LearningDashboard";
 import BatchEdit from "@/pages/BatchEdit";
 import UploadHistory from "@/pages/UploadHistory";
 import CacheMonitor from "@/pages/CacheMonitor";
+import CacheWarmupManagement from "@/pages/CacheWarmupManagement";
+import BatchOperationHistory from "@/pages/BatchOperationHistory";
+import ABTestManagement from "@/pages/ABTestManagement";
 
 function Router() {
   return (
@@ -73,6 +76,9 @@ function Router() {
       <Route path="/batch-edit/:sessionId" component={BatchEdit} />
       <Route path="/upload-history" component={UploadHistory} />
       <Route path="/cache-monitor" component={CacheMonitor} />
+      <Route path="/admin/cache-warmup" component={CacheWarmupManagement} />
+      <Route path="/admin/batch-history" component={BatchOperationHistory} />
+      <Route path="/admin/ab-test" component={ABTestManagement} />
       <Route path="/learning-dashboard" component={LearningDashboard} />
       <Route path="/practice-questions/:errorQuestionId" component={PracticeQuestions} />
       <Route path={"/practice"} component={Practice} />
