@@ -94,10 +94,13 @@ export default function DocumentUpload() {
   const [translateTargetLang, setTranslateTargetLang] = useState<string>('zh');
   const [isTranslating, setIsTranslating] = useState(false);
   const [showTranslation, setShowTranslation] = useState(false);
+  const [isBatchTranslating, setIsBatchTranslating] = useState(false);
+  const [batchTranslateProgress, setBatchTranslateProgress] = useState(0);
 
   const uploadMutation = trpc.documentUpload.uploadAndParse.useMutation();
   const saveMutation = trpc.documentUpload.saveAsErrorQuestion.useMutation();
   const translateTextMutation = trpc.smartScanner.translateText.useMutation();
+  const batchTranslateMutation = trpc.smartScanner.batchTranslateText.useMutation();
 
   // 处理文件选择（支持多文件）
   const handleFileSelect = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
@@ -389,6 +392,73 @@ export default function DocumentUpload() {
     }
   };
 
+  // 批量翻译所有题目
+  const handleBatchTranslate = async () => {
+    if (parsedQuestions.length === 0) {
+      toast.info('没有可翻译的题目');
+      return;
+    }
+
+    setIsBatchTranslating(true);
+    setBatchTranslateProgress(0);
+    setShowTranslation(true);
+
+    try {
+      // 收集所有需要翻译的文本
+      const textsToTranslate: string[] = [];
+      const textMapping: { questionId: string; field: 'title' | 'content' | 'explanation'; index: number }[] = [];
+
+      parsedQuestions.forEach((question) => {
+        if (question.formData.title) {
+          textMapping.push({ questionId: question.id, field: 'title', index: textsToTranslate.length });
+          textsToTranslate.push(question.formData.title);
+        }
+        if (question.formData.content) {
+          textMapping.push({ questionId: question.id, field: 'content', index: textsToTranslate.length });
+          textsToTranslate.push(question.formData.content);
+        }
+        if (question.formData.explanation) {
+          textMapping.push({ questionId: question.id, field: 'explanation', index: textsToTranslate.length });
+          textsToTranslate.push(question.formData.explanation);
+        }
+      });
+
+      // 批量翻译
+      const result = await batchTranslateMutation.mutateAsync({
+        texts: textsToTranslate,
+        targetLanguage: translateTargetLang,
+      });
+
+      // 更新题目的翻译内容
+      const translatedContents: Record<string, { title?: string; content?: string; explanation?: string }> = {};
+
+      textMapping.forEach((mapping) => {
+        const translationResult = result.results[mapping.index];
+        if (translationResult.success) {
+          if (!translatedContents[mapping.questionId]) {
+            translatedContents[mapping.questionId] = {};
+          }
+          translatedContents[mapping.questionId][mapping.field] = translationResult.translatedText;
+        }
+      });
+
+      // 更新状态
+      setParsedQuestions(prev => prev.map(q => ({
+        ...q,
+        translatedContent: translatedContents[q.id] || q.translatedContent,
+      })));
+
+      setBatchTranslateProgress(parsedQuestions.length);
+      toast.success(`成功翻译 ${parsedQuestions.length} 个题目`);
+    } catch (error: any) {
+      toast.error('批量翻译失败', {
+        description: error.message,
+      });
+    } finally {
+      setIsBatchTranslating(false);
+    }
+  };
+
   // 批量保存所有题目
   const handleSaveAll = async () => {
     const unsavedQuestions = parsedQuestions.filter(q => !q.saved);
@@ -600,19 +670,55 @@ export default function DocumentUpload() {
             <h2 className="text-2xl font-bold">
               识别结果 ({parsedQuestions.length} 个题目)
             </h2>
-            <Button
-              onClick={handleSaveAll}
-              disabled={parsedQuestions.every(q => q.saved) || saveMutation.isPending}
-            >
-              {saveMutation.isPending ? (
-                <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  保存中...
-                </>
-              ) : (
-                `批量保存全部 (${parsedQuestions.filter(q => !q.saved).length})`
-              )}
-            </Button>
+            <div className="flex gap-2 items-center">
+              <Select
+                value={translateTargetLang}
+                onValueChange={setTranslateTargetLang}
+              >
+                <SelectTrigger className="w-[140px]">
+                  <SelectValue placeholder="选择目标语言" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="zh">中文</SelectItem>
+                  <SelectItem value="en">英语</SelectItem>
+                  <SelectItem value="ja">日语</SelectItem>
+                  <SelectItem value="ko">韩语</SelectItem>
+                  <SelectItem value="fr">法语</SelectItem>
+                  <SelectItem value="de">德语</SelectItem>
+                  <SelectItem value="es">西班牙语</SelectItem>
+                </SelectContent>
+              </Select>
+              <Button
+                variant="outline"
+                onClick={handleBatchTranslate}
+                disabled={parsedQuestions.length === 0 || isBatchTranslating}
+              >
+                {isBatchTranslating ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    翻译中 ({batchTranslateProgress}/{parsedQuestions.length})
+                  </>
+                ) : (
+                  <>
+                    <Languages className="mr-2 h-4 w-4" />
+                    批量翻译全部
+                  </>
+                )}
+              </Button>
+              <Button
+                onClick={handleSaveAll}
+                disabled={parsedQuestions.every(q => q.saved) || saveMutation.isPending}
+              >
+                {saveMutation.isPending ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    保存中...
+                  </>
+                ) : (
+                  `批量保存全部 (${parsedQuestions.filter(q => !q.saved).length})`
+                )}
+              </Button>
+            </div>
           </div>
 
           {parsedQuestions.map((question, index) => (

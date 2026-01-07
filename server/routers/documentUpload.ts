@@ -2,6 +2,7 @@ import { router, protectedProcedure } from "../_core/trpc";
 import { z } from "zod";
 import * as documentUploadService from "../documentUploadService";
 import * as documentExportService from "../documentExportService";
+import { batchTranslateText } from "../translationService";
 
 /**
  * 文档上传和处理路由
@@ -213,6 +214,77 @@ export const documentUploadRouter = router({
         config: input.config,
       });
       return result;
+    }),
+  
+  /**
+   * 批量翻译识别内容
+   */
+  batchTranslateContents: protectedProcedure
+    .input(z.object({
+      contentIds: z.array(z.number()),
+      targetLanguage: z.string(),
+      sourceLanguage: z.string().optional(),
+    }))
+    .mutation(async ({ input }) => {
+      // 获取所有需要翻译的内容
+      const contents = await Promise.all(
+        input.contentIds.map(id => documentUploadService.getContentById(id))
+      );
+      
+      // 提取文本内容
+      const texts = contents.map(c => {
+        if (!c) return '';
+        // 根据内容类型提取文本
+        if (c.contentType === 'text') {
+          return c.recognizedContent;
+        } else if (c.contentType === 'formula') {
+          // 公式不翻译，返回原内容
+          return c.recognizedContent;
+        } else {
+          return c.recognizedContent;
+        }
+      });
+      
+      // 批量翻译
+      const translationResults = await batchTranslateText(
+        texts,
+        input.targetLanguage,
+        input.sourceLanguage
+      );
+      
+      // 更新数据库中的翻译内容
+      const updatePromises = contents.map(async (content, index) => {
+        if (!content) return null;
+        
+        const translationResult = translationResults.results[index];
+        if (!translationResult.success) {
+          return {
+            contentId: content.id,
+            success: false,
+            error: translationResult.error,
+          };
+        }
+        
+        // 更新翻译内容
+        await documentUploadService.updateTranslatedContent(
+          content.id,
+          translationResult.translatedText
+        );
+        
+        return {
+          contentId: content.id,
+          success: true,
+          translatedText: translationResult.translatedText,
+        };
+      });
+      
+      const results = await Promise.all(updatePromises);
+      
+      return {
+        results: results.filter(r => r !== null),
+        successCount: results.filter(r => r?.success).length,
+        totalCount: input.contentIds.length,
+      };
     }),
   
   /**

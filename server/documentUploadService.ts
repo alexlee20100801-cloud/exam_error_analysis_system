@@ -475,3 +475,36 @@ export async function updateDocumentStatus(
   
   return { success: true };
 }
+
+/**
+ * 根据ID获取识别内容
+ */
+export async function getContentById(contentId: number) {
+  const db = getDb();
+  
+  const [content] = await db
+    .select()
+    .from(recognizedContents)
+    .where(eq(recognizedContents.id, contentId));
+  
+  return content || null;
+}
+
+/**
+ * 更新翻译内容
+ */
+export async function updateTranslatedContent(
+  contentId: number,
+  translatedContent: string
+) {
+  const db = getDb();
+  
+  await db
+    .update(recognizedContents)
+    .set({
+      editedContent: translatedContent,
+    })
+    .where(eq(recognizedContents.id, contentId));
+  
+  return { success: true };
+}
