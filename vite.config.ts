@@ -41,7 +41,6 @@ export default defineConfig({
       deny: ["**/.*"],
     },
     hmr: {
-      host: "3000-irvmef9mtjtdc6r0rtaz0-92f8b563.sg1.manus.computer",
       clientPort: 443,
       protocol: "wss",
     },

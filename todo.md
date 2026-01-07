@@ -210,6 +210,8 @@
 
 ## 紧急Bug修复 (2026-01-08)
 - [x] 修复学习报告页面404错误
+- [x] 修复 React 版本冲突导致的 "Invalid hook call" 错误
+- [x] 修复 Vite WebSocket HMR 连接失败问题
 
 
 ## 紧急Bug修复 (2026-01-08 继续)
