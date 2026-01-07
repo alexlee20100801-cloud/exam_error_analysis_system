@@ -517,7 +517,7 @@ export const learningProgress = mysqlTable("learning_progress", {
 	id: int().autoincrement().primaryKey().notNull(),
 	userId: int().notNull(),
 	knowledgePointId: int().notNull(),
-	masteryLevel: decimal("mastery_level", { precision: 5, scale: 2 }).notNull(),
+	masteryLevel: decimal({ precision: 5, scale: 2 }).notNull(),
 	practiceCount: int().default(0),
 	correctCount: int().default(0),
 	errorCount: int().default(0),
@@ -616,13 +616,6 @@ export const practiceRecords = mysqlTable("practice_records", {
 	knowledgePointIds: json(),
 	subject: mysqlEnum(['chinese','math','english','physics','chemistry','biology','politics','history','geography']).notNull(),
 	grade: mysqlEnum(['junior1','junior2','junior3','senior1','senior2','senior3']).notNull(),
-	// 新增字段：练习模式和会话跟踪
-	practiceMode: mysqlEnum('practice_mode', ['random','chapter','timed','weakness','review']).default('random'),
-	practiceSessionId: varchar('practice_session_id', { length: 64 }), // 练习会话 ID，用于分组统计
-	difficulty: mysqlEnum(['easy','medium','hard']),
-	attemptCount: int('attempt_count').default(1).notNull(), // 第几次尝试
-	confidenceLevel: int('confidence_level'), // 用户自评信心度 1-5
-	notes: text(), // 用户笔记
 	createdAt: timestamp({ mode: 'string' }).default('CURRENT_TIMESTAMP').notNull(),
 });
 
