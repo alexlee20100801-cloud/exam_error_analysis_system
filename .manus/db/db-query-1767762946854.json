@@ -1,0 +1,9 @@
+{
+  "query": "CREATE TABLE IF NOT EXISTS `document_exports` (\n  `id` int AUTO_INCREMENT PRIMARY KEY NOT NULL,\n  `document_id` int NOT NULL,\n  `user_id` int NOT NULL,\n  `export_format` enum('word', 'pdf', 'markdown', 'latex', 'json') NOT NULL,\n  `export_file_url` varchar(500) NOT NULL,\n  `export_file_key` varchar(500) NOT NULL,\n  `export_config` json,\n  `file_size` int NOT NULL,\n  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,\n  INDEX `document_id_idx` (`document_id`),\n  INDEX `user_id_idx` (`user_id`),\n  INDEX `created_at_idx` (`created_at`)\n)",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway03.us-east-1.prod.aws.tidbcloud.com --port 4000 --user Lfr9xqjx7LpxUD9.1efa314e7813 --database Yh4Z4ZSitSFdPWYxtKkkQS --execute CREATE TABLE IF NOT EXISTS `document_exports` (\n  `id` int AUTO_INCREMENT PRIMARY KEY NOT NULL,\n  `document_id` int NOT NULL,\n  `user_id` int NOT NULL,\n  `export_format` enum('word', 'pdf', 'markdown', 'latex', 'json') NOT NULL,\n  `export_file_url` varchar(500) NOT NULL,\n  `export_file_key` varchar(500) NOT NULL,\n  `export_config` json,\n  `file_size` int NOT NULL,\n  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,\n  INDEX `document_id_idx` (`document_id`),\n  INDEX `user_id_idx` (`user_id`),\n  INDEX `created_at_idx` (`created_at`)\n)",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 1660
+}

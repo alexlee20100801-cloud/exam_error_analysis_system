@@ -37,7 +37,7 @@ import { errorQuestionStatsRouter } from "./routers/errorQuestionStats";
 import { aiLearningAdviceRouter } from "./routers/aiLearningAdvice";
 import { reviewTasksRouter } from "./routers/reviewTasks";
 import { reminderSettingsRouter } from "./routers/reminderSettings";
-import { documentUploadRouter } from "./routes/documentUpload";
+import { documentUploadRouter } from "./routers/documentUpload";
 import { symbolCorrectionRouter } from "./routers/symbolCorrection";
 import { enhancedExportRouter } from "./routers/enhancedExport";
 import { annotationsRouter } from "./routers/annotations";

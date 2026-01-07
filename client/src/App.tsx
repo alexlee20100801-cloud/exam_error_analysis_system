@@ -41,6 +41,7 @@ import AnnotationDetail from "@/pages/AnnotationDetail";
 import { AIAnnotationFeedbackStats } from "@/pages/AIAnnotationFeedbackStats";
 import { MyFavoriteQuestions } from "@/pages/MyFavoriteQuestions";
 import QuestionReview from "@/pages/admin/QuestionReview";
+import { SmartDocumentProcessor } from "@/pages/SmartDocumentProcessor";
 import { PWAInstallPrompt } from "@/components/PWAInstallPrompt";
 import { MobileBottomNav } from "@/components/MobileBottomNav";
 
@@ -77,6 +78,7 @@ function Router() {
       <Route path="/favorites" component={MyFavorites} />
       <Route path="/reminders" component={ReviewReminders} />
       <Route path="/document-upload" component={DocumentUpload} />
+      <Route path="/smart-document" component={SmartDocumentProcessor} />
       <Route path="/chart-learning-demo" component={ChartLearningDemo} />
       <Route path="/batch-operations" component={BatchOperationsPage} />
       <Route path="/community/annotations" component={AnnotationCommunity} />

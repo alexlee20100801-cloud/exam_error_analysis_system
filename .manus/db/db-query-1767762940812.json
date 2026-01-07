@@ -1,0 +1,9 @@
+{
+  "query": "CREATE TABLE IF NOT EXISTS `handwriting_removal_logs` (\n  `id` int AUTO_INCREMENT PRIMARY KEY NOT NULL,\n  `region_id` int NOT NULL,\n  `document_id` int NOT NULL,\n  `before_image_url` varchar(500) NOT NULL,\n  `before_image_key` varchar(500) NOT NULL,\n  `after_image_url` varchar(500) NOT NULL,\n  `after_image_key` varchar(500) NOT NULL,\n  `detected_handwriting` json,\n  `processing_params` json,\n  `processing_time_ms` int,\n  `quality_score` decimal(5, 2),\n  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,\n  INDEX `region_id_idx` (`region_id`),\n  INDEX `document_id_idx` (`document_id`)\n)",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway03.us-east-1.prod.aws.tidbcloud.com --port 4000 --user Lfr9xqjx7LpxUD9.1efa314e7813 --database Yh4Z4ZSitSFdPWYxtKkkQS --execute CREATE TABLE IF NOT EXISTS `handwriting_removal_logs` (\n  `id` int AUTO_INCREMENT PRIMARY KEY NOT NULL,\n  `region_id` int NOT NULL,\n  `document_id` int NOT NULL,\n  `before_image_url` varchar(500) NOT NULL,\n  `before_image_key` varchar(500) NOT NULL,\n  `after_image_url` varchar(500) NOT NULL,\n  `after_image_key` varchar(500) NOT NULL,\n  `detected_handwriting` json,\n  `processing_params` json,\n  `processing_time_ms` int,\n  `quality_score` decimal(5, 2),\n  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,\n  INDEX `region_id_idx` (`region_id`),\n  INDEX `document_id_idx` (`document_id`)\n)",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 1650
+}

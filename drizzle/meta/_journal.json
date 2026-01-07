@@ -211,6 +211,13 @@
       "when": 1767761123733,
       "tag": "0029_known_stepford_cuckoos",
       "breakpoints": true
+    },
+    {
+      "idx": 30,
+      "version": "5",
+      "when": 1767762767686,
+      "tag": "0030_married_spot",
+      "breakpoints": true
     }
   ]
 }
