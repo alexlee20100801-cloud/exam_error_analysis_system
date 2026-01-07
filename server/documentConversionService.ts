@@ -341,3 +341,142 @@ export async function layoutIdCardOnA4(
     });
   }
 }
+
+/**
+ * Word文档转PDF
+ * 使用LibreOffice进行转换
+ */
+export async function wordToPdf(wordBuffer: Buffer): Promise<Buffer> {
+  try {
+    // 注意：这需要系统安装LibreOffice
+    // 在生产环境中，建议使用专门的文档转换API服务
+    
+    // 临时实现：返回错误提示
+    throw new TRPCError({
+      code: "NOT_IMPLEMENTED",
+      message: "Word to PDF conversion requires LibreOffice installation. Please use a dedicated document conversion service.",
+    });
+  } catch (error) {
+    console.error("Error converting Word to PDF:", error);
+    throw error;
+  }
+}
+
+/**
+ * Excel转PDF
+ */
+export async function excelToPdf(excelBuffer: Buffer): Promise<Buffer> {
+  try {
+    throw new TRPCError({
+      code: "NOT_IMPLEMENTED",
+      message: "Excel to PDF conversion requires LibreOffice installation. Please use a dedicated document conversion service.",
+    });
+  } catch (error) {
+    console.error("Error converting Excel to PDF:", error);
+    throw error;
+  }
+}
+
+/**
+ * PPT转PDF
+ */
+export async function pptToPdf(pptBuffer: Buffer): Promise<Buffer> {
+  try {
+    throw new TRPCError({
+      code: "NOT_IMPLEMENTED",
+      message: "PPT to PDF conversion requires LibreOffice installation. Please use a dedicated document conversion service.",
+    });
+  } catch (error) {
+    console.error("Error converting PPT to PDF:", error);
+    throw error;
+  }
+}
+
+/**
+ * PDF转Word
+ * 使用AI提取PDF内容并生成Word文档
+ */
+export async function pdfToWord(pdfBuffer: Buffer): Promise<Buffer> {
+  try {
+    // 这需要复杂的PDF解析和Word生成
+    // 建议使用专门的API服务（如Adobe PDF Services API、Aspose等）
+    throw new TRPCError({
+      code: "NOT_IMPLEMENTED",
+      message: "PDF to Word conversion requires a dedicated document conversion service.",
+    });
+  } catch (error) {
+    console.error("Error converting PDF to Word:", error);
+    throw error;
+  }
+}
+
+/**
+ * 通用文档转换接口
+ * 根据输入和输出格式自动选择转换方法
+ */
+export async function convertDocument(
+  inputBuffer: Buffer,
+  inputFormat: "pdf" | "word" | "excel" | "ppt" | "image",
+  outputFormat: "pdf" | "word" | "excel" | "ppt" | "image",
+  options: ConversionOptions = {}
+): Promise<Buffer> {
+  try {
+    // 如果输入输出格式相同，直接返回
+    if (inputFormat === outputFormat) {
+      return inputBuffer;
+    }
+
+    // 图片转PDF
+    if (inputFormat === "image" && outputFormat === "pdf") {
+      return await imagesToPdf([inputBuffer], options);
+    }
+
+    // Word转PDF
+    if (inputFormat === "word" && outputFormat === "pdf") {
+      return await wordToPdf(inputBuffer);
+    }
+
+    // Excel转PDF
+    if (inputFormat === "excel" && outputFormat === "pdf") {
+      return await excelToPdf(inputBuffer);
+    }
+
+    // PPT转PDF
+    if (inputFormat === "ppt" && outputFormat === "pdf") {
+      return await pptToPdf(inputBuffer);
+    }
+
+    // PDF转Word
+    if (inputFormat === "pdf" && outputFormat === "word") {
+      return await pdfToWord(inputBuffer);
+    }
+
+    // 其他转换组合暂不支持
+    throw new TRPCError({
+      code: "NOT_IMPLEMENTED",
+      message: `Conversion from ${inputFormat} to ${outputFormat} is not yet supported.`,
+    });
+  } catch (error) {
+    console.error("Error converting document:", error);
+    throw error;
+  }
+}
+
+/**
+ * 批量文档转换
+ */
+export async function batchConvertDocuments(
+  documents: Array<{
+    buffer: Buffer;
+    inputFormat: "pdf" | "word" | "excel" | "ppt" | "image";
+    outputFormat: "pdf" | "word" | "excel" | "ppt" | "image";
+  }>,
+  options: ConversionOptions = {}
+): Promise<Buffer[]> {
+  const results = await Promise.all(
+    documents.map((doc) =>
+      convertDocument(doc.buffer, doc.inputFormat, doc.outputFormat, options)
+    )
+  );
+  return results;
+}

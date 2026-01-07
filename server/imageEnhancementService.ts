@@ -61,47 +61,127 @@ export async function assessImageQuality(imageBuffer: Buffer): Promise<ImageQual
 }
 
 /**
- * 自动增强图像
+ * 高级去阴影算法
+ * 使用自适应直方图均衡化和形态学操作
+ */
+export async function advancedShadowRemoval(imageBuffer: Buffer): Promise<Buffer> {
+  try {
+    const image = sharp(imageBuffer);
+    const metadata = await image.metadata();
+
+    // 转换为灰度图进行分析
+    const grayBuffer = await image.greyscale().toBuffer();
+    
+    // 使用normalize进行直方图均衡化
+    const normalized = await sharp(imageBuffer)
+      .normalize()
+      .toBuffer();
+
+    // 应用高斯模糊减少噪声
+    const blurred = await sharp(normalized)
+      .blur(1)
+      .toBuffer();
+
+    // 增强局部对比度
+    const enhanced = await sharp(blurred)
+      .clahe({
+        width: 3,
+        height: 3,
+        maxSlope: 3,
+      })
+      .toBuffer();
+
+    return enhanced;
+  } catch (error) {
+    console.error("Error removing shadow:", error);
+    // 如果高级算法失败，使用简单的normalize
+    return await sharp(imageBuffer).normalize().toBuffer();
+  }
+}
+
+/**
+ * 智能亮度调整
+ * 根据图像直方图自动调整亮度和对比度
+ */
+export async function smartBrightnessAdjustment(imageBuffer: Buffer): Promise<Buffer> {
+  try {
+    const quality = await assessImageQuality(imageBuffer);
+    let image = sharp(imageBuffer);
+
+    // 根据亮度值智能调整
+    if (quality.brightness < 80) {
+      // 图像太暗，增加亮度
+      const brightnessMultiplier = 1 + (80 - quality.brightness) / 160;
+      image = image.modulate({
+        brightness: Math.min(brightnessMultiplier, 1.5),
+      });
+    } else if (quality.brightness > 180) {
+      // 图像太亮，降低亮度
+      const brightnessMultiplier = 1 - (quality.brightness - 180) / 300;
+      image = image.modulate({
+        brightness: Math.max(brightnessMultiplier, 0.7),
+      });
+    }
+
+    // 自适应对比度增强
+    if (quality.contrast < 30) {
+      image = image.linear(1.3, -(128 * 0.3));
+    }
+
+    return await image.toBuffer();
+  } catch (error) {
+    console.error("Error adjusting brightness:", error);
+    return imageBuffer;
+  }
+}
+
+/**
+ * 自动增强图像（增强版）
  */
 export async function autoEnhanceImage(
   imageBuffer: Buffer,
   options: ImageEnhancementOptions = {}
 ): Promise<Buffer> {
   try {
-    let image = sharp(imageBuffer);
+    let processedBuffer = imageBuffer;
 
-    // 1. 去除阴影（使用自适应阈值）
+    // 1. 高级去阴影
     if (options.removeShadow !== false) {
-      image = image.normalize();
+      processedBuffer = await advancedShadowRemoval(processedBuffer);
     }
 
-    // 2. 调整亮度和对比度
+    // 2. 智能亮度调整
     if (options.adjustBrightness !== false) {
-      const quality = await assessImageQuality(imageBuffer);
-      
-      // 如果图像太暗，增加亮度
-      if (quality.brightness < 100) {
-        const brightnessMultiplier = 1 + (100 - quality.brightness) / 200;
-        image = image.modulate({
-          brightness: brightnessMultiplier,
-        });
-      }
+      processedBuffer = await smartBrightnessAdjustment(processedBuffer);
     }
 
     // 3. 增强对比度
     if (options.enhanceContrast !== false) {
-      image = image.linear(1.2, -(128 * 0.2));
+      processedBuffer = await sharp(processedBuffer)
+        .linear(1.2, -(128 * 0.2))
+        .toBuffer();
     }
 
     // 4. 降噪
     if (options.denoise) {
-      image = image.median(3);
+      processedBuffer = await sharp(processedBuffer)
+        .median(3)
+        .toBuffer();
     }
 
     // 5. 锐化
-    image = image.sharpen();
+    processedBuffer = await sharp(processedBuffer)
+      .sharpen({
+        sigma: 1,
+        m1: 1,
+        m2: 0.5,
+        x1: 2,
+        y2: 10,
+        y3: 20,
+      })
+      .toBuffer();
 
-    return await image.toBuffer();
+    return processedBuffer;
   } catch (error) {
     console.error("Error enhancing image:", error);
     throw new TRPCError({
@@ -112,25 +192,128 @@ export async function autoEnhanceImage(
 }
 
 /**
- * 智能边缘检测和裁剪
+ * 智能边缘检测和裁剪（增强版）
+ * 使用多阶段检测确保准确裁剪
  */
 export async function smartCropImage(imageBuffer: Buffer): Promise<Buffer> {
   try {
     const image = sharp(imageBuffer);
     const metadata = await image.metadata();
 
-    // 使用sharp的trim功能自动裁剪边缘
-    const trimmed = await image
+    // 第一阶段：使用宽松阈值检测大致边界
+    const roughTrimmed = await image
       .trim({
-        threshold: 10, // 阈值，越小越严格
+        threshold: 20,
       })
       .toBuffer();
 
-    return trimmed;
+    // 第二阶段：使用严格阈值精确裁剪
+    const fineTrimmed = await sharp(roughTrimmed)
+      .trim({
+        threshold: 5,
+      })
+      .toBuffer();
+
+    // 检查裁剪后的尺寸是否合理（至少保留原图的50%）
+    const finalMetadata = await sharp(fineTrimmed).metadata();
+    if (
+      finalMetadata.width &&
+      finalMetadata.height &&
+      metadata.width &&
+      metadata.height &&
+      finalMetadata.width >= metadata.width * 0.5 &&
+      finalMetadata.height >= metadata.height * 0.5
+    ) {
+      return fineTrimmed;
+    } else {
+      // 如果裁剪过度，返回第一阶段的结果
+      return roughTrimmed;
+    }
   } catch (error) {
     console.error("Error cropping image:", error);
     // 如果裁剪失败，返回原图
     return imageBuffer;
+  }
+}
+
+/**
+ * 文档边缘检测（用于证件、试卷等）
+ */
+export async function detectDocumentEdges(imageBuffer: Buffer): Promise<{
+  hasDocument: boolean;
+  boundingBox?: { x: number; y: number; width: number; height: number };
+  confidence: number;
+}> {
+  try {
+    const base64Image = `data:image/jpeg;base64,${imageBuffer.toString("base64")}`;
+
+    const response = await invokeLLM({
+      messages: [
+        {
+          role: "system",
+          content: "你是一个文档边缘检测专家，擅长识别图像中的文档、证件、试卷等矩形物体的边界。",
+        },
+        {
+          role: "user",
+          content: [
+            {
+              type: "text",
+              text: "请分析这张图片，检测是否包含文档（如证件、试卷、纸张等）。如果包含，请给出文档的边界框坐标（相对于图片尺寸的百分比，0-100）。",
+            },
+            {
+              type: "image_url",
+              image_url: {
+                url: base64Image,
+                detail: "low",
+              },
+            },
+          ],
+        },
+      ],
+      response_format: {
+        type: "json_schema",
+        json_schema: {
+          name: "document_detection",
+          strict: true,
+          schema: {
+            type: "object",
+            properties: {
+              hasDocument: {
+                type: "boolean",
+                description: "是否检测到文档",
+              },
+              boundingBox: {
+                type: "object",
+                description: "文档边界框（百分比坐标）",
+                properties: {
+                  x: { type: "number" },
+                  y: { type: "number" },
+                  width: { type: "number" },
+                  height: { type: "number" },
+                },
+                required: ["x", "y", "width", "height"],
+              },
+              confidence: {
+                type: "number",
+                description: "置信度，0-1之间",
+              },
+            },
+            required: ["hasDocument", "confidence"],
+            additionalProperties: false,
+          },
+        },
+      },
+    });
+
+    const content = response.choices[0].message.content;
+    if (!content || typeof content !== "string") {
+      return { hasDocument: false, confidence: 0 };
+    }
+
+    return JSON.parse(content);
+  } catch (error) {
+    console.error("Error detecting document edges:", error);
+    return { hasDocument: false, confidence: 0 };
   }
 }
 

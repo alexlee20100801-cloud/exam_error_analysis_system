@@ -8,11 +8,34 @@ import {
   assessImageQuality,
   compareImageQuality,
   batchProcessImages,
+  detectDocumentEdges,
 } from "../imageEnhancementService";
 import {
   extractContentEnhanced,
   extractAndMergeContentsEnhanced,
 } from "../enhancedOcrService";
+import {
+  recognizeMultilingualText,
+  recognizeComplexScene,
+  recognizeHandwriting,
+  recognizeTable,
+  batchRecognizeMultilingual,
+  batchRecognizeComplexScene,
+} from "../multilingualOcrService";
+import {
+  recognizeCertificate,
+  mergeCertificateImages,
+  layoutCertificateOnA4,
+  batchRecognizeCertificates,
+  smartProcessCertificate,
+} from "../certificateProcessingService";
+import {
+  translateText,
+  translateImage,
+  translateDocument,
+  batchTranslateText,
+  batchTranslateImages,
+} from "../translationService";
 import { storagePut } from "../storage";
 import {
   imagesToPdf,
@@ -21,6 +44,8 @@ import {
   addWatermarkToPdf,
   mergeIdCardImages,
   layoutIdCardOnA4,
+  convertDocument,
+  batchConvertDocuments,
 } from "../documentConversionService";
 
 /**
@@ -492,5 +517,227 @@ export const smartScannerRouter = router({
         imageUrl: uploadResult.url,
         fileKey,
       };
+    }),
+
+  /**
+   * 多语言OCR识别
+   */
+  recognizeMultilingual: protectedProcedure
+    .input(
+      z.object({
+        imageUrl: z.string(),
+        targetLanguages: z.array(z.string()).optional(),
+      })
+    )
+    .mutation(async ({ input }) => {
+      return await recognizeMultilingualText(input.imageUrl, input.targetLanguages);
+    }),
+
+  /**
+   * 复杂场景OCR识别
+   */
+  recognizeComplexScene: protectedProcedure
+    .input(
+      z.object({
+        imageUrl: z.string(),
+        sceneType: z.enum(["table", "handwriting", "invoice", "certificate", "form", "auto"]).optional(),
+      })
+    )
+    .mutation(async ({ input }) => {
+      return await recognizeComplexScene(input.imageUrl, input.sceneType);
+    }),
+
+  /**
+   * 手写体识别
+   */
+  recognizeHandwriting: protectedProcedure
+    .input(
+      z.object({
+        imageUrl: z.string(),
+      })
+    )
+    .mutation(async ({ input }) => {
+      return await recognizeHandwriting(input.imageUrl);
+    }),
+
+  /**
+   * 表格识别
+   */
+  recognizeTable: protectedProcedure
+    .input(
+      z.object({
+        imageUrl: z.string(),
+      })
+    )
+    .mutation(async ({ input }) => {
+      return await recognizeTable(input.imageUrl);
+    }),
+
+  /**
+   * 证件识别
+   */
+  recognizeCertificate: protectedProcedure
+    .input(
+      z.object({
+        imageUrl: z.string(),
+      })
+    )
+    .mutation(async ({ input }) => {
+      return await recognizeCertificate(input.imageUrl);
+    }),
+
+  /**
+   * 文本翻译
+   */
+  translateText: protectedProcedure
+    .input(
+      z.object({
+        text: z.string(),
+        targetLanguage: z.string(),
+        sourceLanguage: z.string().optional(),
+      })
+    )
+    .mutation(async ({ input }) => {
+      return await translateText(
+        input.text,
+        input.targetLanguage,
+        input.sourceLanguage
+      );
+    }),
+
+  /**
+   * 图片翻译（拍照翻译）
+   */
+  translateImage: protectedProcedure
+    .input(
+      z.object({
+        imageUrl: z.string(),
+        targetLanguage: z.string(),
+        sourceLanguage: z.string().optional(),
+      })
+    )
+    .mutation(async ({ input }) => {
+      return await translateImage(
+        input.imageUrl,
+        input.targetLanguage,
+        input.sourceLanguage
+      );
+    }),
+
+  /**
+   * 文档翻译
+   */
+  translateDocument: protectedProcedure
+    .input(
+      z.object({
+        content: z.string(),
+        targetLanguage: z.string(),
+        sourceLanguage: z.string().optional(),
+        preserveFormat: z.boolean().optional(),
+      })
+    )
+    .mutation(async ({ input }) => {
+      return await translateDocument(
+        input.content,
+        input.targetLanguage,
+        input.sourceLanguage,
+        input.preserveFormat
+      );
+    }),
+
+  /**
+   * 文档边缘检测
+   */
+  detectDocumentEdges: protectedProcedure
+    .input(
+      z.object({
+        imageData: z.string(),
+      })
+    )
+    .mutation(async ({ input }) => {
+      const imageBuffer = Buffer.from(
+        input.imageData.replace(/^data:image\/\w+;base64,/, ""),
+        "base64"
+      );
+      return await detectDocumentEdges(imageBuffer);
+    }),
+
+  /**
+   * 批量多语言OCR
+   */
+  batchRecognizeMultilingual: protectedProcedure
+    .input(
+      z.object({
+        imageUrls: z.array(z.string()),
+        targetLanguages: z.array(z.string()).optional(),
+      })
+    )
+    .mutation(async ({ input }) => {
+      return await batchRecognizeMultilingual(input.imageUrls, input.targetLanguages);
+    }),
+
+  /**
+   * 批量复杂场景OCR
+   */
+  batchRecognizeComplexScene: protectedProcedure
+    .input(
+      z.object({
+        imageUrls: z.array(z.string()),
+        sceneType: z.enum(["table", "handwriting", "invoice", "certificate", "form", "auto"]).optional(),
+      })
+    )
+    .mutation(async ({ input }) => {
+      return await batchRecognizeComplexScene(input.imageUrls, input.sceneType);
+    }),
+
+  /**
+   * 批量证件识别
+   */
+  batchRecognizeCertificates: protectedProcedure
+    .input(
+      z.object({
+        imageUrls: z.array(z.string()),
+      })
+    )
+    .mutation(async ({ input }) => {
+      return await batchRecognizeCertificates(input.imageUrls);
+    }),
+
+  /**
+   * 批量文本翻译
+   */
+  batchTranslateText: protectedProcedure
+    .input(
+      z.object({
+        texts: z.array(z.string()),
+        targetLanguage: z.string(),
+        sourceLanguage: z.string().optional(),
+      })
+    )
+    .mutation(async ({ input }) => {
+      return await batchTranslateText(
+        input.texts,
+        input.targetLanguage,
+        input.sourceLanguage
+      );
+    }),
+
+  /**
+   * 批量图片翻译
+   */
+  batchTranslateImages: protectedProcedure
+    .input(
+      z.object({
+        imageUrls: z.array(z.string()),
+        targetLanguage: z.string(),
+        sourceLanguage: z.string().optional(),
+      })
+    )
+    .mutation(async ({ input }) => {
+      return await batchTranslateImages(
+        input.imageUrls,
+        input.targetLanguage,
+        input.sourceLanguage
+      );
     }),
 });
