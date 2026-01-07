@@ -48,6 +48,7 @@ import { annotationTemplatesRouter } from "./routers/annotationTemplates";
 import { aiAnnotationRouter } from "./routers/aiAnnotation";
 import { collaborativeLearningRouter } from "./routers/collaborativeLearning";
 import { aiAnnotationFeedbackRouter } from "./routers/aiAnnotationFeedback";
+import { cacheStatsRouter } from "./routers/cacheStats";
 import { pointsRouter } from "./routers/points";
 import { aiQuestionCollectionRouter } from "./routers/aiQuestionCollection";
 import { questionReviewRouter } from "./routers/questionReview";
@@ -127,6 +128,9 @@ export const appRouter = router({
   
   // AI标注反馈
   aiAnnotationFeedback: aiAnnotationFeedbackRouter,
+  
+  // 缓存统计
+  cacheStats: cacheStatsRouter,
   
   // 积分系统
   points: pointsRouter,

@@ -114,6 +114,23 @@ export async function batchDeleteErrorQuestions(ids: number[]) {
   return result;
 }
 
+export async function batchUpdateErrorQuestions(ids: number[], data: Partial<typeof errorQuestions.$inferInsert>) {
+  const result = await db.update(errorQuestions).set(data).where(inArray(errorQuestions.id, ids));
+  return result;
+}
+
+export async function batchMarkAsMastered(ids: number[]) {
+  const result = await db.update(errorQuestions)
+    .set({ masteryLevel: 100 })
+    .where(inArray(errorQuestions.id, ids));
+  return result;
+}
+
+export async function getErrorQuestionsByIds(ids: number[]) {
+  if (ids.length === 0) return [];
+  return await db.select().from(errorQuestions).where(inArray(errorQuestions.id, ids));
+}
+
 // 知识点相关
 export async function getKnowledgePoints() {
   return await db.select().from(knowledgePoints).orderBy(knowledgePoints.subject, knowledgePoints.grade);
@@ -292,7 +309,7 @@ export async function updateParentStudentRelation(id: number, data: Partial<type
 }
 
 // 学习目标相关
-export async function getLearningGoalsByStudentId(studentId: string) {
+export async function getLearningGoalsByStudentId(studentId: number) {
   return await db.select().from(learningGoals)
     .where(eq(learningGoals.studentId, studentId))
     .orderBy(desc(learningGoals.createdAt));
@@ -309,7 +326,7 @@ export async function updateLearningGoal(id: number, data: Partial<typeof learni
 }
 
 // 目标提醒相关
-export async function getGoalRemindersByParentId(parentId: string) {
+export async function getGoalRemindersByParentId(parentId: number) {
   return await db.select().from(goalReminders)
     .where(eq(goalReminders.parentId, parentId))
     .orderBy(desc(goalReminders.createdAt));
@@ -730,14 +747,14 @@ export async function updateEmailVerificationToken(id: number, data: Partial<typ
 
 // 邮件模板相关
 export async function getEmailTemplates() {
-  return await db.select().from(emailTemplates).where(eq(emailTemplates.isActive, true));
+  return await db.select().from(emailTemplates).where(eq(emailTemplates.isActive, 1));
 }
 
 export async function getEmailTemplateByType(type: string) {
   const result = await db.select().from(emailTemplates)
     .where(and(
       eq(emailTemplates.templateType, type),
-      eq(emailTemplates.isActive, true)
+      eq(emailTemplates.isActive, 1)
     ))
     .limit(1);
   return result[0];
@@ -821,7 +838,7 @@ export async function updateReviewTaskReminder(id: number, data: Partial<typeof 
 
 // 套餐相关
 export async function getPackages() {
-  return await db.select().from(subscriptionPlans).where(eq(subscriptionPlans.isActive, true));
+  return await db.select().from(subscriptionPlans).where(eq(subscriptionPlans.isActive, 1));
 }
 
 export async function getPackageById(id: number) {
@@ -1020,7 +1037,7 @@ export async function createQuestionReview(data: typeof questionReviews.$inferIn
 }
 
 // 图表标注相关
-export async function getAnnotationsByItem(userId: number, itemType: string, itemId: number) {
+export async function getAnnotationsByItem(userId: string, itemType: string, itemId: number) {
   return await db.select().from(annotations)
     .where(and(
       eq(annotations.userId, userId),
@@ -1030,7 +1047,7 @@ export async function getAnnotationsByItem(userId: number, itemType: string, ite
     .orderBy(desc(annotations.createdAt));
 }
 
-export async function getAnnotationsByImageUrl(userId: number, imageUrl: string) {
+export async function getAnnotationsByImageUrl(userId: string, imageUrl: string) {
   return await db.select().from(annotations)
     .where(and(
       eq(annotations.userId, userId),

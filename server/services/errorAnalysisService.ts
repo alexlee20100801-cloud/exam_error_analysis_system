@@ -1,4 +1,5 @@
 import { invokeLLM } from "../_core/llm";
+import { generateContentHash, getCachedAnalysis, saveAnalysisToCache } from './analysisCacheService';
 
 export interface ErrorAnalysisResult {
   success: boolean;
@@ -23,6 +24,32 @@ export async function analyzeErrorQuestion(
   userAnswer?: string
 ): Promise<ErrorAnalysisResult> {
   try {
+    // 1. 生成内容哈希
+    const contentHash = generateContentHash(questionContent, subject, grade);
+    
+    // 2. 查询缓存
+    const cachedResult = await getCachedAnalysis(contentHash, subject, grade);
+    if (cachedResult) {
+      console.log('[ErrorAnalysis] 使用缓存结果');
+      return {
+        success: true,
+        analysis: {
+          knowledgePoints: cachedResult.knowledgePointIds 
+            ? (typeof cachedResult.knowledgePointIds === 'string' 
+              ? JSON.parse(cachedResult.knowledgePointIds) 
+              : cachedResult.knowledgePointIds)
+            : [],
+          errorReason: cachedResult.errorAnalysis || '',
+          correctAnswer: cachedResult.correctAnswer || '',
+          detailedExplanation: cachedResult.detailedExplanation || '',
+          studyAdvice: cachedResult.detailedAnalysis || '',
+          difficulty: (cachedResult.difficulty as 'easy' | 'medium' | 'hard') || 'medium',
+        },
+      };
+    }
+    
+    // 3. 缓存未命中,调用AI分析
+    console.log('[ErrorAnalysis] 缓存未命中,调用AI分析');
     const gradeLabel = getGradeLabel(grade);
     const subjectLabel = getSubjectLabel(subject);
 
@@ -117,6 +144,10 @@ ${userAnswer ? `学生答案：\n${userAnswer}\n` : ""}
     }
 
     const analysis = JSON.parse(content);
+    
+    // 4. 保存分析结果到缓存
+    await saveAnalysisToCache(contentHash, subject, grade, analysis);
+    console.log('[ErrorAnalysis] 分析结果已缓存');
 
     return {
       success: true,

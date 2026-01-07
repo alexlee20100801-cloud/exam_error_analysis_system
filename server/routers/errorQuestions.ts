@@ -700,4 +700,37 @@ export const errorQuestionsRouter = router({
         failCount,
       };
     }),
+
+  /**
+   * 批量导出错题数据
+   */
+  batchExport: protectedProcedure
+    .input(z.object({
+      questionIds: z.array(z.number()),
+      format: z.enum(["json", "csv"]).default("json"),
+    }))
+    .query(async ({ ctx, input }) => {
+      const db = await getDb();
+      if (!db) throw new Error("数据库连接失败");
+
+      const questions = [];
+      
+      // 逐个验证并获取错题数据
+      for (const questionId of input.questionIds) {
+        try {
+          const question = await getErrorQuestionById(questionId);
+          if (question && question.userId === ctx.user.id) {
+            questions.push(question);
+          }
+        } catch (error) {
+          console.error(`Failed to fetch question ${questionId}:`, error);
+        }
+      }
+
+      return {
+        success: true,
+        questions,
+        format: input.format,
+      };
+    }),
 });
