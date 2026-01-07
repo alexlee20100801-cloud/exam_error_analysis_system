@@ -7,12 +7,14 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { trpc } from "@/lib/trpc";
-import { Upload, Camera, FileText, Loader2, CheckCircle, AlertCircle, Download, Clock, Star, Trash2, FileDown } from "lucide-react";
+import { Upload, Camera, FileText, Loader2, CheckCircle, AlertCircle, Download, Clock, Star, Trash2, FileDown, CheckCheck, CalendarPlus, Tag, BarChart3, Share2 } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
 import { ExportDialog } from "@/components/ExportDialog";
 import { ErrorExportDialog } from "@/components/ErrorExportDialog";
 import { EnhancedExportDialog } from "@/components/EnhancedExportDialog";
 import { BatchExportDialog } from "@/components/BatchExportDialog";
+import { AdvancedExportDialog } from "@/components/AdvancedExportDialog";
+import { ShareDialog } from "@/components/ShareDialog";
 import { TagManagementDialog } from "@/components/TagManagementDialog";
 import { TagSelector } from "@/components/TagSelector";
 import { useState } from "react";
@@ -47,6 +49,14 @@ export default function ErrorQuestions() {
   const [selectedQuestionIds, setSelectedQuestionIds] = useState<number[]>([]);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [questionToDelete, setQuestionToDelete] = useState<number | null>(null);
+  const [batchMasteredDialogOpen, setBatchMasteredDialogOpen] = useState(false);
+  const [batchReviewDialogOpen, setBatchReviewDialogOpen] = useState(false);
+  const [batchDifficultyDialogOpen, setBatchDifficultyDialogOpen] = useState(false);
+  const [batchTagDialogOpen, setBatchTagDialogOpen] = useState(false);
+  const [batchDifficulty, setBatchDifficulty] = useState<"easy" | "medium" | "hard">("medium");
+  const [batchTagId, setBatchTagId] = useState<number | null>(null);
+  const [advancedExportDialogOpen, setAdvancedExportDialogOpen] = useState(false);
+  const [shareDialogOpen, setShareDialogOpen] = useState(false);
   const isMobile = useIsMobile();
   
   // 标签数据
@@ -140,6 +150,95 @@ export default function ErrorQuestions() {
     } else if (selectedQuestionIds.length > 0) {
       batchDeleteMutation.mutate({ questionIds: selectedQuestionIds });
     }
+  };
+
+  // 批量标记为已掌握
+  const batchMarkMasteredMutation = trpc.errorQuestions.batchMarkMastered.useMutation({
+    onSuccess: (data) => {
+      toast.success(`成功标记${data.successCount}道错题为已掌握${data.failCount > 0 ? `，${data.failCount}道失败` : ''}`);
+      utils.errorQuestions.list.invalidate();
+      utils.errorQuestions.listBySchoolLevel.invalidate();
+      utils.errorQuestions.listBySchoolLevelAndSubject.invalidate();
+      setSelectedQuestionIds([]);
+      setBatchMasteredDialogOpen(false);
+    },
+    onError: (error) => {
+      toast.error(`批量标记失败：${error.message}`);
+    },
+  });
+
+  // 批量加入复习计划
+  const batchAddToReviewMutation = trpc.reviewPlan.batchAddToReviewPlan.useMutation({
+    onSuccess: (data) => {
+      toast.success(`成功添加${data.successCount}道错题到复习计划${data.failCount > 0 ? `，${data.failCount}道失败` : ''}`);
+      setSelectedQuestionIds([]);
+      setBatchReviewDialogOpen(false);
+    },
+    onError: (error) => {
+      toast.error(`批量添加失败：${error.message}`);
+    },
+  });
+
+  // 批量修改难度
+  const batchUpdateDifficultyMutation = trpc.errorQuestions.batchUpdateDifficulty.useMutation({
+    onSuccess: (data) => {
+      toast.success(`成功修改${data.successCount}道错题的难度${data.failCount > 0 ? `，${data.failCount}道失败` : ''}`);
+      utils.errorQuestions.list.invalidate();
+      utils.errorQuestions.listBySchoolLevel.invalidate();
+      utils.errorQuestions.listBySchoolLevelAndSubject.invalidate();
+      setSelectedQuestionIds([]);
+      setBatchDifficultyDialogOpen(false);
+    },
+    onError: (error) => {
+      toast.error(`批量修改难度失败：${error.message}`);
+    },
+  });
+
+  // 批量添加标签
+  const batchAddTagMutation = trpc.errorQuestions.batchAddTag.useMutation({
+    onSuccess: (data) => {
+      toast.success(`成功为${data.successCount}道错题添加标签${data.failCount > 0 ? `，${data.failCount}道失败` : ''}`);
+      utils.errorQuestions.list.invalidate();
+      utils.errorQuestions.listBySchoolLevel.invalidate();
+      utils.errorQuestions.listBySchoolLevelAndSubject.invalidate();
+      setSelectedQuestionIds([]);
+      setBatchTagDialogOpen(false);
+    },
+    onError: (error) => {
+      toast.error(`批量添加标签失败：${error.message}`);
+    },
+  });
+
+  const handleBatchMarkMastered = () => {
+    if (selectedQuestionIds.length === 0) {
+      toast.error("请先选择要标记的错题");
+      return;
+    }
+    setBatchMasteredDialogOpen(true);
+  };
+
+  const handleBatchAddToReview = () => {
+    if (selectedQuestionIds.length === 0) {
+      toast.error("请先选择要加入复习计划的错题");
+      return;
+    }
+    setBatchReviewDialogOpen(true);
+  };
+
+  const handleBatchUpdateDifficulty = () => {
+    if (selectedQuestionIds.length === 0) {
+      toast.error("请先选择要修改难度的错题");
+      return;
+    }
+    setBatchDifficultyDialogOpen(true);
+  };
+
+  const handleBatchAddTag = () => {
+    if (selectedQuestionIds.length === 0) {
+      toast.error("请先选择要添加标签的错题");
+      return;
+    }
+    setBatchTagDialogOpen(true);
   };
 
   const handleSelectQuestion = (questionId: number, checked: boolean) => {
@@ -619,7 +718,187 @@ export default function ErrorQuestions() {
         selectedQuestionIds={selectedQuestionIds}
         onExportComplete={() => setSelectedQuestionIds([])}
       />
+      <AdvancedExportDialog 
+        open={advancedExportDialogOpen} 
+        onOpenChange={setAdvancedExportDialogOpen}
+        selectedQuestionIds={selectedQuestionIds}
+      />
+      <ShareDialog 
+        open={shareDialogOpen} 
+        onOpenChange={setShareDialogOpen}
+        selectedQuestionIds={selectedQuestionIds}
+      />
       
+      {/* 批量标记已掌握对话框 */}
+      <Dialog open={batchMasteredDialogOpen} onOpenChange={setBatchMasteredDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>批量标记为已掌握</DialogTitle>
+            <DialogDescription>
+              确定要将选中的 {selectedQuestionIds.length} 道错题标记为已掌握吗？
+            </DialogDescription>
+          </DialogHeader>
+          <div className="flex justify-end gap-2 mt-4">
+            <Button 
+              variant="outline" 
+              onClick={() => setBatchMasteredDialogOpen(false)}
+              disabled={batchMarkMasteredMutation.isPending}
+            >
+              取消
+            </Button>
+            <Button 
+              onClick={() => batchMarkMasteredMutation.mutate({ questionIds: selectedQuestionIds })}
+              disabled={batchMarkMasteredMutation.isPending}
+            >
+              {batchMarkMasteredMutation.isPending && (
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              )}
+              确认
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* 批量加入复习计划对话框 */}
+      <Dialog open={batchReviewDialogOpen} onOpenChange={setBatchReviewDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>批量加入复习计划</DialogTitle>
+            <DialogDescription>
+              确定要将选中的 {selectedQuestionIds.length} 道错题加入复习计划吗？
+            </DialogDescription>
+          </DialogHeader>
+          <div className="flex justify-end gap-2 mt-4">
+            <Button 
+              variant="outline" 
+              onClick={() => setBatchReviewDialogOpen(false)}
+              disabled={batchAddToReviewMutation.isPending}
+            >
+              取消
+            </Button>
+            <Button 
+              onClick={() => batchAddToReviewMutation.mutate({ errorQuestionIds: selectedQuestionIds })}
+              disabled={batchAddToReviewMutation.isPending}
+            >
+              {batchAddToReviewMutation.isPending && (
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              )}
+              确认
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* 批量修改难度对话框 */}
+      <Dialog open={batchDifficultyDialogOpen} onOpenChange={setBatchDifficultyDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>批量修改难度</DialogTitle>
+            <DialogDescription>
+              为选中的 {selectedQuestionIds.length} 道错题设置难度等级
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              <Label>难度等级</Label>
+              <Select value={batchDifficulty} onValueChange={(v) => setBatchDifficulty(v as "easy" | "medium" | "hard")}>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="easy">简单</SelectItem>
+                  <SelectItem value="medium">中等</SelectItem>
+                  <SelectItem value="hard">困难</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+          <div className="flex justify-end gap-2">
+            <Button 
+              variant="outline" 
+              onClick={() => setBatchDifficultyDialogOpen(false)}
+              disabled={batchUpdateDifficultyMutation.isPending}
+            >
+              取消
+            </Button>
+            <Button 
+              onClick={() => batchUpdateDifficultyMutation.mutate({ 
+                questionIds: selectedQuestionIds, 
+                difficulty: batchDifficulty 
+              })}
+              disabled={batchUpdateDifficultyMutation.isPending}
+            >
+              {batchUpdateDifficultyMutation.isPending && (
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              )}
+              确认
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* 批量添加标签对话框 */}
+      <Dialog open={batchTagDialogOpen} onOpenChange={setBatchTagDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>批量添加标签</DialogTitle>
+            <DialogDescription>
+              为选中的 {selectedQuestionIds.length} 道错题添加标签
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              <Label>选择标签</Label>
+              <Select 
+                value={batchTagId?.toString() || ""} 
+                onValueChange={(v) => setBatchTagId(parseInt(v))}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="选择一个标签" />
+                </SelectTrigger>
+                <SelectContent>
+                  {allTags.map((tag) => (
+                    <SelectItem key={tag.id} value={tag.id.toString()}>
+                      <div className="flex items-center gap-2">
+                        <div className="w-3 h-3 rounded-full" style={{ backgroundColor: tag.color || '#6366f1' }} />
+                        {tag.name}
+                      </div>
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+          <div className="flex justify-end gap-2">
+            <Button 
+              variant="outline" 
+              onClick={() => setBatchTagDialogOpen(false)}
+              disabled={batchAddTagMutation.isPending}
+            >
+              取消
+            </Button>
+            <Button 
+              onClick={() => {
+                if (!batchTagId) {
+                  toast.error("请选择一个标签");
+                  return;
+                }
+                batchAddTagMutation.mutate({ 
+                  questionIds: selectedQuestionIds, 
+                  tagId: batchTagId 
+                });
+              }}
+              disabled={batchAddTagMutation.isPending || !batchTagId}
+            >
+              {batchAddTagMutation.isPending && (
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              )}
+              确认
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
       {/* 删除确认对话框 */}
       <Dialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
         <DialogContent>
@@ -782,7 +1061,59 @@ export default function ErrorQuestions() {
                   )}
                 </div>
                 {selectedQuestionIds.length > 0 && (
-                  <div className="flex gap-2">
+                  <div className="flex flex-wrap gap-2">
+                    <Button 
+                      variant="outline" 
+                      size="sm"
+                      onClick={handleBatchMarkMastered}
+                      disabled={batchMarkMasteredMutation.isPending}
+                    >
+                      {batchMarkMasteredMutation.isPending ? (
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      ) : (
+                        <CheckCheck className="mr-2 h-4 w-4" />
+                      )}
+                      标记已掌握
+                    </Button>
+                    <Button 
+                      variant="outline" 
+                      size="sm"
+                      onClick={handleBatchAddToReview}
+                      disabled={batchAddToReviewMutation.isPending}
+                    >
+                      {batchAddToReviewMutation.isPending ? (
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      ) : (
+                        <CalendarPlus className="mr-2 h-4 w-4" />
+                      )}
+                      加入复习计划
+                    </Button>
+                    <Button 
+                      variant="outline" 
+                      size="sm"
+                      onClick={handleBatchUpdateDifficulty}
+                      disabled={batchUpdateDifficultyMutation.isPending}
+                    >
+                      {batchUpdateDifficultyMutation.isPending ? (
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      ) : (
+                        <BarChart3 className="mr-2 h-4 w-4" />
+                      )}
+                      修改难度
+                    </Button>
+                    <Button 
+                      variant="outline" 
+                      size="sm"
+                      onClick={handleBatchAddTag}
+                      disabled={batchAddTagMutation.isPending}
+                    >
+                      {batchAddTagMutation.isPending ? (
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      ) : (
+                        <Tag className="mr-2 h-4 w-4" />
+                      )}
+                      添加标签
+                    </Button>
                     <Button 
                       variant="outline" 
                       size="sm"
@@ -790,6 +1121,22 @@ export default function ErrorQuestions() {
                     >
                       <FileDown className="mr-2 h-4 w-4" />
                       批量导出
+                    </Button>
+                    <Button 
+                      variant="outline" 
+                      size="sm"
+                      onClick={() => setAdvancedExportDialogOpen(true)}
+                    >
+                      <FileDown className="mr-2 h-4 w-4" />
+                      高级导出
+                    </Button>
+                    <Button 
+                      variant="outline" 
+                      size="sm"
+                      onClick={() => setShareDialogOpen(true)}
+                    >
+                      <Share2 className="mr-2 h-4 w-4" />
+                      创建分享
                     </Button>
                     <Button 
                       variant="destructive" 

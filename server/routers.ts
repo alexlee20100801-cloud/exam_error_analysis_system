@@ -56,6 +56,8 @@ import { questionExportRouter } from "./routers/questionExport";
 import { aiFavoritesRouter } from "./routers/aiFavorites";
 import { collaborativeFilteringRouter } from "./routers/collaborativeFiltering";
 import { exportTemplatesRouter } from "./routers/exportTemplates";
+import { advancedExportRouter } from "./routers/advancedExport";
+import { shareRouter } from "./routers/share";
 
 export const appRouter = router({
   system: systemRouter,
@@ -125,8 +127,14 @@ export const appRouter = router({
   // 协同过滤推荐
   collaborativeFiltering: collaborativeFilteringRouter,
   
-  // 导出模板管理
+    // 导出模板
   exportTemplates: exportTemplatesRouter,
+  
+  // 高级导出
+  advancedExport: advancedExportRouter,
+  
+  // 分享功能
+  share: shareRouter,
 
   // 学习提醒
   reviewReminders: reviewRemindersRouter,

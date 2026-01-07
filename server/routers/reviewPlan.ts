@@ -103,4 +103,38 @@ export const reviewPlanRouter = router({
       description: "艾宾浩斯遗忘曲线复习间隔（天数）",
     };
   }),
+
+  /**
+   * 批量加入复习计划
+   */
+  batchAddToReviewPlan: protectedProcedure
+    .input(
+      z.object({
+        errorQuestionIds: z.array(z.number()),
+      })
+    )
+    .mutation(async ({ ctx, input }) => {
+      let successCount = 0;
+      let failCount = 0;
+
+      // 逐个添加到复习计划
+      for (const errorQuestionId of input.errorQuestionIds) {
+        try {
+          const success = await addToReviewPlan(ctx.user.id, errorQuestionId);
+          if (success) {
+            successCount++;
+          } else {
+            failCount++;
+          }
+        } catch (error) {
+          failCount++;
+        }
+      }
+
+      return {
+        success: true,
+        successCount,
+        failCount,
+      };
+    }),
 });

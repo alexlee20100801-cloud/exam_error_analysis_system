@@ -2,7 +2,7 @@ import { z } from "zod";
 import { eq, and, desc } from "drizzle-orm";
 import { protectedProcedure, router } from "../_core/trpc";
 import { getSchoolLevelFromGrade } from "../utils/schoolLevelHelper";
-import { errorQuestions } from "../../drizzle/schema";
+import { errorQuestions, errorQuestionTagRelations } from "../../drizzle/schema";
 import { getDb } from "../db";
 import { 
   createErrorQuestion, 
@@ -460,6 +460,142 @@ export const errorQuestionsRouter = router({
 
       return {
         success: true,
+      };
+    }),
+
+  /**
+   * 批量标记为已掌握
+   */
+  batchMarkMastered: protectedProcedure
+    .input(z.object({
+      questionIds: z.array(z.number()),
+    }))
+    .mutation(async ({ ctx, input }) => {
+      const db = await getDb();
+      if (!db) throw new Error("数据库连接失败");
+
+      let successCount = 0;
+      let failCount = 0;
+
+      // 逐个验证并更新
+      for (const questionId of input.questionIds) {
+        try {
+          const question = await getErrorQuestionById(questionId);
+          if (question && question.userId === ctx.user.id) {
+            await db
+              .update(errorQuestions)
+              .set({ isMastered: true, updatedAt: new Date() })
+              .where(eq(errorQuestions.id, questionId));
+            successCount++;
+          } else {
+            failCount++;
+          }
+        } catch (error) {
+          failCount++;
+        }
+      }
+
+      return {
+        success: true,
+        successCount,
+        failCount,
+      };
+    }),
+
+  /**
+   * 批量修改难度
+   */
+  batchUpdateDifficulty: protectedProcedure
+    .input(z.object({
+      questionIds: z.array(z.number()),
+      difficulty: z.enum(["easy", "medium", "hard"]),
+    }))
+    .mutation(async ({ ctx, input }) => {
+      const db = await getDb();
+      if (!db) throw new Error("数据库连接失败");
+
+      let successCount = 0;
+      let failCount = 0;
+
+      // 逐个验证并更新
+      for (const questionId of input.questionIds) {
+        try {
+          const question = await getErrorQuestionById(questionId);
+          if (question && question.userId === ctx.user.id) {
+            await db
+              .update(errorQuestions)
+              .set({ difficulty: input.difficulty, updatedAt: new Date() })
+              .where(eq(errorQuestions.id, questionId));
+            successCount++;
+          } else {
+            failCount++;
+          }
+        } catch (error) {
+          failCount++;
+        }
+      }
+
+      return {
+        success: true,
+        successCount,
+        failCount,
+      };
+    }),
+
+  /**
+   * 批量添加标签
+   */
+  batchAddTag: protectedProcedure
+    .input(z.object({
+      questionIds: z.array(z.number()),
+      tagId: z.number(),
+    }))
+    .mutation(async ({ ctx, input }) => {
+      const db = await getDb();
+      if (!db) throw new Error("数据库连接失败");
+
+      let successCount = 0;
+      let failCount = 0;
+
+      // 导入标签关系表
+      const { errorQuestionTagRelations } = await import("../../drizzle/schema");
+
+      // 逐个验证并添加标签
+      for (const questionId of input.questionIds) {
+        try {
+          const question = await getErrorQuestionById(questionId);
+          if (question && question.userId === ctx.user.id) {
+            // 检查是否已存在该标签关系
+            const existing = await db
+              .select()
+              .from(errorQuestionTagRelations)
+              .where(
+                and(
+                  eq(errorQuestionTagRelations.errorQuestionId, questionId),
+                  eq(errorQuestionTagRelations.tagId, input.tagId)
+                )
+              )
+              .limit(1);
+
+            if (existing.length === 0) {
+              await db.insert(errorQuestionTagRelations).values({
+                errorQuestionId: questionId,
+                tagId: input.tagId,
+              });
+            }
+            successCount++;
+          } else {
+            failCount++;
+          }
+        } catch (error) {
+          failCount++;
+        }
+      }
+
+      return {
+        success: true,
+        successCount,
+        failCount,
       };
     }),
 });

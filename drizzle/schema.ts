@@ -1,5 +1,8 @@
-import { mysqlTable, mysqlSchema, AnyMySqlColumn, index, int, varchar, mysqlEnum, timestamp, text, json, decimal, float, tinyint } from "drizzle-orm/mysql-core"
+import { mysqlTable, mysqlEnum, int, varchar, text, timestamp, json, decimal, tinyint, index, unique, primaryKey, mysqlView } from "drizzle-orm/mysql-core"
 import { sql } from "drizzle-orm"
+
+// 导入分享功能的schema
+export { errorQuestionShares, shareAccessLogs, type ErrorQuestionShare, type NewErrorQuestionShare, type ShareAccessLog, type NewShareAccessLog } from "./share_schema";
 
 export const accountCredentials = mysqlTable("account_credentials", {
 	id: int().autoincrement().notNull(),
