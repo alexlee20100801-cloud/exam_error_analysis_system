@@ -398,7 +398,7 @@ export async function getKnowledgeHeatmapData(userId: number, subject: string) {
         eq(learningProgress.userId, userId)
       )
     )
-    .where(eq(knowledgePoints.subject, subject));
+    .where(sql`${knowledgePoints.subject} = ${subject}`);
 
   return heatmapData.map(d => ({
     knowledgePointId: d.knowledgePointId,

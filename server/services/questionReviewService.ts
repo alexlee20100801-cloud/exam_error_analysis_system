@@ -72,7 +72,7 @@ export async function getPendingQuestions(params: {
     query = query.where(
       and(
         eq(aiGeneratedQuestions.reviewStatus, 'pending'),
-        eq(aiGeneratedQuestions.subject, subject as any)
+        sql`${aiGeneratedQuestions.subject} = ${subject}`
       )
     );
   }
@@ -81,7 +81,7 @@ export async function getPendingQuestions(params: {
     query = query.where(
       and(
         eq(aiGeneratedQuestions.reviewStatus, 'pending'),
-        eq(aiGeneratedQuestions.grade, grade as any)
+        sql`${aiGeneratedQuestions.grade} = ${grade}`
       )
     );
   }
@@ -400,11 +400,11 @@ export async function getReviewedQuestions(params: {
   }
 
   if (subject) {
-    conditions.push(eq(aiGeneratedQuestions.subject, subject as any));
+    conditions.push(sql`${aiGeneratedQuestions.subject} = ${subject}`);
   }
 
   if (grade) {
-    conditions.push(eq(aiGeneratedQuestions.grade, grade as any));
+    conditions.push(sql`${aiGeneratedQuestions.grade} = ${grade}`);
   }
 
   const questions = await db

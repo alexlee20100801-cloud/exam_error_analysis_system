@@ -44,11 +44,11 @@ export async function getSharedAnnotations(filters?: {
     .$dynamic();
   
   if (filters?.subject) {
-    query = query.where(eq(sharedAnnotations.subject, filters.subject));
+    query = query.where(sql`${sharedAnnotations.subject} = ${filters.subject}`);
   }
   
   if (filters?.grade) {
-    query = query.where(eq(sharedAnnotations.grade, filters.grade));
+    query = query.where(sql`${sharedAnnotations.grade} = ${filters.grade}`);
   }
   
   if (filters?.userId) {

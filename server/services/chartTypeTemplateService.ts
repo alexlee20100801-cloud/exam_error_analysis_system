@@ -238,7 +238,7 @@ export async function getTemplatesByCategory(category: string) {
   return db
     .select()
     .from(chartTypeTemplates)
-    .where(eq(chartTypeTemplates.category, category as any));
+    .where(sql`${chartTypeTemplates.category} = ${category}`);
 }
 
 /**

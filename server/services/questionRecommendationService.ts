@@ -37,7 +37,7 @@ export async function analyzeWeakKnowledgePoints(userId: number, subject?: strin
       and(
         eq(errorQuestions.userId, userId),
         eq(errorQuestions.isMastered, false),
-        eq(errorQuestions.subject, subject as any)
+        sql`${errorQuestions.subject} = ${subject}`
       )
     );
   }
@@ -170,7 +170,7 @@ export async function generateRecommendations(params: {
       and(
         eq(aiGeneratedQuestions.reviewStatus, 'approved'),
         eq(aiGeneratedQuestions.isPublic, true),
-        eq(aiGeneratedQuestions.subject, subject as any)
+        sql`${aiGeneratedQuestions.subject} = ${subject}`
       )
     );
   }

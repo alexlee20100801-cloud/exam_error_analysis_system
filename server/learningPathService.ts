@@ -37,7 +37,7 @@ async function analyzeWeakKnowledgePoints(userId: string, subject?: string) {
   // 获取用户的错题
   const conditions = [eq(schema.errorQuestions.userId, userId)];
   if (subject) {
-    conditions.push(eq(schema.errorQuestions.subject, subject as any));
+    conditions.push(sql`${schema.errorQuestions.subject} = ${subject}`);
   }
 
   const errorQuestions = await db
@@ -201,8 +201,8 @@ export async function generateLearningPath(
       .from(schema.questionBank)
       .where(
         and(
-          eq(schema.questionBank.subject, subject as any),
-          eq(schema.questionBank.difficulty, node.difficulty as any)
+          sql`${schema.questionBank.subject} = ${subject}`,
+          sql`${schema.questionBank.difficulty} = ${node.difficulty}`
         )
       )
       .limit(5);

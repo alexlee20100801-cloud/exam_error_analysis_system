@@ -37,11 +37,11 @@ export const exportRouter = router({
       const conditions = [eq(errorQuestions.userId, ctx.user.id)];
 
       if (input.subject) {
-        conditions.push(eq(errorQuestions.subject, input.subject as any));
+        conditions.push(sql`${errorQuestions.subject} = ${input.subject}`);
       }
 
       if (input.grade) {
-        conditions.push(eq(errorQuestions.grade, input.grade as any));
+        conditions.push(sql`${errorQuestions.grade} = ${input.grade}`);
       }
 
       if (input.startDate) {

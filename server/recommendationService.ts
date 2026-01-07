@@ -105,7 +105,7 @@ export async function getRecommendedRealExams(
   // 优先推荐相同年级的题目
   if (errorAnalysis.grade) {
     conditions.push(
-      eq(schema.realExamQuestions.grade, errorAnalysis.grade as any)
+      sql`${schema.realExamQuestions.grade} = ${errorAnalysis.grade}`
     );
   }
 

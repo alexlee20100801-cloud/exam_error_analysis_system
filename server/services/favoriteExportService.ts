@@ -46,7 +46,7 @@ async function getFavoriteQuestions(
     ? await db
         .select()
         .from(favorites)
-        .where(and(eq(favorites.userId, userId), eq(favorites.questionType, questionType)))
+        .where(and(eq(favorites.userId, userId), sql`${favorites.questionType} = ${questionType}`))
     : await db
         .select()
         .from(favorites)

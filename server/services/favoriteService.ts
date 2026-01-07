@@ -31,7 +31,7 @@ export async function addToFavorites(
       and(
         eq(favorites.userId, userId),
         eq(favorites.questionId, questionId),
-        eq(favorites.questionType, questionType)
+        sql`${favorites.questionType} = ${questionType}`
       )
     )
     .limit(1);
@@ -79,7 +79,7 @@ export async function removeFromFavorites(
       and(
         eq(favorites.userId, userId),
         eq(favorites.questionId, questionId),
-        eq(favorites.questionType, questionType)
+        sql`${favorites.questionType} = ${questionType}`
       )
     );
 
@@ -110,7 +110,7 @@ export async function isFavorited(
       and(
         eq(favorites.userId, userId),
         eq(favorites.questionId, questionId),
-        eq(favorites.questionType, questionType)
+        sql`${favorites.questionType} = ${questionType}`
       )
     )
     .limit(1);
@@ -155,7 +155,7 @@ export async function getFavorites(
   // 构建查询条件
   const conditions = [eq(favorites.userId, userId)];
   if (questionType) {
-    conditions.push(eq(favorites.questionType, questionType));
+    conditions.push(sql`${favorites.questionType} = ${questionType}`);
   }
 
   // 查询收藏记录

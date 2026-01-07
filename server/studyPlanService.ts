@@ -59,8 +59,8 @@ export async function generateStudyPlan(userId: string, examId: number): Promise
     .where(
       and(
         eq(errorQuestions.userId, userId),
-        eq(errorQuestions.subject, examInfo.subject),
-        eq(errorQuestions.grade, examInfo.grade),
+        sql`${errorQuestions.subject} = ${examInfo.subject}`,
+        sql`${errorQuestions.grade} = ${examInfo.grade}`,
         eq(errorQuestions.isMastered, false)
       )
     )

@@ -118,8 +118,8 @@ export async function getKnowledgePoints() {
 export async function getKnowledgePointsBySubjectAndGrade(subject: string, grade: string) {
   return await db.select().from(knowledgePoints)
     .where(and(
-      eq(knowledgePoints.subject, subject as any),
-      eq(knowledgePoints.grade, grade as any)
+      sql`${knowledgePoints.subject} = ${subject}`,
+      sql`${knowledgePoints.grade} = ${grade}`
     ));
 }
 
@@ -181,9 +181,9 @@ export async function getQuestionBankByFilters(filters: {
   let query = db.select().from(questionBank);
   
   const conditions = [];
-  if (filters.subject) conditions.push(eq(questionBank.subject, filters.subject as any));
-  if (filters.grade) conditions.push(eq(questionBank.grade, filters.grade as any));
-  if (filters.difficulty) conditions.push(eq(questionBank.difficulty, filters.difficulty as any));
+  if (filters.subject) conditions.push(sql`${questionBank.subject} = ${filters.subject}`);
+  if (filters.grade) conditions.push(sql`${questionBank.grade} = ${filters.grade}`);
+  if (filters.difficulty) conditions.push(sql`${questionBank.difficulty} = ${filters.difficulty}`);
   
   if (conditions.length > 0) {
     query = query.where(and(...conditions)) as any;
@@ -332,9 +332,9 @@ export async function getRealExamQuestions(filters?: {
   let query = db.select().from(realExamQuestions);
   
   const conditions = [];
-  if (filters?.subject) conditions.push(eq(realExamQuestions.subject, filters.subject as any));
-  if (filters?.grade) conditions.push(eq(realExamQuestions.grade, filters.grade as any));
-  if (filters?.difficulty) conditions.push(eq(realExamQuestions.difficulty, filters.difficulty as any));
+  if (filters?.subject) conditions.push(sql`${realExamQuestions.subject} = ${filters.subject}`);
+  if (filters?.grade) conditions.push(sql`${realExamQuestions.grade} = ${filters.grade}`);
+  if (filters?.difficulty) conditions.push(sql`${realExamQuestions.difficulty} = ${filters.difficulty}`);
   if (filters?.sourceSchool) conditions.push(eq(realExamQuestions.sourceSchool, filters.sourceSchool));
   if (filters?.examYear) conditions.push(eq(realExamQuestions.examYear, filters.examYear));
   
@@ -414,9 +414,9 @@ export async function getQuestions(filters?: {
   let query = db.select().from(questions);
   
   const conditions = [];
-  if (filters?.subject) conditions.push(eq(questions.subject, filters.subject as any));
-  if (filters?.grade) conditions.push(eq(questions.grade, filters.grade as any));
-  if (filters?.difficulty) conditions.push(eq(questions.difficulty, filters.difficulty as any));
+  if (filters?.subject) conditions.push(sql`${questions.subject} = ${filters.subject}`);
+  if (filters?.grade) conditions.push(sql`${questions.grade} = ${filters.grade}`);
+  if (filters?.difficulty) conditions.push(sql`${questions.difficulty} = ${filters.difficulty}`);
   
   if (conditions.length > 0) {
     query = query.where(and(...conditions)) as any;
@@ -1078,8 +1078,8 @@ export async function getErrorQuestionsBySubjectAndGrade(userId: number, subject
   const result = await db.select().from(errorQuestions)
     .where(and(
       eq(errorQuestions.userId, userId),
-      eq(errorQuestions.subject, subject as any),
-      eq(errorQuestions.grade, grade as any)
+      sql`${errorQuestions.subject} = ${subject}`,
+      sql`${errorQuestions.grade} = ${grade}`
     ));
   return result;
 }
@@ -1104,8 +1104,8 @@ export async function getKnowledgePointsByIds(ids: number[]) {
 export async function getVideosBySubjectAndGrade(subject: string, grade: string) {
   const result = await db.select().from(videoResources)
     .where(and(
-      eq(videoResources.subject, subject as any),
-      eq(videoResources.grade, grade as any)
+      sql`${videoResources.subject} = ${subject}`,
+      sql`${videoResources.grade} = ${grade}`
     ));
   return result;
 }
@@ -1225,11 +1225,11 @@ export async function getRawQuestions(filters?: {
   let query = db.select().from(rawQuestions);
   
   const conditions = [];
-  if (filters?.subject) conditions.push(eq(rawQuestions.subject, filters.subject as any));
-  if (filters?.grade) conditions.push(eq(rawQuestions.grade, filters.grade as any));
-  if (filters?.processingStatus) conditions.push(eq(rawQuestions.processingStatus, filters.processingStatus as any));
-  if (filters?.duplicateCheckStatus) conditions.push(eq(rawQuestions.duplicateCheckStatus, filters.duplicateCheckStatus as any));
-  if (filters?.complianceStatus) conditions.push(eq(rawQuestions.complianceStatus, filters.complianceStatus as any));
+  if (filters?.subject) conditions.push(sql`${rawQuestions.subject} = ${filters.subject}`);
+  if (filters?.grade) conditions.push(sql`${rawQuestions.grade} = ${filters.grade}`);
+  if (filters?.processingStatus) conditions.push(sql`${rawQuestions.processingStatus} = ${filters.processingStatus}`);
+  if (filters?.duplicateCheckStatus) conditions.push(sql`${rawQuestions.duplicateCheckStatus} = ${filters.duplicateCheckStatus}`);
+  if (filters?.complianceStatus) conditions.push(sql`${rawQuestions.complianceStatus} = ${filters.complianceStatus}`);
   if (filters?.crawlerTaskId) conditions.push(eq(rawQuestions.crawlerTaskId, filters.crawlerTaskId));
   
   if (conditions.length > 0) {

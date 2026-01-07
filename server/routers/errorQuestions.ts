@@ -159,7 +159,7 @@ export const errorQuestionsRouter = router({
         .where(
           and(
             eq(errorQuestions.userId, ctx.user.id),
-            eq(errorQuestions.schoolLevel, input.schoolLevel)
+            sql`${errorQuestions.schoolLevel} = ${input.schoolLevel}`
           )
         )
         .orderBy(desc(errorQuestions.createdAt))
@@ -185,8 +185,8 @@ export const errorQuestionsRouter = router({
         .where(
           and(
             eq(errorQuestions.userId, ctx.user.id),
-            eq(errorQuestions.schoolLevel, input.schoolLevel),
-            eq(errorQuestions.subject, input.subject)
+            sql`${errorQuestions.schoolLevel} = ${input.schoolLevel}`,
+            sql`${errorQuestions.subject} = ${input.subject}`
           )
         )
         .orderBy(desc(errorQuestions.createdAt))

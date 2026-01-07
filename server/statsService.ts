@@ -52,7 +52,7 @@ export async function getErrorQuestionCountBySubject(
 
   const conditions = [eq(errorQuestions.userId, userId)];
   if (schoolLevel) {
-    conditions.push(eq(errorQuestions.schoolLevel, schoolLevel));
+    conditions.push(sql`${errorQuestions.schoolLevel} = ${schoolLevel}`);
   }
 
   const results = await db

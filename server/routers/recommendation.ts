@@ -43,7 +43,7 @@ export const recommendationRouter = router({
         .where(
           and(
             inArray(rawQuestions.id, questionIds),
-            eq(rawQuestions.subject, input.subject)
+            sql`${rawQuestions.subject} = ${input.subject}`
           )
         );
       
@@ -103,7 +103,7 @@ export const recommendationRouter = router({
           .from(rawQuestions)
           .where(
             and(
-              eq(rawQuestions.subject, originalQuestion.subject),
+              sql`${rawQuestions.subject} = ${originalQuestion.subject}`,
               eq(rawQuestions.gradeLevel, originalQuestion.gradeLevel || 'junior1'),
               sql`${rawQuestions.id} != ${input.questionId}`
             )
@@ -123,7 +123,7 @@ export const recommendationRouter = router({
         .from(rawQuestions)
         .where(
           and(
-            eq(rawQuestions.subject, originalQuestion.subject),
+            sql`${rawQuestions.subject} = ${originalQuestion.subject}`,
             sql`${rawQuestions.id} != ${input.questionId}`,
             sql`${rawQuestions.knowledgePointIds} IS NOT NULL`
           )
@@ -176,12 +176,12 @@ export const recommendationRouter = router({
     .query(async ({ input }) => {
       // 构建查询条件
       const conditions = [
-        eq(rawQuestions.subject, input.subject),
+        sql`${rawQuestions.subject} = ${input.subject}`,
         eq(rawQuestions.gradeLevel, input.grade)
       ];
       
       if (input.difficulty) {
-        conditions.push(eq(rawQuestions.difficulty, input.difficulty));
+        conditions.push(sql`${rawQuestions.difficulty} = ${input.difficulty}`);
       }
       
       // 查询符合条件的试题
@@ -277,10 +277,10 @@ export const recommendationRouter = router({
       grade: z.enum(['junior1', 'junior2', 'junior3', 'senior1', 'senior2', 'senior3']).optional()
     }))
     .query(async ({ input }) => {
-      const conditions = [eq(knowledgePoints.subject, input.subject)];
+      const conditions = [sql`${knowledgePoints.subject} = ${input.subject}`];
       
       if (input.grade) {
-        conditions.push(eq(knowledgePoints.grade, input.grade));
+        conditions.push(sql`${knowledgePoints.grade} = ${input.grade}`);
       }
       
       const points = await db

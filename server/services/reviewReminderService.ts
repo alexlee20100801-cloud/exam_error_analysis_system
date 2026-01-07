@@ -49,7 +49,7 @@ export async function createReviewReminder(
         and(
           eq(reviewReminders.userId, userId),
           eq(reviewReminders.questionId, questionId),
-          eq(reviewReminders.questionType, questionType),
+          sql`${reviewReminders.questionType} = ${questionType}`,
           eq(reviewReminders.status, "pending")
         )
       )
@@ -151,7 +151,7 @@ export async function getAllReminders(
 
   const conditions = [eq(reviewReminders.userId, userId)];
   if (status) {
-    conditions.push(eq(reviewReminders.status, status));
+    conditions.push(sql`${reviewReminders.status} = ${status}`);
   }
 
   const reminders = await db

@@ -22,10 +22,10 @@ export async function getRealExamQuestions(filters: {
   const conditions = [];
   
   if (filters.grade) {
-    conditions.push(eq(schema.realExamQuestions.grade, filters.grade as any));
+    conditions.push(sql`${schema.realExamQuestions.grade} = ${filters.grade}`);
   }
   if (filters.subject) {
-    conditions.push(eq(schema.realExamQuestions.subject, filters.subject as any));
+    conditions.push(sql`${schema.realExamQuestions.subject} = ${filters.subject}`);
   }
   if (filters.region) {
     conditions.push(eq(schema.realExamQuestions.sourceRegion, filters.region));
@@ -37,7 +37,7 @@ export async function getRealExamQuestions(filters: {
     conditions.push(eq(schema.realExamQuestions.examYear, filters.year));
   }
   if (filters.difficulty) {
-    conditions.push(eq(schema.realExamQuestions.difficulty, filters.difficulty as any));
+    conditions.push(sql`${schema.realExamQuestions.difficulty} = ${filters.difficulty}`);
   }
 
   // 只显示公开的题目

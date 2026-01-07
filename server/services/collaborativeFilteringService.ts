@@ -120,7 +120,7 @@ export async function getSimilarUsers(userId: number, limit: number = 10): Promi
     .from(users)
     .where(and(
       ne(users.id, userId),
-      eq(users.grade, currentUser.grade),
+      sql`${users.grade} = ${currentUser.grade}`,
       currentUser.region ? eq(users.region, currentUser.region) : sql`1=1`
     ))
     .limit(50); // 先获取候选用户

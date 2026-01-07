@@ -203,7 +203,7 @@ export async function recommendSimilarQuestions(
     const candidateQuestions = await db.select().from(errorQuestions).where(
       and(
         eq(errorQuestions.userId, userId),
-        eq(errorQuestions.subject, sourceQuestion.subject),
+        sql`${errorQuestions.subject} = ${sourceQuestion.subject}`,
         ne(errorQuestions.id, errorQuestionId)
       )
     ).limit(20);

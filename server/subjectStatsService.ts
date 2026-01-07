@@ -59,7 +59,7 @@ export async function getSubjectErrorTrend(userId: string, subject: Subject, wee
     .where(
       and(
         eq(errorQuestions.userId, userId),
-        eq(errorQuestions.subject, subject),
+        sql`${errorQuestions.subject} = ${subject}`,
         gte(errorQuestions.createdAt, startDate)
       )
     )
@@ -92,7 +92,7 @@ export async function getSubjectAccuracyTrend(userId: string, subject: Subject, 
     .where(
       and(
         eq(practiceRecords.userId, userId),
-        eq(practiceRecords.subject, subject),
+        sql`${practiceRecords.subject} = ${subject}`,
         gte(practiceRecords.createdAt, startDate)
       )
     )
@@ -145,7 +145,7 @@ export async function getSubjectWeakChapters(userId: string, subject: Subject) {
         .where(
           and(
             eq(errorQuestions.userId, userId),
-            eq(errorQuestions.subject, subject),
+            sql`${errorQuestions.subject} = ${subject}`,
             sql`JSON_CONTAINS(${errorQuestions.knowledgePointIds}, JSON_ARRAY(${r.knowledgePointId}))`
           )
         );

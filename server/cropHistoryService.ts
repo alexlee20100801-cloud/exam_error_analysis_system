@@ -90,7 +90,7 @@ export async function getCropHistoryByQuestionType(
     .where(
       and(
         eq(cropHistory.userId, userId),
-        eq(cropHistory.questionType, questionType as any)
+        sql`${cropHistory.questionType} = ${questionType}`
       )
     )
     .orderBy(desc(cropHistory.usageCount))

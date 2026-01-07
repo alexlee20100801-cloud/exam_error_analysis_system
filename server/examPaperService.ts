@@ -31,9 +31,9 @@ export async function generateExamPaper(params: {
 
   // 从题库中选择题目
   const conditions = [
-    eq(schema.questionBank.subject, params.subject as any),
-    eq(schema.questionBank.grade, params.grade as any),
-    eq(schema.questionBank.difficulty, params.difficulty as any),
+    sql`${schema.questionBank.subject} = ${params.subject}`,
+    sql`${schema.questionBank.grade} = ${params.grade}`,
+    sql`${schema.questionBank.difficulty} = ${params.difficulty}`,
   ];
 
   if (params.knowledgePointIds && params.knowledgePointIds.length > 0) {
@@ -377,7 +377,7 @@ export async function generateRandomPractice(
   ];
 
   if (subject) {
-    conditions.push(eq(schema.errorQuestions.subject, subject as any));
+    conditions.push(sql`${schema.errorQuestions.subject} = ${subject}`);
   }
 
   const questions = await db
@@ -450,12 +450,12 @@ export async function generateTimedPractice(params: {
 
   let conditions = [
     eq(schema.errorQuestions.userId, parseInt(params.userId)),
-    eq(schema.errorQuestions.subject, params.subject as any),
+    sql`${schema.errorQuestions.subject} = ${params.subject}`,
     eq(schema.errorQuestions.isMastered, 0)
   ];
 
   if (params.difficulty) {
-    conditions.push(eq(schema.errorQuestions.difficulty, params.difficulty as any));
+    conditions.push(sql`${schema.errorQuestions.difficulty} = ${params.difficulty}`);
   }
 
   const questions = await db
@@ -506,7 +506,7 @@ export async function generateAdaptivePaper(params: {
     .where(
       and(
         eq(schema.errorQuestions.userId, parseInt(params.userId)),
-        eq(schema.errorQuestions.subject, params.subject as any),
+        sql`${schema.errorQuestions.subject} = ${params.subject}`,
         eq(schema.errorQuestions.isMastered, 0),
         sql`${schema.errorQuestions.knowledgePointId} IS NOT NULL`
       )

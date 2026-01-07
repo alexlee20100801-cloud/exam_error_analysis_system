@@ -37,7 +37,7 @@ export async function getCropTemplatesByCategory(
     .where(
       and(
         eq(userCropTemplates.userId, userId),
-        eq(userCropTemplates.category, category as any)
+        sql`${userCropTemplates.category} = ${category}`
       )
     )
     .orderBy(desc(userCropTemplates.usageCount));

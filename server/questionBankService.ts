@@ -41,17 +41,17 @@ export async function getQuestions(
   const conditions = [];
 
   if (filter.subject) {
-    conditions.push(eq(questionBank.subject, filter.subject as any));
+    conditions.push(sql`${questionBank.subject} = ${filter.subject}`);
   }
   if (filter.grade) {
-    conditions.push(eq(questionBank.grade, filter.grade as any));
+    conditions.push(sql`${questionBank.grade} = ${filter.grade}`);
   }
 
   if (filter.difficulty) {
-    conditions.push(eq(questionBank.difficulty, filter.difficulty as any));
+    conditions.push(sql`${questionBank.difficulty} = ${filter.difficulty}`);
   }
   if (filter.questionType) {
-    conditions.push(eq(questionBank.questionType, filter.questionType as any));
+    conditions.push(sql`${questionBank.questionType} = ${filter.questionType}`);
   }
   if (filter.searchKeyword) {
     conditions.push(

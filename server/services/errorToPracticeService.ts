@@ -143,7 +143,7 @@ export async function getUserPracticePool(
     query = baseQuery.where(
       and(
         eq(practicePools.userId, userId),
-        eq(practicePools.status, status)
+        sql`${practicePools.status} = ${status}`
       )
     );
   } else {

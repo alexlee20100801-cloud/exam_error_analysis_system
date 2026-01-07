@@ -41,16 +41,16 @@ export const questionsRouter = router({
       const conditions = [eq(questions.isPublished, true)];
 
       if (input.subject) {
-        conditions.push(eq(questions.subject, input.subject as any));
+        conditions.push(sql`${questions.subject} = ${input.subject}`);
       }
       if (input.grade) {
-        conditions.push(eq(questions.grade, input.grade as any));
+        conditions.push(sql`${questions.grade} = ${input.grade}`);
       }
       if (input.semester) {
         conditions.push(eq(questions.semester, input.semester as any));
       }
       if (input.difficulty) {
-        conditions.push(eq(questions.difficulty, input.difficulty as any));
+        conditions.push(sql`${questions.difficulty} = ${input.difficulty}`);
       }
 
       const questionsList = await db

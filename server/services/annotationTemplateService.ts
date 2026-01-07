@@ -46,11 +46,11 @@ export async function getPublicTemplates(filters?: {
     .$dynamic();
   
   if (filters?.category) {
-    query = query.where(eq(annotationTemplates.category, filters.category));
+    query = query.where(sql`${annotationTemplates.category} = ${filters.category}`);
   }
   
   if (filters?.subject) {
-    query = query.where(eq(annotationTemplates.subject, filters.subject));
+    query = query.where(sql`${annotationTemplates.subject} = ${filters.subject}`);
   }
   
   const templates = await query.orderBy(desc(annotationTemplates.usageCount));
