@@ -3,10 +3,11 @@
  * 负责成就解锁、进度计算和徽章管理
  */
 
-import { eq, and, sql, desc } from "drizzle-orm";
+import { eq, and, sql, desc, inArray } from "drizzle-orm";
 import { getDb } from "./db";
 import {
   achievements,
+  userAchievements,
   errorQuestions,
   practiceRecords,
   learningProgress,
@@ -18,7 +19,7 @@ import {
  * 检查并解锁用户成就
  */
 export async function checkAndUnlockAchievements(userId: string): Promise<Achievement[]> {
-  const db = await getDb();
+  const db = getDb();
   if (!db) throw new Error("Database not available");
 
   const newlyUnlocked: Achievement[] = [];
@@ -26,33 +27,29 @@ export async function checkAndUnlockAchievements(userId: string): Promise<Achiev
   // 获取所有成就定义
   const allAchievements = await db.select().from(achievements);
 
-  // 获取用户已觢锁的成就
-  const unlockedAchievements = await db
+  // 获取用户已解锁的成就
+  const unlockedRecords = await db
     .select()
-    .from(achievements)
-    .where(and(
-      eq(achievements.userId, userId),
-      eq(achievements.isUnlocked, true)
-    ));
+    .from(userAchievements)
+    .where(eq(userAchievements.userId, parseInt(userId)));
 
-  const unlockedCodes = new Set(
-    unlockedAchievements.map(a => a.code)
+  const unlockedAchievementIds = new Set(
+    unlockedRecords.map(r => r.achievementId)
   );
 
   // 检查每个成就是否满足解锁条件
   for (const achievement of allAchievements) {
-    if (unlockedCodes.has(achievement.code)) continue;
+    if (unlockedAchievementIds.has(achievement.id)) continue;
 
     const isMet = await checkAchievementRequirement(userId, achievement);
     if (isMet) {
-      // 觢锁成就
-      await db.update(achievements)
-        .set({
-          isUnlocked: true,
-          unlockedAt: new Date(),
-          progress: achievement.target
-        })
-        .where(eq(achievements.id, achievement.id));
+      // 解锁成就
+      await db.insert(userAchievements).values({
+        userId: parseInt(userId),
+        achievementId: achievement.id,
+        unlockedAt: new Date().toISOString(),
+        progress: achievement.requirement
+      });
       newlyUnlocked.push(achievement);
     }
   }
@@ -67,8 +64,10 @@ async function checkAchievementRequirement(
   userId: string,
   achievement: Achievement
 ): Promise<boolean> {
-  const db = await getDb();
+  const db = getDb();
   if (!db) return false;
+
+  const userIdNum = parseInt(userId);
 
   switch (achievement.code) {
     // 学习类成就
@@ -76,7 +75,7 @@ async function checkAchievementRequirement(
       const count = await db
         .select({ count: sql<number>`count(*)` })
         .from(errorQuestions)
-        .where(eq(errorQuestions.userId, userId));
+        .where(eq(errorQuestions.userId, userIdNum));
       return (count[0]?.count ?? 0) >= 1;
     }
 
@@ -86,7 +85,7 @@ async function checkAchievementRequirement(
       const count = await db
         .select({ count: sql<number>`count(*)` })
         .from(errorQuestions)
-        .where(eq(errorQuestions.userId, userId));
+        .where(eq(errorQuestions.userId, userIdNum));
       return (count[0]?.count ?? 0) >= achievement.requirement;
     }
 
@@ -95,7 +94,7 @@ async function checkAchievementRequirement(
       const count = await db
         .select({ count: sql<number>`count(*)` })
         .from(practiceRecords)
-        .where(eq(practiceRecords.userId, userId));
+        .where(eq(practiceRecords.userId, userIdNum));
       return (count[0]?.count ?? 0) >= 1;
     }
 
@@ -104,7 +103,7 @@ async function checkAchievementRequirement(
       const count = await db
         .select({ count: sql<number>`count(*)` })
         .from(practiceRecords)
-        .where(eq(practiceRecords.userId, userId));
+        .where(eq(practiceRecords.userId, userIdNum));
       return (count[0]?.count ?? 0) >= achievement.requirement;
     }
 
@@ -115,7 +114,7 @@ async function checkAchievementRequirement(
         .from(practiceRecords)
         .where(
           and(
-            eq(practiceRecords.userId, userId),
+            eq(practiceRecords.userId, userIdNum),
             eq(practiceRecords.isCorrect, true)
           )
         );
@@ -139,7 +138,7 @@ async function checkAchievementRequirement(
         .from(learningProgress)
         .where(
           and(
-            eq(learningProgress.userId, userId),
+            eq(learningProgress.userId, userIdNum),
             sql`${learningProgress.masteryLevel} >= 90`
           )
         );
@@ -153,7 +152,7 @@ async function checkAchievementRequirement(
         .from(learningProgress)
         .where(
           and(
-            eq(learningProgress.userId, userId),
+            eq(learningProgress.userId, userIdNum),
             sql`${learningProgress.masteryLevel} >= 90`
           )
         );
@@ -164,13 +163,13 @@ async function checkAchievementRequirement(
       const totalErrors = await db
         .select({ count: sql<number>`count(*)` })
         .from(errorQuestions)
-        .where(eq(errorQuestions.userId, userId));
+        .where(eq(errorQuestions.userId, userIdNum));
       const masteredErrors = await db
         .select({ count: sql<number>`count(*)` })
         .from(errorQuestions)
         .where(
           and(
-            eq(errorQuestions.userId, userId),
+            eq(errorQuestions.userId, userIdNum),
             eq(errorQuestions.isMastered, true)
           )
         );
@@ -188,14 +187,16 @@ async function checkAchievementRequirement(
  * 获取用户当前连续打卡天数
  */
 export async function getCurrentStreak(userId: string): Promise<number> {
-  const db = await getDb();
+  const db = getDb();
   if (!db) return 0;
+
+  const userIdNum = parseInt(userId);
 
   // 获取所有打卡记录，按日期降序
   const records = await db
     .select()
     .from(checkInRecords)
-    .where(eq(checkInRecords.userId, userId))
+    .where(eq(checkInRecords.userId, userIdNum))
     .orderBy(desc(checkInRecords.checkInDate));
 
   if (records.length === 0) return 0;
@@ -243,9 +244,10 @@ export async function recordCheckIn(
   userId: string,
   activityType: "error_question" | "practice" | "review" | "video"
 ): Promise<void> {
-  const db = await getDb();
+  const db = getDb();
   if (!db) throw new Error("Database not available");
 
+  const userIdNum = parseInt(userId);
   const today = new Date();
   today.setHours(0, 0, 0, 0);
 
@@ -255,8 +257,8 @@ export async function recordCheckIn(
     .from(checkInRecords)
     .where(
       and(
-        eq(checkInRecords.userId, userId),
-        sql`DATE(${checkInRecords.checkInDate}) = DATE(${today})`
+        eq(checkInRecords.userId, userIdNum),
+        sql`DATE(${checkInRecords.checkInDate}) = DATE(${today.toISOString()})`
       )
     )
     .limit(1);
@@ -264,8 +266,8 @@ export async function recordCheckIn(
   if (existingCheckIn.length === 0) {
     // 今天还没打卡，记录打卡
     await db.insert(checkInRecords).values({
-      userId,
-      checkInDate: today,
+      userId: userIdNum,
+      checkInDate: today.toISOString(),
     });
 
     // 检查是否解锁新成就
@@ -280,38 +282,37 @@ export async function getUserAchievements(userId: string): Promise<
   Array<{
     achievement: Achievement;
     unlocked: boolean;
-    unlockedAt?: Date;
+    unlockedAt?: string;
     progress: number;
   }>
 > {
-  const db = await getDb();
+  const db = getDb();
   if (!db) return [];
 
-  const allAchievements = await db.select().from(achievements);
-  const userUnlocked = await db
-    .select()
-    .from(achievements)
-    .where(and(
-      eq(achievements.userId, userId),
-      eq(achievements.isUnlocked, true)
-    ));
+  const userIdNum = parseInt(userId);
 
-  const unlockedMap = new Map<number, Achievement>();
-  userUnlocked.forEach((a) => {
-    unlockedMap.set(a.id, a);
+  const allAchievements = await db.select().from(achievements);
+  const userUnlockedRecords = await db
+    .select()
+    .from(userAchievements)
+    .where(eq(userAchievements.userId, userIdNum));
+
+  const unlockedMap = new Map<number, typeof userUnlockedRecords[0]>();
+  userUnlockedRecords.forEach((record) => {
+    unlockedMap.set(record.achievementId, record);
   });
 
   const result = await Promise.all(
     allAchievements.map(async (achievement) => {
-      const userAchievement = unlockedMap.get(achievement.id);
-      const progress = userAchievement
+      const userRecord = unlockedMap.get(achievement.id);
+      const progress = userRecord
         ? achievement.requirement
         : await getAchievementProgress(userId, achievement);
 
       return {
         achievement,
-        unlocked: !!userAchievement,
-        unlockedAt: userAchievement?.unlockedAt,
+        unlocked: !!userRecord,
+        unlockedAt: userRecord?.unlockedAt,
         progress,
       };
     })
@@ -327,15 +328,17 @@ async function getAchievementProgress(
   userId: string,
   achievement: Achievement
 ): Promise<number> {
-  const db = await getDb();
+  const db = getDb();
   if (!db) return 0;
+
+  const userIdNum = parseInt(userId);
 
   switch (achievement.category) {
     case "learning": {
       const count = await db
         .select({ count: sql<number>`count(*)` })
         .from(errorQuestions)
-        .where(eq(errorQuestions.userId, userId));
+        .where(eq(errorQuestions.userId, userIdNum));
       return Math.min(count[0]?.count ?? 0, achievement.requirement);
     }
 
@@ -346,7 +349,7 @@ async function getAchievementProgress(
           .from(practiceRecords)
           .where(
             and(
-              eq(practiceRecords.userId, userId),
+              eq(practiceRecords.userId, userIdNum),
               eq(practiceRecords.isCorrect, true)
             )
           );
@@ -355,7 +358,7 @@ async function getAchievementProgress(
       const count = await db
         .select({ count: sql<number>`count(*)` })
         .from(practiceRecords)
-        .where(eq(practiceRecords.userId, userId));
+        .where(eq(practiceRecords.userId, userIdNum));
       return Math.min(count[0]?.count ?? 0, achievement.requirement);
     }
 
@@ -369,13 +372,13 @@ async function getAchievementProgress(
         const totalErrors = await db
           .select({ count: sql<number>`count(*)` })
           .from(errorQuestions)
-          .where(eq(errorQuestions.userId, userId));
+          .where(eq(errorQuestions.userId, userIdNum));
         const masteredErrors = await db
           .select({ count: sql<number>`count(*)` })
           .from(errorQuestions)
           .where(
             and(
-              eq(errorQuestions.userId, userId),
+              eq(errorQuestions.userId, userIdNum),
               eq(errorQuestions.isMastered, true)
             )
           );
@@ -388,7 +391,7 @@ async function getAchievementProgress(
         .from(learningProgress)
         .where(
           and(
-            eq(learningProgress.userId, userId),
+            eq(learningProgress.userId, userIdNum),
             sql`${learningProgress.masteryLevel} >= 90`
           )
         );
@@ -404,21 +407,28 @@ async function getAchievementProgress(
  * 获取用户总积分
  */
 export async function getUserTotalPoints(userId: string): Promise<number> {
-  const db = await getDb();
+  const db = getDb();
   if (!db) return 0;
 
-  const userUnlocked = await db
+  const userIdNum = parseInt(userId);
+
+  const userUnlockedRecords = await db
+    .select()
+    .from(userAchievements)
+    .where(eq(userAchievements.userId, userIdNum));
+
+  if (userUnlockedRecords.length === 0) return 0;
+
+  // 获取所有解锁成就的详细信息
+  const achievementIds = userUnlockedRecords.map(r => r.achievementId);
+  const achievementDetails = await db
     .select()
     .from(achievements)
-    .where(and(
-      eq(achievements.userId, userId),
-      eq(achievements.isUnlocked, true)
-    ));
+    .where(inArray(achievements.id, achievementIds));
 
   let totalPoints = 0;
-  for (const ua of userUnlocked) {
-    // 每个觢锁的成就计算积分（基于目标值）
-    totalPoints += ua.target || 0;
+  for (const achievement of achievementDetails) {
+    totalPoints += achievement.points || 0;
   }
 
   return totalPoints;

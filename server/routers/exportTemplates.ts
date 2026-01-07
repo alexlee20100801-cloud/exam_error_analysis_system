@@ -1,6 +1,12 @@
 import { z } from 'zod';
 import { protectedProcedure, router } from '../_core/trpc';
 import * as exportTemplateService from '../services/exportTemplateService';
+import {
+  getQuestionsWithDetails,
+  generateErrorBookTemplate,
+  generateReviewCardTemplate,
+  generateDetailedAnalysisTemplate
+} from '../exportTemplateService';
 
 const templateDataSchema = z.object({
   name: z.string(),
@@ -107,5 +113,62 @@ export const exportTemplatesRouter = router({
   createSystemTemplates: protectedProcedure
     .mutation(async ({ ctx }) => {
       return await exportTemplateService.createSystemTemplates(ctx.user.id);
+    }),
+
+  // 使用快捷模板导出
+  exportWithTemplate: protectedProcedure
+    .input(
+      z.object({
+        questionIds: z.array(z.number()),
+        template: z.enum(['error_book', 'review_card', 'detailed_analysis'])
+      })
+    )
+    .mutation(async ({ input }) => {
+      try {
+        const questions = await getQuestionsWithDetails(input.questionIds);
+
+        if (questions.length === 0) {
+          return {
+            success: false,
+            error: '没有找到题目'
+          };
+        }
+
+        let content: string;
+        let filename: string;
+
+        switch (input.template) {
+          case 'error_book':
+            content = generateErrorBookTemplate(questions);
+            filename = `错题本_${new Date().toLocaleDateString('zh-CN').replace(/\//g, '-')}.md`;
+            break;
+          case 'review_card':
+            content = generateReviewCardTemplate(questions);
+            filename = `复习卡片_${new Date().toLocaleDateString('zh-CN').replace(/\//g, '-')}.md`;
+            break;
+          case 'detailed_analysis':
+            content = generateDetailedAnalysisTemplate(questions);
+            filename = `详细分析_${new Date().toLocaleDateString('zh-CN').replace(/\//g, '-')}.md`;
+            break;
+          default:
+            return {
+              success: false,
+              error: '未知的模板类型'
+            };
+        }
+
+        return {
+          success: true,
+          content,
+          filename,
+          format: 'markdown'
+        };
+      } catch (error: any) {
+        console.error('导出失败:', error);
+        return {
+          success: false,
+          error: error.message || '导出失败'
+        };
+      }
     }),
 });

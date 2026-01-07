@@ -95,3 +95,8 @@
 - [x] 同步数据库schema（drizzle-kit push）
 - [x] 测试Dashboard页面是否正常加载
 - [x] 保存checkpoint
+
+- [x] 修复achievementService中的SQL查询语法错误（where条件缺失字段名）
+- [x] 批量处理功能 - 支持一次上传多个文档，自动队列处理，提升效率（已有基础实现+增强组件）
+- [x] 在线内容编辑器 - 添加富文本编辑器，让用户可以直接修改AI识别结果（RichTextEditor+DocumentEditor页面）
+- [x] 导出模板系统 - 提供预设模板（如错题本格式、复习卡片格式）（已有完整系统+快捷模板）

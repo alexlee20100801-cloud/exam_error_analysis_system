@@ -34,6 +34,7 @@ import PracticeDetail from "@/pages/PracticeDetail";
 import MyFavorites from "@/pages/MyFavorites";
 import ReviewReminders from "@/pages/ReviewReminders";
 import DocumentUpload from "@/pages/DocumentUpload";
+import DocumentEditor from "@/pages/DocumentEditor";
 import ChartLearningDemo from "@/pages/ChartLearningDemo";
 import BatchOperationsPage from "@/pages/BatchOperationsPage";
 import AnnotationCommunity from "@/pages/AnnotationCommunity";
@@ -78,6 +79,8 @@ function Router() {
       <Route path="/favorites" component={MyFavorites} />
       <Route path="/reminders" component={ReviewReminders} />
       <Route path="/document-upload" component={DocumentUpload} />
+      <Route path="/document-editor" component={DocumentEditor} />
+      <Route path="/document-editor/:id" component={DocumentEditor} />
       <Route path="/smart-document" component={SmartDocumentProcessor} />
       <Route path="/chart-learning-demo" component={ChartLearningDemo} />
       <Route path="/batch-operations" component={BatchOperationsPage} />
