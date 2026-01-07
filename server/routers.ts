@@ -78,6 +78,9 @@ import { batchUploadRouter } from "./routers/batchUpload";
 import { uploadHistoryRouter } from "./routers/uploadHistory";
 import { roleEnhancementRouter } from "./routers/roleEnhancement";
 import { cacheRouter } from "./routers/cache";
+import { cacheWarmupRouter } from "./routers/cacheWarmup";
+import { batchOperationHistoryRouter } from "./routers/batchOperationHistory";
+import { abTestRouter } from "./routers/abTest";
 
 export const appRouter = router({
   system: systemRouter,
@@ -135,6 +138,15 @@ export const appRouter = router({
   
   // 缓存管理
   cache: cacheRouter,
+  
+  // 缓存预热
+  cacheWarmup: cacheWarmupRouter,
+  
+  // 批量操作历史
+  batchOperationHistory: batchOperationHistoryRouter,
+  
+  // A/B测试
+  abTest: abTestRouter,
   
   // 积分系统
   points: pointsRouter,

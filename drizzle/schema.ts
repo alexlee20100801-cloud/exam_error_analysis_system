@@ -94,6 +94,34 @@ export {
   type NewParentViewLog
 } from "./role_enhancement_schema";
 
+// 导入缓存预热和A/B测试 schema
+export {
+  knowledgePointHotness,
+  questionTypeHotness,
+  warmupTasks,
+  batchOperationHistory,
+  abTestExperiments,
+  abTestUserGroups,
+  recommendationFeedback,
+  abTestStatistics,
+  type KnowledgePointHotness,
+  type NewKnowledgePointHotness,
+  type QuestionTypeHotness,
+  type NewQuestionTypeHotness,
+  type WarmupTask,
+  type NewWarmupTask,
+  type BatchOperationHistory,
+  type NewBatchOperationHistory,
+  type AbTestExperiment,
+  type NewAbTestExperiment,
+  type AbTestUserGroup,
+  type NewAbTestUserGroup,
+  type RecommendationFeedback,
+  type NewRecommendationFeedback,
+  type AbTestStatistic,
+  type NewAbTestStatistic
+} from "./cache_warmup_ab_test_schema";
+
 export const accountCredentials = mysqlTable("account_credentials", {
 	id: int().autoincrement().notNull(),
 	userId: int("user_id").notNull(),

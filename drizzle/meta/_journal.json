@@ -281,6 +281,13 @@
       "when": 1767796527639,
       "tag": "0043_lowly_aaron_stack",
       "breakpoints": true
+    },
+    {
+      "idx": 44,
+      "version": "5",
+      "when": 1767813082288,
+      "tag": "0044_lonely_reavers",
+      "breakpoints": true
     }
   ]
 }
