@@ -41,10 +41,11 @@ export default function UploadError() {
   // toast is imported from sonner
   const fileInputRef = useRef<HTMLInputElement>(null);
   
-  const [imageFile, setImageFile] = useState<File | null>(null);
-  const [imagePreview, setImagePreview] = useState<string>("");
+  const [imageFiles, setImageFiles] = useState<File[]>([]);
+  const [imagePreviews, setImagePreviews] = useState<string[]>([]);
   const [isUploading, setIsUploading] = useState(false);
-  const [ocrResult, setOcrResult] = useState<string>("");
+  const [ocrResults, setOcrResults] = useState<string[]>([]);
+  const [uploadProgress, setUploadProgress] = useState<{total: number, completed: number}>({total: 0, completed: 0});
   
   const [formData, setFormData] = useState({
     title: "",
@@ -56,30 +57,7 @@ export default function UploadError() {
     userNotes: "",
   });
 
-  const uploadMutation = trpc.errorQuestion.uploadWithOCR.useMutation({
-    onSuccess: (data) => {
-      toast.success("上传成功", {
-        description: "错题已成功上传并识别",
-      });
-      
-      // 如果有OCR结果，填充到表单
-      if (data.ocrText) {
-        setOcrResult(data.ocrText);
-        setFormData(prev => ({
-          ...prev,
-          content: data.ocrText,
-        }));
-      }
-      
-      setIsUploading(false);
-    },
-    onError: (error) => {
-      toast.error("上传失败", {
-        description: error.message,
-      });
-      setIsUploading(false);
-    },
-  });
+  const uploadMutation = trpc.errorQuestion.uploadWithOCR.useMutation();
 
   const saveMutation = trpc.errorQuestion.create.useMutation({
     onSuccess: () => {
@@ -96,37 +74,56 @@ export default function UploadError() {
   });
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
+    const files = Array.from(e.target.files || []);
+    if (files.length === 0) return;
 
-    // 检查文件大小 (16MB限制)
-    if (file.size > 16 * 1024 * 1024) {
-      toast.error("文件过大", {
-        description: "图片大小不能超过16MB",
+    // 检查文件数量
+    if (files.length > 10) {
+      toast.error("文件数量过多", {
+        description: "最多只能一次上传10张图片",
       });
       return;
     }
 
-    // 检查文件类型
-    if (!file.type.startsWith("image/")) {
-      toast.error("文件类型错误", {
-        description: "请上传图片文件",
-      });
-      return;
+    // 检查文件大小和类型
+    for (const file of files) {
+      if (file.size > 16 * 1024 * 1024) {
+        toast.error("文件过大", {
+          description: `${file.name} 大小超过16MB`,
+        });
+        return;
+      }
+
+      if (!file.type.startsWith("image/")) {
+        toast.error("文件类型错误", {
+          description: `${file.name} 不是图片文件`,
+        });
+        return;
+      }
     }
 
-    setImageFile(file);
+    setImageFiles(files);
     
     // 创建预览
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      setImagePreview(e.target?.result as string);
-    };
-    reader.readAsDataURL(file);
+    const previews: string[] = [];
+    let loadedCount = 0;
+    
+    files.forEach((file, index) => {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        previews[index] = e.target?.result as string;
+        loadedCount++;
+        
+        if (loadedCount === files.length) {
+          setImagePreviews(previews);
+        }
+      };
+      reader.readAsDataURL(file);
+    });
   };
 
   const handleUploadAndOCR = async () => {
-    if (!imageFile) {
+    if (imageFiles.length === 0) {
       toast.error("请选择图片", {
         description: "请先选择要上传的错题图片",
       });
@@ -134,38 +131,57 @@ export default function UploadError() {
     }
 
     setIsUploading(true);
+    setUploadProgress({total: imageFiles.length, completed: 0});
+    const results: string[] = [];
 
     try {
-      // 将图片转换为base64
-      const reader = new FileReader();
-      reader.onload = async (e) => {
-        const base64 = e.target?.result as string;
+      // 批量处理图片
+      for (let i = 0; i < imageFiles.length; i++) {
+        const file = imageFiles[i];
+        
+        // 将图片转换为base64
+        const base64 = await new Promise<string>((resolve) => {
+          const reader = new FileReader();
+          reader.onload = (e) => resolve(e.target?.result as string);
+          reader.readAsDataURL(file);
+        });
         
         // 调用上传和OCR接口
-        await uploadMutation.mutateAsync({
+        const data = await uploadMutation.mutateAsync({
           imageBase64: base64,
-          fileName: imageFile.name,
+          fileName: file.name,
         });
-      };
-      reader.readAsDataURL(imageFile);
+        
+        results.push(data.ocrText || '');
+        setUploadProgress(prev => ({...prev, completed: i + 1}));
+      }
+      
+      setOcrResults(results);
+      
+      // 如果只有21张图，自动填充到表单
+      if (results.length === 1 && results[0]) {
+        setFormData(prev => ({
+          ...prev,
+          content: results[0],
+        }));
+      }
+      
+      toast.success("批量识别完成", {
+        description: `已成功识别 ${results.length} 张图片`,
+      });
+      
+      setIsUploading(false);
     } catch (error) {
       console.error("Upload error:", error);
+      toast.error("上传失败", {
+        description: error instanceof Error ? error.message : '未知错误',
+      });
       setIsUploading(false);
     }
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
     // 验证必填字段
-    if (!formData.title.trim()) {
-      toast.error("请输入标题");
-      return;
-    }
-
-    if (!formData.content.trim()) {
-      toast.error("请输入题目内容");
-      return;
-    }
-
     if (!formData.subject) {
       toast.error("请选择科目");
       return;
@@ -176,23 +192,77 @@ export default function UploadError() {
       return;
     }
 
-    // 从grade推断schoolLevel
+    // 今grade推断schoolLevel
     const schoolLevel = formData.grade.startsWith("junior") ? "junior" : "senior";
 
-    saveMutation.mutate({
-      ...formData,
-      schoolLevel,
-      imageUrl: imagePreview || undefined,
-      imageKey: imageFile?.name || undefined,
-    });
+    // 批量保存逻辑
+    if (ocrResults.length > 1) {
+      // 批量保存多个错题
+      let successCount = 0;
+      
+      for (let i = 0; i < ocrResults.length; i++) {
+        try {
+          await saveMutation.mutateAsync({
+            title: formData.title || `错题 ${i + 1}`,
+            content: ocrResults[i] || '',
+            subject: formData.subject,
+            grade: formData.grade,
+            difficulty: formData.difficulty || 'medium',
+            userAnswer: formData.userAnswer,
+            userNotes: formData.userNotes,
+            schoolLevel,
+            imageUrl: imagePreviews[i] || undefined,
+            imageKey: imageFiles[i]?.name || undefined,
+          });
+          successCount++;
+        } catch (error) {
+          console.error(`保存第${i + 1}题失败:`, error);
+        }
+      }
+      
+      if (successCount > 0) {
+        toast.success(`批量保存成功`, {
+          description: `已成功保存 ${successCount}/${ocrResults.length} 道错题`,
+        });
+        setLocation("/error-questions");
+      } else {
+        toast.error("批量保存失败");
+      }
+    } else {
+      // 单个保存
+      if (!formData.title.trim()) {
+        toast.error("请输入标题");
+        return;
+      }
+
+      if (!formData.content.trim()) {
+        toast.error("请输入题目内容");
+        return;
+      }
+
+      saveMutation.mutate({
+        ...formData,
+        schoolLevel,
+        imageUrl: imagePreviews[0] || undefined,
+        imageKey: imageFiles[0]?.name || undefined,
+      });
+    }
   };
 
-  const handleClearImage = () => {
-    setImageFile(null);
-    setImagePreview("");
-    setOcrResult("");
-    if (fileInputRef.current) {
-      fileInputRef.current.value = "";
+  const handleClearImage = (index?: number) => {
+    if (index !== undefined) {
+      // 删除单个图片
+      setImageFiles(prev => prev.filter((_, i) => i !== index));
+      setImagePreviews(prev => prev.filter((_, i) => i !== index));
+      setOcrResults(prev => prev.filter((_, i) => i !== index));
+    } else {
+      // 清空所有图片
+      setImageFiles([]);
+      setImagePreviews([]);
+      setOcrResults([]);
+      if (fileInputRef.current) {
+        fileInputRef.current.value = "";
+      }
     }
   };
 
@@ -208,7 +278,7 @@ export default function UploadError() {
           <div className="space-y-4">
             <Label>错题图片</Label>
             
-            {!imagePreview ? (
+            {imagePreviews.length === 0 ? (
               <div className="border-2 border-dashed border-border rounded-lg p-8 text-center space-y-4">
                 <div className="flex justify-center gap-4">
                   <Button
@@ -235,66 +305,86 @@ export default function UploadError() {
                   </Button>
                 </div>
                 <p className="text-sm text-muted-foreground">
-                  支持 JPG、PNG 格式，最大 16MB
+                  支持 JPG、PNG 格式，最大 16MB，最多10张
                 </p>
               </div>
             ) : (
               <div className="space-y-4">
-                <div className="relative border rounded-lg overflow-hidden">
-                  <img
-                    src={imagePreview}
-                    alt="错题预览"
-                    className="w-full h-auto"
-                  />
+                {/* 批量图片预览 */}
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                  {imagePreviews.map((preview, index) => (
+                    <div key={index} className="relative border rounded-lg overflow-hidden">
+                      <img
+                        src={preview}
+                        alt={`错题预览 ${index + 1}`}
+                        className="w-full h-48 object-cover"
+                      />
+                      <Button
+                        type="button"
+                        variant="destructive"
+                        size="icon"
+                        className="absolute top-2 right-2"
+                        onClick={() => handleClearImage(index)}
+                      >
+                        <X className="h-4 w-4" />
+                      </Button>
+                      {ocrResults[index] && (
+                        <div className="absolute bottom-2 left-2 bg-green-500 text-white text-xs px-2 py-1 rounded">
+                          ✓ 已识别
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+                
+                <div className="flex gap-2">
+                  {ocrResults.length === 0 && (
+                    <Button
+                      type="button"
+                      onClick={handleUploadAndOCR}
+                      disabled={isUploading}
+                      className="flex-1"
+                    >
+                      {isUploading ? (
+                        <>
+                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                          批量识别中... ({uploadProgress.completed}/{uploadProgress.total})
+                        </>
+                      ) : (
+                        <>
+                          <Check className="mr-2 h-4 w-4" />
+                          开始批量识别 ({imagePreviews.length}张)
+                        </>
+                      )}
+                    </Button>
+                  )}
                   <Button
                     type="button"
-                    variant="destructive"
-                    size="icon"
-                    className="absolute top-2 right-2"
-                    onClick={handleClearImage}
+                    variant="outline"
+                    onClick={() => handleClearImage()}
                   >
-                    <X className="h-4 w-4" />
+                    清空所有
                   </Button>
                 </div>
                 
-                {!ocrResult && (
-                  <Button
-                    type="button"
-                    onClick={handleUploadAndOCR}
-                    disabled={isUploading}
-                    className="w-full"
-                  >
-                    {isUploading ? (
-                      <>
-                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                        识别中...
-                      </>
-                    ) : (
-                      <>
-                        <Check className="mr-2 h-4 w-4" />
-                        开始识别
-                      </>
-                    )}
-                  </Button>
-                )}
-                
-                {ocrResult && (
+                {ocrResults.length > 0 && (
                   <div className="bg-green-50 dark:bg-green-950 border border-green-200 dark:border-green-800 rounded-lg p-4">
                     <p className="text-sm text-green-800 dark:text-green-200 font-medium mb-2">
-                      ✓ 识别完成
+                      ✓ 批量识别完成
                     </p>
                     <p className="text-sm text-green-700 dark:text-green-300">
-                      已自动填充题目内容，请检查并修正
+                      已成功识别 {ocrResults.length} 张图片，请逐个保存或修正
                     </p>
                   </div>
                 )}
               </div>
             )}
             
-            <input
+                <input
               ref={fileInputRef}
               type="file"
               accept="image/*"
+              multiple
               className="hidden"
               onChange={handleFileSelect}
             />

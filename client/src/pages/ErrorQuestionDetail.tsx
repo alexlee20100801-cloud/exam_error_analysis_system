@@ -34,6 +34,7 @@ import { NoteEditor } from "@/components/NoteEditor";
 import { ChartAnnotationTool } from "@/components/ChartAnnotationTool";
 import { ChartOCRExtractor } from "@/components/ChartOCRExtractor";
 import { ComparisonView } from "@/components/ComparisonView";
+import { ErrorAnalysisCard } from "@/components/ErrorAnalysisCard";
 import { useState } from "react";
 import { useSwipeGesture } from "@/hooks/useSwipeGesture";
 import { useIsMobile } from "@/hooks/useMobile";
@@ -455,7 +456,23 @@ export default function ErrorQuestionDetail() {
           )}
         </div>
 
-        {/* AI分析结果 */}
+        {/* AI分析结果 - 简单卡片展示 */}
+        {question.isAnalyzed && question.aiAnalysis && (
+          <ErrorAnalysisCard
+            analysis={{
+              knowledgePoints: question.aiAnalysis.knowledgePoints || [],
+              errorReason: question.aiAnalysis.errorReason || '未分析',
+              correctAnswer: question.aiAnalysis.correctAnswer || question.correctAnswer || '未提供',
+              detailedExplanation: question.aiAnalysis.detailedExplanation || '未分析',
+              studyAdvice: question.aiAnalysis.studyAdvice || '未提供',
+              difficulty: (question.difficulty || 'medium') as "easy" | "medium" | "hard",
+            }}
+            onReanalyze={() => handleDetailedAnalysis()}
+            isReanalyzing={analyzeDetailedMutation.isPending}
+          />
+        )}
+
+        {/* AI分析结果 - 详细分析 */}
         {question.isAnalyzed && question.detailedAnalysis ? (
           <Tabs defaultValue="overview" className="mb-6">
             <TabsList className="grid w-full grid-cols-6">

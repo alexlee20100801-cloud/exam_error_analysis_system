@@ -55,9 +55,11 @@ const coreMenuGroup: MenuGroup = {
   label: '核心功能',
   items: [
     { id: "dashboard", icon: LayoutDashboard, label: "学习概览", path: "/", isCore: true },
+    { id: "learning-dashboard", icon: BarChart3, label: "学习仪表盘", path: "/learning-dashboard", isCore: true },
     { id: "error-questions", icon: BookOpen, label: "错题本", path: "/error-questions", isCore: true },
     { id: "junior-errors", icon: School, label: "初中错题", path: "/error-questions?level=junior", indent: true, schoolLevel: "junior" },
     { id: "senior-errors", icon: GraduationCap, label: "高中错题", path: "/error-questions?level=senior", indent: true, schoolLevel: "senior" },
+    { id: "upload-error-question", icon: Upload, label: "上传错题", path: "/upload-error-question", isCore: true },
     { id: "document-upload", icon: Upload, label: "多格式上传", path: "/document-upload", indent: true },
   ]
 };
