@@ -1393,14 +1393,4 @@ export type NewCheckInRecord = typeof checkInRecords.$inferInsert;
 export type LearningProgress = typeof learningProgress.$inferSelect;
 export type NewLearningProgress = typeof learningProgress.$inferInsert;
 
-// Document types
-export type Document = typeof documents.$inferSelect;
-export type NewDocument = typeof documents.$inferInsert;
-
-// Document Region types
-export type DocumentRegion = typeof documentRegions.$inferSelect;
-export type NewDocumentRegion = typeof documentRegions.$inferInsert;
-
-// Document Export types
-export type DocumentExport = typeof documentExports.$inferSelect;
-export type NewDocumentExport = typeof documentExports.$inferInsert;
+// Document types will be added when document tables are created

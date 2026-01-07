@@ -27,8 +27,8 @@ export async function getSubjectKnowledgeMastery(userId: string, subject: Subjec
     )
     .where(
       and(
-        eq(knowledgePoints.subject, subject),
-        eq(knowledgePoints.level, 'chapter') // 只统计章节级别
+        sql`${knowledgePoints.subject} = ${subject}`,
+        sql`${knowledgePoints.level} = 'chapter'` // 只统计章节级别
       )
     )
     .orderBy(knowledgePoints.name);
@@ -129,8 +129,8 @@ export async function getSubjectWeakChapters(userId: string, subject: Subject) {
     )
     .where(
       and(
-        eq(knowledgePoints.subject, subject),
-        eq(knowledgePoints.level, 'chapter')
+        sql`${knowledgePoints.subject} = ${subject}`,
+        sql`${knowledgePoints.level} = 'chapter'`
       )
     )
     .groupBy(knowledgePoints.id, knowledgePoints.name)

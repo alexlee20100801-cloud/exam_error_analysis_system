@@ -106,14 +106,14 @@ export async function batchDeleteErrorQuestions(ids: number[]) {
 
 // 知识点相关
 export async function getKnowledgePoints() {
-  return await db.select().from(knowledgePoints).orderBy(knowledgePoints.subject, knowledgePoints.grade);
+  return await db.select().from(knowledgePoints).orderBy(sql`${knowledgePoints.subject}`, sql`${knowledgePoints.grade}`);
 }
 
 export async function getKnowledgePointsBySubjectAndGrade(subject: string, grade: string) {
   return await db.select().from(knowledgePoints)
     .where(and(
-      eq(knowledgePoints.subject, subject as any),
-      eq(knowledgePoints.grade, grade as any)
+      sql`${knowledgePoints.subject} = ${subject}`,
+      sql`${knowledgePoints.grade} = ${grade}`
     ));
 }
 

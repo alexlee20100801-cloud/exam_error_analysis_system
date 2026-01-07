@@ -408,8 +408,9 @@ export async function generateChapterPractice(
     .from(schema.knowledgePoints)
     .where(
       and(
-        eq(schema.knowledgePoints.subject, subject as any),
-        eq(schema.knowledgePoints.chapter, chapter)
+        sql`${schema.knowledgePoints.subject} = ${subject}`,
+        sql`${schema.knowledgePoints.level} = 'chapter'`,
+        sql`${schema.knowledgePoints.name} LIKE ${`%${chapter}%`}`
       )
     );
 

@@ -37,8 +37,8 @@ export default function WeaknessAnalysis() {
 
   // 获取热力图数据
   const { data: heatmapData } = trpc.weakness.getHeatmapData.useQuery(
-    { userId: user?.id || 0 },
-    { enabled: !!user?.id }
+    { userId: user?.id || 0, subject: selectedSubject === 'all' ? 'math' : selectedSubject },
+    { enabled: !!user?.id && selectedSubject !== 'all' }
   );
 
   if (isLoading) {

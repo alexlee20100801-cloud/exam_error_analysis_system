@@ -1,7 +1,7 @@
 import { getDb } from "./db";
 import { exams, studyPlans, errorQuestions, knowledgePoints, learningProgress } from "../drizzle/schema";
 import type { InsertStudyPlan } from "../drizzle/schema";
-import { eq, and, gte, lte, desc, asc } from "drizzle-orm";
+import { eq, and, gte, lte, desc, asc, sql } from "drizzle-orm";
 
 /**
  * 智能复习计划生成服务
@@ -47,7 +47,10 @@ export async function generateStudyPlan(userId: string, examId: number): Promise
       learningProgress,
       and(eq(learningProgress.knowledgePointId, knowledgePoints.id), eq(learningProgress.userId, userId))
     )
-    .where(and(eq(knowledgePoints.subject, examInfo.subject), eq(knowledgePoints.grade, examInfo.grade)));
+    .where(and(
+      sql`${knowledgePoints.subject} = ${examInfo.subject}`,
+      sql`${knowledgePoints.grade} = ${examInfo.grade}`
+    ));
 
   // 3. 获取该科目的所有错题
   const errorQuestionsList = await db

@@ -62,6 +62,7 @@ import { weaknessRouter } from "./routers/weakness";
 import { smartExamPaperRouter } from "./routers/smartExamPaper";
 import { practiceRecordsRouter } from "./routers/practiceRecords";
 import { batchImageProcessingRouter } from "./routers/batchImageProcessing";
+import { smartScannerRouter } from "./routers/smartScanner";
 
 export const appRouter = router({
   system: systemRouter,
@@ -211,6 +212,9 @@ export const appRouter = router({
   
   // AI薄弱点分析
   weakness: weaknessRouter,
+  
+  // 智能扫描
+  smartScanner: smartScannerRouter,
   
   // 智能组卷
   examPaper: smartExamPaperRouter,

@@ -48,6 +48,7 @@ import { MobileBottomNav } from "@/components/MobileBottomNav";
 import WeaknessAnalysis from "@/pages/WeaknessAnalysis";
 import SmartExamPaper from "@/pages/SmartExamPaper";
 import PracticeHistory from "@/pages/PracticeHistory";
+import SmartScanner from "@/pages/SmartScanner";
 
 function Router() {
   return (
@@ -83,7 +84,8 @@ function Router() {
       <Route path="/reminders" component={ReviewReminders} />
       <Route path="/weakness-analysis" component={WeaknessAnalysis} />
       <Route path="/smart-exam-paper" component={SmartExamPaper} />
-      <Route path="/practice-history" component={PracticeHistory} />
+          <Route path="/practice-history" component={PracticeHistory} />
+          <Route path="/smart-scanner" component={SmartScanner} />
       <Route path="/document-upload" component={DocumentUpload} />
       <Route path="/document-editor" component={DocumentEditor} />
       <Route path="/document-editor/:id" component={DocumentEditor} />

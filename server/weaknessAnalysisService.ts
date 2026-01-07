@@ -360,7 +360,7 @@ export async function getKnowledgeRadarData(userId: number) {
       eq(learningProgress.knowledgePointId, knowledgePoints.id)
     )
     .where(eq(learningProgress.userId, userId))
-    .groupBy(knowledgePoints.subject);
+    .groupBy(sql`${knowledgePoints.subject}`);
 
   return subjectMastery.map(s => ({
     subject: s.subject,
