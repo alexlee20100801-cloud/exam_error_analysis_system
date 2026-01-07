@@ -1,5 +1,5 @@
 import { getDb } from "./db";
-import { examCalendar as exams, smartReviewTasks as studyPlans, errorQuestions, knowledgePoints, learningProgress } from "../drizzle/schema";
+import { exams, studyPlans, errorQuestions, knowledgePoints, learningProgress } from "../drizzle/schema";
 import type { InsertStudyPlan } from "../drizzle/schema";
 import { eq, and, gte, lte, desc, asc } from "drizzle-orm";
 

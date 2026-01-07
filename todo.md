@@ -268,4 +268,15 @@
 - [x] 修夏collaborativeFilteringService中的数据库查询
 - [x] 修夏recommendationService中的数据库查询
 - [x] 测试推荐功能是否正常工作
-- [ ] 保存checkpoint
+- [x] 保存checkpoint
+
+
+## 修复Dashboard页面数据库查询错误（紧急）
+
+- [x] 诊断数据库查询失败的原因
+- [x] 检查schema定义中的表结构
+- [x] 修复review_reminders表的SQL语法错误（缺少字段名）
+- [x] 检查achievements、review_plans、learning_progress等表是否存在
+- [x] 同步数据库schema（drizzle-kit push）
+- [x] 测试Dashboard页面是否正常加载
+- [x] 保存checkpoint

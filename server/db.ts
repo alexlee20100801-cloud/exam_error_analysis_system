@@ -32,8 +32,8 @@ import {
   errorReviewRecords,
   learningPaths,
   learningPathProgress,
-  examCalendar,
-  smartReviewTasks,
+  exams,
+  studyPlans,
   systemSettings,
   emailVerificationTokens,
   emailTemplates,
@@ -41,12 +41,11 @@ import {
   aiAdviceHistory,
   reviewTasks,
   reviewTaskReminders,
-  packages,
+  subscriptionPlans,
   orders,
   userSubscriptions,
   paymentConfigs,
   accountCredentials,
-  permissionRecords,
   pushConfigs,
   pushRecords,
   userPushReceipts,
@@ -634,43 +633,43 @@ export async function updateLearningPathProgress(userId: number, pathId: number,
 
 // 考试日历相关
 export async function getExamCalendarByUserId(userId: number) {
-  return await db.select().from(examCalendar)
-    .where(eq(examCalendar.userId, userId))
-    .orderBy(examCalendar.examDate);
+  return await db.select().from(exams)
+    .where(eq(exams.userId, userId))
+    .orderBy(exams.examDate);
 }
 
-export async function createExamCalendar(data: typeof examCalendar.$inferInsert) {
-  const result = await db.insert(examCalendar).values(data);
+export async function createExamCalendar(data: typeof exams.$inferInsert) {
+  const result = await db.insert(exams).values(data);
   return result;
 }
 
-export async function updateExamCalendar(id: number, data: Partial<typeof examCalendar.$inferInsert>) {
-  const result = await db.update(examCalendar).set(data).where(eq(examCalendar.id, id));
+export async function updateExamCalendar(id: number, data: Partial<typeof exams.$inferInsert>) {
+  const result = await db.update(exams).set(data).where(eq(exams.id, id));
   return result;
 }
 
 export async function deleteExamCalendar(id: number) {
-  const result = await db.delete(examCalendar).where(eq(examCalendar.id, id));
+  const result = await db.delete(exams).where(eq(exams.id, id));
   return result;
 }
 
 // 智能复习任务相关
 export async function getSmartReviewTasksByUserAndExam(userId: number, examId: number) {
-  return await db.select().from(smartReviewTasks)
+  return await db.select().from(studyPlans)
     .where(and(
-      eq(smartReviewTasks.userId, userId),
-      eq(smartReviewTasks.examId, examId)
+      eq(studyPlans.userId, userId),
+      eq(studyPlans.examId, examId)
     ))
-    .orderBy(smartReviewTasks.taskDate);
+    .orderBy(studyPlans.taskDate);
 }
 
-export async function createSmartReviewTask(data: typeof smartReviewTasks.$inferInsert) {
-  const result = await db.insert(smartReviewTasks).values(data);
+export async function createSmartReviewTask(data: typeof studyPlans.$inferInsert) {
+  const result = await db.insert(studyPlans).values(data);
   return result;
 }
 
-export async function updateSmartReviewTask(id: number, data: Partial<typeof smartReviewTasks.$inferInsert>) {
-  const result = await db.update(smartReviewTasks).set(data).where(eq(smartReviewTasks.id, id));
+export async function updateSmartReviewTask(id: number, data: Partial<typeof studyPlans.$inferInsert>) {
+  const result = await db.update(studyPlans).set(data).where(eq(studyPlans.id, id));
   return result;
 }
 
@@ -807,21 +806,21 @@ export async function updateReviewTaskReminder(id: number, data: Partial<typeof 
 
 // 套餐相关
 export async function getPackages() {
-  return await db.select().from(packages).where(eq(packages.isActive, true));
+  return await db.select().from(subscriptionPlans).where(eq(subscriptionPlans.isActive, true));
 }
 
 export async function getPackageById(id: number) {
-  const result = await db.select().from(packages).where(eq(packages.id, id)).limit(1);
+  const result = await db.select().from(subscriptionPlans).where(eq(subscriptionPlans.id, id)).limit(1);
   return result[0];
 }
 
-export async function createPackage(data: typeof packages.$inferInsert) {
-  const result = await db.insert(packages).values(data);
+export async function createPackage(data: typeof subscriptionPlans.$inferInsert) {
+  const result = await db.insert(subscriptionPlans).values(data);
   return result;
 }
 
-export async function updatePackage(id: number, data: Partial<typeof packages.$inferInsert>) {
-  const result = await db.update(packages).set(data).where(eq(packages.id, id));
+export async function updatePackage(id: number, data: Partial<typeof subscriptionPlans.$inferInsert>) {
+  const result = await db.update(subscriptionPlans).set(data).where(eq(subscriptionPlans.id, id));
   return result;
 }
 
@@ -927,16 +926,17 @@ export async function updateAccountCredential(userId: number, data: Partial<type
 }
 
 // 权限记录相关
-export async function getPermissionRecordsByUserId(userId: number) {
-  return await db.select().from(permissionRecords)
-    .where(eq(permissionRecords.userId, userId))
-    .orderBy(desc(permissionRecords.grantedAt));
-}
+// TODO: permissionRecords表不存在，需要创建或移除这些函数
+// export async function getPermissionRecordsByUserId(userId: number) {
+//   return await db.select().from(permissionRecords)
+//     .where(eq(permissionRecords.userId, userId))
+//     .orderBy(desc(permissionRecords.grantedAt));
+// }
 
-export async function createPermissionRecord(data: typeof permissionRecords.$inferInsert) {
-  const result = await db.insert(permissionRecords).values(data);
-  return result;
-}
+// export async function createPermissionRecord(data: typeof permissionRecords.$inferInsert) {
+//   const result = await db.insert(permissionRecords).values(data);
+//   return result;
+// }
 
 // 推送配置相关
 export async function getPushConfigs() {

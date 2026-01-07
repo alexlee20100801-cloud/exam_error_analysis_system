@@ -1,11 +1,12 @@
 import { getDb } from "./db";
-import { examCalendar as exams } from "../drizzle/schema";
-import { examCalendar as exams, type InsertExamCalendar as InsertExam } from "../drizzle/schema";
+import { exams } from "../drizzle/schema";
 import { eq, and, gte, desc } from "drizzle-orm";
 
 /**
  * 考试管理服务
  */
+
+type InsertExam = typeof exams.$inferInsert;
 
 /**
  * 创建考试

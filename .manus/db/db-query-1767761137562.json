@@ -1,0 +1,28 @@
+{
+  "query": "SHOW CREATE TABLE achievements",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway03.us-east-1.prod.aws.tidbcloud.com --port 4000 --user Lfr9xqjx7LpxUD9.1efa314e7813 --database Yh4Z4ZSitSFdPWYxtKkkQS --execute SHOW CREATE TABLE achievements",
+  "rows": [
+    {
+      "Table": "achievements",
+      "Create Table": "CREATE TABLE `achievements` ("
+    }
+  ],
+  "messages": [
+    "  `id` int(11) NOT NULL AUTO_INCREMENT,",
+    "  `code` varchar(64) COLLATE utf8mb4_unicode_ci NOT NULL,",
+    "  `name` varchar(128) COLLATE utf8mb4_unicode_ci NOT NULL,",
+    "  `description` text COLLATE utf8mb4_unicode_ci NOT NULL,",
+    "  `category` enum('learning','practice','streak','mastery','social') COLLATE utf8mb4_unicode_ci NOT NULL,",
+    "  `icon` varchar(64) COLLATE utf8mb4_unicode_ci NOT NULL,",
+    "  `color` varchar(32) COLLATE utf8mb4_unicode_ci NOT NULL,",
+    "  `requirement` int(11) NOT NULL,",
+    "  `points` int(11) NOT NULL DEFAULT '10',",
+    "  `createdAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,",
+    "  PRIMARY KEY (`id`) /*T![clustered_index] CLUSTERED */,",
+    "  UNIQUE KEY `achievements_code_unique` (`code`)",
+    ") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci AUTO_INCREMENT=30001"
+  ],
+  "stdout": "Table\tCreate Table\nachievements\tCREATE TABLE `achievements` (\n  `id` int(11) NOT NULL AUTO_INCREMENT,\n  `code` varchar(64) COLLATE utf8mb4_unicode_ci NOT NULL,\n  `name` varchar(128) COLLATE utf8mb4_unicode_ci NOT NULL,\n  `description` text COLLATE utf8mb4_unicode_ci NOT NULL,\n  `category` enum('learning','practice','streak','mastery','social') COLLATE utf8mb4_unicode_ci NOT NULL,\n  `icon` varchar(64) COLLATE utf8mb4_unicode_ci NOT NULL,\n  `color` varchar(32) COLLATE utf8mb4_unicode_ci NOT NULL,\n  `requirement` int(11) NOT NULL,\n  `points` int(11) NOT NULL DEFAULT '10',\n  `createdAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,\n  PRIMARY KEY (`id`) /*T![clustered_index] CLUSTERED */,\n  UNIQUE KEY `achievements_code_unique` (`code`)\n) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci AUTO_INCREMENT=30001\n",
+  "stderr": "",
+  "execution_time_ms": 1491
+}
