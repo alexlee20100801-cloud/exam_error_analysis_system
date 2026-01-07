@@ -81,6 +81,8 @@ import { cacheRouter } from "./routers/cache";
 import { cacheWarmupRouter } from "./routers/cacheWarmup";
 import { batchOperationHistoryRouter } from "./routers/batchOperationHistory";
 import { abTestRouter } from "./routers/abTest";
+import { warmupIntelligenceRouter } from "./routers/warmupIntelligence";
+import { auditEnhancementRouter } from "./routers/auditEnhancement";
 
 export const appRouter = router({
   system: systemRouter,
@@ -147,6 +149,12 @@ export const appRouter = router({
   
   // A/B测试
   abTest: abTestRouter,
+  
+  // 预热任务智能优化
+  warmupIntelligence: warmupIntelligenceRouter,
+  
+  // 批量操作审计增强
+  auditEnhancement: auditEnhancementRouter,
   
   // 积分系统
   points: pointsRouter,

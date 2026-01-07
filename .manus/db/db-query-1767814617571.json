@@ -1,0 +1,9 @@
+{
+  "query": "ALTER TABLE warmup_tasks \nADD COLUMN recommended_by_ai INT NOT NULL DEFAULT 0 COMMENT '是否由AI推荐(1=是, 0=否)',\nADD COLUMN ai_recommendation_score FLOAT COMMENT 'AI推荐分数(0-100)',\nADD COLUMN ai_recommendation_reason TEXT COMMENT 'AI推荐理由',\nADD COLUMN before_cache_hit_rate FLOAT COMMENT '预热前缓存命中率',\nADD COLUMN after_cache_hit_rate FLOAT COMMENT '预热后缓存命中率',\nADD COLUMN hit_rate_improvement FLOAT COMMENT '命中率提升百分比',\nADD COLUMN before_avg_response_time INT COMMENT '预热前平均响应时间(毫秒)',\nADD COLUMN after_avg_response_time INT COMMENT '预热后平均响应时间(毫秒)',\nADD COLUMN response_time_improvement FLOAT COMMENT '响应时间改善百分比',\nADD COLUMN effectiveness_score FLOAT COMMENT '效果评分(0-100)'",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway03.us-east-1.prod.aws.tidbcloud.com --port 4000 --user Lfr9xqjx7LpxUD9.1efa314e7813 --database Yh4Z4ZSitSFdPWYxtKkkQS --execute ALTER TABLE warmup_tasks \nADD COLUMN recommended_by_ai INT NOT NULL DEFAULT 0 COMMENT '是否由AI推荐(1=是, 0=否)',\nADD COLUMN ai_recommendation_score FLOAT COMMENT 'AI推荐分数(0-100)',\nADD COLUMN ai_recommendation_reason TEXT COMMENT 'AI推荐理由',\nADD COLUMN before_cache_hit_rate FLOAT COMMENT '预热前缓存命中率',\nADD COLUMN after_cache_hit_rate FLOAT COMMENT '预热后缓存命中率',\nADD COLUMN hit_rate_improvement FLOAT COMMENT '命中率提升百分比',\nADD COLUMN before_avg_response_time INT COMMENT '预热前平均响应时间(毫秒)',\nADD COLUMN after_avg_response_time INT COMMENT '预热后平均响应时间(毫秒)',\nADD COLUMN response_time_improvement FLOAT COMMENT '响应时间改善百分比',\nADD COLUMN effectiveness_score FLOAT COMMENT '效果评分(0-100)'",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 4211
+}

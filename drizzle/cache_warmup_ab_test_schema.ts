@@ -86,6 +86,20 @@ export const warmupTasks = mysqlTable("warmup_tasks", {
   executionTimeMs: int("execution_time_ms"), // 执行耗时(毫秒)
   errorMessage: text("error_message"), // 错误信息
   
+  // 智能优化相关字段
+  recommendedByAi: int("recommended_by_ai").notNull().default(0), // 是否由AI推荐(1=是, 0=否)
+  aiRecommendationScore: float("ai_recommendation_score"), // AI推荐分数(0-100)
+  aiRecommendationReason: text("ai_recommendation_reason"), // AI推荐理由
+  
+  // 效果跟踪字段
+  beforeCacheHitRate: float("before_cache_hit_rate"), // 预热前缓存命中率
+  afterCacheHitRate: float("after_cache_hit_rate"), // 预热后缓存命中率
+  hitRateImprovement: float("hit_rate_improvement"), // 命中率提升百分比
+  beforeAvgResponseTime: int("before_avg_response_time"), // 预热前平均响应时间(毫秒)
+  afterAvgResponseTime: int("after_avg_response_time"), // 预热后平均响应时间(毫秒)
+  responseTimeImprovement: float("response_time_improvement"), // 响应时间改善百分比
+  effectivenessScore: float("effectiveness_score"), // 效果评分(0-100)
+  
   scheduledAt: timestamp("scheduled_at", { mode: "date" }).notNull().default(sql`CURRENT_TIMESTAMP`),
   startedAt: timestamp("started_at", { mode: "date" }),
   completedAt: timestamp("completed_at", { mode: "date" }),
@@ -171,6 +185,21 @@ export const abTestExperiments = mysqlTable("ab_test_experiments", {
   
   // 实验状态
   status: mysqlEnum("status", ["draft", "running", "paused", "completed", "archived"]).notNull().default("draft"),
+  
+  // 自动决策相关字段
+  autoDecisionEnabled: int("auto_decision_enabled").notNull().default(0), // 是否启用自动决策(1=是, 0=否)
+  decisionStatus: mysqlEnum("decision_status", ["pending", "ready_for_decision", "decided", "notified"]).notNull().default("pending"),
+  decisionMadeAt: timestamp("decision_made_at", { mode: "date" }), // 决策时间
+  decisionRecommendation: mysqlEnum("decision_recommendation", ["rollout_treatment", "keep_control", "needs_review", "inconclusive"]), // 决策建议
+  decisionReason: text("decision_reason"), // 决策理由
+  decisionConfidence: float("decision_confidence"), // 决策置信度(0-1)
+  notificationSentAt: timestamp("notification_sent_at", { mode: "date" }), // 通知发送时间
+  notificationRecipients: json("notification_recipients"), // 通知接收人列表(JSON数组)
+  
+  // 自动决策阈值配置
+  minSampleSize: int("min_sample_size").notNull().default(100), // 最小样本量
+  significanceLevel: float("significance_level").notNull().default(0.05), // 显著性水平(默认0.05)
+  minEffectSize: float("min_effect_size").notNull().default(0.05), // 最小效应量(默认5%提升)
   
   // 时间范围
   startDate: timestamp("start_date", { mode: "date" }),

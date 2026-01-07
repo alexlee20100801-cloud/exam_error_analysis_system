@@ -1,0 +1,9 @@
+{
+  "query": "CREATE TABLE IF NOT EXISTS question_type_hotness (\n  id INT AUTO_INCREMENT PRIMARY KEY,\n  subject VARCHAR(50) NOT NULL,\n  school_level ENUM('junior', 'senior') NOT NULL,\n  difficulty ENUM('easy', 'medium', 'hard') NOT NULL,\n  question_type_pattern TEXT NOT NULL,\n  occurrence_count INT NOT NULL DEFAULT 0,\n  analysis_count INT NOT NULL DEFAULT 0,\n  hotness_score FLOAT NOT NULL DEFAULT 0,\n  statistics_date TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,\n  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,\n  updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,\n  INDEX subject_level_difficulty_idx (subject, school_level, difficulty),\n  INDEX hotness_score_idx (hotness_score)\n)",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway03.us-east-1.prod.aws.tidbcloud.com --port 4000 --user Lfr9xqjx7LpxUD9.1efa314e7813 --database Yh4Z4ZSitSFdPWYxtKkkQS --execute CREATE TABLE IF NOT EXISTS question_type_hotness (\n  id INT AUTO_INCREMENT PRIMARY KEY,\n  subject VARCHAR(50) NOT NULL,\n  school_level ENUM('junior', 'senior') NOT NULL,\n  difficulty ENUM('easy', 'medium', 'hard') NOT NULL,\n  question_type_pattern TEXT NOT NULL,\n  occurrence_count INT NOT NULL DEFAULT 0,\n  analysis_count INT NOT NULL DEFAULT 0,\n  hotness_score FLOAT NOT NULL DEFAULT 0,\n  statistics_date TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,\n  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,\n  updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,\n  INDEX subject_level_difficulty_idx (subject, school_level, difficulty),\n  INDEX hotness_score_idx (hotness_score)\n)",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 1672
+}

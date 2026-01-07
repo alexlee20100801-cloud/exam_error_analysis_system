@@ -13,6 +13,11 @@ import {
   getAllExperiments,
   getExperimentDetail,
 } from "../services/abTestService";
+import {
+  performAutoDecision,
+  sendDecisionNotification,
+  checkAndDecideAllExperiments,
+} from "../services/abTestAutoDecisionService";
 
 export const abTestRouter = router({
   /**
@@ -206,5 +211,55 @@ export const abTestRouter = router({
     .query(async ({ input }) => {
       const experiment = await getExperimentDetail(input.experimentId);
       return experiment;
+    }),
+
+  /**
+   * 执行自动决策
+   */
+  performAutoDecision: protectedProcedure
+    .input(
+      z.object({
+        experimentId: z.number(),
+      })
+    )
+    .mutation(async ({ input }) => {
+      const decisionResult = await performAutoDecision(input.experimentId);
+      return decisionResult;
+    }),
+
+  /**
+   * 发送决策通知
+   */
+  sendDecisionNotification: protectedProcedure
+    .input(
+      z.object({
+        experimentId: z.number(),
+      })
+    )
+    .mutation(async ({ input }) => {
+      // 先执行决策
+      const decisionResult = await performAutoDecision(input.experimentId);
+      
+      // 发送通知
+      const success = await sendDecisionNotification(decisionResult);
+      
+      return {
+        success,
+        decisionResult,
+        message: success ? "通知已发送" : "通知发送失败",
+      };
+    }),
+
+  /**
+   * 检查所有实验并执行自动决策
+   */
+  checkAllExperiments: protectedProcedure
+    .mutation(async () => {
+      const results = await checkAndDecideAllExperiments();
+      return {
+        success: true,
+        results,
+        message: `已检查${results.length}个实验`,
+      };
     }),
 });
