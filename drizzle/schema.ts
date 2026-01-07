@@ -1390,3 +1390,72 @@ export type LearningProgress = typeof learningProgress.$inferSelect;
 export type NewLearningProgress = typeof learningProgress.$inferInsert;
 
 // Document types will be added when document tables are created
+
+// 用户自定义框选模板表
+export const userCropTemplates = mysqlTable("user_crop_templates", {
+	id: int().autoincrement().primaryKey().notNull(),
+	userId: int("user_id").notNull(),
+	templateName: varchar("template_name", { length: 255 }).notNull(),
+	description: text(),
+	regions: json().notNull(), // 框选区域配置 [{x, y, width, height, label}]
+	thumbnailUrl: varchar("thumbnail_url", { length: 500 }),
+	category: mysqlEnum(['choice', 'blank', 'short_answer', 'calculation', 'essay', 'custom']).default('custom').notNull(),
+	usageCount: int("usage_count").default(0).notNull(),
+	isPublic: tinyint("is_public").default(0).notNull(),
+	createdAt: timestamp("created_at", { mode: 'string' }).default('CURRENT_TIMESTAMP').notNull(),
+	updatedAt: timestamp("updated_at", { mode: 'string' }).defaultNow().onUpdateNow().notNull(),
+},
+(table) => [
+	index("user_id_idx").on(table.userId),
+	index("category_idx").on(table.category),
+]);
+
+export type UserCropTemplate = typeof userCropTemplates.$inferSelect;
+export type NewUserCropTemplate = typeof userCropTemplates.$inferInsert;
+
+// 批量框选任务表
+export const batchCropTasks = mysqlTable("batch_crop_tasks", {
+	id: int().autoincrement().primaryKey().notNull(),
+	userId: int("user_id").notNull(),
+	taskName: varchar("task_name", { length: 255 }).notNull(),
+	fileList: json("file_list").notNull(), // [{url, filename, status, result}]
+	totalFiles: int("total_files").notNull(),
+	processedFiles: int("processed_files").default(0).notNull(),
+	failedFiles: int("failed_files").default(0).notNull(),
+	status: mysqlEnum(['pending', 'processing', 'completed', 'failed']).default('pending').notNull(),
+	errorMessage: text("error_message"),
+	createdAt: timestamp("created_at", { mode: 'string' }).default('CURRENT_TIMESTAMP').notNull(),
+	updatedAt: timestamp("updated_at", { mode: 'string' }).defaultNow().onUpdateNow().notNull(),
+	completedAt: timestamp("completed_at", { mode: 'string' }),
+},
+(table) => [
+	index("user_id_idx").on(table.userId),
+	index("status_idx").on(table.status),
+]);
+
+export type BatchCropTask = typeof batchCropTasks.$inferSelect;
+export type NewBatchCropTask = typeof batchCropTasks.$inferInsert;
+
+// 框选历史记录表
+export const cropHistory = mysqlTable("crop_history", {
+	id: int().autoincrement().primaryKey().notNull(),
+	userId: int("user_id").notNull(),
+	imageUrl: varchar("image_url", { length: 500 }).notNull(),
+	imageHash: varchar("image_hash", { length: 64 }), // 图片哈希值用于相似度匹配
+	regions: json().notNull(), // 框选区域配置
+	questionType: mysqlEnum("question_type", ['choice', 'blank', 'short_answer', 'calculation', 'essay', 'mixed']),
+	subject: mysqlEnum(['chinese', 'math', 'english', 'physics', 'chemistry', 'biology', 'politics', 'history', 'geography']),
+	grade: mysqlEnum(['grade7', 'grade8', 'grade9', 'grade10', 'grade11', 'grade12']),
+	feedback: mysqlEnum(['accepted', 'rejected', 'modified']), // 用户反馈
+	usageCount: int("usage_count").default(1).notNull(),
+	lastUsedAt: timestamp("last_used_at", { mode: 'string' }).default('CURRENT_TIMESTAMP').notNull(),
+	createdAt: timestamp("created_at", { mode: 'string' }).default('CURRENT_TIMESTAMP').notNull(),
+},
+(table) => [
+	index("user_id_idx").on(table.userId),
+	index("question_type_idx").on(table.questionType),
+	index("image_hash_idx").on(table.imageHash),
+]);
+
+export type CropHistory = typeof cropHistory.$inferSelect;
+export type NewCropHistory = typeof cropHistory.$inferInsert;

@@ -1,0 +1,9 @@
+{
+  "query": "CREATE TABLE IF NOT EXISTS `batch_crop_tasks` (\n\t`id` int AUTO_INCREMENT NOT NULL,\n\t`user_id` int NOT NULL,\n\t`task_name` varchar(255) NOT NULL,\n\t`file_list` json NOT NULL,\n\t`total_files` int NOT NULL,\n\t`processed_files` int NOT NULL DEFAULT 0,\n\t`failed_files` int NOT NULL DEFAULT 0,\n\t`status` enum('pending','processing','completed','failed') NOT NULL DEFAULT 'pending',\n\t`error_message` text,\n\t`created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,\n\t`updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,\n\t`completed_at` timestamp,\n\tCONSTRAINT `batch_crop_tasks_id` PRIMARY KEY(`id`),\n\tINDEX `user_id_idx` (`user_id`),\n\tINDEX `status_idx` (`status`)\n);",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway03.us-east-1.prod.aws.tidbcloud.com --port 4000 --user Lfr9xqjx7LpxUD9.1efa314e7813 --database Yh4Z4ZSitSFdPWYxtKkkQS --execute CREATE TABLE IF NOT EXISTS `batch_crop_tasks` (\n\t`id` int AUTO_INCREMENT NOT NULL,\n\t`user_id` int NOT NULL,\n\t`task_name` varchar(255) NOT NULL,\n\t`file_list` json NOT NULL,\n\t`total_files` int NOT NULL,\n\t`processed_files` int NOT NULL DEFAULT 0,\n\t`failed_files` int NOT NULL DEFAULT 0,\n\t`status` enum('pending','processing','completed','failed') NOT NULL DEFAULT 'pending',\n\t`error_message` text,\n\t`created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,\n\t`updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,\n\t`completed_at` timestamp,\n\tCONSTRAINT `batch_crop_tasks_id` PRIMARY KEY(`id`),\n\tINDEX `user_id_idx` (`user_id`),\n\tINDEX `status_idx` (`status`)\n);",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 1645
+}

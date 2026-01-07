@@ -65,6 +65,9 @@ import { batchImageProcessingRouter } from "./routers/batchImageProcessing";
 import { smartScannerRouter } from "./routers/smartScanner";
 import { idCardManagementRouter } from "./routers/idCardManagement";
 import { smartCropRouter } from "./routers/smartCrop";
+import { cropTemplatesRouter } from "./routers/cropTemplates";
+import { batchSmartCropRouter } from "./routers/batchSmartCrop";
+import { cropHistoryRouter } from "./routers/cropHistory";
 
 export const appRouter = router({
   system: systemRouter,
@@ -223,6 +226,15 @@ export const appRouter = router({
   
   // 智能框选
   smartCrop: smartCropRouter,
+  
+  // 框选模板管理
+  cropTemplates: cropTemplatesRouter,
+  
+  // 批量智能框选
+  batchSmartCrop: batchSmartCropRouter,
+  
+  // 框选历史记录
+  cropHistory: cropHistoryRouter,
   
   // 智能组卷
   examPaper: smartExamPaperRouter,

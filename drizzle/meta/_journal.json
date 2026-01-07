@@ -239,6 +239,20 @@
       "when": 1767776465883,
       "tag": "0033_striped_wendell_vaughn",
       "breakpoints": true
+    },
+    {
+      "idx": 34,
+      "version": "5",
+      "when": 1767780802157,
+      "tag": "0034_dark_nico_minoru",
+      "breakpoints": true
+    },
+    {
+      "idx": 35,
+      "version": "5",
+      "when": 1767781493307,
+      "tag": "0035_aromatic_clint_barton",
+      "breakpoints": true
     }
   ]
 }

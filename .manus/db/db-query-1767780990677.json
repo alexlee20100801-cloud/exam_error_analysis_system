@@ -1,0 +1,9 @@
+{
+  "query": "CREATE TABLE IF NOT EXISTS `user_crop_templates` (\n\t`id` int AUTO_INCREMENT NOT NULL,\n\t`user_id` int NOT NULL,\n\t`template_name` varchar(255) NOT NULL,\n\t`description` text,\n\t`regions` json NOT NULL,\n\t`thumbnail_url` varchar(500),\n\t`category` enum('choice','blank','short_answer','calculation','essay','custom') NOT NULL DEFAULT 'custom',\n\t`usage_count` int NOT NULL DEFAULT 0,\n\t`is_public` tinyint NOT NULL DEFAULT 0,\n\t`created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,\n\t`updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,\n\tCONSTRAINT `user_crop_templates_id` PRIMARY KEY(`id`),\n\tINDEX `user_id_idx` (`user_id`),\n\tINDEX `category_idx` (`category`)\n);",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway03.us-east-1.prod.aws.tidbcloud.com --port 4000 --user Lfr9xqjx7LpxUD9.1efa314e7813 --database Yh4Z4ZSitSFdPWYxtKkkQS --execute CREATE TABLE IF NOT EXISTS `user_crop_templates` (\n\t`id` int AUTO_INCREMENT NOT NULL,\n\t`user_id` int NOT NULL,\n\t`template_name` varchar(255) NOT NULL,\n\t`description` text,\n\t`regions` json NOT NULL,\n\t`thumbnail_url` varchar(500),\n\t`category` enum('choice','blank','short_answer','calculation','essay','custom') NOT NULL DEFAULT 'custom',\n\t`usage_count` int NOT NULL DEFAULT 0,\n\t`is_public` tinyint NOT NULL DEFAULT 0,\n\t`created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,\n\t`updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,\n\tCONSTRAINT `user_crop_templates_id` PRIMARY KEY(`id`),\n\tINDEX `user_id_idx` (`user_id`),\n\tINDEX `category_idx` (`category`)\n);",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 1663
+}
