@@ -26,6 +26,7 @@ import { VoiceInputButtonEnhanced } from "@/components/VoiceInputButtonEnhanced"
 import { LatexEditor } from "@/components/LatexEditor";
 import { useLocation, useSearch } from "wouter";
 import { SCHOOL_LEVELS, SUBJECTS, type SchoolLevel, type Subject } from "../../../shared/subjects";
+import { BatchOperationToolbar } from "@/components/BatchOperationToolbar";
 
 export default function ErrorQuestions() {
   const [, setLocation] = useLocation();
@@ -1050,7 +1051,7 @@ export default function ErrorQuestions() {
                 </Select>
               </div>
               
-              {/* 统计信息和批量操作 */}
+              {/* 统计信息 */}
               <div className="flex items-end gap-4">
                 <div className="text-sm text-muted-foreground">
                   共 <span className="font-semibold text-foreground">{errorQuestions?.length || 0}</span> 道错题
@@ -1060,99 +1061,6 @@ export default function ErrorQuestions() {
                     </span>
                   )}
                 </div>
-                {selectedQuestionIds.length > 0 && (
-                  <div className="flex flex-wrap gap-2">
-                    <Button 
-                      variant="outline" 
-                      size="sm"
-                      onClick={handleBatchMarkMastered}
-                      disabled={batchMarkMasteredMutation.isPending}
-                    >
-                      {batchMarkMasteredMutation.isPending ? (
-                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                      ) : (
-                        <CheckCheck className="mr-2 h-4 w-4" />
-                      )}
-                      标记已掌握
-                    </Button>
-                    <Button 
-                      variant="outline" 
-                      size="sm"
-                      onClick={handleBatchAddToReview}
-                      disabled={batchAddToReviewMutation.isPending}
-                    >
-                      {batchAddToReviewMutation.isPending ? (
-                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                      ) : (
-                        <CalendarPlus className="mr-2 h-4 w-4" />
-                      )}
-                      加入复习计划
-                    </Button>
-                    <Button 
-                      variant="outline" 
-                      size="sm"
-                      onClick={handleBatchUpdateDifficulty}
-                      disabled={batchUpdateDifficultyMutation.isPending}
-                    >
-                      {batchUpdateDifficultyMutation.isPending ? (
-                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                      ) : (
-                        <BarChart3 className="mr-2 h-4 w-4" />
-                      )}
-                      修改难度
-                    </Button>
-                    <Button 
-                      variant="outline" 
-                      size="sm"
-                      onClick={handleBatchAddTag}
-                      disabled={batchAddTagMutation.isPending}
-                    >
-                      {batchAddTagMutation.isPending ? (
-                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                      ) : (
-                        <Tag className="mr-2 h-4 w-4" />
-                      )}
-                      添加标签
-                    </Button>
-                    <Button 
-                      variant="outline" 
-                      size="sm"
-                      onClick={() => setBatchExportDialogOpen(true)}
-                    >
-                      <FileDown className="mr-2 h-4 w-4" />
-                      批量导出
-                    </Button>
-                    <Button 
-                      variant="outline" 
-                      size="sm"
-                      onClick={() => setAdvancedExportDialogOpen(true)}
-                    >
-                      <FileDown className="mr-2 h-4 w-4" />
-                      高级导出
-                    </Button>
-                    <Button 
-                      variant="outline" 
-                      size="sm"
-                      onClick={() => setShareDialogOpen(true)}
-                    >
-                      <Share2 className="mr-2 h-4 w-4" />
-                      创建分享
-                    </Button>
-                    <Button 
-                      variant="destructive" 
-                      size="sm"
-                      onClick={handleBatchDeleteClick}
-                      disabled={batchDeleteMutation.isPending}
-                    >
-                      {batchDeleteMutation.isPending ? (
-                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                      ) : (
-                        <Trash2 className="mr-2 h-4 w-4" />
-                      )}
-                      批量删除
-                    </Button>
-                  </div>
-                )}
               </div>
             </div>
           </CardContent>
@@ -1329,6 +1237,26 @@ export default function ErrorQuestions() {
             </CardContent>
           </Card>
         )}
+
+        {/* 批量操作工具栏 */}
+        <BatchOperationToolbar
+          selectedCount={selectedQuestionIds.length}
+          totalCount={errorQuestions?.length || 0}
+          onMarkMastered={handleBatchMarkMastered}
+          onAddToReview={handleBatchAddToReview}
+          onUpdateDifficulty={handleBatchUpdateDifficulty}
+          onAddTag={handleBatchAddTag}
+          onBatchExport={() => setBatchExportDialogOpen(true)}
+          onAdvancedExport={() => setAdvancedExportDialogOpen(true)}
+          onShare={() => setShareDialogOpen(true)}
+          onDelete={handleBatchDeleteClick}
+          onClearSelection={() => setSelectedQuestionIds([])}
+          isMarkingMastered={batchMarkMasteredMutation.isPending}
+          isAddingToReview={batchAddToReviewMutation.isPending}
+          isUpdatingDifficulty={batchUpdateDifficultyMutation.isPending}
+          isAddingTag={batchAddTagMutation.isPending}
+          isDeleting={batchDeleteMutation.isPending}
+        />
       </div>
     </DashboardLayout>
   );

@@ -60,6 +60,7 @@ import UploadError from "@/pages/UploadError";
 import LearningDashboard from "@/pages/LearningDashboard";
 import BatchEdit from "@/pages/BatchEdit";
 import UploadHistory from "@/pages/UploadHistory";
+import CacheMonitor from "@/pages/CacheMonitor";
 
 function Router() {
   return (
@@ -71,6 +72,7 @@ function Router() {
       <Route path="/upload-error" component={UploadError} />
       <Route path="/batch-edit/:sessionId" component={BatchEdit} />
       <Route path="/upload-history" component={UploadHistory} />
+      <Route path="/cache-monitor" component={CacheMonitor} />
       <Route path="/learning-dashboard" component={LearningDashboard} />
       <Route path="/practice-questions/:errorQuestionId" component={PracticeQuestions} />
       <Route path={"/practice"} component={Practice} />

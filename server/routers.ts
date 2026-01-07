@@ -77,6 +77,7 @@ import { recommendationRouter } from "./routers/recommendation";
 import { batchUploadRouter } from "./routers/batchUpload";
 import { uploadHistoryRouter } from "./routers/uploadHistory";
 import { roleEnhancementRouter } from "./routers/roleEnhancement";
+import { cacheRouter } from "./routers/cache";
 
 export const appRouter = router({
   system: systemRouter,
@@ -131,6 +132,9 @@ export const appRouter = router({
   
   // 缓存统计
   cacheStats: cacheStatsRouter,
+  
+  // 缓存管理
+  cache: cacheRouter,
   
   // 积分系统
   points: pointsRouter,

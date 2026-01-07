@@ -1,13 +1,8 @@
 import { z } from "zod";
 import { protectedProcedure, router } from "../_core/trpc";
 import { db } from "../db";
-import { 
-  rawQuestions,
-  qualityScores,
-  knowledgePoints,
-  knowledgePointRelations
-} from "../../drizzle/schema";
-import { eq, and, inArray, sql, desc, gte } from "drizzle-orm";
+import { rawQuestions, qualityScores, questionAnalysisCache, knowledgePoints } from "../../drizzle/schema";
+import { eq, and, inArray, sql, desc, gte, or } from "drizzle-orm";
 
 export const recommendationRouter = router({
   // 基于质量评分的试题推荐
@@ -68,11 +63,12 @@ export const recommendationRouter = router({
       return result;
     }),
 
-  // 基于知识图谱的相似题推荐
+  // 基于知识图谱的相似题推荐(优化版,利用缓存数据)
   recommendSimilarQuestions: protectedProcedure
     .input(z.object({
       questionId: z.number(),
-      limit: z.number().min(1).max(20).default(5)
+      limit: z.number().min(1).max(20).default(5),
+      useCache: z.boolean().default(true) // 是否使用缓存数据加速推荐
     }))
     .query(async ({ input }) => {
       // 获取原试题
@@ -96,6 +92,73 @@ export const recommendationRouter = router({
         }
       }
       
+      // 如果启用缓存优化,先从缓存中查找高命中的相似题目
+      if (input.useCache && knowledgePointIds.length > 0) {
+        // 查找缓存中具有相同知识点的题目
+        const cachedQuestions = await db
+          .select()
+          .from(questionAnalysisCache)
+          .where(
+            and(
+              sql`${questionAnalysisCache.subject} = ${originalQuestion.subject}`,
+              sql`${questionAnalysisCache.knowledgePointIds} IS NOT NULL`,
+              gte(questionAnalysisCache.hitCount, 2) // 优先推荐命中次数较多的题目
+            )
+          )
+          .limit(input.limit * 3);
+        
+        // 计算缓存题目的相似度
+        const cachedWithSimilarity = cachedQuestions
+          .map(cached => {
+            let cachedKnowledgePointIds: number[] = [];
+            try {
+              cachedKnowledgePointIds = JSON.parse(cached.knowledgePointIds as any);
+            } catch (e) {
+              return null;
+            }
+            
+            // 计算交集
+            const intersection = knowledgePointIds.filter(id => 
+              cachedKnowledgePointIds.includes(id)
+            );
+            
+            if (intersection.length === 0) return null;
+            
+            // 计算Jaccard相似度
+            const union = [...new Set([...knowledgePointIds, ...cachedKnowledgePointIds])];
+            const similarity = intersection.length / union.length;
+            
+            // 缓存命中次数作为质量指标
+            const qualityBonus = Math.min((cached.hitCount || 0) / 10, 0.2);
+            const finalScore = similarity + qualityBonus;
+            
+            return {
+              id: cached.id,
+              contentHash: cached.contentHash,
+              subject: cached.subject,
+              grade: cached.grade,
+              errorAnalysis: cached.errorAnalysis,
+              correctAnswer: cached.correctAnswer,
+              detailedExplanation: cached.detailedExplanation,
+              difficulty: cached.difficulty,
+              knowledgePointIds: cached.knowledgePointIds,
+              hitCount: cached.hitCount,
+              similarityScore: finalScore,
+              sharedKnowledgePoints: intersection.length,
+              recommendReason: `高质量相似题 (知识点匹配: ${intersection.length}个, 命中: ${cached.hitCount}次, 相似度: ${(similarity * 100).toFixed(0)}%)`,
+              fromCache: true
+            };
+          })
+          .filter(q => q !== null && q.similarityScore > 0.3)
+          .sort((a, b) => b!.similarityScore - a!.similarityScore)
+          .slice(0, input.limit);
+        
+        // 如果缓存中找到足够的相似题,直接返回
+        if (cachedWithSimilarity.length >= input.limit) {
+          return cachedWithSimilarity;
+        }
+      }
+      
       if (knowledgePointIds.length === 0) {
         // 如果没有知识点标注,返回同学科同年级的试题
         const similarQuestions = await db
@@ -113,7 +176,8 @@ export const recommendationRouter = router({
         return similarQuestions.map(q => ({
           ...q,
           similarityScore: 0.5,
-          recommendReason: '同学科同年级试题'
+          recommendReason: '同学科同年级试题',
+          fromCache: false
         }));
       }
       
@@ -153,7 +217,8 @@ export const recommendationRouter = router({
             ...q,
             similarityScore: similarity,
             sharedKnowledgePoints: intersection.length,
-            recommendReason: `相似知识点: ${intersection.length} 个 (相似度: ${(similarity * 100).toFixed(0)}%)`
+            recommendReason: `相似知识点: ${intersection.length} 个 (相似度: ${(similarity * 100).toFixed(0)}%)`,
+            fromCache: false
           };
         })
         .filter(q => q !== null && q.similarityScore > 0.3) // 过滤低相似度

@@ -21,7 +21,7 @@ import {
 } from "@/components/ui/sidebar";
 import { getLoginUrl } from "@/const";
 import { useIsMobile } from "@/hooks/useMobile";
-import { LayoutDashboard, LogOut, PanelLeft, Users, BookOpen, GraduationCap, School, Trophy, Video, Calendar, BarChart3, Clock, UserCircle, FileText, Database, FileQuestion, Route, Settings, Timer, Target, Heart, Bell, Upload, Shield, Folder, Brain, Sparkles } from "lucide-react";
+import { LayoutDashboard, LogOut, PanelLeft, Users, BookOpen, GraduationCap, School, Trophy, Video, Calendar, BarChart3, Clock, UserCircle, FileText, Database, FileQuestion, Route, Settings, Timer, Target, Heart, Bell, Upload, Shield, Folder, Brain, Sparkles, HardDrive } from "lucide-react";
 import { trpc } from "@/lib/trpc";
 import { Badge } from "@/components/ui/badge";
 import { CSSProperties, useEffect, useRef, useState } from "react";
@@ -98,6 +98,8 @@ const analyticsMenuGroup: MenuGroup = {
     { id: "report", icon: BarChart3, label: "学习报告", path: "/learning-report" },
     { id: "calendar", icon: Calendar, label: "学习日历", path: "/study-calendar" },
     { id: "achievements", icon: Trophy, label: "学习成就", path: "/achievements" },
+    { id: "cache-monitor", icon: HardDrive, label: "缓存监控", path: "/cache-monitor" },
+    { id: "upload-history", icon: Clock, label: "上传历史", path: "/upload-history" },
   ]
 };
 
