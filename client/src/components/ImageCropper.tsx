@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { Crop, X, Check, ZoomIn, ZoomOut, RotateCw } from 'lucide-react';
+import { Crop, X, Check, ZoomIn, ZoomOut, RotateCw, Undo2, Redo2, Copy, Trash2, FlipHorizontal, FlipVertical, Sun, Contrast, Sparkles } from 'lucide-react';
 import { toast } from 'sonner';
 
 interface CropArea {
@@ -29,6 +29,13 @@ export function ImageCropper({ imageUrl, onCropComplete, onSkip, onCancel }: Ima
   const [dragStart, setDragStart] = useState<{ x: number; y: number } | null>(null);
   const [scale, setScale] = useState(1);
   const [rotation, setRotation] = useState(0);
+  const [flipHorizontal, setFlipHorizontal] = useState(false);
+  const [flipVertical, setFlipVertical] = useState(false);
+  const [brightness, setBrightness] = useState(100);
+  const [contrast, setContrast] = useState(100);
+  const [history, setHistory] = useState<CropArea[][]>([]);
+  const [historyIndex, setHistoryIndex] = useState(-1);
+  const [selectedCropIndex, setSelectedCropIndex] = useState<number | null>(null);
 
   // 加载图片
   useEffect(() => {
@@ -74,11 +81,15 @@ export function ImageCropper({ imageUrl, onCropComplete, onSkip, onCancel }: Ima
     // 清空画布
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-    // 应用旋转
+    // 应用变换
     ctx.save();
     ctx.translate(canvas.width / 2, canvas.height / 2);
     ctx.rotate((currentRotation * Math.PI) / 180);
+    ctx.scale(flipHorizontal ? -1 : 1, flipVertical ? -1 : 1);
     ctx.translate(-canvas.width / 2, -canvas.height / 2);
+
+    // 应用亮度和对比度滤镜
+    ctx.filter = `brightness(${brightness}%) contrast(${contrast}%)`;
 
     // 绘制图片
     ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
@@ -126,7 +137,7 @@ export function ImageCropper({ imageUrl, onCropComplete, onSkip, onCancel }: Ima
     if (image) {
       drawCanvas(image, cropAreas, currentCrop, scale, rotation);
     }
-  }, [image, cropAreas, currentCrop, scale, rotation, drawCanvas]);
+  }, [image, cropAreas, currentCrop, scale, rotation, flipHorizontal, flipVertical, brightness, contrast, drawCanvas]);
 
   // 鼠标按下
   const handleMouseDown = (e: React.MouseEvent<HTMLCanvasElement>) => {
@@ -178,7 +189,13 @@ export function ImageCropper({ imageUrl, onCropComplete, onSkip, onCancel }: Ima
         height: Math.abs(currentCrop.height)
       };
 
-      setCropAreas([...cropAreas, normalizedCrop]);
+      const newCropAreas = [...cropAreas, normalizedCrop];
+      setCropAreas(newCropAreas);
+      // 添加到历史记录
+      const newHistory = history.slice(0, historyIndex + 1);
+      newHistory.push(newCropAreas);
+      setHistory(newHistory);
+      setHistoryIndex(newHistory.length - 1);
       toast.success(`已添加区域 ${cropAreas.length + 1}`);
     }
 
@@ -190,15 +207,82 @@ export function ImageCropper({ imageUrl, onCropComplete, onSkip, onCancel }: Ima
   // 删除最后一个裁剪区域
   const handleRemoveLastCrop = () => {
     if (cropAreas.length > 0) {
-      setCropAreas(cropAreas.slice(0, -1));
+      const newCropAreas = cropAreas.slice(0, -1);
+      setCropAreas(newCropAreas);
+      // 添加到历史记录
+      const newHistory = history.slice(0, historyIndex + 1);
+      newHistory.push(newCropAreas);
+      setHistory(newHistory);
+      setHistoryIndex(newHistory.length - 1);
       toast.info('已删除最后一个区域');
+    }
+  };
+
+  // 删除选中的裁剪区域
+  const handleRemoveSelected = () => {
+    if (selectedCropIndex !== null && selectedCropIndex >= 0 && selectedCropIndex < cropAreas.length) {
+      const newCropAreas = cropAreas.filter((_, index) => index !== selectedCropIndex);
+      setCropAreas(newCropAreas);
+      setSelectedCropIndex(null);
+      // 添加到历史记录
+      const newHistory = history.slice(0, historyIndex + 1);
+      newHistory.push(newCropAreas);
+      setHistory(newHistory);
+      setHistoryIndex(newHistory.length - 1);
+      toast.info('已删除选中区域');
     }
   };
 
   // 清除所有裁剪区域
   const handleClearAll = () => {
-    setCropAreas([]);
+    const newCropAreas: CropArea[] = [];
+    setCropAreas(newCropAreas);
+    // 添加到历史记录
+    const newHistory = history.slice(0, historyIndex + 1);
+    newHistory.push(newCropAreas);
+    setHistory(newHistory);
+    setHistoryIndex(newHistory.length - 1);
     toast.info('已清除所有区域');
+  };
+
+  // 撤销
+  const handleUndo = () => {
+    if (historyIndex > 0) {
+      setHistoryIndex(historyIndex - 1);
+      setCropAreas(history[historyIndex - 1]);
+      toast.info('已撤销');
+    }
+  };
+
+  // 重做
+  const handleRedo = () => {
+    if (historyIndex < history.length - 1) {
+      setHistoryIndex(historyIndex + 1);
+      setCropAreas(history[historyIndex + 1]);
+      toast.info('已重做');
+    }
+  };
+
+  // 复制选中区域
+  const handleCopySelected = () => {
+    if (selectedCropIndex !== null && selectedCropIndex >= 0 && selectedCropIndex < cropAreas.length) {
+      const selectedArea = cropAreas[selectedCropIndex];
+      const copiedArea: CropArea = {
+        ...selectedArea,
+        id: Date.now().toString(),
+        x: selectedArea.x + 20,
+        y: selectedArea.y + 20
+      };
+      const newCropAreas = [...cropAreas, copiedArea];
+      setCropAreas(newCropAreas);
+      setSelectedCropIndex(newCropAreas.length - 1);
+      // 添加到历史记录
+      const newHistory = history.slice(0, historyIndex + 1);
+      newHistory.push(newCropAreas);
+      setHistory(newHistory);
+      setHistoryIndex(newHistory.length - 1);
+      toast.success('已复制区域');
+    }
   };
 
   // 完成裁剪
@@ -249,6 +333,21 @@ export function ImageCropper({ imageUrl, onCropComplete, onSkip, onCancel }: Ima
   const handleZoomIn = () => setScale(Math.min(scale + 0.2, 3));
   const handleZoomOut = () => setScale(Math.max(scale - 0.2, 0.5));
   const handleRotate = () => setRotation((rotation + 90) % 360);
+  const handleFlipHorizontal = () => setFlipHorizontal(!flipHorizontal);
+  const handleFlipVertical = () => setFlipVertical(!flipVertical);
+  const handleBrightnessIncrease = () => setBrightness(Math.min(brightness + 10, 200));
+  const handleBrightnessDecrease = () => setBrightness(Math.max(brightness - 10, 0));
+  const handleContrastIncrease = () => setContrast(Math.min(contrast + 10, 200));
+  const handleContrastDecrease = () => setContrast(Math.max(contrast - 10, 0));
+  const handleResetFilters = () => {
+    setBrightness(100);
+    setContrast(100);
+    setFlipHorizontal(false);
+    setFlipVertical(false);
+    setRotation(0);
+    setScale(1);
+    toast.success('已重置所有调整');
+  };
 
   return (
     <Card>
@@ -264,12 +363,32 @@ export function ImageCropper({ imageUrl, onCropComplete, onSkip, onCancel }: Ima
                 在图片上拖动鼠标框选需要识别的题目区域，可框选多个区域
               </p>
             </div>
-            <div className="flex gap-2">
+            <div className="flex gap-2 flex-wrap">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handleUndo}
+                disabled={historyIndex <= 0}
+                title="撤销 (Ctrl+Z)"
+              >
+                <Undo2 className="h-4 w-4" />
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handleRedo}
+                disabled={historyIndex >= history.length - 1}
+                title="重做 (Ctrl+Y)"
+              >
+                <Redo2 className="h-4 w-4" />
+              </Button>
+              <div className="w-px h-6 bg-border" />
               <Button
                 variant="outline"
                 size="sm"
                 onClick={handleZoomOut}
                 disabled={scale <= 0.5}
+                title="缩小"
               >
                 <ZoomOut className="h-4 w-4" />
               </Button>
@@ -278,6 +397,7 @@ export function ImageCropper({ imageUrl, onCropComplete, onSkip, onCancel }: Ima
                 size="sm"
                 onClick={handleZoomIn}
                 disabled={scale >= 3}
+                title="放大"
               >
                 <ZoomIn className="h-4 w-4" />
               </Button>
@@ -285,8 +405,25 @@ export function ImageCropper({ imageUrl, onCropComplete, onSkip, onCancel }: Ima
                 variant="outline"
                 size="sm"
                 onClick={handleRotate}
+                title="旋转90度"
               >
                 <RotateCw className="h-4 w-4" />
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handleFlipHorizontal}
+                title="水平翻转"
+              >
+                <FlipHorizontal className="h-4 w-4" />
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handleFlipVertical}
+                title="垂直翻转"
+              >
+                <FlipVertical className="h-4 w-4" />
               </Button>
             </div>
           </div>
@@ -306,29 +443,84 @@ export function ImageCropper({ imageUrl, onCropComplete, onSkip, onCancel }: Ima
             />
           </div>
 
-          <div className="flex items-center justify-between">
-            <div className="text-sm text-muted-foreground">
-              已框选 <span className="font-semibold text-foreground">{cropAreas.length}</span> 个区域
+          <div className="space-y-3">
+            <div className="flex items-center gap-4">
+              <div className="flex items-center gap-2">
+                <Sun className="h-4 w-4 text-muted-foreground" />
+                <span className="text-sm text-muted-foreground">亮度</span>
+                <Button variant="outline" size="sm" onClick={handleBrightnessDecrease}>-</Button>
+                <span className="text-sm font-mono w-12 text-center">{brightness}%</span>
+                <Button variant="outline" size="sm" onClick={handleBrightnessIncrease}>+</Button>
+              </div>
+              <div className="flex items-center gap-2">
+                <Contrast className="h-4 w-4 text-muted-foreground" />
+                <span className="text-sm text-muted-foreground">对比度</span>
+                <Button variant="outline" size="sm" onClick={handleContrastDecrease}>-</Button>
+                <span className="text-sm font-mono w-12 text-center">{contrast}%</span>
+                <Button variant="outline" size="sm" onClick={handleContrastIncrease}>+</Button>
+              </div>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handleResetFilters}
+                title="重置所有调整"
+              >
+                <Sparkles className="h-4 w-4 mr-1" />
+                重置
+              </Button>
             </div>
-            <div className="flex gap-2">
-              {cropAreas.length > 0 && (
-                <>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={handleRemoveLastCrop}
-                  >
-                    撤销上一个
-                  </Button>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={handleClearAll}
-                  >
-                    清除全部
-                  </Button>
-                </>
-              )}
+
+            <div className="flex items-center justify-between">
+              <div className="text-sm text-muted-foreground">
+                已框选 <span className="font-semibold text-foreground">{cropAreas.length}</span> 个区域
+                {selectedCropIndex !== null && (
+                  <span className="ml-2 text-primary">
+                    (已选中区域 {selectedCropIndex + 1})
+                  </span>
+                )}
+              </div>
+              <div className="flex gap-2">
+                {selectedCropIndex !== null && (
+                  <>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={handleCopySelected}
+                      title="复制选中区域 (Ctrl+C)"
+                    >
+                      <Copy className="h-4 w-4 mr-1" />
+                      复制
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={handleRemoveSelected}
+                      title="删除选中区域 (Delete)"
+                    >
+                      <Trash2 className="h-4 w-4 mr-1" />
+                      删除
+                    </Button>
+                  </>
+                )}
+                {cropAreas.length > 0 && (
+                  <>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={handleRemoveLastCrop}
+                    >
+                      撤销上一个
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={handleClearAll}
+                    >
+                      清除全部
+                    </Button>
+                  </>
+                )}
+              </div>
             </div>
           </div>
 
