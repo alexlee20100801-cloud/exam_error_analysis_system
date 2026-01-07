@@ -1045,7 +1045,7 @@ export async function batchDeleteAnnotations(ids: number[]) {
 }
 
 // 获取数据库实例
-export async function getDb() {
+export function getDb() {
   return db;
 }
 

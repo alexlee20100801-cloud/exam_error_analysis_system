@@ -1,0 +1,18 @@
+{
+  "query": "SHOW COLUMNS FROM users LIKE 'grade'",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway03.us-east-1.prod.aws.tidbcloud.com --port 4000 --user Lfr9xqjx7LpxUD9.1efa314e7813 --database Yh4Z4ZSitSFdPWYxtKkkQS --execute SHOW COLUMNS FROM users LIKE 'grade'",
+  "rows": [
+    {
+      "Field": "grade",
+      "Type": "enum('junior1','junior2','junior3','senior1','senior2','senior3')",
+      "Null": "YES",
+      "Key": "",
+      "Default": "NULL",
+      "Extra": ""
+    }
+  ],
+  "messages": [],
+  "stdout": "Field\tType\tNull\tKey\tDefault\tExtra\ngrade\tenum('junior1','junior2','junior3','senior1','senior2','senior3')\tYES\t\tNULL\t\n",
+  "stderr": "",
+  "execution_time_ms": 1564
+}

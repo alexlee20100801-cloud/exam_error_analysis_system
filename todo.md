@@ -260,3 +260,12 @@
 - [x] 编写单元测试
 - [x] 测试完整流程
 - [x] 保存checkpoint
+
+
+## 修复AI推荐功能数据库错误（紧急）
+
+- [x] 诊断db2.select错误原因
+- [x] 修夏collaborativeFilteringService中的数据库查询
+- [x] 修夏recommendationService中的数据库查询
+- [x] 测试推荐功能是否正常工作
+- [ ] 保存checkpoint

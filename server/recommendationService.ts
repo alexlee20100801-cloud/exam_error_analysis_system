@@ -13,8 +13,7 @@ export interface RecommendedQuestion {
  * 获取用户的错题知识点分布
  */
 async function getUserErrorKnowledgePoints(userId: string) {
-  const db = await getDb();
-  if (!db) throw new Error("Database not initialized");
+  const db = getDb();
 
   // 获取用户最近的错题记录
   // 直接从错题表获取数据（错题表已包含知识点和分类信息）
@@ -80,8 +79,7 @@ export async function getRecommendedRealExams(
   userId: string,
   limit: number = 10
 ): Promise<RecommendedQuestion[]> {
-  const db = await getDb();
-  if (!db) throw new Error("Database not initialized");
+  const db = getDb();
 
   // 1. 分析用户错题
   const errorAnalysis = await getUserErrorKnowledgePoints(userId);
@@ -205,8 +203,7 @@ export async function getRecommendedRealExams(
  * 获取推荐统计信息
  */
 export async function getRecommendationStats(userId: string) {
-  const db = await getDb();
-  if (!db) throw new Error("Database not initialized");
+  const db = getDb();
 
   // 获取错题分析
   const errorAnalysis = await getUserErrorKnowledgePoints(userId);
