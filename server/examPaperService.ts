@@ -352,3 +352,470 @@ export async function deleteExamPaper(paperId: number, userId: string) {
     success: true,
   };
 }
+
+
+/**
+ * ============================================
+ * 练习模式功能
+ * ============================================
+ */
+
+/**
+ * 随机练习模式 - 从错题库随机抽取题目
+ */
+export async function generateRandomPractice(
+  userId: string,
+  count: number,
+  subject?: string
+) {
+  const db = await getDb();
+  if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Database not initialized" });
+
+  let conditions = [
+    eq(schema.errorQuestions.userId, parseInt(userId)),
+    eq(schema.errorQuestions.isMastered, 0)
+  ];
+
+  if (subject) {
+    conditions.push(eq(schema.errorQuestions.subject, subject as any));
+  }
+
+  const questions = await db
+    .select()
+    .from(schema.errorQuestions)
+    .where(and(...conditions))
+    .orderBy(sql`RAND()`)
+    .limit(count);
+
+  return questions;
+}
+
+/**
+ * 章节复习模式 - 按章节顺序练习
+ */
+export async function generateChapterPractice(
+  userId: string,
+  subject: string,
+  chapter: string,
+  count: number
+) {
+  const db = await getDb();
+  if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Database not initialized" });
+
+  // 获取该章节的知识点
+  const chapterKnowledgePoints = await db
+    .select({ id: schema.knowledgePoints.id })
+    .from(schema.knowledgePoints)
+    .where(
+      and(
+        eq(schema.knowledgePoints.subject, subject as any),
+        eq(schema.knowledgePoints.chapter, chapter)
+      )
+    );
+
+  const kpIds = chapterKnowledgePoints.map(kp => kp.id);
+
+  if (kpIds.length === 0) {
+    return [];
+  }
+
+  const questions = await db
+    .select()
+    .from(schema.errorQuestions)
+    .where(
+      and(
+        eq(schema.errorQuestions.userId, parseInt(userId)),
+        inArray(schema.errorQuestions.knowledgePointId, kpIds),
+        eq(schema.errorQuestions.isMastered, 0)
+      )
+    )
+    .limit(count);
+
+  return questions;
+}
+
+/**
+ * 限时练习模式 - 模拟考试环境
+ */
+export async function generateTimedPractice(params: {
+  userId: string;
+  subject: string;
+  timeLimit: number; // 分钟
+  questionCount: number;
+  difficulty?: string;
+}) {
+  const db = await getDb();
+  if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Database not initialized" });
+
+  let conditions = [
+    eq(schema.errorQuestions.userId, parseInt(params.userId)),
+    eq(schema.errorQuestions.subject, params.subject as any),
+    eq(schema.errorQuestions.isMastered, 0)
+  ];
+
+  if (params.difficulty) {
+    conditions.push(eq(schema.errorQuestions.difficulty, params.difficulty as any));
+  }
+
+  const questions = await db
+    .select()
+    .from(schema.errorQuestions)
+    .where(and(...conditions))
+    .orderBy(sql`RAND()`)
+    .limit(params.questionCount);
+
+  // 创建练习会话
+  const sessionId = `practice_${Date.now()}`;
+
+  return {
+    sessionId,
+    timeLimit: params.timeLimit,
+    startTime: new Date().toISOString(),
+    questions: questions.map(q => ({
+      id: q.id,
+      content: q.questionContent,
+      type: q.questionType,
+      difficulty: q.difficulty,
+      options: q.options,
+    })),
+  };
+}
+
+/**
+ * 基于薄弱点生成专属复习卷
+ */
+export async function generateAdaptivePaper(params: {
+  userId: string;
+  title: string;
+  subject: string;
+  grade: string;
+  questionCount: number;
+  difficulty?: 'easy' | 'medium' | 'hard' | 'mixed';
+}) {
+  const db = await getDb();
+  if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Database not initialized" });
+
+  // 1. 获取用户薄弱知识点
+  const weakKnowledgePoints = await db
+    .select({
+      knowledgePointId: schema.errorQuestions.knowledgePointId,
+      errorCount: sql<number>`COUNT(*)`,
+    })
+    .from(schema.errorQuestions)
+    .where(
+      and(
+        eq(schema.errorQuestions.userId, parseInt(params.userId)),
+        eq(schema.errorQuestions.subject, params.subject as any),
+        eq(schema.errorQuestions.isMastered, 0),
+        sql`${schema.errorQuestions.knowledgePointId} IS NOT NULL`
+      )
+    )
+    .groupBy(schema.errorQuestions.knowledgePointId)
+    .orderBy(sql`COUNT(*) DESC`)
+    .limit(10);
+
+  const weakKpIds = weakKnowledgePoints
+    .map(wp => wp.knowledgePointId)
+    .filter((id): id is number => id !== null);
+
+  if (weakKpIds.length === 0) {
+    throw new TRPCError({ 
+      code: "BAD_REQUEST", 
+      message: "没有找到薄弱知识点，请先录入错题" 
+    });
+  }
+
+  // 2. 根据难度分配题目
+  const difficulty = params.difficulty || 'mixed';
+  let easyCount = 0, mediumCount = 0, hardCount = 0;
+
+  if (difficulty === 'mixed') {
+    easyCount = Math.floor(params.questionCount * 0.3);
+    mediumCount = Math.floor(params.questionCount * 0.5);
+    hardCount = params.questionCount - easyCount - mediumCount;
+  } else if (difficulty === 'easy') {
+    easyCount = params.questionCount;
+  } else if (difficulty === 'medium') {
+    mediumCount = params.questionCount;
+  } else {
+    hardCount = params.questionCount;
+  }
+
+  const selectedQuestions: any[] = [];
+
+  // 选择不同难度的题目
+  if (easyCount > 0) {
+    const easy = await db
+      .select()
+      .from(schema.errorQuestions)
+      .where(
+        and(
+          eq(schema.errorQuestions.userId, parseInt(params.userId)),
+          inArray(schema.errorQuestions.knowledgePointId, weakKpIds),
+          eq(schema.errorQuestions.difficulty, 'easy'),
+          eq(schema.errorQuestions.isMastered, 0)
+        )
+      )
+      .limit(easyCount);
+    selectedQuestions.push(...easy);
+  }
+
+  if (mediumCount > 0) {
+    const medium = await db
+      .select()
+      .from(schema.errorQuestions)
+      .where(
+        and(
+          eq(schema.errorQuestions.userId, parseInt(params.userId)),
+          inArray(schema.errorQuestions.knowledgePointId, weakKpIds),
+          eq(schema.errorQuestions.difficulty, 'medium'),
+          eq(schema.errorQuestions.isMastered, 0)
+        )
+      )
+      .limit(mediumCount);
+    selectedQuestions.push(...medium);
+  }
+
+  if (hardCount > 0) {
+    const hard = await db
+      .select()
+      .from(schema.errorQuestions)
+      .where(
+        and(
+          eq(schema.errorQuestions.userId, parseInt(params.userId)),
+          inArray(schema.errorQuestions.knowledgePointId, weakKpIds),
+          eq(schema.errorQuestions.difficulty, 'hard'),
+          eq(schema.errorQuestions.isMastered, 0)
+        )
+      )
+      .limit(hardCount);
+    selectedQuestions.push(...hard);
+  }
+
+  // 如果题目不够，补充其他题目
+  if (selectedQuestions.length < params.questionCount) {
+    const remaining = await db
+      .select()
+      .from(schema.errorQuestions)
+      .where(
+        and(
+          eq(schema.errorQuestions.userId, parseInt(params.userId)),
+          inArray(schema.errorQuestions.knowledgePointId, weakKpIds),
+          eq(schema.errorQuestions.isMastered, 0)
+        )
+      )
+      .limit(params.questionCount - selectedQuestions.length);
+    selectedQuestions.push(...remaining);
+  }
+
+  // 3. 创建试卷
+  const totalScore = selectedQuestions.length * 5; // 每题5分
+
+  const [paper] = await db
+    .insert(schema.generatedExamPapers)
+    .values({
+      userId: params.userId,
+      title: params.title,
+      subject: params.subject as any,
+      grade: params.grade as any,
+      schoolLevel: 'junior_high', // 默认初中
+      difficulty: difficulty as any,
+      knowledgePointIds: weakKpIds,
+      totalQuestions: selectedQuestions.length,
+      totalScore,
+      questionTypes: [],
+      questions: selectedQuestions.map(q => ({
+        id: q.id,
+        type: q.questionType,
+        score: 5,
+      })),
+      isCompleted: false,
+    })
+    .$returningId();
+
+  return {
+    paperId: paper.id,
+    title: params.title,
+    questionCount: selectedQuestions.length,
+    totalScore,
+    weakKnowledgePoints: weakKnowledgePoints.map(wp => ({
+      knowledgePointId: wp.knowledgePointId,
+      errorCount: wp.errorCount,
+    })),
+  };
+}
+
+/**
+ * 导出试卷为PDF（增强版）
+ */
+export async function exportPaperToPDFEnhanced(params: {
+  paperId: number;
+  userId: string;
+  includeAnswer: boolean;
+  includeAnalysis: boolean;
+  paperSize: 'A4' | 'A3' | 'Letter';
+  layout: 'single' | 'double';
+}) {
+  const db = await getDb();
+  if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Database not initialized" });
+
+  // 获取试卷详情
+  const paperDetail = await getExamPaperDetail(params.paperId, params.userId);
+
+  // 生成HTML内容
+  const html = generateEnhancedPaperHTML(paperDetail, params);
+
+  // 这里应该调用PDF生成服务
+  // 暂时返回HTML内容
+  return {
+    html,
+    downloadUrl: `/api/papers/${params.paperId}/download`,
+  };
+}
+
+/**
+ * 生成增强版试卷HTML
+ */
+function generateEnhancedPaperHTML(paper: any, options: any): string {
+  let html = `
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>${paper.title}</title>
+  <style>
+    @page {
+      size: ${options.paperSize};
+      margin: 2cm;
+    }
+    body {
+      font-family: "SimSun", "Microsoft YaHei", serif;
+      font-size: 12pt;
+      line-height: 1.8;
+      color: #333;
+    }
+    .header {
+      text-align: center;
+      margin-bottom: 30px;
+      border-bottom: 2px solid #333;
+      padding-bottom: 15px;
+    }
+    .title {
+      font-size: 20pt;
+      font-weight: bold;
+      margin-bottom: 10px;
+    }
+    .info {
+      margin: 8px 0;
+      font-size: 11pt;
+      color: #666;
+    }
+    .question {
+      margin: 25px 0;
+      page-break-inside: avoid;
+    }
+    .question-header {
+      font-weight: bold;
+      margin-bottom: 12px;
+      color: #000;
+    }
+    .question-content {
+      margin-left: 25px;
+      line-height: 2;
+    }
+    .options {
+      margin-left: 45px;
+      margin-top: 10px;
+    }
+    .option-item {
+      margin: 8px 0;
+    }
+    .answer-section {
+      margin-top: 50px;
+      page-break-before: always;
+    }
+    .answer-section h2 {
+      border-bottom: 2px solid #333;
+      padding-bottom: 10px;
+    }
+    ${options.layout === 'double' ? `
+    .questions {
+      column-count: 2;
+      column-gap: 30px;
+    }
+    ` : ''}
+  </style>
+</head>
+<body>
+  <div class="header">
+    <div class="title">${paper.title}</div>
+    <div class="info">
+      <span>学科：${paper.subject}</span>
+      <span style="margin-left: 30px;">年级：${paper.grade}</span>
+      <span style="margin-left: 30px;">总分：${paper.totalScore}分</span>
+      <span style="margin-left: 30px;">题数：${paper.totalQuestions}题</span>
+    </div>
+    <div class="info">
+      姓名：__________ 班级：__________ 得分：__________
+    </div>
+  </div>
+
+  <div class="questions">
+`;
+
+  // 题目部分
+  paper.questionsDetail.forEach((q: any, idx: number) => {
+    html += `
+<div class="question">
+  <div class="question-header">
+    ${idx + 1}. (${q.score}分) ${q.questionType}
+  </div>
+  <div class="question-content">
+    ${q.questionContent || q.content}
+  </div>
+`;
+
+    if (q.options) {
+      const opts = typeof q.options === 'string' ? JSON.parse(q.options) : q.options;
+      if (Array.isArray(opts) && opts.length > 0) {
+        html += '<div class="options">';
+        opts.forEach((opt: string, optIdx: number) => {
+          html += `<div class="option-item">${String.fromCharCode(65 + optIdx)}. ${opt}</div>`;
+        });
+        html += '</div>';
+      }
+    }
+
+    html += '</div>';
+  });
+
+  html += '</div>';
+
+  // 答案部分
+  if (options.includeAnswer) {
+    html += '<div class="answer-section"><h2>参考答案与解析</h2>';
+
+    paper.questionsDetail.forEach((q: any, idx: number) => {
+      html += `
+<div class="question">
+  <div class="question-header">${idx + 1}. 答案</div>
+  <div class="question-content">${q.correctAnswer || q.answer || '暂无答案'}</div>
+`;
+
+      if (options.includeAnalysis && q.analysis) {
+        html += `
+  <div class="question-header">解析</div>
+  <div class="question-content">${q.analysis}</div>
+`;
+      }
+
+      html += '</div>';
+    });
+
+    html += '</div>';
+  }
+
+  html += '</body></html>';
+
+  return html;
+}

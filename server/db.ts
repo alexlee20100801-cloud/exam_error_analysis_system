@@ -207,7 +207,7 @@ export async function createVideoResource(data: typeof videoResources.$inferInse
 export async function getReviewPlansByUserId(userId: number) {
   return await db.select().from(reviewPlans)
     .where(eq(reviewPlans.userId, userId))
-    .orderBy(reviewPlans.scheduledDate);
+    .orderBy(reviewPlans.scheduledAt);
 }
 
 export async function createReviewPlan(data: typeof reviewPlans.$inferInsert) {
@@ -222,9 +222,14 @@ export async function updateReviewPlan(id: number, data: Partial<typeof reviewPl
 
 // 成就相关
 export async function getAchievementsByUserId(userId: number) {
-  return await db.select().from(achievements)
-    .where(eq(achievements.userId, userId))
-    .orderBy(desc(achievements.isUnlocked), desc(achievements.progress));
+  return await db.select({
+    achievement: achievements,
+    userAchievement: userAchievements
+  })
+  .from(achievements)
+  .leftJoin(userAchievements, eq(userAchievements.achievementId, achievements.id))
+  .where(eq(userAchievements.userId, userId))
+  .orderBy(desc(userAchievements.progress));
 }
 
 export async function createAchievement(data: typeof achievements.$inferInsert) {
@@ -242,8 +247,8 @@ export async function getCheckInRecordsByUserId(userId: number, startDate?: Date
   let query = db.select().from(checkInRecords).where(eq(checkInRecords.userId, userId));
   
   const conditions = [eq(checkInRecords.userId, userId)];
-  if (startDate) conditions.push(gte(checkInRecords.checkInDate, startDate));
-  if (endDate) conditions.push(lte(checkInRecords.checkInDate, endDate));
+  if (startDate) conditions.push(gte(checkInRecords.checkInDate, startDate.toISOString().split('T')[0]));
+  if (endDate) conditions.push(lte(checkInRecords.checkInDate, endDate.toISOString().split('T')[0]));
   
   return await db.select().from(checkInRecords)
     .where(and(...conditions))

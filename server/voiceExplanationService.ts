@@ -126,7 +126,7 @@ export async function updateExplanationScript(
       .update(errorQuestions)
       .set({
         voiceExplanation: script,
-        updatedAt: new Date(),
+        updatedAt: new Date().toISOString(),
       })
       .where(eq(errorQuestions.id, errorQuestionId));
 

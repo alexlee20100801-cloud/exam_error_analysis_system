@@ -115,7 +115,7 @@ async function checkAchievementRequirement(
         .where(
           and(
             eq(practiceRecords.userId, userIdNum),
-            eq(practiceRecords.isCorrect, true)
+            eq(practiceRecords.isCorrect, 1)
           )
         );
       return records.length >= 5; // 连续5题正确视为满分
@@ -170,8 +170,7 @@ async function checkAchievementRequirement(
         .where(
           and(
             eq(errorQuestions.userId, userIdNum),
-            eq(errorQuestions.isMastered, true)
-          )
+         eq(errorQuestions.isMastered, 0)          )
         );
       const total = totalErrors[0]?.count ?? 0;
       const mastered = masteredErrors[0]?.count ?? 0;
@@ -267,7 +266,8 @@ export async function recordCheckIn(
     // 今天还没打卡，记录打卡
     await db.insert(checkInRecords).values({
       userId: userIdNum,
-      checkInDate: today.toISOString(),
+      checkInDate: today.toISOString().split('T')[0],
+      activityType: 'practice',
     });
 
     // 检查是否解锁新成就
@@ -350,7 +350,7 @@ async function getAchievementProgress(
           .where(
             and(
               eq(practiceRecords.userId, userIdNum),
-              eq(practiceRecords.isCorrect, true)
+              eq(practiceRecords.isCorrect, 1)
             )
           );
         return records.length >= 5 ? 1 : 0;
@@ -379,7 +379,7 @@ async function getAchievementProgress(
           .where(
             and(
               eq(errorQuestions.userId, userIdNum),
-              eq(errorQuestions.isMastered, true)
+              eq(errorQuestions.isMastered, 1)
             )
           );
         const total = totalErrors[0]?.count ?? 0;

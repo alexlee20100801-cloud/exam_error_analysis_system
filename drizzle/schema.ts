@@ -1316,3 +1316,56 @@ export const documentExports = mysqlTable("document_exports", {
   index("user_id_idx").on(table.userId),
   index("created_at_idx").on(table.createdAt),
 ]);
+
+// ============================================
+// Type Exports
+// ============================================
+
+// User types
+export type User = typeof users.$inferSelect;
+export type NewUser = typeof users.$inferInsert;
+
+// Achievement types
+export type Achievement = typeof achievements.$inferSelect;
+export type NewAchievement = typeof achievements.$inferInsert;
+export type InsertAchievement = typeof achievements.$inferInsert;
+
+// Error Question types
+export type ErrorQuestion = typeof errorQuestions.$inferSelect;
+export type NewErrorQuestion = typeof errorQuestions.$inferInsert;
+
+// Knowledge Point types
+export type KnowledgePoint = typeof knowledgePoints.$inferSelect;
+export type NewKnowledgePoint = typeof knowledgePoints.$inferInsert;
+
+// Practice Record types
+export type PracticeRecord = typeof practiceRecords.$inferSelect;
+export type NewPracticeRecord = typeof practiceRecords.$inferInsert;
+
+// Review Plan types
+export type ReviewPlan = typeof reviewPlans.$inferSelect;
+export type NewReviewPlan = typeof reviewPlans.$inferInsert;
+
+// User Achievement types
+export type UserAchievement = typeof userAchievements.$inferSelect;
+export type NewUserAchievement = typeof userAchievements.$inferInsert;
+
+// Check In Record types
+export type CheckInRecord = typeof checkInRecords.$inferSelect;
+export type NewCheckInRecord = typeof checkInRecords.$inferInsert;
+
+// Learning Progress types
+export type LearningProgress = typeof learningProgress.$inferSelect;
+export type NewLearningProgress = typeof learningProgress.$inferInsert;
+
+// Document types
+export type Document = typeof documents.$inferSelect;
+export type NewDocument = typeof documents.$inferInsert;
+
+// Document Region types
+export type DocumentRegion = typeof documentRegions.$inferSelect;
+export type NewDocumentRegion = typeof documentRegions.$inferInsert;
+
+// Document Export types
+export type DocumentExport = typeof documentExports.$inferSelect;
+export type NewDocumentExport = typeof documentExports.$inferInsert;

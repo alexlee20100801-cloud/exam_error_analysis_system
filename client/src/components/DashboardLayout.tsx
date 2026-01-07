@@ -21,7 +21,7 @@ import {
 } from "@/components/ui/sidebar";
 import { getLoginUrl } from "@/const";
 import { useIsMobile } from "@/hooks/useMobile";
-import { LayoutDashboard, LogOut, PanelLeft, Users, BookOpen, GraduationCap, School, Trophy, Video, Calendar, BarChart3, Clock, UserCircle, FileText, Database, FileQuestion, Route, Settings, Timer, Target, Heart, Bell, Upload, Shield, Folder } from "lucide-react";
+import { LayoutDashboard, LogOut, PanelLeft, Users, BookOpen, GraduationCap, School, Trophy, Video, Calendar, BarChart3, Clock, UserCircle, FileText, Database, FileQuestion, Route, Settings, Timer, Target, Heart, Bell, Upload, Shield, Folder, Brain, Sparkles } from "lucide-react";
 import { trpc } from "@/lib/trpc";
 import { Badge } from "@/components/ui/badge";
 import { CSSProperties, useEffect, useRef, useState } from "react";
@@ -67,6 +67,7 @@ const practiceMenuGroup: MenuGroup = {
   id: 'practice',
   label: '练习测试',
   items: [
+    { id: "smart-exam-paper", icon: Sparkles, label: "智能组卷", path: "/smart-exam-paper" },
     { id: "ai-exam", icon: FileText, label: "AI试卷生成", path: "/exam-generator" },
     { id: "practice", icon: FileQuestion, label: "真题练习", path: "/real-exam-practice" },
     { id: "ai-practice", icon: BookOpen, label: "AI题目练习", path: "/question-practice" },
@@ -91,6 +92,7 @@ const analyticsMenuGroup: MenuGroup = {
   id: 'analytics',
   label: '数据分析',
   items: [
+    { id: "weakness-analysis", icon: Brain, label: "AI薄弱点分析", path: "/weakness-analysis" },
     { id: "report", icon: BarChart3, label: "学习报告", path: "/learning-report" },
     { id: "calendar", icon: Calendar, label: "学习日历", path: "/study-calendar" },
     { id: "achievements", icon: Trophy, label: "学习成就", path: "/achievements" },

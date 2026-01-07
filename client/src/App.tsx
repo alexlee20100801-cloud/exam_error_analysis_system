@@ -45,6 +45,8 @@ import QuestionReview from "@/pages/admin/QuestionReview";
 import { SmartDocumentProcessor } from "@/pages/SmartDocumentProcessor";
 import { PWAInstallPrompt } from "@/components/PWAInstallPrompt";
 import { MobileBottomNav } from "@/components/MobileBottomNav";
+import WeaknessAnalysis from "@/pages/WeaknessAnalysis";
+import SmartExamPaper from "@/pages/SmartExamPaper";
 
 function Router() {
   return (
@@ -78,6 +80,8 @@ function Router() {
       <Route path="/practice/:id" component={PracticeDetail} />
       <Route path="/favorites" component={MyFavorites} />
       <Route path="/reminders" component={ReviewReminders} />
+      <Route path="/weakness-analysis" component={WeaknessAnalysis} />
+      <Route path="/smart-exam-paper" component={SmartExamPaper} />
       <Route path="/document-upload" component={DocumentUpload} />
       <Route path="/document-editor" component={DocumentEditor} />
       <Route path="/document-editor/:id" component={DocumentEditor} />

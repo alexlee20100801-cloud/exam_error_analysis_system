@@ -58,6 +58,8 @@ import { collaborativeFilteringRouter } from "./routers/collaborativeFiltering";
 import { exportTemplatesRouter } from "./routers/exportTemplates";
 import { advancedExportRouter } from "./routers/advancedExport";
 import { shareRouter } from "./routers/share";
+import { weaknessRouter } from "./routers/weakness";
+import { smartExamPaperRouter } from "./routers/smartExamPaper";
 
 export const appRouter = router({
   system: systemRouter,
@@ -198,6 +200,12 @@ export const appRouter = router({
   
   // 真题练习
   questions: questionsRouter,
+  
+  // AI薄弱点分析
+  weakness: weaknessRouter,
+  
+  // 智能组卷
+  examPaper: smartExamPaperRouter,
   
   // 定时任务管理
   scheduledTasks: scheduledTasksRouter,
