@@ -83,19 +83,35 @@ export async function analyzeUserWeakness(userId: number): Promise<WeaknessAnaly
   }
 
   // 2. 按知识点分组统计错题
-  const knowledgePointStats = await db
+  // 由于 knowledgePointIds 是 JSON 数组,需要特殊处理
+  const errorQuestionsData = await db
     .select({
-      knowledgePointId: errorQuestions.knowledgePointId,
-      errorCount: count(errorQuestions.id),
+      id: errorQuestions.id,
+      knowledgePointIds: errorQuestions.knowledgePointIds,
     })
     .from(errorQuestions)
     .where(
       and(
         eq(errorQuestions.userId, userId),
-        sql`${errorQuestions.knowledgePointId} IS NOT NULL`
+        sql`${errorQuestions.knowledgePointIds} IS NOT NULL`
       )
-    )
-    .groupBy(errorQuestions.knowledgePointId);
+    );
+
+  // 展开知识点ID并统计
+  const knowledgePointMap = new Map<number, number>();
+  for (const question of errorQuestionsData) {
+    const kpIds = question.knowledgePointIds as number[] | null;
+    if (kpIds && Array.isArray(kpIds)) {
+      for (const kpId of kpIds) {
+        knowledgePointMap.set(kpId, (knowledgePointMap.get(kpId) || 0) + 1);
+      }
+    }
+  }
+
+  const knowledgePointStats = Array.from(knowledgePointMap.entries()).map(([knowledgePointId, errorCount]) => ({
+    knowledgePointId,
+    errorCount,
+  }));
 
   // 3. 获取每个知识点的详细信息和练习记录
   const weakPoints: WeakKnowledgePoint[] = [];
@@ -128,7 +144,7 @@ export async function analyzeUserWeakness(userId: number): Promise<WeaknessAnaly
       .where(
         and(
           eq(practiceRecords.userId, userId),
-          eq(errorQuestions.knowledgePointId, stat.knowledgePointId)
+          sql`JSON_CONTAINS(${errorQuestions.knowledgePointIds}, ${stat.knowledgePointId})`
         )
       );
 
@@ -157,7 +173,7 @@ export async function analyzeUserWeakness(userId: number): Promise<WeaknessAnaly
       .where(
         and(
           eq(errorQuestions.userId, userId),
-          eq(errorQuestions.knowledgePointId, stat.knowledgePointId)
+          sql`JSON_CONTAINS(${errorQuestions.knowledgePointIds}, ${stat.knowledgePointId})`
         )
       );
 
@@ -236,7 +252,8 @@ async function generateImprovementSuggestion(wp: WeakKnowledgePoint): Promise<st
       ],
     });
 
-    return response.choices[0]?.message?.content || "建议加强该知识点的练习";
+    const content = response.choices[0]?.message?.content;
+    return typeof content === 'string' ? content : "建议加强该知识点的练习";
   } catch (error) {
     console.error("生成改进建议失败:", error);
     return "建议加强该知识点的练习，多做相关题目";
@@ -382,11 +399,10 @@ export async function getKnowledgeHeatmapData(userId: number, subject: string) {
       knowledgePointId: knowledgePoints.id,
       name: knowledgePoints.name,
       grade: knowledgePoints.grade,
-      chapter: knowledgePoints.chapter,
       masteryLevel: learningProgress.masteryLevel,
       errorCount: sql<number>`(
         SELECT COUNT(*) FROM ${errorQuestions}
-        WHERE ${errorQuestions.knowledgePointId} = ${knowledgePoints.id}
+        WHERE JSON_CONTAINS(${errorQuestions.knowledgePointIds}, CAST(${knowledgePoints.id} AS JSON))
         AND ${errorQuestions.userId} = ${userId}
       )`,
     })
@@ -404,7 +420,6 @@ export async function getKnowledgeHeatmapData(userId: number, subject: string) {
     knowledgePointId: d.knowledgePointId,
     name: d.name,
     grade: d.grade,
-    chapter: d.chapter || "未分类",
     masteryLevel: d.masteryLevel ? Number(d.masteryLevel) : 0,
     errorCount: Number(d.errorCount) || 0,
   }));

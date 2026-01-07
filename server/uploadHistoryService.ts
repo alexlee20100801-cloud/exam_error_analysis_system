@@ -153,9 +153,9 @@ export async function getUserUploadStats(userId: number, days = 30) {
   });
 
   const totalUploads = history.length;
-  const totalQuestions = history.reduce((sum, record) => sum + (record.totalCount || 0), 0);
-  const totalSuccess = history.reduce((sum, record) => sum + (record.successCount || 0), 0);
-  const totalFailed = history.reduce((sum, record) => sum + (record.failedCount || 0), 0);
+  const totalQuestions = history.reduce((sum: number, record) => sum + (record.totalCount || 0), 0);
+  const totalSuccess = history.reduce((sum: number, record) => sum + (record.successCount || 0), 0);
+  const totalFailed = history.reduce((sum: number, record) => sum + (record.failedCount || 0), 0);
 
   // 计算平均识别准确率
   const overallAccuracy = totalQuestions > 0 ? (totalSuccess / totalQuestions) * 100 : 0;

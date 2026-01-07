@@ -1,9 +1,10 @@
 import { drizzle } from 'drizzle-orm/mysql2';
 import mysql from 'mysql2/promise';
 import { ENV } from './_core/env';
+import * as schema from '../drizzle/schema';
 
 const connection = mysql.createPool(ENV.databaseUrl);
-export const db = drizzle(connection);
+export const db = drizzle(connection, { schema, mode: 'default' });
 
 import { 
   users, 
@@ -57,6 +58,9 @@ import {
   knowledgePointTags,
   knowledgePointRelations,
   ocrProcessingLogs,
+  uploadHistory,
+  uploadSessions,
+  uploadSessionItems,
 } from '../drizzle/schema';
 import { eq, and, desc, sql, gte, lte, inArray, or, like, asc, isNull, ne } from 'drizzle-orm';
 
