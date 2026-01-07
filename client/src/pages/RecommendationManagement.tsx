@@ -178,7 +178,7 @@ export default function RecommendationManagement() {
                       </TableRow>
                     </TableHeader>
                     <TableBody>
-                      {warmupTasks.map((task) => (
+                      {warmupTasks.map((task: any) => (
                         <TableRow key={task.id}>
                           <TableCell className="font-medium">{task.taskName}</TableCell>
                           <TableCell>

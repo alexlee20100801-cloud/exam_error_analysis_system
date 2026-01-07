@@ -3,7 +3,7 @@ import { appRouter } from './routers';
 import type { TrpcContext } from './_core/context';
 
 describe('批量操作和AI缓存功能测试', () => {
-  let caller: ReturnType<typeof appRouter.createCaller>;
+  let caller: ReturnType<typeof createCaller>;
   let testUserId: number;
   let testQuestionIds: number[] = [];
 
@@ -26,7 +26,8 @@ describe('批量操作和AI缓存功能测试', () => {
       res: {} as any,
     };
 
-    caller = appRouter.createCaller(mockContext);
+    const createCaller = appRouter.createCaller;
+    caller = createCaller(mockContext);
     testUserId = mockContext.user.id;
   });
 

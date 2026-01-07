@@ -5,12 +5,13 @@ import { questionAnalysisCache } from '../drizzle/schema';
 import { eq } from 'drizzle-orm';
 
 describe('缓存管理功能测试', () => {
-  let caller: ReturnType<typeof appRouter.createCaller>;
+  let caller: ReturnType<typeof createCaller>;
   let testCacheId: number;
 
   beforeAll(async () => {
     // 创建测试caller(模拟已登录用户)
-    caller = appRouter.createCaller({
+    const createCaller = appRouter.createCaller;
+    caller = createCaller({
       user: {
         id: 1,
         name: 'Test User',

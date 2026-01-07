@@ -41,7 +41,7 @@ export default function AuditReports() {
 
   // 导出审计报告
   const exportMutation = trpc.auditEnhancement.exportAuditReport.useMutation({
-    onSuccess: (result) => {
+    onSuccess: (result: any) => {
       if (result.success && result.csvData) {
         // 创建下载链接
         const blob = new Blob([result.csvData], { type: "text/csv;charset=utf-8;" });
@@ -57,7 +57,7 @@ export default function AuditReports() {
         toast.error("审计报告导出失败");
       }
     },
-    onError: (error) => {
+    onError: (error: any) => {
       toast.error("导出失败", {
         description: error.message,
       });
@@ -257,7 +257,7 @@ export default function AuditReports() {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {operations.map((op) => (
+                  {operations.map((op: any) => (
                     <TableRow key={op.id}>
                       <TableCell className="font-mono text-sm">{op.id}</TableCell>
                       <TableCell>{getOperationTypeBadge(op.operationType)}</TableCell>

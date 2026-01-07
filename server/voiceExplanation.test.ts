@@ -12,7 +12,7 @@ import {
 describe("AI语音讲解功能测试", () => {
   let testUserId: number;
   let testErrorQuestionId: number;
-  let caller: ReturnType<typeof appRouter.createCaller>;
+  let caller: ReturnType<typeof createCaller>;
 
   beforeAll(async () => {
     const db = await getDb();
@@ -50,7 +50,8 @@ describe("AI语音讲解功能测试", () => {
     testErrorQuestionId = question.id;
 
     // 创建caller
-    caller = appRouter.createCaller({
+    const createCaller = appRouter.createCaller;
+    caller = createCaller({
       user: {
         id: testUserId,
         openId: `test-voice-${Date.now()}`,

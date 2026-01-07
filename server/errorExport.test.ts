@@ -12,7 +12,7 @@ import { unlink } from "fs/promises";
 describe("错题导出功能测试", () => {
   let testUserId: number;
   let testErrorQuestionIds: number[] = [];
-  let caller: ReturnType<typeof appRouter.createCaller>;
+  let caller: ReturnType<typeof createCaller>;
 
   beforeAll(async () => {
     const db = await getDb();
@@ -82,7 +82,8 @@ describe("错题导出功能测试", () => {
     }
 
     // 创建caller
-    caller = appRouter.createCaller({
+    const createCaller = appRouter.createCaller;
+    caller = createCaller({
       user: {
         id: testUserId,
         openId: `test-export-${Date.now()}`,

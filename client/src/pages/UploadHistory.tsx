@@ -13,11 +13,11 @@ const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884d8'];
 export default function UploadHistory() {
   const [timeRange, setTimeRange] = useState<'7days' | '30days' | '90days' | 'all'>('30days');
 
-  const { data: history, isLoading } = trpc.errorQuestion.getUploadHistory.useQuery({
+  const { data: history, isLoading } = trpc.errorQuestions.getUploadHistory.useQuery({
     timeRange,
   });
 
-  const { data: stats, isLoading: statsLoading } = trpc.errorQuestion.getUploadStats.useQuery({
+  const { data: stats, isLoading: statsLoading } = trpc.errorQuestions.getUploadStats.useQuery({
     timeRange,
   });
 
@@ -30,23 +30,23 @@ export default function UploadHistory() {
   }
 
   // 准备图表数据
-  const uploadTrendData = history?.map(h => ({
+  const uploadTrendData = history?.map((h: any) => ({
     date: format(new Date(h.uploadTime), 'MM-dd', { locale: zhCN }),
     count: h.totalCount,
     accuracy: (h.recognitionAccuracy * 100).toFixed(1),
   })) || [];
 
-  const subjectDistribution = stats?.subjectDistribution.map(s => ({
+  const subjectDistribution = stats?.subjectDistribution.map((s: any) => ({
     name: s.subject,
     value: s.count,
   })) || [];
 
-  const gradeDistribution = stats?.gradeDistribution.map(g => ({
+  const gradeDistribution = stats?.gradeDistribution.map((g: any) => ({
     name: g.grade,
     value: g.count,
   })) || [];
 
-  const accuracyTrendData = history?.map(h => ({
+  const accuracyTrendData = history?.map((h: any) => ({
     date: format(new Date(h.uploadTime), 'MM-dd', { locale: zhCN }),
     accuracy: (h.recognitionAccuracy * 100).toFixed(1),
   })) || [];
@@ -216,7 +216,7 @@ export default function UploadHistory() {
                     fill="#8884d8"
                     dataKey="value"
                   >
-                    {subjectDistribution.map((entry, index) => (
+                    {subjectDistribution.map((entry: any, index: any) => (
                       <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                     ))}
                   </Pie>
@@ -250,7 +250,7 @@ export default function UploadHistory() {
                     fill="#8884d8"
                     dataKey="value"
                   >
-                    {gradeDistribution.map((entry, index) => (
+                    {gradeDistribution.map((entry: any, index: any) => (
                       <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                     ))}
                   </Pie>

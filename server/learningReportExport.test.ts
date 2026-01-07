@@ -6,7 +6,7 @@ import { getDb, upsertUser, createErrorQuestion, createPracticeRecord } from "./
 import type { InsertErrorQuestion, InsertPracticeRecord } from "../drizzle/schema";
 
 describe("学习报告导出功能", () => {
-  let caller: ReturnType<typeof appRouter.createCaller>;
+  let caller: ReturnType<typeof createCaller>;
   const testUserOpenId = `test-user-${Date.now()}`;
   let testUserId: number;
 
@@ -73,7 +73,8 @@ describe("学习报告导出功能", () => {
       avatar: null,
     };
 
-    caller = appRouter.createCaller(ctx);
+    const createCaller = appRouter.createCaller;
+    caller = createCaller(ctx);
   }, 30000);
 
   it("应该能获取报告预览数据", async () => {

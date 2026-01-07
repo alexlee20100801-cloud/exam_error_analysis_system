@@ -3,7 +3,7 @@ import { appRouter } from "./routers";
 import type { Context } from "./_core/context";
 
 describe("学习统计功能测试", () => {
-  let caller: ReturnType<typeof appRouter.createCaller>;
+  let caller: ReturnType<typeof createCaller>;
   let mockUserId: number;
 
   beforeAll(async () => {
@@ -21,7 +21,8 @@ describe("学习统计功能测试", () => {
       res: {} as any,
     };
 
-    caller = appRouter.createCaller(mockContext);
+    const createCaller = appRouter.createCaller;
+    caller = createCaller(mockContext);
 
     // 创建一些测试数据
     await caller.errorQuestions.create({

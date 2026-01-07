@@ -6,7 +6,7 @@ import { eq } from 'drizzle-orm';
 import type { TrpcContext } from './_core/context';
 
 describe('批量上传错题功能测试', () => {
-  let caller: ReturnType<typeof appRouter.createCaller>;
+  let caller: ReturnType<typeof createCaller>;
   let testUserId: string;
   const createdQuestionIds: number[] = [];
 
@@ -31,7 +31,8 @@ describe('批量上传错题功能测试', () => {
       req: {} as any,
       res: {} as any,
     };
-    caller = appRouter.createCaller(mockContext);
+    const createCaller = appRouter.createCaller;
+    caller = createCaller(mockContext);
   });
 
   afterAll(async () => {

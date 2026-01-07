@@ -3,7 +3,7 @@ import { appRouter } from "./routers";
 import type { Context } from "./_core/context";
 
 describe("错题上传功能测试", () => {
-  let caller: ReturnType<typeof appRouter.createCaller>;
+  let caller: ReturnType<typeof createCaller>;
   let mockUserId: number;
 
   beforeAll(() => {
@@ -21,7 +21,8 @@ describe("错题上传功能测试", () => {
       res: {} as any,
     };
 
-    caller = appRouter.createCaller(mockContext);
+    const createCaller = appRouter.createCaller;
+    caller = createCaller(mockContext);
   });
 
   it("应该能够创建错题（手动输入）", async () => {

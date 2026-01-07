@@ -1,6 +1,6 @@
 import { getDb } from "../db";
 import { favorites, questions, errorQuestions } from "../../drizzle/schema";
-import { eq, and, desc } from "drizzle-orm";
+import { eq, and, desc, sql } from "drizzle-orm";
 
 /**
  * 题目类型

@@ -4,7 +4,7 @@ import type { Context } from "./_core/context";
 import { analyzeErrorQuestion } from "./services/errorAnalysisService";
 
 describe("AI错题分析功能测试", () => {
-  let caller: ReturnType<typeof appRouter.createCaller>;
+  let caller: ReturnType<typeof createCaller>;
   let mockUserId: number;
   let testQuestionId: number;
 
@@ -23,7 +23,8 @@ describe("AI错题分析功能测试", () => {
       res: {} as any,
     };
 
-    caller = appRouter.createCaller(mockContext);
+    const createCaller = appRouter.createCaller;
+    caller = createCaller(mockContext);
 
     // 创建一个测试错题
     const createResult = await caller.errorQuestions.create({

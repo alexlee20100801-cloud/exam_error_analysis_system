@@ -8,7 +8,7 @@ import { calculateNextReviewTime, EBBINGHAUS_INTERVALS } from "./reviewPlanServi
 describe("复习计划功能测试", () => {
   let testUserId: number;
   let testErrorQuestionId: number;
-  let caller: ReturnType<typeof appRouter.createCaller>;
+  let caller: ReturnType<typeof createCaller>;
 
   beforeAll(async () => {
     const db = await getDb();
@@ -41,7 +41,8 @@ describe("复习计划功能测试", () => {
     testErrorQuestionId = errorQuestion.id;
 
     // 创建caller
-    caller = appRouter.createCaller({
+    const createCaller = appRouter.createCaller;
+    caller = createCaller({
       user: {
         id: testUserId,
         openId: `test-review-${Date.now()}`,

@@ -66,7 +66,7 @@ export default function UploadError() {
       });
       setLocation("/error-questions");
     },
-    onError: (error) => {
+    onError: (error: any) => {
       toast.error("保存失败", {
         description: error.message,
       });

@@ -62,7 +62,7 @@ export default function BatchEdit() {
       });
       navigate('/error-questions');
     },
-    onError: (error) => {
+    onError: (error: any) => {
       toast({
         title: '批量确认失败',
         description: error.message,
@@ -78,7 +78,7 @@ export default function BatchEdit() {
         description: '错题属性已更新',
       });
     },
-    onError: (error) => {
+    onError: (error: any) => {
       toast({
         title: '更新失败',
         description: error.message,
@@ -89,7 +89,7 @@ export default function BatchEdit() {
 
   useEffect(() => {
     if (session?.items && session.items.length > 0) {
-      setSelectedItems(new Set(session.items.map(item => item.id)));
+      setSelectedItems(new Set(session.items.map((item: any) => item.id)));
     }
   }, [session]);
 
@@ -180,7 +180,7 @@ export default function BatchEdit() {
     if (selectedItems.size === session.items.length) {
       setSelectedItems(new Set());
     } else {
-      setSelectedItems(new Set(session.items.map(item => item.id)));
+      setSelectedItems(new Set(session.items.map((item: any) => item.id)));
     }
   };
 
@@ -295,7 +295,7 @@ export default function BatchEdit() {
           </Button>
         </div>
 
-        {session.items.map((item, index) => (
+        {session.items.map((item: any, index: any) => (
           <Card key={item.id} className={selectedItems.has(item.id) ? 'border-primary' : ''}>
             <CardHeader>
               <div className="flex items-start justify-between">

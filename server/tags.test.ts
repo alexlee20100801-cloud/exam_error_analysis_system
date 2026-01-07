@@ -6,7 +6,7 @@ import { getDb, upsertUser, createErrorQuestion } from "./db";
 import type { InsertErrorQuestion } from "../drizzle/schema";
 
 describe("错题标签功能", () => {
-  let caller: ReturnType<typeof appRouter.createCaller>;
+  let caller: ReturnType<typeof createCaller>;
   const testUserOpenId = `test-user-${Date.now()}`;
   let testUserId: number;
   let testQuestionId: number;
@@ -52,7 +52,8 @@ describe("错题标签功能", () => {
       avatar: null,
     };
 
-    caller = appRouter.createCaller(ctx);
+    const createCaller = appRouter.createCaller;
+    caller = createCaller(ctx);
   }, 30000);
 
   it("应该能创建标签", async () => {

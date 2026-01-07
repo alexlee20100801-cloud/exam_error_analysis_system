@@ -202,7 +202,7 @@ export default function ExperimentDashboard() {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {experiments.map((exp) => (
+                  {experiments.map((exp: any) => (
                     <TableRow key={exp.id}>
                       <TableCell className="font-medium">{exp.experimentName}</TableCell>
                       <TableCell>{getStatusBadge(exp.status)}</TableCell>
