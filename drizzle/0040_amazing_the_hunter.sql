@@ -1,0 +1,1 @@
+ALTER TABLE `users` MODIFY COLUMN `userType` enum('student','parent','teacher') NOT NULL DEFAULT 'student';

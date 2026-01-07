@@ -1,0 +1,9 @@
+{
+  "query": "ALTER TABLE users \nADD COLUMN IF NOT EXISTS grade ENUM('junior1','junior2','junior3','senior1','senior2','senior3'),\nADD COLUMN IF NOT EXISTS school VARCHAR(200),\nADD COLUMN IF NOT EXISTS userType ENUM('student','parent','teacher') NOT NULL DEFAULT 'student',\nADD COLUMN IF NOT EXISTS region VARCHAR(100),\nADD COLUMN IF NOT EXISTS currentSemester ENUM('first','second'),\nADD COLUMN IF NOT EXISTS disabledMenuItems JSON,\nADD COLUMN IF NOT EXISTS email_verified TINYINT DEFAULT 0,\nADD COLUMN IF NOT EXISTS wechat_open_id VARCHAR(128),\nADD COLUMN IF NOT EXISTS wechat_nickname VARCHAR(200),\nADD COLUMN IF NOT EXISTS theme ENUM('light','dark','system') DEFAULT 'system',\nADD COLUMN IF NOT EXISTS points INT DEFAULT 0 NOT NULL,\nADD COLUMN IF NOT EXISTS total_feedback_count INT DEFAULT 0 NOT NULL;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway03.us-east-1.prod.aws.tidbcloud.com --port 4000 --user Lfr9xqjx7LpxUD9.1efa314e7813 --database Yh4Z4ZSitSFdPWYxtKkkQS --execute ALTER TABLE users \nADD COLUMN IF NOT EXISTS grade ENUM('junior1','junior2','junior3','senior1','senior2','senior3'),\nADD COLUMN IF NOT EXISTS school VARCHAR(200),\nADD COLUMN IF NOT EXISTS userType ENUM('student','parent','teacher') NOT NULL DEFAULT 'student',\nADD COLUMN IF NOT EXISTS region VARCHAR(100),\nADD COLUMN IF NOT EXISTS currentSemester ENUM('first','second'),\nADD COLUMN IF NOT EXISTS disabledMenuItems JSON,\nADD COLUMN IF NOT EXISTS email_verified TINYINT DEFAULT 0,\nADD COLUMN IF NOT EXISTS wechat_open_id VARCHAR(128),\nADD COLUMN IF NOT EXISTS wechat_nickname VARCHAR(200),\nADD COLUMN IF NOT EXISTS theme ENUM('light','dark','system') DEFAULT 'system',\nADD COLUMN IF NOT EXISTS points INT DEFAULT 0 NOT NULL,\nADD COLUMN IF NOT EXISTS total_feedback_count INT DEFAULT 0 NOT NULL;",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 2721
+}

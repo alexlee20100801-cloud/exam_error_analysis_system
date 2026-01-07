@@ -253,6 +253,13 @@
       "when": 1767790304443,
       "tag": "0039_curvy_xavin",
       "breakpoints": true
+    },
+    {
+      "idx": 40,
+      "version": "5",
+      "when": 1767795459210,
+      "tag": "0040_amazing_the_hunter",
+      "breakpoints": true
     }
   ]
 }
