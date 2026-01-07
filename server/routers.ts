@@ -70,6 +70,9 @@ import { batchSmartCropRouter } from "./routers/batchSmartCrop";
 import { cropHistoryRouter } from "./routers/cropHistory";
 import { dataCrawlerRouter } from "./routers/dataCrawler";
 import { deduplicationRouter } from "./routers/deduplication";
+import { complianceRouter } from "./routers/compliance";
+import { qualityRouter } from "./routers/quality";
+import { recommendationRouter } from "./routers/recommendation";
 
 export const appRouter = router({
   system: systemRouter,
@@ -264,6 +267,15 @@ export const appRouter = router({
   
   // 第二阶段：查重去噪
   deduplication: deduplicationRouter,
+  
+  // 第二阶段：合规审核
+  compliance: complianceRouter,
+  
+  // 第二阶段：质量评分
+  quality: qualityRouter,
+  
+  // 第三阶段：智能推荐
+  recommendation: recommendationRouter,
 });
 
 export type AppRouter = typeof appRouter;

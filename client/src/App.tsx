@@ -42,6 +42,9 @@ import AnnotationDetail from "@/pages/AnnotationDetail";
 import { AIAnnotationFeedbackStats } from "@/pages/AIAnnotationFeedbackStats";
 import { MyFavoriteQuestions } from "@/pages/MyFavoriteQuestions";
 import QuestionReview from "@/pages/admin/QuestionReview";
+import DeduplicationManagement from "@/pages/admin/DeduplicationManagement";
+import ComplianceManagement from "@/pages/admin/ComplianceManagement";
+import QualityManagement from "@/pages/admin/QualityManagement";
 import { SmartDocumentProcessor } from "@/pages/SmartDocumentProcessor";
 import { PWAInstallPrompt } from "@/components/PWAInstallPrompt";
 import { MobileBottomNav } from "@/components/MobileBottomNav";
@@ -52,6 +55,7 @@ import DataCrawler from "./pages/DataCrawler";
 import KnowledgeGraph from "./pages/KnowledgeGraph";
 import SmartScanner from "@/pages/SmartScanner";
 import IdCardManagement from "@/pages/IdCardManagement";
+import RecommendationEngine from "@/pages/RecommendationEngine";
 
 function Router() {
   return (
@@ -100,6 +104,10 @@ function Router() {
       <Route path="/annotation/:id" component={AnnotationDetail} />
       <Route path="/admin/annotation-feedback" component={AIAnnotationFeedbackStats} />
       <Route path="/admin/question-review" component={QuestionReview} />
+      <Route path="/admin/deduplication" component={DeduplicationManagement} />
+      <Route path="/admin/compliance" component={ComplianceManagement} />
+      <Route path="/admin/quality" component={QualityManagement} />
+      <Route path="/recommendation" component={RecommendationEngine} />
         <Route path="/data-crawler" component={DataCrawler} />
         <Route path="/knowledge-graph" component={KnowledgeGraph} />
       <Route path="/my-favorite-questions" component={MyFavoriteQuestions} />

@@ -282,6 +282,128 @@ export const deduplicationRouter = router({
       };
     }),
 
+  // 查找重复试题对(用于管理界面)
+  findDuplicates: protectedProcedure
+    .input(z.object({
+      threshold: z.number().min(0).max(1).default(0.9),
+      limit: z.number().min(1).max(100).default(50)
+    }))
+    .query(async ({ input }) => {
+      // 查询相似度记录
+      const similarities = await db
+        .select({
+          questionId: questionSimilarities.question1Id,
+          duplicateId: questionSimilarities.question2Id,
+          similarity: questionSimilarities.overallSimilarity,
+          textSimilarity: questionSimilarities.textSimilarity,
+          imageSimilarity: questionSimilarities.imageSimilarity
+        })
+        .from(questionSimilarities)
+        .where(gte(questionSimilarities.overallSimilarity, (input.threshold * 100).toString()))
+        .orderBy(desc(questionSimilarities.overallSimilarity))
+        .limit(input.limit);
+      
+      // 获取试题详情
+      const questionIds = [...new Set(similarities.flatMap(s => [s.questionId, s.duplicateId]))];
+      const questions = await db
+        .select()
+        .from(rawQuestions)
+        .where(sql`${rawQuestions.id} IN (${sql.join(questionIds.map(id => sql`${id}`), sql`, `)})`);      
+      const questionMap = new Map(questions.map(q => [q.id, q]));
+      
+      // 组合数据
+      const duplicatePairs = similarities.map(s => {
+        const original = questionMap.get(s.questionId);
+        const duplicate = questionMap.get(s.duplicateId);
+        return {
+          questionId: s.questionId,
+          duplicateId: s.duplicateId,
+          similarity: parseFloat(s.similarity) / 100,
+          textSimilarity: s.textSimilarity ? parseFloat(s.textSimilarity) / 100 : 0,
+          imageSimilarity: s.imageSimilarity ? parseFloat(s.imageSimilarity) / 100 : 0,
+          subject: original?.subject || 'unknown',
+          originalContent: original?.content || '',
+          duplicateContent: duplicate?.content || ''
+        };
+      });
+      
+      return duplicatePairs;
+    }),
+
+  // 处理重复试题(用于管理界面)
+  handleDuplicate: protectedProcedure
+    .input(z.object({
+      questionId: z.number(),
+      duplicateId: z.number(),
+      action: z.enum(['keep_original', 'merge', 'delete_duplicate'])
+    }))
+    .mutation(async ({ input, ctx }) => {
+      const { questionId, duplicateId, action } = input;
+      
+      if (action === 'keep_original') {
+        // 标记原题为唯一,重复题为duplicate
+        await db.update(rawQuestions)
+          .set({ duplicateCheckStatus: 'unique' })
+          .where(eq(rawQuestions.id, questionId));
+        
+        await db.update(rawQuestions)
+          .set({ 
+            duplicateCheckStatus: 'duplicate',
+            duplicateOfId: questionId
+          })
+          .where(eq(rawQuestions.id, duplicateId));
+        
+        // 记录处理
+        await db.insert(deduplicationRecords).values({
+          batchId: `manual_${Date.now()}`,
+          questionId: duplicateId,
+          action: 'discard',
+          reason: `人工确认与试题 ${questionId} 重复`,
+          duplicateGroupId: `group_${questionId}`,
+          similarQuestionIds: [questionId],
+          processedBy: ctx.user?.name || 'admin'
+        });
+      } else if (action === 'delete_duplicate') {
+        // 直接删除重复题
+        await db.update(rawQuestions)
+          .set({ 
+            duplicateCheckStatus: 'duplicate',
+            duplicateOfId: questionId
+          })
+          .where(eq(rawQuestions.id, duplicateId));
+        
+        await db.insert(deduplicationRecords).values({
+          batchId: `manual_${Date.now()}`,
+          questionId: duplicateId,
+          action: 'delete',
+          reason: `人工删除,与试题 ${questionId} 重复`,
+          duplicateGroupId: `group_${questionId}`,
+          similarQuestionIds: [questionId],
+          processedBy: ctx.user?.name || 'admin'
+        });
+      } else if (action === 'merge') {
+        // 合并逻辑(暂时标记为已处理)
+        await db.update(rawQuestions)
+          .set({ duplicateCheckStatus: 'merged' })
+          .where(eq(rawQuestions.id, duplicateId));
+        
+        await db.insert(deduplicationRecords).values({
+          batchId: `manual_${Date.now()}`,
+          questionId: duplicateId,
+          action: 'merge',
+          reason: `合并到试题 ${questionId}`,
+          duplicateGroupId: `group_${questionId}`,
+          similarQuestionIds: [questionId],
+          processedBy: ctx.user?.name || 'admin'
+        });
+      }
+      
+      return {
+        success: true,
+        message: '处理成功'
+      };
+    }),
+
   // 获取查重统计
   getDeduplicationStats: protectedProcedure
     .query(async () => {

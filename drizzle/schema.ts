@@ -45,6 +45,19 @@ export {
   type NewReviewStat
 } from "./compliance_schema";
 
+// 导入质量评分 schema
+export {
+  qualityScores,
+  qualityRules,
+  qualityImprovements,
+  type QualityScore,
+  type NewQualityScore,
+  type QualityRule,
+  type NewQualityRule,
+  type QualityImprovement,
+  type NewQualityImprovement
+} from "./quality_schema";
+
 export const accountCredentials = mysqlTable("account_credentials", {
 	id: int().autoincrement().notNull(),
 	userId: int("user_id").notNull(),
