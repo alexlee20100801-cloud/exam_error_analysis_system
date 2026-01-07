@@ -16,6 +16,8 @@ import { Progress } from '@/components/ui/progress';
 import { LatexText } from '@/components/LatexPreview';
 import { RichTextEditor } from '@/components/RichTextEditor';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { BatchImageUpload } from '@/components/BatchImageUpload';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 // 学科映射
 const SUBJECT_MAP: Record<string, string> = {

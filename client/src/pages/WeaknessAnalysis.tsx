@@ -16,6 +16,8 @@ import {
   BarChart3
 } from "lucide-react";
 import { trpc } from "@/lib/trpc";
+import { KnowledgeRadarChart } from "@/components/KnowledgeRadarChart";
+import { KnowledgeHeatmap } from "@/components/KnowledgeHeatmap";
 
 export default function WeaknessAnalysis() {
   const { data: user } = trpc.auth.me.useQuery();
@@ -29,6 +31,12 @@ export default function WeaknessAnalysis() {
 
   // 获取雷达图数据
   const { data: radarData } = trpc.weakness.getRadarData.useQuery(
+    { userId: user?.id || 0 },
+    { enabled: !!user?.id }
+  );
+
+  // 获取热力图数据
+  const { data: heatmapData } = trpc.weakness.getHeatmapData.useQuery(
     { userId: user?.id || 0 },
     { enabled: !!user?.id }
   );
@@ -316,7 +324,22 @@ export default function WeaknessAnalysis() {
           </Card>
         </TabsContent>
 
-        <TabsContent value="chart" className="space-y-4">
+        <TabsContent value="chart" className="space-y-6">
+          {/* 雷达图 */}
+          {radarData && radarData.length > 0 && (
+            <KnowledgeRadarChart data={radarData} />
+          )}
+
+          {/* 热力图 */}
+          {heatmapData && heatmapData.length > 0 && (
+            <KnowledgeHeatmap 
+              data={heatmapData}
+              title="学习活动热力图"
+              description="展示最近90天的学习活动和错题录入趋势"
+            />
+          )}
+
+          {/* 原有内容 */}
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">

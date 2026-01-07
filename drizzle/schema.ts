@@ -613,8 +613,40 @@ export const practiceRecords = mysqlTable("practice_records", {
 	knowledgePointIds: json(),
 	subject: mysqlEnum(['chinese','math','english','physics','chemistry','biology','politics','history','geography']).notNull(),
 	grade: mysqlEnum(['junior1','junior2','junior3','senior1','senior2','senior3']).notNull(),
+	// 新增字段：练习模式和会话跟踪
+	practiceMode: mysqlEnum('practice_mode', ['random','chapter','timed','weakness','review']).default('random'),
+	practiceSessionId: varchar('practice_session_id', { length: 64 }), // 练习会话 ID，用于分组统计
+	difficulty: mysqlEnum(['easy','medium','hard']),
+	attemptCount: int('attempt_count').default(1).notNull(), // 第几次尝试
+	confidenceLevel: int('confidence_level'), // 用户自评信心度 1-5
+	notes: text(), // 用户笔记
 	createdAt: timestamp({ mode: 'string' }).default('CURRENT_TIMESTAMP').notNull(),
 });
+
+// 练习会话表 - 跟踪每次练习的整体情况
+export const practiceSessions = mysqlTable("practice_sessions", {
+	id: int().autoincrement().primaryKey().notNull(),
+	sessionId: varchar('session_id', { length: 64 }).notNull().unique(), // UUID
+	userId: int('user_id').notNull(),
+	practiceMode: mysqlEnum('practice_mode', ['random','chapter','timed','weakness','review']).notNull(),
+	subject: mysqlEnum(['chinese','math','english','physics','chemistry','biology','politics','history','geography']),
+	grade: mysqlEnum(['junior1','junior2','junior3','senior1','senior2','senior3']),
+	totalQuestions: int('total_questions').default(0).notNull(),
+	completedQuestions: int('completed_questions').default(0).notNull(),
+	correctCount: int('correct_count').default(0).notNull(),
+	wrongCount: int('wrong_count').default(0).notNull(),
+	totalTimeSpent: int('total_time_spent').default(0).notNull(), // 总用时（秒）
+	accuracyRate: decimal('accuracy_rate', { precision: 5, scale: 2 }), // 正确率
+	status: mysqlEnum('status', ['in_progress','completed','abandoned']).default('in_progress').notNull(),
+	startedAt: timestamp('started_at', { mode: 'string' }).default('CURRENT_TIMESTAMP').notNull(),
+	completedAt: timestamp('completed_at', { mode: 'string' }),
+	createdAt: timestamp('created_at', { mode: 'string' }).default('CURRENT_TIMESTAMP').notNull(),
+	updatedAt: timestamp('updated_at', { mode: 'string' }).defaultNow().onUpdateNow().notNull(),
+},
+(table) => [
+	index("idx_user_sessions").on(table.userId, table.createdAt),
+	index("idx_session_id").on(table.sessionId),
+])
 
 export const pushConfigs = mysqlTable("push_configs", {
 	id: int().autoincrement().notNull(),
@@ -1341,6 +1373,9 @@ export type NewKnowledgePoint = typeof knowledgePoints.$inferInsert;
 // Practice Record types
 export type PracticeRecord = typeof practiceRecords.$inferSelect;
 export type NewPracticeRecord = typeof practiceRecords.$inferInsert;
+
+export type PracticeSession = typeof practiceSessions.$inferSelect;
+export type NewPracticeSession = typeof practiceSessions.$inferInsert;
 
 // Review Plan types
 export type ReviewPlan = typeof reviewPlans.$inferSelect;

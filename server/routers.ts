@@ -60,6 +60,8 @@ import { advancedExportRouter } from "./routers/advancedExport";
 import { shareRouter } from "./routers/share";
 import { weaknessRouter } from "./routers/weakness";
 import { smartExamPaperRouter } from "./routers/smartExamPaper";
+import { practiceRecordsRouter } from "./routers/practiceRecords";
+import { batchImageProcessingRouter } from "./routers/batchImageProcessing";
 
 export const appRouter = router({
   system: systemRouter,
@@ -80,6 +82,9 @@ export const appRouter = router({
   
   // 文档上传和解析
   documentUpload: documentUploadRouter,
+  
+  // 批量图片处理
+  batchImageProcessing: batchImageProcessingRouter,
   
   // 符号校正
   symbolCorrection: symbolCorrectionRouter,
@@ -152,6 +157,9 @@ export const appRouter = router({
   
   // 练习和学习追踪
   practice: practiceRouter,
+  
+  // 练习记录系统
+  practiceRecords: practiceRecordsRouter,
   
   // 复习计划
   review: reviewRouter,
