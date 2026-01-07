@@ -734,3 +734,11 @@
 - [x] 修复Dashboard页面数据库查询错误（practice_records和learning_progress表字段映射问题）
 - [x] 移除schema中不存在的字段定义
 - [x] 运行测试验证修复效果
+
+---
+
+## Vite HMR WebSocket连接错误修复（2026-01-07）
+
+- [x] 修复Vite HMR WebSocket连接错误
+- [x] 配置Vite服务器正确处理代理环境的WebSocket连接（添加hmr.clientPort=443和protocol=wss）
+- [x] 测试热更新功能是否正常工作（服务器已重启，页面正常加载）
