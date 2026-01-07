@@ -73,6 +73,23 @@ export default function UploadError() {
     },
   });
 
+  // 直接调用相机拍照(移动端)
+  const handleCameraCapture = () => {
+    if (fileInputRef.current) {
+      // 设置 capture 属性以调用相机
+      fileInputRef.current.setAttribute('capture', 'environment');
+      fileInputRef.current.click();
+    }
+  };
+
+  // 从相册选择图片
+  const handleGallerySelect = () => {
+    if (fileInputRef.current) {
+      fileInputRef.current.removeAttribute('capture');
+      fileInputRef.current.click();
+    }
+  };
+
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []);
     if (files.length === 0) return;
@@ -267,7 +284,7 @@ export default function UploadError() {
   };
 
   return (
-    <div className="container max-w-4xl py-8">
+    <div className="container max-w-4xl py-4 px-4 sm:py-8">
       <Card>
         <CardHeader>
           <CardTitle>上传错题</CardTitle>
@@ -279,29 +296,28 @@ export default function UploadError() {
             <Label>错题图片</Label>
             
             {imagePreviews.length === 0 ? (
-              <div className="border-2 border-dashed border-border rounded-lg p-8 text-center space-y-4">
-                <div className="flex justify-center gap-4">
+              <div className="border-2 border-dashed border-border rounded-lg p-6 md:p-8 text-center space-y-4">
+                {/* 移动端优化:垂直布局,更大的按钮 */}
+                <div className="flex flex-col sm:flex-row justify-center gap-3 sm:gap-4">
                   <Button
                     type="button"
                     variant="outline"
-                    onClick={() => fileInputRef.current?.click()}
+                    size="lg"
+                    className="w-full sm:w-auto h-12 sm:h-10"
+                    onClick={handleCameraCapture}
                   >
-                    <Upload className="mr-2 h-4 w-4" />
-                    选择图片
+                    <Camera className="mr-2 h-5 w-5" />
+                    拍照上传
                   </Button>
                   <Button
                     type="button"
                     variant="outline"
-                    onClick={() => {
-                      // 移动端会调用相机
-                      if (fileInputRef.current) {
-                        fileInputRef.current.setAttribute("capture", "environment");
-                        fileInputRef.current.click();
-                      }
-                    }}
+                    size="lg"
+                    className="w-full sm:w-auto h-12 sm:h-10"
+                    onClick={handleGallerySelect}
                   >
-                    <Camera className="mr-2 h-4 w-4" />
-                    拍照
+                    <Upload className="mr-2 h-5 w-5" />
+                    从相册选择
                   </Button>
                 </div>
                 <p className="text-sm text-muted-foreground">
@@ -310,8 +326,8 @@ export default function UploadError() {
               </div>
             ) : (
               <div className="space-y-4">
-                {/* 批量图片预览 */}
-                <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                {/* 批量图片预览 - 移动端优化 */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-4">
                   {imagePreviews.map((preview, index) => (
                     <div key={index} className="relative border rounded-lg overflow-hidden">
                       <img

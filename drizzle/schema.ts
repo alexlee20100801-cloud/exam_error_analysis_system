@@ -58,6 +58,42 @@ export {
   type NewQualityImprovement
 } from "./quality_schema";
 
+// 导入批量编辑和AI缓存 schema
+export {
+  uploadSessions,
+  uploadSessionItems,
+  questionAnalysisCache,
+  type UploadSession,
+  type NewUploadSession,
+  type UploadSessionItem,
+  type NewUploadSessionItem,
+  type QuestionAnalysisCache,
+  type NewQuestionAnalysisCache
+} from "./batch_and_cache_schema";
+
+// 导入上传历史 schema
+export {
+  uploadHistory,
+  type UploadHistory,
+  type NewUploadHistory
+} from "./upload_history_schema";
+
+// 导入角色增强 schema
+export {
+  teacherClasses,
+  studentClasses,
+  classReports,
+  parentViewLogs,
+  type TeacherClass,
+  type NewTeacherClass,
+  type StudentClass,
+  type NewStudentClass,
+  type ClassReport,
+  type NewClassReport,
+  type ParentViewLog,
+  type NewParentViewLog
+} from "./role_enhancement_schema";
+
 export const accountCredentials = mysqlTable("account_credentials", {
 	id: int().autoincrement().notNull(),
 	userId: int("user_id").notNull(),

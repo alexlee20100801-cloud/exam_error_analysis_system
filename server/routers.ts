@@ -73,6 +73,9 @@ import { deduplicationRouter } from "./routers/deduplication";
 import { complianceRouter } from "./routers/compliance";
 import { qualityRouter } from "./routers/quality";
 import { recommendationRouter } from "./routers/recommendation";
+import { batchUploadRouter } from "./routers/batchUpload";
+import { uploadHistoryRouter } from "./routers/uploadHistory";
+import { roleEnhancementRouter } from "./routers/roleEnhancement";
 
 export const appRouter = router({
   system: systemRouter,
@@ -274,8 +277,17 @@ export const appRouter = router({
   // 第二阶段：质量评分
   quality: qualityRouter,
   
-  // 第三阶段：智能推荐
+  // 推荐系统
   recommendation: recommendationRouter,
+  
+  // 批量上传和AI缓存
+  batchUpload: batchUploadRouter,
+  
+  // 上传历史记录
+  uploadHistory: uploadHistoryRouter,
+  
+  // 角色增强(家长和教师)
+  roleEnhancement: roleEnhancementRouter,
 });
 
 export type AppRouter = typeof appRouter;
