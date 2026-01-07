@@ -68,6 +68,7 @@ import { smartCropRouter } from "./routers/smartCrop";
 import { cropTemplatesRouter } from "./routers/cropTemplates";
 import { batchSmartCropRouter } from "./routers/batchSmartCrop";
 import { cropHistoryRouter } from "./routers/cropHistory";
+import { dataCrawlerRouter } from "./routers/dataCrawler";
 
 export const appRouter = router({
   system: systemRouter,
@@ -256,6 +257,9 @@ export const appRouter = router({
   
   // 题目导出
   questionExport: questionExportRouter,
+  
+  // 第一阶段：数据采集路由
+  dataCrawler: dataCrawlerRouter,
 });
 
 export type AppRouter = typeof appRouter;

@@ -51,6 +51,12 @@ import {
   userPushReceipts,
   questionReviews,
   annotations,
+  crawlerTasks,
+  rawQuestions,
+  crawlerSources,
+  knowledgePointTags,
+  knowledgePointRelations,
+  ocrProcessingLogs,
 } from '../drizzle/schema';
 import { eq, and, desc, sql, gte, lte, inArray, or, like, asc, isNull, ne } from 'drizzle-orm';
 
@@ -106,14 +112,14 @@ export async function batchDeleteErrorQuestions(ids: number[]) {
 
 // 知识点相关
 export async function getKnowledgePoints() {
-  return await db.select().from(knowledgePoints).orderBy(sql`${knowledgePoints.subject}`, sql`${knowledgePoints.grade}`);
+  return await db.select().from(knowledgePoints).orderBy(knowledgePoints.subject, knowledgePoints.grade);
 }
 
 export async function getKnowledgePointsBySubjectAndGrade(subject: string, grade: string) {
   return await db.select().from(knowledgePoints)
     .where(and(
-      sql`${knowledgePoints.subject} = ${subject}`,
-      sql`${knowledgePoints.grade} = ${grade}`
+      eq(knowledgePoints.subject, subject as any),
+      eq(knowledgePoints.grade, grade as any)
     ));
 }
 
@@ -1163,4 +1169,148 @@ export async function getPendingReviewPlans(userId: number) {
       eq(reviewPlans.status, 'pending')
     ));
   return result;
+}
+
+// ==================== 第一阶段：数据采集相关操作 ====================
+
+// 爬虫任务管理
+export async function createCrawlerTask(data: typeof crawlerTasks.$inferInsert) {
+  const result = await db.insert(crawlerTasks).values(data);
+  return result;
+}
+
+export async function getCrawlerTasks(filters?: { status?: string; taskType?: string }) {
+  let query = db.select().from(crawlerTasks);
+  
+  const conditions = [];
+  if (filters?.status) conditions.push(eq(crawlerTasks.status, filters.status as any));
+  if (filters?.taskType) conditions.push(eq(crawlerTasks.taskType, filters.taskType as any));
+  
+  if (conditions.length > 0) {
+    query = query.where(and(...conditions)) as any;
+  }
+  
+  return await query.orderBy(desc(crawlerTasks.createdAt));
+}
+
+export async function getCrawlerTaskById(id: number) {
+  const result = await db.select().from(crawlerTasks).where(eq(crawlerTasks.id, id));
+  return result[0];
+}
+
+export async function updateCrawlerTask(id: number, data: Partial<typeof crawlerTasks.$inferInsert>) {
+  const result = await db.update(crawlerTasks).set(data).where(eq(crawlerTasks.id, id));
+  return result;
+}
+
+export async function deleteCrawlerTask(id: number) {
+  const result = await db.delete(crawlerTasks).where(eq(crawlerTasks.id, id));
+  return result;
+}
+
+// 原始试题管理
+export async function createRawQuestion(data: typeof rawQuestions.$inferInsert) {
+  const result = await db.insert(rawQuestions).values(data);
+  return result;
+}
+
+export async function getRawQuestions(filters?: {
+  subject?: string;
+  grade?: string;
+  processingStatus?: string;
+  duplicateCheckStatus?: string;
+  complianceStatus?: string;
+  crawlerTaskId?: number;
+}) {
+  let query = db.select().from(rawQuestions);
+  
+  const conditions = [];
+  if (filters?.subject) conditions.push(eq(rawQuestions.subject, filters.subject as any));
+  if (filters?.grade) conditions.push(eq(rawQuestions.grade, filters.grade as any));
+  if (filters?.processingStatus) conditions.push(eq(rawQuestions.processingStatus, filters.processingStatus as any));
+  if (filters?.duplicateCheckStatus) conditions.push(eq(rawQuestions.duplicateCheckStatus, filters.duplicateCheckStatus as any));
+  if (filters?.complianceStatus) conditions.push(eq(rawQuestions.complianceStatus, filters.complianceStatus as any));
+  if (filters?.crawlerTaskId) conditions.push(eq(rawQuestions.crawlerTaskId, filters.crawlerTaskId));
+  
+  if (conditions.length > 0) {
+    query = query.where(and(...conditions)) as any;
+  }
+  
+  return await query.orderBy(desc(rawQuestions.createdAt));
+}
+
+export async function getRawQuestionById(id: number) {
+  const result = await db.select().from(rawQuestions).where(eq(rawQuestions.id, id));
+  return result[0];
+}
+
+export async function updateRawQuestion(id: number, data: Partial<typeof rawQuestions.$inferInsert>) {
+  const result = await db.update(rawQuestions).set(data).where(eq(rawQuestions.id, id));
+  return result;
+}
+
+// 爬虫来源管理
+export async function createCrawlerSource(data: typeof crawlerSources.$inferInsert) {
+  const result = await db.insert(crawlerSources).values(data);
+  return result;
+}
+
+export async function getCrawlerSources(filters?: { sourceType?: string; isActive?: boolean }) {
+  let query = db.select().from(crawlerSources);
+  
+  const conditions = [];
+  if (filters?.sourceType) conditions.push(eq(crawlerSources.sourceType, filters.sourceType as any));
+  if (filters?.isActive !== undefined) conditions.push(eq(crawlerSources.isActive, filters.isActive ? 1 : 0));
+  
+  if (conditions.length > 0) {
+    query = query.where(and(...conditions)) as any;
+  }
+  
+  return await query.orderBy(desc(crawlerSources.credibilityScore));
+}
+
+export async function updateCrawlerSource(id: number, data: Partial<typeof crawlerSources.$inferInsert>) {
+  const result = await db.update(crawlerSources).set(data).where(eq(crawlerSources.id, id));
+  return result;
+}
+
+// 知识点标签管理
+export async function createKnowledgePointTag(data: typeof knowledgePointTags.$inferInsert) {
+  const result = await db.insert(knowledgePointTags).values(data);
+  return result;
+}
+
+export async function getKnowledgePointTags(knowledgePointId: number) {
+  return await db.select().from(knowledgePointTags)
+    .where(eq(knowledgePointTags.knowledgePointId, knowledgePointId))
+    .orderBy(desc(knowledgePointTags.weight));
+}
+
+// 知识点关联管理
+export async function createKnowledgePointRelation(data: typeof knowledgePointRelations.$inferInsert) {
+  const result = await db.insert(knowledgePointRelations).values(data);
+  return result;
+}
+
+export async function getKnowledgePointRelations(knowledgePointId: number, relationType?: string) {
+  let query = db.select().from(knowledgePointRelations)
+    .where(eq(knowledgePointRelations.fromKnowledgePointId, knowledgePointId));
+  
+  if (relationType) {
+    query = query.where(eq(knowledgePointRelations.relationType, relationType as any)) as any;
+  }
+  
+  return await query.orderBy(desc(knowledgePointRelations.strength));
+}
+
+// OCR处理日志
+export async function createOcrProcessingLog(data: typeof ocrProcessingLogs.$inferInsert) {
+  const result = await db.insert(ocrProcessingLogs).values(data);
+  return result;
+}
+
+export async function getOcrProcessingLogs(rawQuestionId: number) {
+  return await db.select().from(ocrProcessingLogs)
+    .where(eq(ocrProcessingLogs.rawQuestionId, rawQuestionId))
+    .orderBy(desc(ocrProcessingLogs.createdAt));
 }

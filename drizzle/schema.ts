@@ -1459,3 +1459,165 @@ export const cropHistory = mysqlTable("crop_history", {
 
 export type CropHistory = typeof cropHistory.$inferSelect;
 export type NewCropHistory = typeof cropHistory.$inferInsert;
+
+// ==================== 第一阶段：基础数据采集和处理 ====================
+
+// 爬虫任务表
+export const crawlerTasks = mysqlTable("crawler_tasks", {
+	id: int().autoincrement().primaryKey().notNull(),
+	taskName: varchar("task_name", { length: 255 }).notNull(),
+	taskType: mysqlEnum("task_type", ['education_cloud', 'school_bank', 'web_crawler', 'manual_upload']).notNull(),
+	sourceUrl: varchar("source_url", { length: 500 }),
+	sourceType: varchar("source_type", { length: 100 }), // 来源类型：教育局、学校官网、教研网等
+	targetSubject: mysqlEnum("target_subject", ['chinese', 'math', 'english', 'physics', 'chemistry', 'biology', 'politics', 'history', 'geography']),
+	targetGrade: mysqlEnum("target_grade", ['junior1', 'junior2', 'junior3', 'senior1', 'senior2', 'senior3']),
+	scheduleType: mysqlEnum("schedule_type", ['once', 'daily', 'weekly', 'monthly']).default('once').notNull(),
+	scheduleTime: varchar("schedule_time", { length: 50 }), // cron表达式或时间字符串
+	status: mysqlEnum("status", ['pending', 'running', 'completed', 'failed', 'paused']).default('pending').notNull(),
+	totalItems: int("total_items").default(0).notNull(),
+	processedItems: int("processed_items").default(0).notNull(),
+	successItems: int("success_items").default(0).notNull(),
+	failedItems: int("failed_items").default(0).notNull(),
+	lastRunAt: timestamp("last_run_at", { mode: 'string' }),
+	nextRunAt: timestamp("next_run_at", { mode: 'string' }),
+	errorMessage: text("error_message"),
+	config: json(), // 爬虫配置：选择器、分页规则、反爬策略等
+	createdBy: int("created_by").notNull(),
+	createdAt: timestamp("created_at", { mode: 'string' }).default('CURRENT_TIMESTAMP').notNull(),
+	updatedAt: timestamp("updated_at", { mode: 'string' }).defaultNow().onUpdateNow().notNull(),
+},
+(table) => [
+	index("status_idx").on(table.status),
+	index("schedule_type_idx").on(table.scheduleType),
+	index("next_run_at_idx").on(table.nextRunAt),
+]);
+
+export type CrawlerTask = typeof crawlerTasks.$inferSelect;
+export type NewCrawlerTask = typeof crawlerTasks.$inferInsert;
+
+// 原始试题表
+export const rawQuestions = mysqlTable("raw_questions", {
+	id: int().autoincrement().primaryKey().notNull(),
+	crawlerTaskId: int("crawler_task_id"), // 关联爬虫任务
+	sourceUrl: varchar("source_url", { length: 500 }).notNull(),
+	sourceType: varchar("source_type", { length: 100 }).notNull(), // 教育云、学校题库、网络爬取等
+	sourceName: varchar("source_name", { length: 255 }), // 来源名称：XX学校、XX教育局
+	rawContent: text("raw_content").notNull(), // 原始内容（HTML/文本）
+	imageUrls: json("image_urls"), // 图片URL数组
+	ocrText: text("ocr_text"), // OCR识别的文本
+	ocrConfidence: decimal("ocr_confidence", { precision: 5, scale: 2 }), // OCR置信度
+	extractedMetadata: json("extracted_metadata"), // 提取的元数据
+	subject: mysqlEnum(['chinese', 'math', 'english', 'physics', 'chemistry', 'biology', 'politics', 'history', 'geography']),
+	grade: mysqlEnum(['junior1', 'junior2', 'junior3', 'senior1', 'senior2', 'senior3']),
+	questionType: mysqlEnum("question_type", ['choice', 'blank', 'short_answer', 'calculation', 'essay', 'mixed']),
+	difficulty: mysqlEnum(['easy', 'medium', 'hard']),
+	knowledgePointIds: json("knowledge_point_ids"), // AI识别的知识点ID数组
+	processingStatus: mysqlEnum("processing_status", ['raw', 'ocr_done', 'metadata_extracted', 'quality_checked', 'approved', 'rejected']).default('raw').notNull(),
+	qualityScore: decimal("quality_score", { precision: 5, scale: 2 }), // 质量评分
+	duplicateCheckStatus: mysqlEnum("duplicate_check_status", ['pending', 'unique', 'duplicate', 'similar']).default('pending').notNull(),
+	duplicateOfId: int("duplicate_of_id"), // 如果是重复题，指向原题ID
+	similarityScore: decimal("similarity_score", { precision: 5, scale: 2 }), // 相似度分数
+	complianceStatus: mysqlEnum("compliance_status", ['pending', 'compliant', 'out_of_scope', 'needs_review']).default('pending').notNull(),
+	complianceNotes: text("compliance_notes"), // 合规审核备注
+	isPublic: tinyint("is_public").default(0).notNull(),
+	createdAt: timestamp("created_at", { mode: 'string' }).default('CURRENT_TIMESTAMP').notNull(),
+	updatedAt: timestamp("updated_at", { mode: 'string' }).defaultNow().onUpdateNow().notNull(),
+},
+(table) => [
+	index("crawler_task_id_idx").on(table.crawlerTaskId),
+	index("source_type_idx").on(table.sourceType),
+	index("subject_grade_idx").on(table.subject, table.grade),
+	index("processing_status_idx").on(table.processingStatus),
+	index("duplicate_check_status_idx").on(table.duplicateCheckStatus),
+	index("compliance_status_idx").on(table.complianceStatus),
+]);
+
+export type RawQuestion = typeof rawQuestions.$inferSelect;
+export type NewRawQuestion = typeof rawQuestions.$inferInsert;
+
+// 爬虫来源配置表
+export const crawlerSources = mysqlTable("crawler_sources", {
+	id: int().autoincrement().primaryKey().notNull(),
+	sourceName: varchar("source_name", { length: 255 }).notNull(),
+	sourceType: mysqlEnum("source_type", ['education_cloud', 'school_bank', 'education_website', 'research_website', 'famous_school']).notNull(),
+	sourceUrl: varchar("source_url", { length: 500 }),
+	region: varchar({ length: 100 }).default('深圳').notNull(), // 地区
+	credibilityScore: decimal("credibility_score", { precision: 5, scale: 2 }).default('0'), // 可信度评分
+	totalQuestions: int("total_questions").default(0).notNull(),
+	approvedQuestions: int("approved_questions").default(0).notNull(),
+	lastCrawledAt: timestamp("last_crawled_at", { mode: 'string' }),
+	isActive: tinyint("is_active").default(1).notNull(),
+	crawlerConfig: json("crawler_config"), // 该来源的爬虫配置
+	notes: text(),
+	createdAt: timestamp("created_at", { mode: 'string' }).default('CURRENT_TIMESTAMP').notNull(),
+	updatedAt: timestamp("updated_at", { mode: 'string' }).defaultNow().onUpdateNow().notNull(),
+},
+(table) => [
+	index("source_type_idx").on(table.sourceType),
+	index("region_idx").on(table.region),
+	index("is_active_idx").on(table.isActive),
+]);
+
+export type CrawlerSource = typeof crawlerSources.$inferSelect;
+export type NewCrawlerSource = typeof crawlerSources.$inferInsert;
+
+// 知识点标签表（扩展现有知识图谱）
+export const knowledgePointTags = mysqlTable("knowledge_point_tags", {
+	id: int().autoincrement().primaryKey().notNull(),
+	knowledgePointId: int("knowledge_point_id").notNull(),
+	tagName: varchar("tag_name", { length: 100 }).notNull(),
+	tagType: mysqlEnum("tag_type", ['concept', 'method', 'application', 'difficulty', 'exam_frequency']).notNull(),
+	weight: decimal({ precision: 5, scale: 2 }).default('1.00').notNull(), // 标签权重
+	usageCount: int("usage_count").default(0).notNull(),
+	createdAt: timestamp("created_at", { mode: 'string' }).default('CURRENT_TIMESTAMP').notNull(),
+},
+(table) => [
+	index("knowledge_point_id_idx").on(table.knowledgePointId),
+	index("tag_type_idx").on(table.tagType),
+	unique("unique_kp_tag").on(table.knowledgePointId, table.tagName),
+]);
+
+export type KnowledgePointTag = typeof knowledgePointTags.$inferSelect;
+export type NewKnowledgePointTag = typeof knowledgePointTags.$inferInsert;
+
+// 知识点关联表
+export const knowledgePointRelations = mysqlTable("knowledge_point_relations", {
+	id: int().autoincrement().primaryKey().notNull(),
+	fromKnowledgePointId: int("from_knowledge_point_id").notNull(),
+	toKnowledgePointId: int("to_knowledge_point_id").notNull(),
+	relationType: mysqlEnum("relation_type", ['prerequisite', 'related', 'advanced', 'application']).notNull(),
+	strength: decimal({ precision: 5, scale: 2 }).default('1.00').notNull(), // 关联强度
+	description: text(),
+	createdAt: timestamp("created_at", { mode: 'string' }).default('CURRENT_TIMESTAMP').notNull(),
+},
+(table) => [
+	index("from_kp_idx").on(table.fromKnowledgePointId),
+	index("to_kp_idx").on(table.toKnowledgePointId),
+	index("relation_type_idx").on(table.relationType),
+	unique("unique_relation").on(table.fromKnowledgePointId, table.toKnowledgePointId, table.relationType),
+]);
+
+export type KnowledgePointRelation = typeof knowledgePointRelations.$inferSelect;
+export type NewKnowledgePointRelation = typeof knowledgePointRelations.$inferInsert;
+
+// OCR处理日志表
+export const ocrProcessingLogs = mysqlTable("ocr_processing_logs", {
+	id: int().autoincrement().primaryKey().notNull(),
+	rawQuestionId: int("raw_question_id").notNull(),
+	imageUrl: varchar("image_url", { length: 500 }).notNull(),
+	ocrEngine: varchar("ocr_engine", { length: 50 }).default('manus_llm').notNull(),
+	ocrText: text("ocr_text").notNull(),
+	confidence: decimal({ precision: 5, scale: 2 }),
+	hasSpecialSymbols: tinyint("has_special_symbols").default(0).notNull(), // 是否包含数学符号/化学式
+	specialSymbolsDetected: json("special_symbols_detected"), // 检测到的特殊符号列表
+	processingTime: int("processing_time"), // 处理时间（毫秒）
+	errorMessage: text("error_message"),
+	createdAt: timestamp("created_at", { mode: 'string' }).default('CURRENT_TIMESTAMP').notNull(),
+},
+(table) => [
+	index("raw_question_id_idx").on(table.rawQuestionId),
+	index("has_special_symbols_idx").on(table.hasSpecialSymbols),
+]);
+
+export type OcrProcessingLog = typeof ocrProcessingLogs.$inferSelect;
+export type NewOcrProcessingLog = typeof ocrProcessingLogs.$inferInsert;
