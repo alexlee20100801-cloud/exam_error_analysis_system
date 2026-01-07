@@ -115,6 +115,58 @@ export const exportTemplatesRouter = router({
       return await exportTemplateService.createSystemTemplates(ctx.user.id);
     }),
 
+  // 批量导出（使用自定义模板）
+  batchExport: protectedProcedure
+    .input(
+      z.object({
+        questionIds: z.array(z.number()),
+        templateId: z.number(),
+        format: z.enum(['word', 'pdf', 'markdown']).default('word'),
+      })
+    )
+    .mutation(async ({ input, ctx }) => {
+      try {
+        const questions = await getQuestionsWithDetails(input.questionIds);
+
+        if (questions.length === 0) {
+          return {
+            success: false,
+            error: '没有找到题目'
+          };
+        }
+
+        // 获取模板
+        const template = await exportTemplateService.getExportTemplate(ctx.user.id, input.templateId);
+        if (!template) {
+          return {
+            success: false,
+            error: '模板不存在'
+          };
+        }
+
+        // 生成内容（使用错题本模板格式作为基础）
+        const content = generateErrorBookTemplate(questions);
+        const timestamp = new Date().toLocaleDateString('zh-CN').replace(/\//g, '-');
+        const filename = `${template.name}_${timestamp}.${input.format === 'word' ? 'docx' : input.format}`;
+
+        // 这里返回markdown内容，前端可以根据format进行转换
+        // 实际生产环境中，应该在服务端完成格式转换
+        return {
+          success: true,
+          content,
+          filename,
+          format: input.format,
+          downloadUrl: `data:text/markdown;charset=utf-8,${encodeURIComponent(content)}`
+        };
+      } catch (error: any) {
+        console.error('批量导出失败:', error);
+        return {
+          success: false,
+          error: error.message || '导出失败'
+        };
+      }
+    }),
+
   // 使用快捷模板导出
   exportWithTemplate: protectedProcedure
     .input(

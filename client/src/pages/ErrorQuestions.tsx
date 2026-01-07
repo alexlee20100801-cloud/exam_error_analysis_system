@@ -12,6 +12,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { ExportDialog } from "@/components/ExportDialog";
 import { ErrorExportDialog } from "@/components/ErrorExportDialog";
 import { EnhancedExportDialog } from "@/components/EnhancedExportDialog";
+import { BatchExportDialog } from "@/components/BatchExportDialog";
 import { TagManagementDialog } from "@/components/TagManagementDialog";
 import { TagSelector } from "@/components/TagSelector";
 import { useState } from "react";
@@ -34,6 +35,7 @@ export default function ErrorQuestions() {
   const [exportDialogOpen, setExportDialogOpen] = useState(false);
   const [errorExportDialogOpen, setErrorExportDialogOpen] = useState(false);
   const [enhancedExportDialogOpen, setEnhancedExportDialogOpen] = useState(false);
+  const [batchExportDialogOpen, setBatchExportDialogOpen] = useState(false);
   const [tagManagementDialogOpen, setTagManagementDialogOpen] = useState(false);
   const [selectedTagIds, setSelectedTagIds] = useState<number[]>([]);
   const [selectedLevel, setSelectedLevel] = useState<SchoolLevel | "all">(
@@ -611,6 +613,12 @@ export default function ErrorQuestions() {
           subjects: selectedSubject !== "all" ? [selectedSubject] : undefined,
         }}
       />
+      <BatchExportDialog 
+        open={batchExportDialogOpen} 
+        onOpenChange={setBatchExportDialogOpen}
+        selectedQuestionIds={selectedQuestionIds}
+        onExportComplete={() => setSelectedQuestionIds([])}
+      />
       
       {/* 删除确认对话框 */}
       <Dialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
@@ -774,19 +782,29 @@ export default function ErrorQuestions() {
                   )}
                 </div>
                 {selectedQuestionIds.length > 0 && (
-                  <Button 
-                    variant="destructive" 
-                    size="sm"
-                    onClick={handleBatchDeleteClick}
-                    disabled={batchDeleteMutation.isPending}
-                  >
-                    {batchDeleteMutation.isPending ? (
-                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    ) : (
-                      <Trash2 className="mr-2 h-4 w-4" />
-                    )}
-                    批量删除
-                  </Button>
+                  <div className="flex gap-2">
+                    <Button 
+                      variant="outline" 
+                      size="sm"
+                      onClick={() => setBatchExportDialogOpen(true)}
+                    >
+                      <FileDown className="mr-2 h-4 w-4" />
+                      批量导出
+                    </Button>
+                    <Button 
+                      variant="destructive" 
+                      size="sm"
+                      onClick={handleBatchDeleteClick}
+                      disabled={batchDeleteMutation.isPending}
+                    >
+                      {batchDeleteMutation.isPending ? (
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      ) : (
+                        <Trash2 className="mr-2 h-4 w-4" />
+                      )}
+                      批量删除
+                    </Button>
+                  </div>
                 )}
               </div>
             </div>

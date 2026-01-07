@@ -5,7 +5,9 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { toast } from 'sonner';
-import { Download, FileText, Loader2, CheckCircle2 } from 'lucide-react';
+import { Download, FileText, Loader2, CheckCircle2, Eye } from 'lucide-react';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import ReactMarkdown from 'react-markdown';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 
 interface ExportTemplatesProps {
@@ -17,6 +19,9 @@ export default function ExportTemplates({ selectedQuestionIds, onClose }: Export
   const [, setLocation] = useLocation();
   const [isExporting, setIsExporting] = useState(false);
   const [selectedTemplate, setSelectedTemplate] = useState<string>('');
+  const [previewTemplate, setPreviewTemplate] = useState<string>('error_book');
+  const [previewContent, setPreviewContent] = useState<string>('');
+  const [isLoadingPreview, setIsLoadingPreview] = useState(false);
 
   // 快捷模板
   const quickTemplates = [
@@ -44,6 +49,34 @@ export default function ExportTemplates({ selectedQuestionIds, onClose }: Export
   ];
 
   const exportMutation = trpc.exportTemplates.exportWithTemplate.useMutation();
+
+  // 生成示例预览内容
+  const generateSamplePreview = (templateId: string): string => {
+    const sampleQuestion = {
+      title: '二次函数的应用',
+      content: '已知二次函数 $f(x) = ax^2 + bx + c$ 的图像经过点 $(1, 2)$，且对称轴为 $x = 2$，求该二次函数的解析式。',
+      userAnswer: '$f(x) = x^2 + 2x + 1$',
+      correctAnswer: '$f(x) = -\\frac{1}{2}x^2 + 2x + \\frac{1}{2}$',
+      explanation: '根据对称轴为 $x = 2$，可设 $f(x) = a(x-2)^2 + k$，将点 $(1, 2)$ 代入求解。',
+      subject: '数学',
+      grade: '高一',
+      difficulty: '中等'
+    };
+
+    switch (templateId) {
+      case 'error_book':
+        return `# 错题本\n\n## 题目 1: ${sampleQuestion.title}\n\n**学科：** ${sampleQuestion.subject} | **年级：** ${sampleQuestion.grade} | **难度：** ${sampleQuestion.difficulty}\n\n### 题目内容\n\n${sampleQuestion.content}\n\n### 我的答案\n\n${sampleQuestion.userAnswer}\n\n### 正确答案\n\n${sampleQuestion.correctAnswer}\n\n### 详细解析\n\n${sampleQuestion.explanation}\n\n---\n`;
+      
+      case 'review_card':
+        return `# 复习卡片\n\n## 📝 ${sampleQuestion.title}\n\n> **${sampleQuestion.subject}** · ${sampleQuestion.grade} · ${sampleQuestion.difficulty}\n\n### 题目\n\n${sampleQuestion.content}\n\n<details>\n<summary>点击查看答案</summary>\n\n**正确答案：** ${sampleQuestion.correctAnswer}\n\n**解析：** ${sampleQuestion.explanation}\n\n</details>\n\n---\n`;
+      
+      case 'detailed_analysis':
+        return `# 详细分析报告\n\n## 统计信息\n\n- **总题数：** 1 道\n- **学科分布：** ${sampleQuestion.subject} (100%)\n- **难度分布：** ${sampleQuestion.difficulty} (100%)\n\n## 题目详情\n\n### 1. ${sampleQuestion.title}\n\n**基本信息**\n- 学科：${sampleQuestion.subject}\n- 年级：${sampleQuestion.grade}\n- 难度：${sampleQuestion.difficulty}\n\n**题目内容**\n\n${sampleQuestion.content}\n\n**答案对比**\n\n| 项目 | 内容 |\n|------|------|\n| 我的答案 | ${sampleQuestion.userAnswer} |\n| 正确答案 | ${sampleQuestion.correctAnswer} |\n\n**详细解析**\n\n${sampleQuestion.explanation}\n\n---\n`;
+      
+      default:
+        return '请选择一个模板查看预览';
+    }
+  };
 
   const handleExport = async (templateId: string) => {
     if (selectedQuestionIds.length === 0) {
@@ -109,7 +142,14 @@ export default function ExportTemplates({ selectedQuestionIds, onClose }: Export
         </AlertDescription>
       </Alert>
 
-      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+      <Tabs defaultValue="templates" className="mb-6">
+        <TabsList className="grid w-full max-w-md grid-cols-2">
+          <TabsTrigger value="templates">模板选择</TabsTrigger>
+          <TabsTrigger value="preview">实时预览</TabsTrigger>
+        </TabsList>
+        
+        <TabsContent value="templates" className="mt-6">
+          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
         {quickTemplates.map((template) => (
           <Card
             key={template.id}
@@ -165,7 +205,100 @@ export default function ExportTemplates({ selectedQuestionIds, onClose }: Export
             </CardContent>
           </Card>
         ))}
-      </div>
+          </div>
+        </TabsContent>
+        
+        <TabsContent value="preview" className="mt-6">
+          <div className="grid gap-6 lg:grid-cols-2">
+            {/* 左侧：模板选择 */}
+            <Card>
+              <CardHeader>
+                <CardTitle>选择预览模板</CardTitle>
+                <CardDescription>点击模板查看预览效果</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                {quickTemplates.map((template) => (
+                  <Button
+                    key={template.id}
+                    variant={previewTemplate === template.id ? 'default' : 'outline'}
+                    className="w-full justify-start h-auto py-4"
+                    onClick={async () => {
+                      setPreviewTemplate(template.id);
+                      setIsLoadingPreview(true);
+                      try {
+                        // 使用示例数据生成预览
+                        const sampleQuestionIds = selectedQuestionIds.length > 0 
+                          ? selectedQuestionIds.slice(0, 2) // 只预览前2道题
+                          : []; // 如果没有选中题目，显示示例
+                        
+                        if (sampleQuestionIds.length > 0) {
+                          const result = await exportMutation.mutateAsync({
+                            questionIds: sampleQuestionIds,
+                            template: template.id as any
+                          });
+                          
+                          if (result.success && result.content) {
+                            setPreviewContent(result.content);
+                          } else {
+                            setPreviewContent('预览加载失败');
+                          }
+                        } else {
+                          setPreviewContent(generateSamplePreview(template.id));
+                        }
+                      } catch (error) {
+                        setPreviewContent('预览加载失败');
+                      } finally {
+                        setIsLoadingPreview(false);
+                      }
+                    }}
+                  >
+                    <div className="flex items-start gap-3 text-left">
+                      <span className="text-2xl">{template.icon}</span>
+                      <div>
+                        <div className="font-semibold">{template.name}</div>
+                        <div className="text-xs text-muted-foreground mt-1">
+                          {template.description}
+                        </div>
+                      </div>
+                    </div>
+                  </Button>
+                ))}
+              </CardContent>
+            </Card>
+            
+            {/* 右侧：预览区域 */}
+            <Card className="lg:col-span-1">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Eye className="h-5 w-5" />
+                  模板预览
+                </CardTitle>
+                <CardDescription>
+                  {selectedQuestionIds.length > 0 
+                    ? `预览前 ${Math.min(2, selectedQuestionIds.length)} 道题目的导出效果`
+                    : '示例预览'}
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                {isLoadingPreview ? (
+                  <div className="flex items-center justify-center py-12">
+                    <Loader2 className="h-8 w-8 animate-spin text-primary" />
+                  </div>
+                ) : previewContent ? (
+                  <div className="prose dark:prose-invert max-w-none border rounded-lg p-6 bg-muted/30 max-h-[600px] overflow-y-auto">
+                    <ReactMarkdown>{previewContent}</ReactMarkdown>
+                  </div>
+                ) : (
+                  <div className="text-center py-12 text-muted-foreground">
+                    <Eye className="h-12 w-12 mx-auto mb-4 opacity-50" />
+                    <p>选择一个模板查看预览效果</p>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </div>
+        </TabsContent>
+      </Tabs>
 
       <div className="mt-8">
         <Card>

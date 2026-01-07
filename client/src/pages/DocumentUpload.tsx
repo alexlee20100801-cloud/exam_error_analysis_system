@@ -14,6 +14,8 @@ import { Badge } from '@/components/ui/badge';
 import { ImageCropper } from '@/components/ImageCropper';
 import { Progress } from '@/components/ui/progress';
 import { LatexText } from '@/components/LatexPreview';
+import { RichTextEditor } from '@/components/RichTextEditor';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 
 // 学科映射
 const SUBJECT_MAP: Record<string, string> = {
@@ -78,6 +80,8 @@ export default function DocumentUpload() {
   const [parsedQuestions, setParsedQuestions] = useState<ParsedQuestion[]>([]);
   const [isProcessing, setIsProcessing] = useState(false);
   const [processingProgress, setProcessingProgress] = useState(0);
+  const [editingQuestion, setEditingQuestion] = useState<ParsedQuestion | null>(null);
+  const [richTextContent, setRichTextContent] = useState('');
 
   const uploadMutation = trpc.documentUpload.uploadAndParse.useMutation();
   const saveMutation = trpc.documentUpload.saveAsErrorQuestion.useMutation();
@@ -772,26 +776,96 @@ export default function DocumentUpload() {
                 </div>
 
                 {!question.saved && (
-                  <Button
-                    onClick={() => handleSaveQuestion(question)}
-                    disabled={saveMutation.isPending}
-                    className="w-full"
-                  >
-                    {saveMutation.isPending ? (
-                      <>
-                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                        保存中...
-                      </>
-                    ) : (
-                      '保存此题目'
-                    )}
-                  </Button>
+                  <div className="flex gap-2">
+                    <Button
+                      variant="outline"
+                      onClick={() => {
+                        setEditingQuestion(question);
+                        // 将当前内容转换为HTML格式
+                        const htmlContent = `
+                          <h2>题目内容</h2>
+                          <p>${question.formData.content}</p>
+                          <h3>我的答案</h3>
+                          <p>${question.formData.userAnswer || '未填写'}</p>
+                          <h3>正确答案</h3>
+                          <p>${question.formData.correctAnswer || '未填写'}</p>
+                          <h3>详细解析</h3>
+                          <p>${question.formData.explanation || '未填写'}</p>
+                        `;
+                        setRichTextContent(htmlContent);
+                      }}
+                      className="flex-1"
+                    >
+                      编辑内容
+                    </Button>
+                    <Button
+                      onClick={() => handleSaveQuestion(question)}
+                      disabled={saveMutation.isPending}
+                      className="flex-1"
+                    >
+                      {saveMutation.isPending ? (
+                        <>
+                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                          保存中...
+                        </>
+                      ) : (
+                        '保存此题目'
+                      )}
+                    </Button>
+                  </div>
                 )}
               </CardContent>
             </Card>
           ))}
         </div>
       )}
+
+      {/* 富文本编辑器对话框 */}
+      <Dialog open={!!editingQuestion} onOpenChange={(open) => !open && setEditingQuestion(null)}>
+        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>编辑题目内容</DialogTitle>
+            <DialogDescription>
+              使用富文本编辑器修改AI识别结果，支持格式化、图片、表格等
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <RichTextEditor
+              content={richTextContent}
+              onChange={setRichTextContent}
+              placeholder="在此编辑题目内容..."
+            />
+          </div>
+          <div className="flex justify-end gap-2">
+            <Button
+              variant="outline"
+              onClick={() => setEditingQuestion(null)}
+            >
+              取消
+            </Button>
+            <Button
+              onClick={() => {
+                if (editingQuestion) {
+                  // 从富文本内容中提取纯文本（简单处理）
+                  const tempDiv = document.createElement('div');
+                  tempDiv.innerHTML = richTextContent;
+                  const textContent = tempDiv.textContent || '';
+                  
+                  // 更新题目内容
+                  updateQuestionFormData(editingQuestion.id, {
+                    content: textContent
+                  });
+                  
+                  toast.success('内容已更新');
+                  setEditingQuestion(null);
+                }
+              }}
+            >
+              保存修改
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
