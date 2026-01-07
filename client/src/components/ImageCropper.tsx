@@ -1,8 +1,24 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { Crop, X, Check, ZoomIn, ZoomOut, RotateCw, Undo2, Redo2, Copy, Trash2, FlipHorizontal, FlipVertical, Sun, Contrast, Sparkles } from 'lucide-react';
+import { Crop, X, Check, ZoomIn, ZoomOut, RotateCw, Undo2, Redo2, Copy, Trash2, FlipHorizontal, FlipVertical, Sun, Contrast, Sparkles, Layout, Wand2 } from 'lucide-react';
 import { toast } from 'sonner';
+import { PRESET_CROP_TEMPLATES, templateAreaToPixels, type CropTemplate } from '../../../shared/cropTemplates';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@/components/ui/dialog';
 
 interface CropArea {
   id: string;
@@ -36,6 +52,12 @@ export function ImageCropper({ imageUrl, onCropComplete, onSkip, onCancel }: Ima
   const [history, setHistory] = useState<CropArea[][]>([]);
   const [historyIndex, setHistoryIndex] = useState(-1);
   const [selectedCropIndex, setSelectedCropIndex] = useState<number | null>(null);
+  const [showTemplateDialog, setShowTemplateDialog] = useState(false);
+  const [selectedTemplate, setSelectedTemplate] = useState<string>('');
+  const [isSmartDetecting, setIsSmartDetecting] = useState(false);
+  const [touchStartDistance, setTouchStartDistance] = useState<number | null>(null);
+  const [initialScale, setInitialScale] = useState(1);
+  const [longPressTimer, setLongPressTimer] = useState<NodeJS.Timeout | null>(null);
 
   // 加载图片
   useEffect(() => {
@@ -179,6 +201,12 @@ export function ImageCropper({ imageUrl, onCropComplete, onSkip, onCancel }: Ima
 
   // 鼠标抬起
   const handleMouseUp = () => {
+    // 清除长按定时器
+    if (longPressTimer) {
+      clearTimeout(longPressTimer);
+      setLongPressTimer(null);
+    }
+
     if (currentCrop && Math.abs(currentCrop.width) > 20 && Math.abs(currentCrop.height) > 20) {
       // 标准化裁剪区域（处理负宽高）
       const normalizedCrop: CropArea = {
@@ -202,6 +230,108 @@ export function ImageCropper({ imageUrl, onCropComplete, onSkip, onCancel }: Ima
     setIsDragging(false);
     setDragStart(null);
     setCurrentCrop(null);
+  };
+
+  // 触摸开始
+  const handleTouchStart = (e: React.TouchEvent<HTMLCanvasElement>) => {
+    const canvas = canvasRef.current;
+    if (!canvas || !image) return;
+
+    if (e.touches.length === 2) {
+      // 双指缩放
+      e.preventDefault();
+      const touch1 = e.touches[0];
+      const touch2 = e.touches[1];
+      const distance = Math.hypot(
+        touch2.clientX - touch1.clientX,
+        touch2.clientY - touch1.clientY
+      );
+      setTouchStartDistance(distance);
+      setInitialScale(scale);
+    } else if (e.touches.length === 1) {
+      // 单指框选
+      const touch = e.touches[0];
+      const rect = canvas.getBoundingClientRect();
+      const x = ((touch.clientX - rect.left) / canvas.width) * image.width;
+      const y = ((touch.clientY - rect.top) / canvas.height) * image.height;
+
+      // 长按选中区域
+      const timer = setTimeout(() => {
+        // 检查是否点击到了某个框选区域
+        const clickedIndex = cropAreas.findIndex(area => {
+          return (
+            x >= area.x &&
+            x <= area.x + area.width &&
+            y >= area.y &&
+            y <= area.y + area.height
+          );
+        });
+        if (clickedIndex !== -1) {
+          setSelectedCropIndex(clickedIndex);
+          toast.info(`已选中区域 ${clickedIndex + 1}`);
+        }
+      }, 500); // 500ms长按
+      setLongPressTimer(timer);
+
+      setIsDragging(true);
+      setDragStart({ x, y });
+      setCurrentCrop({
+        id: Date.now().toString(),
+        x,
+        y,
+        width: 0,
+        height: 0
+      });
+    }
+  };
+
+  // 触摸移动
+  const handleTouchMove = (e: React.TouchEvent<HTMLCanvasElement>) => {
+    const canvas = canvasRef.current;
+    if (!canvas || !image) return;
+
+    if (e.touches.length === 2 && touchStartDistance !== null) {
+      // 双指缩放
+      e.preventDefault();
+      const touch1 = e.touches[0];
+      const touch2 = e.touches[1];
+      const distance = Math.hypot(
+        touch2.clientX - touch1.clientX,
+        touch2.clientY - touch1.clientY
+      );
+      const scaleChange = distance / touchStartDistance;
+      const newScale = Math.max(0.5, Math.min(3, initialScale * scaleChange));
+      setScale(newScale);
+    } else if (e.touches.length === 1 && isDragging && dragStart && currentCrop) {
+      // 单指框选
+      const touch = e.touches[0];
+      const rect = canvas.getBoundingClientRect();
+      const x = ((touch.clientX - rect.left) / canvas.width) * image.width;
+      const y = ((touch.clientY - rect.top) / canvas.height) * image.height;
+
+      setCurrentCrop({
+        ...currentCrop,
+        width: x - dragStart.x,
+        height: y - dragStart.y
+      });
+    }
+  };
+
+  // 触摸结束
+  const handleTouchEnd = () => {
+    // 清除长按定时器
+    if (longPressTimer) {
+      clearTimeout(longPressTimer);
+      setLongPressTimer(null);
+    }
+
+    if (touchStartDistance !== null) {
+      // 缩放结束
+      setTouchStartDistance(null);
+    } else {
+      // 框选结束
+      handleMouseUp();
+    }
   };
 
   // 删除最后一个裁剪区域
@@ -283,6 +413,104 @@ export function ImageCropper({ imageUrl, onCropComplete, onSkip, onCancel }: Ima
       setHistoryIndex(newHistory.length - 1);
       toast.success('已复制区域');
     }
+  };
+
+  // AI智能框选
+  const handleSmartDetect = async () => {
+    if (!imageUrl || !image) {
+      toast.error('图片未加载');
+      return;
+    }
+
+    setIsSmartDetecting(true);
+    try {
+      // 调用tRPC API进行AI检测
+      const response = await fetch('/api/trpc/smartCrop.detectAreas', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          imageUrl: imageUrl,
+          optimize: true,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error('AI检测失败');
+      }
+
+      const data = await response.json();
+      const result = data.result.data;
+
+      if (!result.areas || result.areas.length === 0) {
+        toast.error('未检测到题目区域', {
+          description: '请手动框选或使用模板'
+        });
+        return;
+      }
+
+      // 将百分比坐标转换为像素坐标
+      const newCropAreas: CropArea[] = result.areas.map((area: any, index: number) => ({
+        id: `${Date.now()}-${index}`,
+        x: (area.x / 100) * image.width,
+        y: (area.y / 100) * image.height,
+        width: (area.width / 100) * image.width,
+        height: (area.height / 100) * image.height,
+      }));
+
+      setCropAreas(newCropAreas);
+      // 添加到历史记录
+      const newHistory = history.slice(0, historyIndex + 1);
+      newHistory.push(newCropAreas);
+      setHistory(newHistory);
+      setHistoryIndex(newHistory.length - 1);
+
+      toast.success(`AI智能检测完成`, {
+        description: `检测到 ${result.totalQuestions} 道题，${newCropAreas.length} 个区域\n${result.suggestions || ''}`
+      });
+    } catch (error) {
+      console.error('AI智能框选失败:', error);
+      toast.error('AI智能框选失败', {
+        description: '请稍后重试或手动框选'
+      });
+    } finally {
+      setIsSmartDetecting(false);
+    }
+  };
+
+  // 应用模板
+  const handleApplyTemplate = (templateId: string) => {
+    if (!image) {
+      toast.error('图片未加载');
+      return;
+    }
+
+    const template = PRESET_CROP_TEMPLATES.find(t => t.id === templateId);
+    if (!template) {
+      toast.error('模板不存在');
+      return;
+    }
+
+    // 将模板区域转换为实际像素坐标
+    const newCropAreas: CropArea[] = template.areas.map((area, index) => {
+      const pixels = templateAreaToPixels(area, image.width, image.height);
+      return {
+        id: `${Date.now()}-${index}`,
+        ...pixels
+      };
+    });
+
+    setCropAreas(newCropAreas);
+    // 添加到历史记录
+    const newHistory = history.slice(0, historyIndex + 1);
+    newHistory.push(newCropAreas);
+    setHistory(newHistory);
+    setHistoryIndex(newHistory.length - 1);
+    setShowTemplateDialog(false);
+    toast.success(`已应用模板：${template.name}`, {
+      description: `已添加 ${newCropAreas.length} 个框选区域`
+    });
   };
 
   // 完成裁剪
@@ -439,7 +667,11 @@ export function ImageCropper({ imageUrl, onCropComplete, onSkip, onCancel }: Ima
               onMouseMove={handleMouseMove}
               onMouseUp={handleMouseUp}
               onMouseLeave={handleMouseUp}
-              className="cursor-crosshair"
+              onTouchStart={handleTouchStart}
+              onTouchMove={handleTouchMove}
+              onTouchEnd={handleTouchEnd}
+              className="cursor-crosshair touch-none"
+              style={{ touchAction: 'none' }}
             />
           </div>
 
@@ -525,6 +757,86 @@ export function ImageCropper({ imageUrl, onCropComplete, onSkip, onCancel }: Ima
           </div>
 
           <div className="flex gap-3 pt-2">
+            <Button
+              variant="outline"
+              onClick={handleSmartDetect}
+              disabled={isSmartDetecting || !image}
+              className="flex-1"
+            >
+              <Wand2 className={`mr-2 h-4 w-4 ${isSmartDetecting ? 'animate-spin' : ''}`} />
+              {isSmartDetecting ? 'AI分析中...' : 'AI智能框选'}
+            </Button>
+            <Dialog open={showTemplateDialog} onOpenChange={setShowTemplateDialog}>
+              <DialogTrigger asChild>
+                <Button
+                  variant="outline"
+                  className="flex-1"
+                >
+                  <Layout className="mr-2 h-4 w-4" />
+                  使用模板
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="max-w-2xl">
+                <DialogHeader>
+                  <DialogTitle>选择框选模板</DialogTitle>
+                  <DialogDescription>
+                    选择预设模板快速框选常见题型，或手动框选自定义区域
+                  </DialogDescription>
+                </DialogHeader>
+                <div className="space-y-4 py-4">
+                  <div className="grid grid-cols-2 gap-4">
+                    {PRESET_CROP_TEMPLATES.map((template) => (
+                      <Card
+                        key={template.id}
+                        className={`cursor-pointer transition-all hover:border-primary ${
+                          selectedTemplate === template.id ? 'border-primary bg-primary/5' : ''
+                        }`}
+                        onClick={() => setSelectedTemplate(template.id)}
+                      >
+                        <CardContent className="p-4">
+                          <div className="flex items-start gap-3">
+                            <div className="text-3xl">{template.icon}</div>
+                            <div className="flex-1 space-y-1">
+                              <h4 className="font-semibold text-sm">{template.name}</h4>
+                              <p className="text-xs text-muted-foreground">
+                                {template.description}
+                              </p>
+                              <p className="text-xs text-muted-foreground">
+                                {template.areas.length} 个区域
+                              </p>
+                            </div>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    ))}
+                  </div>
+                  <div className="flex gap-2 justify-end">
+                    <Button
+                      variant="outline"
+                      onClick={() => {
+                        setShowTemplateDialog(false);
+                        setSelectedTemplate('');
+                      }}
+                    >
+                      取消
+                    </Button>
+                    <Button
+                      onClick={() => {
+                        if (selectedTemplate) {
+                          handleApplyTemplate(selectedTemplate);
+                          setSelectedTemplate('');
+                        } else {
+                          toast.error('请选择一个模板');
+                        }
+                      }}
+                      disabled={!selectedTemplate}
+                    >
+                      应用模板
+                    </Button>
+                  </div>
+                </div>
+              </DialogContent>
+            </Dialog>
             <Button
               variant="outline"
               onClick={onCancel}

@@ -64,6 +64,7 @@ import { practiceRecordsRouter } from "./routers/practiceRecords";
 import { batchImageProcessingRouter } from "./routers/batchImageProcessing";
 import { smartScannerRouter } from "./routers/smartScanner";
 import { idCardManagementRouter } from "./routers/idCardManagement";
+import { smartCropRouter } from "./routers/smartCrop";
 
 export const appRouter = router({
   system: systemRouter,
@@ -219,6 +220,9 @@ export const appRouter = router({
   
   // 证件管理
   idCardManagement: idCardManagementRouter,
+  
+  // 智能框选
+  smartCrop: smartCropRouter,
   
   // 智能组卷
   examPaper: smartExamPaperRouter,
