@@ -585,3 +585,17 @@
 - 实时处理进度反馈
 - 结果分标签页展示（处理后图像/识别文字）
 - 一键导出为PDF文档
+
+
+---
+
+## 紧急修复任务（2026-01-07）
+
+### API路由问题
+- [x] 检查documentUpload路由是否在server/routers.ts中注册（已确认正确注册）
+- [x] documentUpload路由没有问题
+
+### 数据库字段问题
+- [x] 修复practice_records表字段名（TypeScript属性名使用驼峰，数据库列名使用下划线）
+- [x] 修复learning_progress表字段名（TypeScript属性名使用驼峰，数据库列名使用下划线）
+- [x] Schema修复完成，无需迁移（数据库已有正确的字段）
