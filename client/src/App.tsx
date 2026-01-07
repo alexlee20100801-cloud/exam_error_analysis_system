@@ -48,7 +48,8 @@ import { MobileBottomNav } from "@/components/MobileBottomNav";
 import WeaknessAnalysis from "@/pages/WeaknessAnalysis";
 import SmartExamPaper from "@/pages/SmartExamPaper";
 import PracticeHistory from "@/pages/PracticeHistory";
-import DataCrawler from "@/pages/DataCrawler";
+import DataCrawler from "./pages/DataCrawler";
+import KnowledgeGraph from "./pages/KnowledgeGraph";
 import SmartScanner from "@/pages/SmartScanner";
 import IdCardManagement from "@/pages/IdCardManagement";
 
@@ -99,7 +100,8 @@ function Router() {
       <Route path="/annotation/:id" component={AnnotationDetail} />
       <Route path="/admin/annotation-feedback" component={AIAnnotationFeedbackStats} />
       <Route path="/admin/question-review" component={QuestionReview} />
-      <Route path="/admin/data-crawler" component={DataCrawler} />
+        <Route path="/data-crawler" component={DataCrawler} />
+        <Route path="/knowledge-graph" component={KnowledgeGraph} />
       <Route path="/my-favorite-questions" component={MyFavoriteQuestions} />
       <Route component={NotFound} />
     </Switch>

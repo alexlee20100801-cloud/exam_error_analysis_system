@@ -69,6 +69,7 @@ import { cropTemplatesRouter } from "./routers/cropTemplates";
 import { batchSmartCropRouter } from "./routers/batchSmartCrop";
 import { cropHistoryRouter } from "./routers/cropHistory";
 import { dataCrawlerRouter } from "./routers/dataCrawler";
+import { deduplicationRouter } from "./routers/deduplication";
 
 export const appRouter = router({
   system: systemRouter,
@@ -260,6 +261,9 @@ export const appRouter = router({
   
   // 第一阶段：数据采集路由
   dataCrawler: dataCrawlerRouter,
+  
+  // 第二阶段：查重去噪
+  deduplication: deduplicationRouter,
 });
 
 export type AppRouter = typeof appRouter;

@@ -220,31 +220,10 @@
       "breakpoints": true
     },
     {
-      "idx": 31,
-      "version": "5",
-      "when": 1767769090470,
-      "tag": "0031_lame_leopardon",
-      "breakpoints": true
-    },
-    {
-      "idx": 32,
-      "version": "5",
-      "when": 1767771673381,
-      "tag": "0032_unusual_young_avengers",
-      "breakpoints": true
-    },
-    {
       "idx": 33,
       "version": "5",
       "when": 1767776465883,
       "tag": "0033_striped_wendell_vaughn",
-      "breakpoints": true
-    },
-    {
-      "idx": 34,
-      "version": "5",
-      "when": 1767780802157,
-      "tag": "0034_dark_nico_minoru",
       "breakpoints": true
     },
     {
@@ -255,10 +234,17 @@
       "breakpoints": true
     },
     {
-      "idx": 36,
+      "idx": 37,
       "version": "5",
-      "when": 1767786911508,
-      "tag": "0036_faulty_blizzard",
+      "when": 1767789090655,
+      "tag": "0037_brainy_captain_universe",
+      "breakpoints": true
+    },
+    {
+      "idx": 38,
+      "version": "5",
+      "when": 1767789269243,
+      "tag": "0038_outgoing_orphan",
       "breakpoints": true
     }
   ]

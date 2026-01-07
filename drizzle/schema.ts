@@ -7,6 +7,44 @@ export { errorQuestionShares, shareAccessLogs, type ErrorQuestionShare, type New
 // 导入证件管理schema
 export { idCards, type IdCard, type NewIdCard } from "./id_card_schema";
 
+// 导入查重去噪 schema
+export { 
+  questionSimilarities, 
+  deduplicationRecords, 
+  noiseDetectionRecords, 
+  deduplicationConfig,
+  type QuestionSimilarity, 
+  type NewQuestionSimilarity,
+  type DeduplicationRecord,
+  type NewDeduplicationRecord,
+  type NoiseDetectionRecord,
+  type NewNoiseDetectionRecord,
+  type DeduplicationConfig,
+  type NewDeduplicationConfig
+} from "./deduplication_schema";
+
+// 导入合规审核 schema
+export {
+  complianceRules,
+  complianceChecks,
+  complianceViolations,
+  manualReviews,
+  reviewWorkflows,
+  reviewStats,
+  type ComplianceRule,
+  type NewComplianceRule,
+  type ComplianceCheck,
+  type NewComplianceCheck,
+  type ComplianceViolation,
+  type NewComplianceViolation,
+  type ManualReview,
+  type NewManualReview,
+  type ReviewWorkflow,
+  type NewReviewWorkflow,
+  type ReviewStat,
+  type NewReviewStat
+} from "./compliance_schema";
+
 export const accountCredentials = mysqlTable("account_credentials", {
 	id: int().autoincrement().notNull(),
 	userId: int("user_id").notNull(),
