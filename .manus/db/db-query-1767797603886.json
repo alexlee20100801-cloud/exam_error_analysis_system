@@ -1,0 +1,241 @@
+{
+  "query": "SHOW TABLES;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway03.us-east-1.prod.aws.tidbcloud.com --port 4000 --user Lfr9xqjx7LpxUD9.1efa314e7813 --database Yh4Z4ZSitSFdPWYxtKkkQS --execute SHOW TABLES;",
+  "rows": [
+    {
+      "Tables_in_Yh4Z4ZSitSFdPWYxtKkkQS": "__drizzle_migrations"
+    },
+    {
+      "Tables_in_Yh4Z4ZSitSFdPWYxtKkkQS": "account_credentials"
+    },
+    {
+      "Tables_in_Yh4Z4ZSitSFdPWYxtKkkQS": "achievements"
+    },
+    {
+      "Tables_in_Yh4Z4ZSitSFdPWYxtKkkQS": "ai_advice_history"
+    },
+    {
+      "Tables_in_Yh4Z4ZSitSFdPWYxtKkkQS": "ai_annotation_feedback"
+    },
+    {
+      "Tables_in_Yh4Z4ZSitSFdPWYxtKkkQS": "ai_generated_questions"
+    },
+    {
+      "Tables_in_Yh4Z4ZSitSFdPWYxtKkkQS": "ai_question_favorites"
+    },
+    {
+      "Tables_in_Yh4Z4ZSitSFdPWYxtKkkQS": "annotation_comments"
+    },
+    {
+      "Tables_in_Yh4Z4ZSitSFdPWYxtKkkQS": "annotation_likes"
+    },
+    {
+      "Tables_in_Yh4Z4ZSitSFdPWYxtKkkQS": "annotation_templates"
+    },
+    {
+      "Tables_in_Yh4Z4ZSitSFdPWYxtKkkQS": "annotations"
+    },
+    {
+      "Tables_in_Yh4Z4ZSitSFdPWYxtKkkQS": "batch_crop_tasks"
+    },
+    {
+      "Tables_in_Yh4Z4ZSitSFdPWYxtKkkQS": "chart_annotations"
+    },
+    {
+      "Tables_in_Yh4Z4ZSitSFdPWYxtKkkQS": "chart_data_extractions"
+    },
+    {
+      "Tables_in_Yh4Z4ZSitSFdPWYxtKkkQS": "chart_type_templates"
+    },
+    {
+      "Tables_in_Yh4Z4ZSitSFdPWYxtKkkQS": "check_in_records"
+    },
+    {
+      "Tables_in_Yh4Z4ZSitSFdPWYxtKkkQS": "collection_tasks"
+    },
+    {
+      "Tables_in_Yh4Z4ZSitSFdPWYxtKkkQS": "crop_history"
+    },
+    {
+      "Tables_in_Yh4Z4ZSitSFdPWYxtKkkQS": "document_exports"
+    },
+    {
+      "Tables_in_Yh4Z4ZSitSFdPWYxtKkkQS": "document_regions"
+    },
+    {
+      "Tables_in_Yh4Z4ZSitSFdPWYxtKkkQS": "email_templates"
+    },
+    {
+      "Tables_in_Yh4Z4ZSitSFdPWYxtKkkQS": "email_verification_tokens"
+    },
+    {
+      "Tables_in_Yh4Z4ZSitSFdPWYxtKkkQS": "error_question_tag_relations"
+    },
+    {
+      "Tables_in_Yh4Z4ZSitSFdPWYxtKkkQS": "error_question_tags"
+    },
+    {
+      "Tables_in_Yh4Z4ZSitSFdPWYxtKkkQS": "error_questions"
+    },
+    {
+      "Tables_in_Yh4Z4ZSitSFdPWYxtKkkQS": "error_review_records"
+    },
+    {
+      "Tables_in_Yh4Z4ZSitSFdPWYxtKkkQS": "exams"
+    },
+    {
+      "Tables_in_Yh4Z4ZSitSFdPWYxtKkkQS": "export_templates"
+    },
+    {
+      "Tables_in_Yh4Z4ZSitSFdPWYxtKkkQS": "favorite_folders"
+    },
+    {
+      "Tables_in_Yh4Z4ZSitSFdPWYxtKkkQS": "favorites"
+    },
+    {
+      "Tables_in_Yh4Z4ZSitSFdPWYxtKkkQS": "generated_exam_papers"
+    },
+    {
+      "Tables_in_Yh4Z4ZSitSFdPWYxtKkkQS": "goal_reminders"
+    },
+    {
+      "Tables_in_Yh4Z4ZSitSFdPWYxtKkkQS": "handwriting_removal_logs"
+    },
+    {
+      "Tables_in_Yh4Z4ZSitSFdPWYxtKkkQS": "id_cards"
+    },
+    {
+      "Tables_in_Yh4Z4ZSitSFdPWYxtKkkQS": "knowledge_points"
+    },
+    {
+      "Tables_in_Yh4Z4ZSitSFdPWYxtKkkQS": "learning_goals"
+    },
+    {
+      "Tables_in_Yh4Z4ZSitSFdPWYxtKkkQS": "learning_path_progress"
+    },
+    {
+      "Tables_in_Yh4Z4ZSitSFdPWYxtKkkQS": "learning_paths"
+    },
+    {
+      "Tables_in_Yh4Z4ZSitSFdPWYxtKkkQS": "learning_progress"
+    },
+    {
+      "Tables_in_Yh4Z4ZSitSFdPWYxtKkkQS": "orders"
+    },
+    {
+      "Tables_in_Yh4Z4ZSitSFdPWYxtKkkQS": "parent_student_relations"
+    },
+    {
+      "Tables_in_Yh4Z4ZSitSFdPWYxtKkkQS": "payment_callback_logs"
+    },
+    {
+      "Tables_in_Yh4Z4ZSitSFdPWYxtKkkQS": "payment_configs"
+    },
+    {
+      "Tables_in_Yh4Z4ZSitSFdPWYxtKkkQS": "practice_pools"
+    },
+    {
+      "Tables_in_Yh4Z4ZSitSFdPWYxtKkkQS": "practice_records"
+    },
+    {
+      "Tables_in_Yh4Z4ZSitSFdPWYxtKkkQS": "push_configs"
+    },
+    {
+      "Tables_in_Yh4Z4ZSitSFdPWYxtKkkQS": "push_records"
+    },
+    {
+      "Tables_in_Yh4Z4ZSitSFdPWYxtKkkQS": "question_bank"
+    },
+    {
+      "Tables_in_Yh4Z4ZSitSFdPWYxtKkkQS": "question_recommendations"
+    },
+    {
+      "Tables_in_Yh4Z4ZSitSFdPWYxtKkkQS": "question_review_records"
+    },
+    {
+      "Tables_in_Yh4Z4ZSitSFdPWYxtKkkQS": "question_reviews"
+    },
+    {
+      "Tables_in_Yh4Z4ZSitSFdPWYxtKkkQS": "question_sources"
+    },
+    {
+      "Tables_in_Yh4Z4ZSitSFdPWYxtKkkQS": "questions"
+    },
+    {
+      "Tables_in_Yh4Z4ZSitSFdPWYxtKkkQS": "real_exam_practice_records"
+    },
+    {
+      "Tables_in_Yh4Z4ZSitSFdPWYxtKkkQS": "real_exam_questions"
+    },
+    {
+      "Tables_in_Yh4Z4ZSitSFdPWYxtKkkQS": "recognized_contents"
+    },
+    {
+      "Tables_in_Yh4Z4ZSitSFdPWYxtKkkQS": "review_history"
+    },
+    {
+      "Tables_in_Yh4Z4ZSitSFdPWYxtKkkQS": "review_plans"
+    },
+    {
+      "Tables_in_Yh4Z4ZSitSFdPWYxtKkkQS": "review_reminders"
+    },
+    {
+      "Tables_in_Yh4Z4ZSitSFdPWYxtKkkQS": "review_task_reminders"
+    },
+    {
+      "Tables_in_Yh4Z4ZSitSFdPWYxtKkkQS": "review_tasks"
+    },
+    {
+      "Tables_in_Yh4Z4ZSitSFdPWYxtKkkQS": "scheduled_tasks"
+    },
+    {
+      "Tables_in_Yh4Z4ZSitSFdPWYxtKkkQS": "shared_annotations"
+    },
+    {
+      "Tables_in_Yh4Z4ZSitSFdPWYxtKkkQS": "study_plans"
+    },
+    {
+      "Tables_in_Yh4Z4ZSitSFdPWYxtKkkQS": "subscription_plans"
+    },
+    {
+      "Tables_in_Yh4Z4ZSitSFdPWYxtKkkQS": "system_settings"
+    },
+    {
+      "Tables_in_Yh4Z4ZSitSFdPWYxtKkkQS": "task_execution_logs"
+    },
+    {
+      "Tables_in_Yh4Z4ZSitSFdPWYxtKkkQS": "uploaded_documents"
+    },
+    {
+      "Tables_in_Yh4Z4ZSitSFdPWYxtKkkQS": "user_achievements"
+    },
+    {
+      "Tables_in_Yh4Z4ZSitSFdPWYxtKkkQS": "user_crop_templates"
+    },
+    {
+      "Tables_in_Yh4Z4ZSitSFdPWYxtKkkQS": "user_practice_behaviors"
+    },
+    {
+      "Tables_in_Yh4Z4ZSitSFdPWYxtKkkQS": "user_push_receipts"
+    },
+    {
+      "Tables_in_Yh4Z4ZSitSFdPWYxtKkkQS": "user_reminder_settings"
+    },
+    {
+      "Tables_in_Yh4Z4ZSitSFdPWYxtKkkQS": "user_similarity_cache"
+    },
+    {
+      "Tables_in_Yh4Z4ZSitSFdPWYxtKkkQS": "user_subscriptions"
+    },
+    {
+      "Tables_in_Yh4Z4ZSitSFdPWYxtKkkQS": "users"
+    },
+    {
+      "Tables_in_Yh4Z4ZSitSFdPWYxtKkkQS": "video_resources"
+    }
+  ],
+  "messages": [],
+  "stdout": "Tables_in_Yh4Z4ZSitSFdPWYxtKkkQS\n__drizzle_migrations\naccount_credentials\nachievements\nai_advice_history\nai_annotation_feedback\nai_generated_questions\nai_question_favorites\nannotation_comments\nannotation_likes\nannotation_templates\nannotations\nbatch_crop_tasks\nchart_annotations\nchart_data_extractions\nchart_type_templates\ncheck_in_records\ncollection_tasks\ncrop_history\ndocument_exports\ndocument_regions\nemail_templates\nemail_verification_tokens\nerror_question_tag_relations\nerror_question_tags\nerror_questions\nerror_review_records\nexams\nexport_templates\nfavorite_folders\nfavorites\ngenerated_exam_papers\ngoal_reminders\nhandwriting_removal_logs\nid_cards\nknowledge_points\nlearning_goals\nlearning_path_progress\nlearning_paths\nlearning_progress\norders\nparent_student_relations\npayment_callback_logs\npayment_configs\npractice_pools\npractice_records\npush_configs\npush_records\nquestion_bank\nquestion_recommendations\nquestion_review_records\nquestion_reviews\nquestion_sources\nquestions\nreal_exam_practice_records\nreal_exam_questions\nrecognized_contents\nreview_history\nreview_plans\nreview_reminders\nreview_task_reminders\nreview_tasks\nscheduled_tasks\nshared_annotations\nstudy_plans\nsubscription_plans\nsystem_settings\ntask_execution_logs\nuploaded_documents\nuser_achievements\nuser_crop_templates\nuser_practice_behaviors\nuser_push_receipts\nuser_reminder_settings\nuser_similarity_cache\nuser_subscriptions\nusers\nvideo_resources\n",
+  "stderr": "",
+  "execution_time_ms": 1518
+}

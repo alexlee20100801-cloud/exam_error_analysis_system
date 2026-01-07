@@ -58,6 +58,8 @@ import IdCardManagement from "@/pages/IdCardManagement";
 import RecommendationEngine from "@/pages/RecommendationEngine";
 import UploadError from "@/pages/UploadError";
 import LearningDashboard from "@/pages/LearningDashboard";
+import BatchEdit from "@/pages/BatchEdit";
+import UploadHistory from "@/pages/UploadHistory";
 
 function Router() {
   return (
@@ -67,6 +69,8 @@ function Router() {
       <Route path="/error-questions" component={ErrorQuestions} />
       <Route path="/error-questions/:id" component={ErrorQuestionDetail} />
       <Route path="/upload-error" component={UploadError} />
+      <Route path="/batch-edit/:sessionId" component={BatchEdit} />
+      <Route path="/upload-history" component={UploadHistory} />
       <Route path="/learning-dashboard" component={LearningDashboard} />
       <Route path="/practice-questions/:errorQuestionId" component={PracticeQuestions} />
       <Route path={"/practice"} component={Practice} />

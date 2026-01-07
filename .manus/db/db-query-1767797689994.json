@@ -1,0 +1,9 @@
+{
+  "query": "CREATE TABLE IF NOT EXISTS `upload_history` (\n  `id` int AUTO_INCREMENT NOT NULL,\n  `user_id` int NOT NULL,\n  `session_id` int,\n  `upload_type` enum('single','batch') NOT NULL DEFAULT 'batch',\n  `total_count` int NOT NULL DEFAULT 0,\n  `success_count` int NOT NULL DEFAULT 0,\n  `failed_count` int NOT NULL DEFAULT 0,\n  `average_confidence` decimal(5,2),\n  `subject_distribution` varchar(500),\n  `grade_distribution` varchar(500),\n  `processing_duration` int,\n  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,\n  CONSTRAINT `upload_history_id` PRIMARY KEY(`id`),\n  INDEX `idx_user_id` (`user_id`),\n  INDEX `idx_created_at` (`created_at`),\n  INDEX `idx_upload_type` (`upload_type`)\n);",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway03.us-east-1.prod.aws.tidbcloud.com --port 4000 --user Lfr9xqjx7LpxUD9.1efa314e7813 --database Yh4Z4ZSitSFdPWYxtKkkQS --execute CREATE TABLE IF NOT EXISTS `upload_history` (\n  `id` int AUTO_INCREMENT NOT NULL,\n  `user_id` int NOT NULL,\n  `session_id` int,\n  `upload_type` enum('single','batch') NOT NULL DEFAULT 'batch',\n  `total_count` int NOT NULL DEFAULT 0,\n  `success_count` int NOT NULL DEFAULT 0,\n  `failed_count` int NOT NULL DEFAULT 0,\n  `average_confidence` decimal(5,2),\n  `subject_distribution` varchar(500),\n  `grade_distribution` varchar(500),\n  `processing_duration` int,\n  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,\n  CONSTRAINT `upload_history_id` PRIMARY KEY(`id`),\n  INDEX `idx_user_id` (`user_id`),\n  INDEX `idx_created_at` (`created_at`),\n  INDEX `idx_upload_type` (`upload_type`)\n);",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 1643
+}

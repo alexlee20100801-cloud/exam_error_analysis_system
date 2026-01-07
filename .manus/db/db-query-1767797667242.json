@@ -1,0 +1,9 @@
+{
+  "query": "CREATE TABLE IF NOT EXISTS `upload_session_items` (\n  `id` int AUTO_INCREMENT NOT NULL,\n  `session_id` int NOT NULL,\n  `image_url` text NOT NULL,\n  `question_content` text,\n  `student_answer` text,\n  `correct_answer` text,\n  `subject` enum('chinese','math','english','physics','chemistry','biology','politics','history','geography'),\n  `grade` enum('junior1','junior2','junior3','senior1','senior2','senior3'),\n  `difficulty` enum('easy','medium','hard'),\n  `knowledge_point_ids` json,\n  `ocr_confidence` float NOT NULL DEFAULT 0,\n  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,\n  `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,\n  CONSTRAINT `upload_session_items_id` PRIMARY KEY(`id`)\n);",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway03.us-east-1.prod.aws.tidbcloud.com --port 4000 --user Lfr9xqjx7LpxUD9.1efa314e7813 --database Yh4Z4ZSitSFdPWYxtKkkQS --execute CREATE TABLE IF NOT EXISTS `upload_session_items` (\n  `id` int AUTO_INCREMENT NOT NULL,\n  `session_id` int NOT NULL,\n  `image_url` text NOT NULL,\n  `question_content` text,\n  `student_answer` text,\n  `correct_answer` text,\n  `subject` enum('chinese','math','english','physics','chemistry','biology','politics','history','geography'),\n  `grade` enum('junior1','junior2','junior3','senior1','senior2','senior3'),\n  `difficulty` enum('easy','medium','hard'),\n  `knowledge_point_ids` json,\n  `ocr_confidence` float NOT NULL DEFAULT 0,\n  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,\n  `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,\n  CONSTRAINT `upload_session_items_id` PRIMARY KEY(`id`)\n);",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 1668
+}
