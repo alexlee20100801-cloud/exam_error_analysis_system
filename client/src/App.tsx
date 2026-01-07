@@ -56,6 +56,8 @@ import KnowledgeGraph from "./pages/KnowledgeGraph";
 import SmartScanner from "@/pages/SmartScanner";
 import IdCardManagement from "@/pages/IdCardManagement";
 import RecommendationEngine from "@/pages/RecommendationEngine";
+import UploadError from "@/pages/UploadError";
+import LearningDashboard from "@/pages/LearningDashboard";
 
 function Router() {
   return (
@@ -64,6 +66,8 @@ function Router() {
       <Route path={"/dashboard"} component={Dashboard} />
       <Route path="/error-questions" component={ErrorQuestions} />
       <Route path="/error-questions/:id" component={ErrorQuestionDetail} />
+      <Route path="/upload-error" component={UploadError} />
+      <Route path="/learning-dashboard" component={LearningDashboard} />
       <Route path="/practice-questions/:errorQuestionId" component={PracticeQuestions} />
       <Route path={"/practice"} component={Practice} />
       <Route path={"/question-practice"} component={QuestionPractice} />

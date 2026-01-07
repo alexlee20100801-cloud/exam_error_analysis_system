@@ -209,7 +209,7 @@ export interface LearningOverview {
   weakKnowledgePoints: number;
 }
 
-export async function getLearningOverview(userId: string): Promise<LearningOverview> {
+export async function getLearningOverview(userId: string, subject?: string): Promise<LearningOverview> {
   const db = await getDb();
   if (!db) {
     return {
@@ -224,10 +224,14 @@ export async function getLearningOverview(userId: string): Promise<LearningOverv
 
   try {
     // 错题总数
+    const errorConditions = [eq(errorQuestions.userId, userId)];
+    if (subject) {
+      errorConditions.push(sql`${errorQuestions.subject} = ${subject}`);
+    }
     const errorQuestionsCount = await db
       .select({ count: sql<number>`COUNT(*)` })
       .from(errorQuestions)
-      .where(eq(errorQuestions.userId, userId));
+      .where(and(...errorConditions));
 
     // 练习总数和正确率
     const practiceStats = await db

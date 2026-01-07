@@ -14,8 +14,52 @@ import {
 import { extractTextFromImage, extractAndMergeTextFromImages } from "../ocrService";
 import { storagePut } from "../storage";
 import { createReviewReminder } from "../services/reviewReminderService";
+import { analyzeErrorQuestion } from "../services/errorAnalysisService";
 
 export const errorQuestionsRouter = router({
+  /**
+   * 上传图片并OCR识别（仅上传和识别，不保存）
+   */
+  uploadWithOCR: protectedProcedure
+    .input(z.object({
+      imageBase64: z.string(),
+      fileName: z.string(),
+    }))
+    .mutation(async ({ ctx, input }) => {
+      try {
+        // 1. 上传图片到S3
+        const imageBuffer = Buffer.from(input.imageBase64.split(',')[1] || input.imageBase64, 'base64');
+        const randomSuffix = Math.random().toString(36).substring(2, 15);
+        const fileKey = `error-questions/${ctx.user.id}/${Date.now()}-${randomSuffix}.jpg`;
+        
+        const { url: imageUrl } = await storagePut(
+          fileKey,
+          imageBuffer,
+          "image/jpeg"
+        );
+
+        // 2. OCR识别图片内容
+        const ocrResult = await extractTextFromImage(imageUrl);
+        
+        if (!ocrResult.success) {
+          return {
+            success: false,
+            error: ocrResult.error || "OCR识别失败",
+            imageUrl,
+          };
+        }
+
+        return {
+          success: true,
+          imageUrl,
+          ocrText: ocrResult.content,
+        };
+      } catch (error) {
+        console.error("[ErrorQuestions] OCR识别失败:", error);
+        throw new Error(error instanceof Error ? error.message : "OCR识别失败");
+      }
+    }),
+
   /**
    * 创建错题（手动输入）
    */
@@ -25,22 +69,26 @@ export const errorQuestionsRouter = router({
       content: z.string().min(1),
       subject: z.enum(["chinese", "math", "english", "physics", "chemistry", "biology", "politics", "history", "geography"]),
       grade: z.enum(["junior1", "junior2", "junior3", "senior1", "senior2", "senior3"]),
+      schoolLevel: z.enum(["junior", "senior"]),
       difficulty: z.enum(["easy", "medium", "hard"]).optional(),
       userAnswer: z.string().optional(),
       userNotes: z.string().optional(),
+      imageUrl: z.string().optional(),
+      imageKey: z.string().optional(),
     }))
     .mutation(async ({ ctx, input }) => {
-      const schoolLevel = getSchoolLevelFromGrade(input.grade);
       const result = await createErrorQuestion({
         userId: ctx.user.id,
         title: input.title,
         content: input.content,
-        schoolLevel,
+        schoolLevel: input.schoolLevel,
         subject: input.subject,
         grade: input.grade,
         difficulty: input.difficulty,
         userAnswer: input.userAnswer,
         userNotes: input.userNotes,
+        imageUrl: input.imageUrl,
+        imageKey: input.imageKey,
         isAnalyzed: false,
         isMastered: false,
         reviewCount: 0,
@@ -229,6 +277,60 @@ export const errorQuestionsRouter = router({
       }
       
       return question;
+    }),
+
+  /**
+   * AI分析错题
+   */
+  analyze: protectedProcedure
+    .input(z.object({
+      questionId: z.number(),
+    }))
+    .mutation(async ({ ctx, input }) => {
+      // 验证权限
+      const question = await getErrorQuestionById(input.questionId);
+      if (!question || question.userId !== ctx.user.id) {
+        throw new Error("无权分析此错题");
+      }
+
+      // 调用AI分析服务
+      const analysisResult = await analyzeErrorQuestion(
+        question.content,
+        question.subject,
+        question.grade,
+        question.userAnswer || undefined
+      );
+
+      if (!analysisResult.success || !analysisResult.analysis) {
+        throw new Error(analysisResult.error || "AI分析失败");
+      }
+
+      const { analysis } = analysisResult;
+
+      // 更新错题记录
+      const db = await getDb();
+      if (!db) {
+        throw new Error("数据库连接失败");
+      }
+
+      await db
+        .update(errorQuestions)
+        .set({
+          errorAnalysis: analysis.errorReason,
+          correctAnswer: analysis.correctAnswer,
+          detailedExplanation: analysis.detailedExplanation,
+          detailedAnalysis: analysis.studyAdvice,
+          difficulty: analysis.difficulty,
+          knowledgePointIds: JSON.stringify(analysis.knowledgePoints),
+          isAnalyzed: 1,
+          updatedAt: new Date().toISOString(),
+        })
+        .where(eq(errorQuestions.id, input.questionId));
+
+      return {
+        success: true,
+        analysis,
+      };
     }),
 
   /**
