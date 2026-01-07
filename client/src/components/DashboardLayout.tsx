@@ -21,7 +21,7 @@ import {
 } from "@/components/ui/sidebar";
 import { getLoginUrl } from "@/const";
 import { useIsMobile } from "@/hooks/useMobile";
-import { LayoutDashboard, LogOut, PanelLeft, Users, BookOpen, GraduationCap, School, Trophy, Video, Calendar, BarChart3, Clock, UserCircle, FileText, Database, FileQuestion, Route, Settings, Timer, Target, Heart, Bell, Upload, Shield, Folder, Brain, Sparkles, HardDrive, Zap, History, FlaskConical } from "lucide-react";
+import { LayoutDashboard, LogOut, PanelLeft, Users, BookOpen, GraduationCap, School, Trophy, Video, Calendar, BarChart3, Clock, UserCircle, FileText, Database, FileQuestion, Route, Settings, Timer, Target, Heart, Bell, Upload, Shield, Folder, Brain, Sparkles, HardDrive, Zap, History, FlaskConical, TrendingUp, Activity, FileSearch } from "lucide-react";
 import { trpc } from "@/lib/trpc";
 import { Badge } from "@/components/ui/badge";
 import { CSSProperties, useEffect, useRef, useState } from "react";
@@ -114,6 +114,9 @@ const adminMenuGroup: MenuGroup = {
     { id: "cache-warmup", icon: Zap, label: "缓存预热管理", path: "/admin/cache-warmup" },
     { id: "batch-history", icon: History, label: "批量操作历史", path: "/admin/batch-history" },
     { id: "ab-test", icon: FlaskConical, label: "A/B测试管理", path: "/admin/ab-test" },
+    { id: "recommendation", icon: TrendingUp, label: "智能推荐管理", path: "/admin/recommendation" },
+    { id: "experiments", icon: Activity, label: "实验监控仪表板", path: "/admin/experiments" },
+    { id: "audit", icon: FileSearch, label: "审计报告查询", path: "/admin/audit" },
   ]
 };
 

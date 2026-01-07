@@ -1,0 +1,9 @@
+{
+  "query": "CREATE TABLE IF NOT EXISTS `notification_configs` (\n  `id` int AUTO_INCREMENT PRIMARY KEY,\n  `notification_type` enum('ab_test_decision','warmup_task_completed','batch_operation_completed','system_alert','custom') NOT NULL,\n  `title` varchar(200) NOT NULL,\n  `description` text,\n  `enable_platform_notification` int NOT NULL DEFAULT 1,\n  `enable_email_notification` int NOT NULL DEFAULT 0,\n  `enable_sms_notification` int NOT NULL DEFAULT 0,\n  `recipients` json NOT NULL,\n  `email_template` text,\n  `sms_template` text,\n  `is_active` int NOT NULL DEFAULT 1,\n  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,\n  `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,\n  INDEX `notification_type_idx` (`notification_type`),\n  INDEX `is_active_idx` (`is_active`)\n)",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway03.us-east-1.prod.aws.tidbcloud.com --port 4000 --user Lfr9xqjx7LpxUD9.1efa314e7813 --database Yh4Z4ZSitSFdPWYxtKkkQS --execute CREATE TABLE IF NOT EXISTS `notification_configs` (\n  `id` int AUTO_INCREMENT PRIMARY KEY,\n  `notification_type` enum('ab_test_decision','warmup_task_completed','batch_operation_completed','system_alert','custom') NOT NULL,\n  `title` varchar(200) NOT NULL,\n  `description` text,\n  `enable_platform_notification` int NOT NULL DEFAULT 1,\n  `enable_email_notification` int NOT NULL DEFAULT 0,\n  `enable_sms_notification` int NOT NULL DEFAULT 0,\n  `recipients` json NOT NULL,\n  `email_template` text,\n  `sms_template` text,\n  `is_active` int NOT NULL DEFAULT 1,\n  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,\n  `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,\n  INDEX `notification_type_idx` (`notification_type`),\n  INDEX `is_active_idx` (`is_active`)\n)",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 1831
+}

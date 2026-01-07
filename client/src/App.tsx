@@ -64,6 +64,9 @@ import CacheMonitor from "@/pages/CacheMonitor";
 import CacheWarmupManagement from "@/pages/CacheWarmupManagement";
 import BatchOperationHistory from "@/pages/BatchOperationHistory";
 import ABTestManagement from "@/pages/ABTestManagement";
+import RecommendationManagement from "@/pages/RecommendationManagement";
+import ExperimentDashboard from "@/pages/ExperimentDashboard";
+import AuditReports from "@/pages/AuditReports";
 
 function Router() {
   return (
@@ -79,6 +82,9 @@ function Router() {
       <Route path="/admin/cache-warmup" component={CacheWarmupManagement} />
       <Route path="/admin/batch-history" component={BatchOperationHistory} />
       <Route path="/admin/ab-test" component={ABTestManagement} />
+      <Route path="/admin/recommendation" component={RecommendationManagement} />
+      <Route path="/admin/experiments" component={ExperimentDashboard} />
+      <Route path="/admin/audit" component={AuditReports} />
       <Route path="/learning-dashboard" component={LearningDashboard} />
       <Route path="/practice-questions/:errorQuestionId" component={PracticeQuestions} />
       <Route path={"/practice"} component={Practice} />

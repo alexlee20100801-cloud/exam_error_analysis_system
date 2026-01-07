@@ -94,6 +94,16 @@ export {
   type NewParentViewLog
 } from "./role_enhancement_schema";
 
+// 导入通知配置 schema
+export {
+  notificationConfigs,
+  notificationHistory,
+  type NotificationConfig,
+  type NewNotificationConfig,
+  type NotificationHistory,
+  type NewNotificationHistory
+} from "./notification_schema";
+
 // 导入缓存预热和A/B测试 schema
 export {
   knowledgePointHotness,

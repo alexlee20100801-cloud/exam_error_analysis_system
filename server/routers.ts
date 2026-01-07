@@ -83,6 +83,8 @@ import { batchOperationHistoryRouter } from "./routers/batchOperationHistory";
 import { abTestRouter } from "./routers/abTest";
 import { warmupIntelligenceRouter } from "./routers/warmupIntelligence";
 import { auditEnhancementRouter } from "./routers/auditEnhancement";
+import { scheduledTasksManagementRouter } from "./routers/scheduledTasksManagement";
+import { notificationManagementRouter } from "./routers/notificationManagement";
 
 export const appRouter = router({
   system: systemRouter,
@@ -155,6 +157,12 @@ export const appRouter = router({
   
   // 批量操作审计增强
   auditEnhancement: auditEnhancementRouter,
+  
+  // 定时任务管理
+  scheduledTasksManagement: scheduledTasksManagementRouter,
+  
+  // 通知管理
+  notificationManagement: notificationManagementRouter,
   
   // 积分系统
   points: pointsRouter,
