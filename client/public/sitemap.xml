@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9
+        http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd">
+  
+  <!-- 首页 -->
+  <url>
+    <loc>https://exam-error-analysis.manus.space/</loc>
+    <lastmod>2026-01-08</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>1.0</priority>
+  </url>
+  
+  <!-- 学习仪表盘 -->
+  <url>
+    <loc>https://exam-error-analysis.manus.space/dashboard</loc>
+    <lastmod>2026-01-08</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.9</priority>
+  </url>
+  
+  <!-- 上传错题 -->
+  <url>
+    <loc>https://exam-error-analysis.manus.space/upload</loc>
+    <lastmod>2026-01-08</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  
+  <!-- 错题列表 -->
+  <url>
+    <loc>https://exam-error-analysis.manus.space/error-questions</loc>
+    <lastmod>2026-01-08</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+  </url>
+  
+  <!-- 学习报告 -->
+  <url>
+    <loc>https://exam-error-analysis.manus.space/learning-report</loc>
+    <lastmod>2026-01-08</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  
+  <!-- 知识图谱 -->
+  <url>
+    <loc>https://exam-error-analysis.manus.space/knowledge-graph</loc>
+    <lastmod>2026-01-08</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  
+  <!-- 协作错题集 -->
+  <url>
+    <loc>https://exam-error-analysis.manus.space/collaborative-collections</loc>
+    <lastmod>2026-01-08</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  
+  <!-- 上传历史 -->
+  <url>
+    <loc>https://exam-error-analysis.manus.space/upload-history</loc>
+    <lastmod>2026-01-08</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  
+  <!-- 设置页面 -->
+  <url>
+    <loc>https://exam-error-analysis.manus.space/settings</loc>
+    <lastmod>2026-01-08</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  
+  <!-- 智能推荐管理 -->
+  <url>
+    <loc>https://exam-error-analysis.manus.space/admin/recommendations</loc>
+    <lastmod>2026-01-08</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  
+  <!-- 实验监控仪表板 -->
+  <url>
+    <loc>https://exam-error-analysis.manus.space/admin/experiments</loc>
+    <lastmod>2026-01-08</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  
+  <!-- 审计报告 -->
+  <url>
+    <loc>https://exam-error-analysis.manus.space/admin/audit</loc>
+    <lastmod>2026-01-08</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  
+  <!-- 通知配置 -->
+  <url>
+    <loc>https://exam-error-analysis.manus.space/admin/notifications</loc>
+    <lastmod>2026-01-08</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.4</priority>
+  </url>
+
+</urlset>

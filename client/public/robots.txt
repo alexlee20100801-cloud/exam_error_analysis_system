@@ -1,0 +1,36 @@
+# robots.txt for 深圳初高中错题分析学习系统
+
+# 允许所有搜索引擎爬取
+User-agent: *
+Allow: /
+
+# 禁止爬取用户私密内容
+Disallow: /api/
+Disallow: /admin/
+Disallow: /settings
+
+# 禁止爬取上传和临时文件
+Disallow: /uploads/
+Disallow: /temp/
+
+# Sitemap位置
+Sitemap: https://exam-error-analysis.manus.space/sitemap.xml
+
+# 爬取延迟(秒)
+Crawl-delay: 1
+
+# 特定搜索引擎规则
+User-agent: Googlebot
+Allow: /
+Disallow: /api/
+Disallow: /admin/
+
+User-agent: Baiduspider
+Allow: /
+Disallow: /api/
+Disallow: /admin/
+
+User-agent: Sogou web spider
+Allow: /
+Disallow: /api/
+Disallow: /admin/

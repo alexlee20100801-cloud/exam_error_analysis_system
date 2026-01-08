@@ -13,6 +13,19 @@
     <meta name="keywords" content="错题本,错题分析,AI学习,智能教育,深圳初中,深圳高中,知识图谱,个性化学习,学习助手,OCR识别,协作学习" />
     <meta name="author" content="深圳初高中错题分析学习系统" />
     
+    <!-- Open Graph Meta Tags -->
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="深圳初高中错题分析学习系统 - AI智能错题本与个性化学习助手" />
+    <meta property="og:description" content="专为深圳初高中学生打造的AI智能错题分析系统，提供错题拍照识别、智能分析、知识图谱、个性化推荐、协作学习等功能，帮助学生高效掌握知识点，提升学习成绩。" />
+    <meta property="og:url" content="https://exam-error-analysis.manus.space" />
+    <meta property="og:site_name" content="深圳初高中错题分析学习系统" />
+    <meta property="og:locale" content="zh_CN" />
+    
+    <!-- Twitter Card Meta Tags -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="深圳初高中错题分析学习系统 - AI智能错题本与个性化学习助手" />
+    <meta name="twitter:description" content="专为深圳初高中学生打造的AI智能错题分析系统，提供错题拍照识别、智能分析、知识图谱、个性化推荐、协作学习等功能。" />
+    
     <!-- PWA Meta Tags -->
     <meta name="theme-color" content="#3b82f6" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -35,6 +48,38 @@
   </head>
 
   <body>
+    <!-- JSON-LD Structured Data -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "EducationalApplication",
+      "name": "深圳初高中错题分析学习系统",
+      "description": "专为深圳初高中学生打造的AI智能错题分析系统，提供错题拍照识别、智能分析、知识图谱、个性化推荐、协作学习等功能，帮助学生高效掌握知识点，提升学习成绩。",
+      "applicationCategory": "EducationalApplication",
+      "operatingSystem": "Web",
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "CNY"
+      },
+      "featureList": [
+        "AI智能错题识别",
+        "OCR文字识别",
+        "知识图谱可视化",
+        "个性化学习推荐",
+        "协作学习功能",
+        "学习数据分析",
+        "智能复习提醒"
+      ],
+      "educationalLevel": "初中,高中",
+      "inLanguage": "zh-CN",
+      "audience": {
+        "@type": "EducationalAudience",
+        "educationalRole": "student"
+      }
+    }
+    </script>
+    
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
     <script
