@@ -81,7 +81,7 @@ export default function LearningReport() {
     { 
       enabled: !!user,
       staleTime: 5 * 60 * 1000, // 5分钟内数据视为新鲜
-      cacheTime: 10 * 60 * 1000, // 缓存保留10分钟
+      gcTime: 10 * 60 * 1000, // 缓存保留10分钟
       retry: 2, // 失败后重试2次
       retryDelay: 1000, // 重试延迟1秒
     }
@@ -93,7 +93,7 @@ export default function LearningReport() {
     { 
       enabled: !!user,
       staleTime: 5 * 60 * 1000,
-      cacheTime: 10 * 60 * 1000,
+      gcTime: 10 * 60 * 1000,
       retry: 2,
       retryDelay: 1000,
     }
@@ -105,7 +105,7 @@ export default function LearningReport() {
     { 
       enabled: !!user,
       staleTime: 5 * 60 * 1000,
-      cacheTime: 10 * 60 * 1000,
+      gcTime: 10 * 60 * 1000,
       retry: 2,
       retryDelay: 1000,
     }
@@ -117,7 +117,7 @@ export default function LearningReport() {
     { 
       enabled: !!user,
       staleTime: 5 * 60 * 1000,
-      cacheTime: 10 * 60 * 1000,
+      gcTime: 10 * 60 * 1000,
       retry: 2,
       retryDelay: 1000,
     }
@@ -129,7 +129,7 @@ export default function LearningReport() {
     { 
       enabled: !!user,
       staleTime: 5 * 60 * 1000,
-      cacheTime: 10 * 60 * 1000,
+      gcTime: 10 * 60 * 1000,
       retry: 2,
       retryDelay: 1000,
     }
@@ -139,7 +139,7 @@ export default function LearningReport() {
     { 
       enabled: !!user,
       staleTime: 5 * 60 * 1000,
-      cacheTime: 10 * 60 * 1000,
+      gcTime: 10 * 60 * 1000,
       retry: 2,
       retryDelay: 1000,
     }
@@ -149,7 +149,7 @@ export default function LearningReport() {
     { 
       enabled: !!user,
       staleTime: 5 * 60 * 1000,
-      cacheTime: 10 * 60 * 1000,
+      gcTime: 10 * 60 * 1000,
       retry: 2,
       retryDelay: 1000,
     }
