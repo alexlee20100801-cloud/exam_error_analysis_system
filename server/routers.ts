@@ -95,6 +95,8 @@ import { printPreviewRouter } from "./routers/printPreview";
 import { collaborativeCollectionsRouter } from "./routers/collaborativeCollections";
 import { ogImageRouter } from "./routers/ogImage";
 import { sitemapAutoUpdateRouter } from "./routers/sitemapAutoUpdate";
+import { sitemapHistoryRouter } from "./routers/sitemapHistory";
+import { structuredDataValidationRouter } from "./routers/structuredDataValidation";
 
 export const appRouter = router({
   system: systemRouter,
@@ -192,6 +194,12 @@ export const appRouter = router({
   
   // Sitemap自动更新
   sitemapAutoUpdate: sitemapAutoUpdateRouter,
+  
+  // Sitemap更新历史
+  sitemapHistory: sitemapHistoryRouter,
+  
+  // 结构化数据验证
+  structuredDataValidation: structuredDataValidationRouter,
   
   // 打印预览
   printPreview: printPreviewRouter,

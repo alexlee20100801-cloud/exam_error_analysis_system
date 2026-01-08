@@ -32,6 +32,9 @@ export {
 // 导入证件管理schema
 export { idCards, type IdCard, type NewIdCard } from "./id_card_schema";
 
+// 导入Sitemap更新历史schema
+export { sitemapUpdateHistory } from "./sitemap_history_schema";
+
 // 导入查重去噪 schema
 export { 
   questionSimilarities, 

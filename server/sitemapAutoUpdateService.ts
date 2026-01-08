@@ -1,5 +1,6 @@
 import { db } from "./db";
 import { errorQuestionShares, collaborativeCollections } from "../drizzle/schema";
+import { sitemapUpdateHistory } from "../drizzle/sitemap_history_schema";
 import { desc, eq } from "drizzle-orm";
 import { storagePut } from "./storage";
 import { notifyOwner } from "./_core/notification";
@@ -97,6 +98,8 @@ export async function updateSitemapFile(): Promise<{
   totalUrls?: number;
   error?: string;
 }> {
+  const startTime = Date.now();
+  
   try {
     // 生成sitemap XML
     const xml = await generateSitemapXML();
@@ -106,6 +109,16 @@ export async function updateSitemapFile(): Promise<{
 
     // 上传到S3
     const { url } = await storagePut("sitemap.xml", xml, "application/xml");
+
+    const executionTime = Date.now() - startTime;
+
+    // 记录更新历史
+    await db.insert(sitemapUpdateHistory).values({
+      success: true,
+      totalUrls: urlCount,
+      sitemapUrl: url,
+      executionTimeMs: executionTime,
+    });
 
     // 发送通知给项目所有者
     await notifyOwner({
@@ -121,15 +134,25 @@ export async function updateSitemapFile(): Promise<{
   } catch (error) {
     console.error("Failed to update sitemap:", error);
     
+    const executionTime = Date.now() - startTime;
+    const errorMessage = error instanceof Error ? error.message : "未知错误";
+
+    // 记录失败历史
+    await db.insert(sitemapUpdateHistory).values({
+      success: false,
+      errorMessage,
+      executionTimeMs: executionTime,
+    });
+    
     // 发送错误通知
     await notifyOwner({
       title: "Sitemap更新失败",
-      content: `Sitemap自动更新失败: ${error instanceof Error ? error.message : "未知错误"}`,
+      content: `Sitemap自动更新失败: ${errorMessage}`,
     });
 
     return {
       success: false,
-      error: error instanceof Error ? error.message : "未知错误",
+      error: errorMessage,
     };
   }
 }
