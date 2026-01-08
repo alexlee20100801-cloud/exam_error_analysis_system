@@ -35,10 +35,11 @@ import { ChartAnnotationTool } from "@/components/ChartAnnotationTool";
 import { ChartOCRExtractor } from "@/components/ChartOCRExtractor";
 import { ComparisonView } from "@/components/ComparisonView";
 import { ErrorAnalysisCard } from "@/components/ErrorAnalysisCard";
+import { ShareDialog } from "@/components/ShareDialog";
 import { useState } from "react";
 import { useSwipeGesture } from "@/hooks/useSwipeGesture";
 import { useIsMobile } from "@/hooks/useMobile";
-import { ChevronLeft, ChevronRight, Trash2 } from "lucide-react";
+import { ChevronLeft, ChevronRight, Trash2, Share2 } from "lucide-react";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -74,6 +75,7 @@ export default function ErrorQuestionDetail() {
   const questionId = params?.id ? parseInt(params.id) : 0;
   const [showVoicePlayer, setShowVoicePlayer] = useState(false);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const [shareDialogOpen, setShareDialogOpen] = useState(false);
   const isMobile = useIsMobile();
   
   // 获取所有错题ID列表用于切换
@@ -368,6 +370,14 @@ export default function ErrorQuestionDetail() {
             >
               <Target className="mr-2 h-4 w-4" />
               {generatePracticeMutation.isPending ? "生成中..." : "生成专项练习"}
+            </Button>
+            <Button
+              variant="outline"
+              onClick={() => setShareDialogOpen(true)}
+              size="lg"
+            >
+              <Share2 className="mr-2 h-4 w-4" />
+              分享错题
             </Button>
             <Button
               variant="destructive"
@@ -879,6 +889,13 @@ export default function ErrorQuestionDetail() {
           </Card>
         </div>
       </div>
+
+      {/* 分享对话框 */}
+      <ShareDialog 
+        open={shareDialogOpen} 
+        onOpenChange={setShareDialogOpen}
+        selectedQuestionIds={[questionId]}
+      />
     </DashboardLayout>
   );
 }
