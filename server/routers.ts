@@ -98,6 +98,8 @@ import { sitemapAutoUpdateRouter } from "./routers/sitemapAutoUpdate";
 import { sitemapHistoryRouter } from "./routers/sitemapHistory";
 import { structuredDataValidationRouter } from "./routers/structuredDataValidation";
 import { seoRouter } from "./seoRouter";
+import { crawlerRouter } from "./routers/crawler";
+import { aiExamPaperRouter } from "./routers/aiExamPaper";
 
 export const appRouter = router({
   system: systemRouter,
@@ -204,6 +206,8 @@ export const appRouter = router({
   
   // SEO管理
   seo: seoRouter,
+  crawler: crawlerRouter,
+  aiExamPaper: aiExamPaperRouter,
   
   // 打印预览
   printPreview: printPreviewRouter,

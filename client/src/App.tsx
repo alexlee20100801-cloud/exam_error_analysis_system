@@ -77,6 +77,8 @@ import CollaborativeCollectionDetail from "@/pages/CollaborativeCollectionDetail
 import BatchUploadWithCrop from "@/pages/BatchUploadWithCrop";
 import EnhancedPrintPreview from "@/pages/EnhancedPrintPreview";
 import SeoManagement from "@/pages/SeoManagement";
+import CrawlerManagement from "@/pages/CrawlerManagement";
+import AIExamPaperGeneration from "@/pages/AIExamPaperGeneration";
 
 function Router() {
   return (
@@ -96,6 +98,8 @@ function Router() {
       <Route path="/admin/recommendation" component={RecommendationManagement} />
       <Route path="/admin/experiments" component={ExperimentDashboard} />
       <Route path="/admin/audit" component={AuditReports} />
+      <Route path="/admin/crawler" component={CrawlerManagement} />
+      <Route path="/ai-exam-paper" component={AIExamPaperGeneration} />
       <Route path="/learning-dashboard" component={LearningDashboard} />
       <Route path="/learning-analytics" component={LearningAnalytics} />
       <Route path="/smart-review-reminder" component={SmartReviewReminder} />

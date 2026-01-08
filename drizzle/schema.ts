@@ -201,6 +201,28 @@ export {
   type NewLearningReport
 } from "./learning_analytics_schema";
 
+// 导入爬虫和试题数据库 schema
+export {
+  questionsDb,
+  videoExplanations,
+  crawlSources,
+  crawlTasks,
+  questionTags,
+  questionQuality,
+  type QuestionDb,
+  type NewQuestionDb,
+  type VideoExplanation,
+  type NewVideoExplanation,
+  type CrawlSource,
+  type NewCrawlSource,
+  type CrawlTask,
+  type NewCrawlTask,
+  type QuestionTag,
+  type NewQuestionTag,
+  type QuestionQuality,
+  type NewQuestionQuality
+} from "./crawler_question_db_schema";
+
 export const accountCredentials = mysqlTable("account_credentials", {
 	id: int().autoincrement().notNull(),
 	userId: int("user_id").notNull(),
