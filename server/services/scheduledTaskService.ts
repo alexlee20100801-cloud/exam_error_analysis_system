@@ -471,7 +471,12 @@ export async function triggerTask(taskName: string) {
 export async function getAllTasksStatus() {
   const db = await getDb();
   if (!db) throw new Error('Database not available');
-  return await db.select().from(scheduledTasks);
+  const tasks = await db.select().from(scheduledTasks);
+  // 将tinyint类型的isEnabled转换为布尔值
+  return tasks.map((task: any) => ({
+    ...task,
+    isEnabled: task.isEnabled ? true : false,
+  }));
 }
 
 /**
