@@ -72,6 +72,10 @@ import { LearningAnalytics } from "@/pages/LearningAnalytics";
 import { SmartReviewReminder } from "@/pages/SmartReviewReminder";
 import { LearningReportGeneration } from "@/pages/LearningReportGeneration";
 import PrintPreview from "@/pages/PrintPreview";
+import CollaborativeCollections from "@/pages/CollaborativeCollections";
+import CollaborativeCollectionDetail from "@/pages/CollaborativeCollectionDetail";
+import BatchUploadWithCrop from "@/pages/BatchUploadWithCrop";
+import EnhancedPrintPreview from "@/pages/EnhancedPrintPreview";
 
 function Router() {
   return (
@@ -81,6 +85,7 @@ function Router() {
       <Route path="/error-questions" component={ErrorQuestions} />
       <Route path="/error-questions/:id" component={ErrorQuestionDetail} />
       <Route path="/upload-error" component={UploadError} />
+      <Route path="/batch-upload-crop" component={BatchUploadWithCrop} />
       <Route path="/batch-edit/:sessionId" component={BatchEdit} />
       <Route path="/upload-history" component={UploadHistory} />
       <Route path="/cache-monitor" component={CacheMonitor} />
@@ -95,6 +100,9 @@ function Router() {
       <Route path="/smart-review-reminder" component={SmartReviewReminder} />
       <Route path="/learning-report-generation" component={LearningReportGeneration} />
       <Route path="/print-preview/:questionIds" component={PrintPreview} />
+      <Route path="/enhanced-print-preview/:questionIds" component={EnhancedPrintPreview} />
+      <Route path="/collaborative-collections" component={CollaborativeCollections} />
+      <Route path="/collaborative-collections/:id" component={CollaborativeCollectionDetail} />
       <Route path="/practice-questions/:errorQuestionId" component={PracticeQuestions} />
       <Route path={"/practice"} component={Practice} />
       <Route path={"/question-practice"} component={QuestionPractice} />

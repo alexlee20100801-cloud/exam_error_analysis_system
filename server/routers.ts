@@ -91,6 +91,7 @@ import { learningAnalyticsRouter } from "./routers/learningAnalytics";
 import { smartReviewReminderRouter } from "./routers/smartReviewReminder";
 import { learningReportGenerationRouter } from "./routers/learningReportGeneration";
 import { printPreviewRouter } from "./routers/printPreview";
+import { collaborativeCollectionsRouter } from "./routers/collaborativeCollections";
 
 export const appRouter = router({
   system: systemRouter,
@@ -185,6 +186,9 @@ export const appRouter = router({
   
   // 打印预览
   printPreview: printPreviewRouter,
+  
+  // 协作错题集
+  collaborativeCollections: collaborativeCollectionsRouter,
   
   // 积分系统
   points: pointsRouter,

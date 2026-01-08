@@ -21,7 +21,7 @@ import {
 } from "@/components/ui/sidebar";
 import { getLoginUrl } from "@/const";
 import { useIsMobile } from "@/hooks/useMobile";
-import { LayoutDashboard, LogOut, PanelLeft, Users, BookOpen, GraduationCap, School, Trophy, Video, Calendar, BarChart3, Clock, UserCircle, FileText, Database, FileQuestion, Route, Settings, Timer, Target, Heart, Bell, Upload, Shield, Folder, Brain, Sparkles, HardDrive, Zap, History, FlaskConical, TrendingUp, Activity, FileSearch } from "lucide-react";
+import { LayoutDashboard, LogOut, PanelLeft, Users, BookOpen, GraduationCap, School, Trophy, Video, Calendar, BarChart3, Clock, UserCircle, FileText, Database, FileQuestion, Route, Settings, Timer, Target, Heart, Bell, Upload, Shield, Folder, Brain, Sparkles, HardDrive, Zap, History, FlaskConical, TrendingUp, Activity, FileSearch, UsersRound } from "lucide-react";
 import { trpc } from "@/lib/trpc";
 import { Badge } from "@/components/ui/badge";
 import { CSSProperties, useEffect, useRef, useState } from "react";
@@ -60,6 +60,7 @@ const coreMenuGroup: MenuGroup = {
     { id: "junior-errors", icon: School, label: "初中错题", path: "/error-questions?level=junior", indent: true, schoolLevel: "junior" },
     { id: "senior-errors", icon: GraduationCap, label: "高中错题", path: "/error-questions?level=senior", indent: true, schoolLevel: "senior" },
     { id: "upload-error-question", icon: Upload, label: "上传错题", path: "/upload-error-question", isCore: true },
+    { id: "batch-upload-crop", icon: Crop, label: "批量上传裁剪", path: "/batch-upload-crop", indent: true },
     { id: "document-upload", icon: Upload, label: "多格式上传", path: "/document-upload", indent: true },
   ]
 };
@@ -82,6 +83,7 @@ const toolsMenuGroup: MenuGroup = {
   id: 'tools',
   label: '学习工具',
   items: [
+    { id: "collaborative-collections", icon: UsersRound, label: "协作错题集", path: "/collaborative-collections" },
     { id: "smart-review-reminder", icon: Bell, label: "智能复习提醒", path: "/smart-review-reminder" },
     { id: "favorites", icon: Heart, label: "我的收藏", path: "/favorites" },
     { id: "reminders", icon: Bell, label: "学习提醒", path: "/reminders" },
