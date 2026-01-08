@@ -104,6 +104,7 @@ import { paperAlgorithmOptimizationRouter } from "./routers/paperAlgorithmOptimi
 import { crawlerRouter } from "./routers/crawler";
 import { aiExamPaperRouter } from "./routers/aiExamPaper";
 import { optimizationRouter } from "./routers/optimization";
+import { systemManagementRouter } from "./routers/systemManagement";
 
 export const appRouter = router({
   system: systemRouter,
@@ -394,6 +395,9 @@ export const appRouter = router({
   
   // 角色增强(家长和教师)
   roleEnhancement: roleEnhancementRouter,
+  
+  // 系统管理
+  systemManagement: systemManagementRouter,
 });
 
 export type AppRouter = typeof appRouter;
