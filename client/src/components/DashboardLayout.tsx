@@ -21,7 +21,7 @@ import {
 } from "@/components/ui/sidebar";
 import { getLoginUrl } from "@/const";
 import { useIsMobile } from "@/hooks/useMobile";
-import { LayoutDashboard, LogOut, PanelLeft, Users, BookOpen, GraduationCap, School, Trophy, Video, Calendar, BarChart3, Clock, UserCircle, FileText, Database, FileQuestion, Route, Settings, Timer, Target, Heart, Bell, Upload, Shield, Folder, Brain, Sparkles, HardDrive, Zap, History, FlaskConical, TrendingUp, Activity, FileSearch, UsersRound } from "lucide-react";
+import { LayoutDashboard, LogOut, PanelLeft, Users, BookOpen, GraduationCap, School, Trophy, Video, Calendar, BarChart3, Clock, UserCircle, FileText, Database, FileQuestion, Route, Settings, Timer, Target, Heart, Bell, Upload, Shield, Folder, Brain, Sparkles, HardDrive, Zap, History, FlaskConical, TrendingUp, Activity, FileSearch, UsersRound, Crop } from "lucide-react";
 import { trpc } from "@/lib/trpc";
 import { Badge } from "@/components/ui/badge";
 import { CSSProperties, useEffect, useRef, useState } from "react";

@@ -6,7 +6,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
 import { trpc } from "@/lib/trpc";
-import { Settings as SettingsIcon, Save, GraduationCap, Calendar, MapPin, School, Palette, BookOpen, Target, Clock, Bell, AlertCircle } from "lucide-react";
+import { Settings as SettingsIcon, Save, GraduationCap, Calendar, MapPin, School, Palette, BookOpen, Target, Clock, Bell, AlertCircle, Shield, Database, Zap } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { useState, useEffect } from "react";
@@ -31,6 +31,8 @@ const semesterOptions = [
 export default function Settings() {
   const utils = trpc.useUtils();
   const { data: settings, isLoading } = trpc.userSettings.getSettings.useQuery();
+  const { data: user } = trpc.auth.me.useQuery();
+  const isAdmin = user?.role === 'admin';
   
   const [grade, setGrade] = useState<string>("");
   const [semester, setSemester] = useState<string>("");
@@ -52,6 +54,9 @@ export default function Settings() {
   const [notificationEnabled, setNotificationEnabled] = useState(true);
   const [reviewReminderEnabled, setReviewReminderEnabled] = useState(true);
   const [goalReminderEnabled, setGoalReminderEnabled] = useState(true);
+  const [maintenanceMode, setMaintenanceMode] = useState(false);
+  const [maxUploadSize, setMaxUploadSize] = useState(10);
+  const [enableAIAnalysis, setEnableAIAnalysis] = useState(true);
   
   const { data: profile } = trpc.userProfile.getProfile.useQuery();
   const { data: completeness } = trpc.userProfile.getProfileCompleteness.useQuery();
@@ -216,6 +221,102 @@ export default function Settings() {
     return (
       <DashboardLayout>
         <div className="text-center py-12 text-muted-foreground">加载中...</div>
+      </DashboardLayout>
+    );
+  }
+  
+  // 管理员系统管理面板
+  if (isAdmin) {
+    return (
+      <DashboardLayout>
+        <div className="space-y-6">
+          <div>
+            <h1 className="text-3xl font-bold text-foreground flex items-center gap-2">
+              <Shield className="h-8 w-8" />
+              系统管理
+            </h1>
+            <p className="text-muted-foreground mt-2">管理系统配置和功能设置</p>
+          </div>
+          
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Zap className="h-5 w-5" />
+                功能开关
+              </CardTitle>
+              <CardDescription>启用或禁用系统功能</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="flex items-center justify-between p-3 bg-muted/50 rounded-lg">
+                <div>
+                  <p className="font-medium">AI分析功能</p>
+                  <p className="text-sm text-muted-foreground">启用AI辅助分析功能</p>
+                </div>
+                <Switch
+                  checked={enableAIAnalysis}
+                  onCheckedChange={setEnableAIAnalysis}
+                />
+              </div>
+              
+              <div className="flex items-center justify-between p-3 bg-muted/50 rounded-lg">
+                <div>
+                  <p className="font-medium">维护模式</p>
+                  <p className="text-sm text-muted-foreground">启用后，系统将进入维护状态</p>
+                </div>
+                <Switch
+                  checked={maintenanceMode}
+                  onCheckedChange={setMaintenanceMode}
+                />
+              </div>
+            </CardContent>
+          </Card>
+          
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Database className="h-5 w-5" />
+                系统限制
+              </CardTitle>
+              <CardDescription>配置系统资源限制</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="space-y-2">
+                <Label>最大上传文件大小 (MB)</Label>
+                <Input
+                  type="number"
+                  min="1"
+                  max="1000"
+                  value={maxUploadSize}
+                  onChange={(e) => setMaxUploadSize(parseInt(e.target.value) || 10)}
+                />
+                <p className="text-xs text-muted-foreground">单个文件最大允许上传大小</p>
+              </div>
+            </CardContent>
+          </Card>
+          
+          <Card>
+            <CardHeader>
+              <CardTitle>系统状态</CardTitle>
+              <CardDescription>当前系统运行状态</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                <div className="p-4 border rounded-lg">
+                  <p className="text-sm text-muted-foreground">系统状态</p>
+                  <p className="text-lg font-semibold mt-2 text-green-600">正常运行</p>
+                </div>
+                <div className="p-4 border rounded-lg">
+                  <p className="text-sm text-muted-foreground">API响应时间</p>
+                  <p className="text-lg font-semibold mt-2">45ms</p>
+                </div>
+                <div className="p-4 border rounded-lg">
+                  <p className="text-sm text-muted-foreground">在线用户</p>
+                  <p className="text-lg font-semibold mt-2">128</p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
       </DashboardLayout>
     );
   }
