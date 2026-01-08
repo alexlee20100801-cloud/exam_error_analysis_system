@@ -1,0 +1,9 @@
+{
+  "query": "CREATE TABLE IF NOT EXISTS `crawler_selector_rules` (\n  `id` int AUTO_INCREMENT PRIMARY KEY NOT NULL,\n  `website_name` varchar(255) NOT NULL,\n  `website_url` varchar(500) NOT NULL,\n  `rule_type` enum('css_selector', 'xpath', 'regex') NOT NULL,\n  `target_field` varchar(100) NOT NULL,\n  `selector_rule` text NOT NULL,\n  `fallback_rule` text,\n  `priority` int DEFAULT 0 NOT NULL,\n  `is_active` tinyint DEFAULT 1 NOT NULL,\n  `success_rate` decimal(5, 2) DEFAULT 0.00,\n  `last_tested_at` timestamp NULL,\n  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,\n  `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,\n  INDEX `idx_website_name` (`website_name`),\n  INDEX `idx_target_field` (`target_field`),\n  INDEX `idx_is_active` (`is_active`)\n)",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway03.us-east-1.prod.aws.tidbcloud.com --port 4000 --user Lfr9xqjx7LpxUD9.1efa314e7813 --database Yh4Z4ZSitSFdPWYxtKkkQS --execute CREATE TABLE IF NOT EXISTS `crawler_selector_rules` (\n  `id` int AUTO_INCREMENT PRIMARY KEY NOT NULL,\n  `website_name` varchar(255) NOT NULL,\n  `website_url` varchar(500) NOT NULL,\n  `rule_type` enum('css_selector', 'xpath', 'regex') NOT NULL,\n  `target_field` varchar(100) NOT NULL,\n  `selector_rule` text NOT NULL,\n  `fallback_rule` text,\n  `priority` int DEFAULT 0 NOT NULL,\n  `is_active` tinyint DEFAULT 1 NOT NULL,\n  `success_rate` decimal(5, 2) DEFAULT 0.00,\n  `last_tested_at` timestamp NULL,\n  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,\n  `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,\n  INDEX `idx_website_name` (`website_name`),\n  INDEX `idx_target_field` (`target_field`),\n  INDEX `idx_is_active` (`is_active`)\n)",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 1695
+}

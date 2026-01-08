@@ -79,6 +79,7 @@ import EnhancedPrintPreview from "@/pages/EnhancedPrintPreview";
 import SeoManagement from "@/pages/SeoManagement";
 import CrawlerManagement from "@/pages/CrawlerManagement";
 import AIExamPaperGeneration from "@/pages/AIExamPaperGeneration";
+import CrawlerConfigManagement from "@/pages/CrawlerConfigManagement";
 
 function Router() {
   return (
@@ -157,6 +158,7 @@ function Router() {
         <Route path="/data-crawler" component={DataCrawler} />
         <Route path="/knowledge-graph" component={KnowledgeGraph} />
       <Route path="/my-favorite-questions" component={MyFavoriteQuestions} />
+      <Route path="/admin/crawler-config" component={CrawlerConfigManagement} />
       <Route component={NotFound} />
     </Switch>
   );

@@ -98,6 +98,9 @@ import { sitemapAutoUpdateRouter } from "./routers/sitemapAutoUpdate";
 import { sitemapHistoryRouter } from "./routers/sitemapHistory";
 import { structuredDataValidationRouter } from "./routers/structuredDataValidation";
 import { seoRouter } from "./seoRouter";
+import { crawlerConfigRouter } from "./routers/crawlerConfig";
+import { aiClassificationOptimizationRouter } from "./routers/aiClassificationOptimization";
+import { paperAlgorithmOptimizationRouter } from "./routers/paperAlgorithmOptimization";
 import { crawlerRouter } from "./routers/crawler";
 import { aiExamPaperRouter } from "./routers/aiExamPaper";
 
@@ -207,6 +210,15 @@ export const appRouter = router({
   // SEO管理
   seo: seoRouter,
   crawler: crawlerRouter,
+  
+  // 爬虫配置管理
+  crawlerConfig: crawlerConfigRouter,
+  
+  // AI分类优化
+  aiClassificationOptimization: aiClassificationOptimizationRouter,
+  
+  // 组卷算法优化
+  paperAlgorithmOptimization: paperAlgorithmOptimizationRouter,
   aiExamPaper: aiExamPaperRouter,
   
   // 打印预览

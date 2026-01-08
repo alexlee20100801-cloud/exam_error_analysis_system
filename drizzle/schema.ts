@@ -223,6 +223,34 @@ export {
   type NewQuestionQuality
 } from "./crawler_question_db_schema";
 
+// 导入爬虫优化和算法调优 schema
+export {
+  crawlerSelectorRules,
+  crawlerPerformanceStats,
+  aiClassificationTestSet,
+  aiClassificationEvaluationHistory,
+  aiPromptVersions,
+  paperGenerationFeedback,
+  paperAlgorithmConfig,
+  paperQualityEvaluationHistory,
+  type CrawlerSelectorRule,
+  type NewCrawlerSelectorRule,
+  type CrawlerPerformanceStat,
+  type NewCrawlerPerformanceStat,
+  type AiClassificationTestSet,
+  type NewAiClassificationTestSet,
+  type AiClassificationEvaluationHistory,
+  type NewAiClassificationEvaluationHistory,
+  type AiPromptVersion,
+  type NewAiPromptVersion,
+  type PaperGenerationFeedback,
+  type NewPaperGenerationFeedback,
+  type PaperAlgorithmConfig,
+  type NewPaperAlgorithmConfig,
+  type PaperQualityEvaluationHistory,
+  type NewPaperQualityEvaluationHistory
+} from "./crawler_optimization_schema";
+
 export const accountCredentials = mysqlTable("account_credentials", {
 	id: int().autoincrement().notNull(),
 	userId: int("user_id").notNull(),

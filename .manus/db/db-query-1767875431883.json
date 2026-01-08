@@ -1,0 +1,9 @@
+{
+  "query": "CREATE TABLE IF NOT EXISTS `crawler_performance_stats` (\n  `id` int AUTO_INCREMENT PRIMARY KEY NOT NULL,\n  `rule_id` int NOT NULL,\n  `website_name` varchar(255) NOT NULL,\n  `total_attempts` int DEFAULT 0 NOT NULL,\n  `successful_attempts` int DEFAULT 0 NOT NULL,\n  `failed_attempts` int DEFAULT 0 NOT NULL,\n  `average_response_time` int DEFAULT 0 NOT NULL,\n  `data_quality_score` decimal(5, 2) DEFAULT 0.00,\n  `error_messages` json,\n  `last_run_at` timestamp NULL,\n  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,\n  `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,\n  INDEX `idx_rule_id` (`rule_id`),\n  INDEX `idx_website_name` (`website_name`),\n  INDEX `idx_last_run_at` (`last_run_at`)\n)",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway03.us-east-1.prod.aws.tidbcloud.com --port 4000 --user Lfr9xqjx7LpxUD9.1efa314e7813 --database Yh4Z4ZSitSFdPWYxtKkkQS --execute CREATE TABLE IF NOT EXISTS `crawler_performance_stats` (\n  `id` int AUTO_INCREMENT PRIMARY KEY NOT NULL,\n  `rule_id` int NOT NULL,\n  `website_name` varchar(255) NOT NULL,\n  `total_attempts` int DEFAULT 0 NOT NULL,\n  `successful_attempts` int DEFAULT 0 NOT NULL,\n  `failed_attempts` int DEFAULT 0 NOT NULL,\n  `average_response_time` int DEFAULT 0 NOT NULL,\n  `data_quality_score` decimal(5, 2) DEFAULT 0.00,\n  `error_messages` json,\n  `last_run_at` timestamp NULL,\n  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,\n  `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,\n  INDEX `idx_rule_id` (`rule_id`),\n  INDEX `idx_website_name` (`website_name`),\n  INDEX `idx_last_run_at` (`last_run_at`)\n)",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 1657
+}

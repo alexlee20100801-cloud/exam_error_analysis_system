@@ -358,6 +358,13 @@
       "when": 1767869652989,
       "tag": "0054_luxuriant_night_thrasher",
       "breakpoints": true
+    },
+    {
+      "idx": 55,
+      "version": "5",
+      "when": 1767875216143,
+      "tag": "0055_last_wolfpack",
+      "breakpoints": true
     }
   ]
 }
