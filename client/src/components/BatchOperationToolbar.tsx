@@ -8,7 +8,8 @@ import {
   Share2, 
   Trash2, 
   Loader2,
-  X
+  X,
+  Printer
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -21,6 +22,7 @@ interface BatchOperationToolbarProps {
   onAddTag: () => void;
   onBatchExport: () => void;
   onAdvancedExport: () => void;
+  onPrintPreview: () => void;
   onShare: () => void;
   onDelete: () => void;
   onClearSelection: () => void;
@@ -40,6 +42,7 @@ export function BatchOperationToolbar({
   onAddTag,
   onBatchExport,
   onAdvancedExport,
+  onPrintPreview,
   onShare,
   onDelete,
   onClearSelection,
@@ -157,6 +160,16 @@ export function BatchOperationToolbar({
               >
                 <FileDown className="h-4 w-4 mr-1.5" />
                 高级导出
+              </Button>
+
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={onPrintPreview}
+                className="h-9"
+              >
+                <Printer className="h-4 w-4 mr-1.5" />
+                打印预览
               </Button>
 
               <Button

@@ -71,6 +71,7 @@ import AuditReports from "@/pages/AuditReports";
 import { LearningAnalytics } from "@/pages/LearningAnalytics";
 import { SmartReviewReminder } from "@/pages/SmartReviewReminder";
 import { LearningReportGeneration } from "@/pages/LearningReportGeneration";
+import PrintPreview from "@/pages/PrintPreview";
 
 function Router() {
   return (
@@ -93,6 +94,7 @@ function Router() {
       <Route path="/learning-analytics" component={LearningAnalytics} />
       <Route path="/smart-review-reminder" component={SmartReviewReminder} />
       <Route path="/learning-report-generation" component={LearningReportGeneration} />
+      <Route path="/print-preview/:questionIds" component={PrintPreview} />
       <Route path="/practice-questions/:errorQuestionId" component={PracticeQuestions} />
       <Route path={"/practice"} component={Practice} />
       <Route path={"/question-practice"} component={QuestionPractice} />

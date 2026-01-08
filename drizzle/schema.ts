@@ -4,6 +4,31 @@ import { sql } from "drizzle-orm"
 // 导入分享功能的schema
 export { errorQuestionShares, shareAccessLogs, type ErrorQuestionShare, type NewErrorQuestionShare, type ShareAccessLog, type NewShareAccessLog } from "./share_schema";
 
+// 导入打印预览schema
+export { printTemplates, printHistory, type PrintTemplate, type NewPrintTemplate, type PrintHistory, type NewPrintHistory } from "./print_preview_schema";
+
+// 导入协作错题集schema
+export {
+  collaborativeCollections,
+  collectionMembers,
+  collectionQuestions,
+  collectionComments,
+  collectionActivities,
+  commentLikes,
+  type CollaborativeCollection,
+  type NewCollaborativeCollection,
+  type CollectionMember,
+  type NewCollectionMember,
+  type CollectionQuestion,
+  type NewCollectionQuestion,
+  type CollectionComment,
+  type NewCollectionComment,
+  type CollectionActivity,
+  type NewCollectionActivity,
+  type CommentLike,
+  type NewCommentLike
+} from "./collaborative_collections_schema";
+
 // 导入证件管理schema
 export { idCards, type IdCard, type NewIdCard } from "./id_card_schema";
 

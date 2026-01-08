@@ -90,6 +90,7 @@ import { userProfileRouter } from "./routers/userProfile";
 import { learningAnalyticsRouter } from "./routers/learningAnalytics";
 import { smartReviewReminderRouter } from "./routers/smartReviewReminder";
 import { learningReportGenerationRouter } from "./routers/learningReportGeneration";
+import { printPreviewRouter } from "./routers/printPreview";
 
 export const appRouter = router({
   system: systemRouter,
@@ -181,6 +182,9 @@ export const appRouter = router({
   
   // 学习报告生成
   learningReportGeneration: learningReportGenerationRouter,
+  
+  // 打印预览
+  printPreview: printPreviewRouter,
   
   // 积分系统
   points: pointsRouter,

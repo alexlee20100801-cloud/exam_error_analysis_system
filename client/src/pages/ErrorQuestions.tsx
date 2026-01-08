@@ -1248,6 +1248,7 @@ export default function ErrorQuestions() {
           onAddTag={handleBatchAddTag}
           onBatchExport={() => setBatchExportDialogOpen(true)}
           onAdvancedExport={() => setAdvancedExportDialogOpen(true)}
+          onPrintPreview={() => setLocation(`/print-preview/${selectedQuestionIds.join(',')}`)}
           onShare={() => setShareDialogOpen(true)}
           onDelete={handleBatchDeleteClick}
           onClearSelection={() => setSelectedQuestionIds([])}
