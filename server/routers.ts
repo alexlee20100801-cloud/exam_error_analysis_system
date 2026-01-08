@@ -87,6 +87,9 @@ import { scheduledTasksManagementRouter } from "./routers/scheduledTasksManageme
 import { notificationManagementRouter } from "./routers/notificationManagement";
 import { notificationConfigRouter } from "./routers/notificationConfig";
 import { userProfileRouter } from "./routers/userProfile";
+import { learningAnalyticsRouter } from "./routers/learningAnalytics";
+import { smartReviewReminderRouter } from "./routers/smartReviewReminder";
+import { learningReportGenerationRouter } from "./routers/learningReportGeneration";
 
 export const appRouter = router({
   system: systemRouter,
@@ -169,6 +172,15 @@ export const appRouter = router({
   
   // 用户资料管理
   userProfile: userProfileRouter,
+  
+  // 学习数据分析
+  learningAnalytics: learningAnalyticsRouter,
+  
+  // 智能复习提醒
+  smartReviewReminder: smartReviewReminderRouter,
+  
+  // 学习报告生成
+  learningReportGeneration: learningReportGenerationRouter,
   
   // 积分系统
   points: pointsRouter,

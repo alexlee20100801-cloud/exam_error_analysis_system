@@ -68,6 +68,9 @@ import ABTestManagement from "@/pages/ABTestManagement";
 import RecommendationManagement from "@/pages/RecommendationManagement";
 import ExperimentDashboard from "@/pages/ExperimentDashboard";
 import AuditReports from "@/pages/AuditReports";
+import { LearningAnalytics } from "@/pages/LearningAnalytics";
+import { SmartReviewReminder } from "@/pages/SmartReviewReminder";
+import { LearningReportGeneration } from "@/pages/LearningReportGeneration";
 
 function Router() {
   return (
@@ -87,6 +90,9 @@ function Router() {
       <Route path="/admin/experiments" component={ExperimentDashboard} />
       <Route path="/admin/audit" component={AuditReports} />
       <Route path="/learning-dashboard" component={LearningDashboard} />
+      <Route path="/learning-analytics" component={LearningAnalytics} />
+      <Route path="/smart-review-reminder" component={SmartReviewReminder} />
+      <Route path="/learning-report-generation" component={LearningReportGeneration} />
       <Route path="/practice-questions/:errorQuestionId" component={PracticeQuestions} />
       <Route path={"/practice"} component={Practice} />
       <Route path={"/question-practice"} component={QuestionPractice} />

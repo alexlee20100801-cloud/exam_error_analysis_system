@@ -132,6 +132,22 @@ export {
   type NewAbTestStatistic
 } from "./cache_warmup_ab_test_schema";
 
+// 导入学习数据分析 schema
+export {
+  studySessions,
+  subjectMasterySnapshots,
+  reviewReminderSettings,
+  learningReports,
+  type StudySession,
+  type NewStudySession,
+  type SubjectMasterySnapshot,
+  type NewSubjectMasterySnapshot,
+  type ReviewReminderSetting,
+  type NewReviewReminderSetting,
+  type LearningReport,
+  type NewLearningReport
+} from "./learning_analytics_schema";
+
 export const accountCredentials = mysqlTable("account_credentials", {
 	id: int().autoincrement().notNull(),
 	userId: int("user_id").notNull(),

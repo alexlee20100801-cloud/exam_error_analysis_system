@@ -82,6 +82,7 @@ const toolsMenuGroup: MenuGroup = {
   id: 'tools',
   label: '学习工具',
   items: [
+    { id: "smart-review-reminder", icon: Bell, label: "智能复习提醒", path: "/smart-review-reminder" },
     { id: "favorites", icon: Heart, label: "我的收藏", path: "/favorites" },
     { id: "reminders", icon: Bell, label: "学习提醒", path: "/reminders" },
     { id: "learning-path", icon: Route, label: "学习路径", path: "/learning-path" },
@@ -94,6 +95,8 @@ const analyticsMenuGroup: MenuGroup = {
   id: 'analytics',
   label: '数据分析',
   items: [
+    { id: "learning-analytics", icon: TrendingUp, label: "学习数据可视化", path: "/learning-analytics" },
+    { id: "learning-report-generation", icon: FileText, label: "学习报告生成", path: "/learning-report-generation" },
     { id: "weakness-analysis", icon: Brain, label: "AI薄弱点分析", path: "/weakness-analysis" },
     { id: "report", icon: BarChart3, label: "学习报告", path: "/learning-report" },
     { id: "calendar", icon: Calendar, label: "学习日历", path: "/study-calendar" },
