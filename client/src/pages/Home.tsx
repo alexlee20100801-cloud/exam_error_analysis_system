@@ -5,6 +5,7 @@ import { getLoginUrl } from "@/const";
 import { BookOpen, Brain, LineChart, Video, CheckCircle, Target } from "lucide-react";
 import { useEffect } from "react";
 import { useLocation } from "wouter";
+import { SEO } from "@/components/SEO";
 
 export default function Home() {
   const { user, loading, isAuthenticated } = useAuth();
@@ -28,7 +29,27 @@ export default function Home() {
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <>
+      <SEO
+        title="首页"
+        description="专为深圳初高中学生打造的AI智能错题分析系统，提供错题拍照识别、智能分析、知识图谱、个性化推荐、协作学习等功能，帮助学生高效掌握知识点，提升学习成绩。"
+        keywords="错题本,错题分析,AI学习,智能教育,深圳初中,深圳高中,知识图谱,个性化学习,学习助手,OCR识别,协作学习"
+        canonical="https://exam-error-analysis.manus.space/"
+        structuredData={{
+          "@context": "https://schema.org",
+          "@type": "WebPage",
+          "name": "深圳初高中错题分析学习系统",
+          "description": "专为深圳初高中学生打造的AI智能错题分析系统",
+          "url": "https://exam-error-analysis.manus.space/",
+          "inLanguage": "zh-CN",
+          "isPartOf": {
+            "@type": "WebSite",
+            "name": "深圳初高中错题分析学习系统",
+            "url": "https://exam-error-analysis.manus.space"
+          }
+        }}
+      />
+      <div className="min-h-screen bg-background">
       {/* 导航栏 */}
       <nav className="border-b bg-card">
         <div className="container mx-auto px-4 py-4 flex justify-between items-center">
@@ -216,5 +237,6 @@ export default function Home() {
         </div>
       </footer>
     </div>
+    </>
   );
 }

@@ -36,6 +36,48 @@ async function startServer() {
   app.use(express.urlencoded({ limit: "50mb", extended: true }));
   // OAuth callback under /api/oauth/callback
   registerOAuthRoutes(app);
+  
+  // Sitemap.xml endpoint
+  app.get("/sitemap.xml", async (req, res) => {
+    try {
+      const baseUrl = req.protocol + "://" + req.get("host");
+      const currentDate = new Date().toISOString().split("T")[0];
+      
+      // 静态页面
+      const staticPages = [
+        { url: "/", priority: "1.0", changefreq: "daily" },
+        { url: "/dashboard", priority: "0.9", changefreq: "daily" },
+        { url: "/upload", priority: "0.8", changefreq: "weekly" },
+        { url: "/error-questions", priority: "0.8", changefreq: "daily" },
+        { url: "/knowledge-graph", priority: "0.7", changefreq: "weekly" },
+        { url: "/learning-report", priority: "0.7", changefreq: "daily" },
+        { url: "/settings", priority: "0.5", changefreq: "monthly" },
+      ];
+      
+      // TODO: 后续可以添加动态页面（公开分享的错题）
+      
+      // 生成XML
+      const xml = `<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+${staticPages
+  .map(
+    (page) => `  <url>
+    <loc>${baseUrl}${page.url}</loc>
+    <lastmod>${currentDate}</lastmod>
+    <changefreq>${page.changefreq}</changefreq>
+    <priority>${page.priority}</priority>
+  </url>`
+  )
+  .join("\n")}
+</urlset>`;
+      
+      res.header("Content-Type", "application/xml");
+      res.send(xml);
+    } catch (error) {
+      console.error("[Sitemap] Error generating sitemap:", error);
+      res.status(500).send("Error generating sitemap");
+    }
+  });
   // tRPC API
   app.use(
     "/api/trpc",

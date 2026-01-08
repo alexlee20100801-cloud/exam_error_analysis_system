@@ -48,6 +48,7 @@ import { annotationTemplatesRouter } from "./routers/annotationTemplates";
 import { aiAnnotationRouter } from "./routers/aiAnnotation";
 import { collaborativeLearningRouter } from "./routers/collaborativeLearning";
 import { aiAnnotationFeedbackRouter } from "./routers/aiAnnotationFeedback";
+import { sitemapRouter } from "./routers/sitemap";
 import { cacheStatsRouter } from "./routers/cacheStats";
 import { pointsRouter } from "./routers/points";
 import { aiQuestionCollectionRouter } from "./routers/aiQuestionCollection";
@@ -183,6 +184,9 @@ export const appRouter = router({
   
   // 学习报告生成
   learningReportGeneration: learningReportGenerationRouter,
+  
+  // Sitemap生成
+  sitemap: sitemapRouter,
   
   // 打印预览
   printPreview: printPreviewRouter,

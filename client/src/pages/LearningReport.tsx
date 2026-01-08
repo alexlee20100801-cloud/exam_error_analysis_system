@@ -28,6 +28,7 @@ import { useState } from "react";
 import { NotificationSettingsDialog } from "@/components/NotificationSettingsDialog";
 import { ALL_SUBJECTS, SUBJECTS, getSubjectName } from "@shared/subjects";
 import { BarChart, Bar, XAxis as RechartsXAxis, YAxis as RechartsYAxis, CartesianGrid as RechartsCartesianGrid, Tooltip as RechartsTooltip, Legend as RechartsLegend, ResponsiveContainer as RechartsResponsiveContainer } from "recharts";
+import { SEO } from "@/components/SEO";
 import {
   RadarChart,
   PolarGrid,
@@ -276,7 +277,22 @@ export default function LearningReport() {
   })) || [];
 
   return (
-    <DashboardLayout>
+    <>
+      <SEO
+        title="学习报告"
+        description="查看你的学习进度、掌握度分析、薄弱知识点和AI学习建议，全面了解你的学习情况。"
+        keywords="学习报告,学习分析,掌握度,薄弱知识点,AI建议,学习进度"
+        canonical="https://exam-error-analysis.manus.space/learning-report"
+        structuredData={{
+          "@context": "https://schema.org",
+          "@type": "WebPage",
+          "name": "学习报告",
+          "description": "查看你的学习进度、掌握度分析、薄弱知识点和AI学习建议",
+          "url": "https://exam-error-analysis.manus.space/learning-report",
+          "inLanguage": "zh-CN"
+        }}
+      />
+      <DashboardLayout>
       <div className="space-y-6">
         {/* 页面标题 */}
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
@@ -915,5 +931,6 @@ export default function LearningReport() {
         wechatBound={!!user?.wechatOpenId}
       />
     </DashboardLayout>
+    </>
   );
 }
