@@ -94,6 +94,7 @@ import { learningReportGenerationRouter } from "./routers/learningReportGenerati
 import { printPreviewRouter } from "./routers/printPreview";
 import { collaborativeCollectionsRouter } from "./routers/collaborativeCollections";
 import { ogImageRouter } from "./routers/ogImage";
+import { sitemapAutoUpdateRouter } from "./routers/sitemapAutoUpdate";
 
 export const appRouter = router({
   system: systemRouter,
@@ -188,6 +189,9 @@ export const appRouter = router({
   
   // Sitemap生成
   sitemap: sitemapRouter,
+  
+  // Sitemap自动更新
+  sitemapAutoUpdate: sitemapAutoUpdateRouter,
   
   // 打印预览
   printPreview: printPreviewRouter,

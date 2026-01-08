@@ -746,3 +746,23 @@
 - [ ] 后端：实现sitemap自动更新机制（定时任务）
 - [ ] 前端：添加sitemap提交到搜索引擎的指引
 - [ ] 测试sitemap格式和有效性
+
+## SEO增强功能（2026-01-08 第五批）
+
+### 前端集成OG图片
+- [x] 在错题分享页面调用OG图片生成API
+- [x] 在学习报告页面调用OG图片生成API
+- [x] 动态设置og:image标签
+- [ ] 测试社交媒体分享效果
+
+### Sitemap自动更新
+- [x] 实现定时任务每日自动更新sitemap.xml
+- [x] 添加Google Search Console提交指引
+- [x] 添加Bing Webmaster提交指引
+- [x] 实现sitemap更新通知功能
+
+### 结构化数据扩展
+- [x] 为错题详情页添加Question/Answer类型的结构化数据
+- [x] 为学习报告添加Course类型标记
+- [ ] 验证结构化数据有效性（Google Rich Results Test）
+- [ ] 测试搜索引擎抓取效果

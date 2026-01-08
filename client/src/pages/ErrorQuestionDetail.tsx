@@ -36,9 +36,10 @@ import { ChartOCRExtractor } from "@/components/ChartOCRExtractor";
 import { ComparisonView } from "@/components/ComparisonView";
 import { ErrorAnalysisCard } from "@/components/ErrorAnalysisCard";
 import { ShareDialog } from "@/components/ShareDialog";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useSwipeGesture } from "@/hooks/useSwipeGesture";
 import { SEO } from "@/components/SEO";
+import { SEOHead } from "@/components/SEOHead";
 import { useIsMobile } from "@/hooks/useMobile";
 import { ChevronLeft, ChevronRight, Trash2, Share2 } from "lucide-react";
 import {
@@ -75,20 +76,85 @@ export default function ErrorQuestionDetail() {
   
   const questionId = params?.id ? parseInt(params.id) : 0;
   
+  // 生成OG图片
+  const generateOGImageMutation = trpc.ogImage.generateQuestionImage.useMutation();
+  const [ogImageUrl, setOgImageUrl] = useState<string | undefined>();
+  
+  useEffect(() => {
+    if (questionId && !ogImageUrl) {
+      generateOGImageMutation.mutate(
+        { questionId },
+        {
+          onSuccess: (data) => {
+            setOgImageUrl(data.imageUrl);
+          },
+          onError: (error) => {
+            console.error('Failed to generate OG image:', error);
+          },
+        }
+      );
+    }
+  }, [questionId]);
+  
   const seoData = {
     title: `错题详情 #${questionId}`,
     description: '查看错题详细信息,包括题目内容、AI分析、知识点、学习建议和相似题目推荐,帮助学生深入理解和掌握知识点。',
     keywords: '错题详情,错题分析,AI分析,知识点,学习建议,相似题目,深圳初中,深圳高中',
-    ogImage: 'https://example.com/og-error-question.jpg',
-    structuredData: {
+    ogImage: ogImageUrl || 'https://example.com/og-error-question.jpg',
+    structuredData: question ? {
+      '@context': 'https://schema.org',
+      '@type': 'QAPage',
+      mainEntity: {
+        '@type': 'Question',
+        name: question.title || `错题 #${questionId}`,
+        text: question.content || '',
+        dateCreated: question.createdAt?.toISOString(),
+        author: {
+          '@type': 'Person',
+          name: '学生'
+        },
+        eduQuestionType: question.subject,
+        educationalLevel: question.grade,
+        answerCount: question.aiAnalysis ? 1 : 0,
+        acceptedAnswer: question.aiAnalysis ? {
+          '@type': 'Answer',
+          text: question.aiAnalysis,
+          dateCreated: question.analyzedAt?.toISOString(),
+          author: {
+            '@type': 'Organization',
+            name: '深圳初高中错题分析学习系统 AI分析'
+          },
+          upvoteCount: 0
+        } : undefined
+      },
+      breadcrumb: {
+        '@type': 'BreadcrumbList',
+        itemListElement: [
+          {
+            '@type': 'ListItem',
+            position: 1,
+            name: '首页',
+            item: `${window.location.origin}/dashboard`
+          },
+          {
+            '@type': 'ListItem',
+            position: 2,
+            name: '错题本',
+            item: `${window.location.origin}/error-questions`
+          },
+          {
+            '@type': 'ListItem',
+            position: 3,
+            name: `错题 #${questionId}`,
+            item: window.location.href
+          }
+        ]
+      }
+    } : {
       '@context': 'https://schema.org',
       '@type': 'WebPage',
       name: `错题详情 #${questionId} - 深圳初高中错题分析学习系统`,
-      description: '错题详细信息和AI分析,帮助学生深入理解知识点',
-      provider: {
-        '@type': 'Organization',
-        name: '深圳初高中错题分析学习系统'
-      }
+      description: '错题详细信息和AI分析,帮助学生深入理解知识点'
     }
   };
   const [showVoicePlayer, setShowVoicePlayer] = useState(false);
@@ -273,6 +339,14 @@ export default function ErrorQuestionDetail() {
   return (
     <>
       <SEO {...seoData} />
+      <SEOHead
+        title={seoData.title}
+        description={seoData.description}
+        ogImage={ogImageUrl}
+        ogType="article"
+        keywords={seoData.keywords.split(',')}
+        structuredData={seoData.structuredData}
+      />
       <DashboardLayout>
       <div ref={swipeRef} className="container py-8 max-w-6xl relative">
         {/* 移动端滑动提示 */}

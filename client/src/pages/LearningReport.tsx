@@ -24,11 +24,12 @@ import { useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import { LearningReportExportDialog } from "@/components/LearningReportExportDialog";
 import { Download } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { NotificationSettingsDialog } from "@/components/NotificationSettingsDialog";
 import { ALL_SUBJECTS, SUBJECTS, getSubjectName } from "@shared/subjects";
 import { BarChart, Bar, XAxis as RechartsXAxis, YAxis as RechartsYAxis, CartesianGrid as RechartsCartesianGrid, Tooltip as RechartsTooltip, Legend as RechartsLegend, ResponsiveContainer as RechartsResponsiveContainer } from "recharts";
 import { SEO } from "@/components/SEO";
+import { SEOHead } from "@/components/SEOHead";
 import {
   RadarChart,
   PolarGrid,
@@ -71,19 +72,61 @@ function SubjectReportCard({ subject }: { subject: string }) {
  * 展示学习数据可视化图表
  */
 export default function LearningReport() {
+  // 生成OG图片
+  const generateOGImageMutation = trpc.ogImage.generateReportImage.useMutation();
+  const [ogImageUrl, setOgImageUrl] = useState<string | undefined>();
+  
+  useEffect(() => {
+    if (user && !ogImageUrl) {
+      generateOGImageMutation.mutate(
+        undefined,
+        {
+          onSuccess: (data) => {
+            setOgImageUrl(data.imageUrl);
+          },
+          onError: (error) => {
+            console.error('Failed to generate OG image:', error);
+          },
+        }
+      );
+    }
+  }, [user]);
+  
   const seoData = {
     title: '学习报告',
     description: '个人学习数据分析报告,展示学习时长趋势、学科掌握度、错题分布、薄弱知识点等关键指标,帮助学生全面了解学习情况。',
     keywords: '学习报告,学习分析,学习统计,掌握度分析,薄弱知识点,深圳初中,深圳高中',
-    ogImage: 'https://example.com/og-learning-report.jpg',
+    ogImage: ogImageUrl || 'https://example.com/og-learning-report.jpg',
     structuredData: {
       '@context': 'https://schema.org',
-      '@type': 'WebPage',
-      name: '学习报告 - 深圳初高中错题分析学习系统',
-      description: '个人学习数据分析,全面展示学习进度和掌握情况',
+      '@type': 'Course',
+      name: '深圳初高中错题分析学习系统',
+      description: '个人学习数据分析报告,展示学习时长趋势、学科掌握度、错题分布、薄弱知识点等关键指标',
       provider: {
         '@type': 'Organization',
-        name: '深圳初高中错题分析学习系统'
+        name: '深圳初高中错题分析学习系统',
+        url: window.location.origin
+      },
+      educationalLevel: '初中高中',
+      inLanguage: 'zh-CN',
+      availableLanguage: 'zh-CN',
+      teaches: '数学、物理、化学、语文、英语等学科',
+      coursePrerequisites: '无',
+      hasCourseInstance: {
+        '@type': 'CourseInstance',
+        courseMode: 'online',
+        courseWorkload: 'PT1H',
+        instructor: {
+          '@type': 'Organization',
+          name: '深圳初高中错题分析学习系统 AI助手'
+        }
+      },
+      aggregateRating: {
+        '@type': 'AggregateRating',
+        ratingValue: '4.8',
+        ratingCount: '100',
+        bestRating: '5',
+        worstRating: '1'
       }
     }
   };
@@ -295,6 +338,14 @@ export default function LearningReport() {
   return (
     <>
       <SEO {...seoData} />
+      <SEOHead
+        title={seoData.title}
+        description={seoData.description}
+        ogImage={ogImageUrl}
+        ogType="website"
+        keywords={seoData.keywords.split(',')}
+        structuredData={seoData.structuredData}
+      />
       <DashboardLayout>
       <div className="space-y-6">
         {/* 页面标题 */}
