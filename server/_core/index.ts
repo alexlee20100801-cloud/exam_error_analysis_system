@@ -8,6 +8,7 @@ import { appRouter } from "../routers";
 import { createContext } from "./context";
 import { serveStatic, setupVite } from "./vite";
 import { initializeScheduledTasks, upsertScheduledTask } from "../services/scheduledTaskService";
+import { initializeAutomationScheduler } from "../automationScheduler";
 
 function isPortAvailable(port: number): Promise<boolean> {
   return new Promise(resolve => {
@@ -116,6 +117,10 @@ ${staticPages
       // 初始化所有启用的定时任务
       await initializeScheduledTasks();
       console.log('[Server] Scheduled tasks initialized successfully');
+      
+      // 初始化自动化调度器
+      initializeAutomationScheduler();
+      console.log('[Server] Automation scheduler initialized successfully');
     } catch (error) {
       console.error('[Server] Failed to initialize scheduled tasks:', error);
     }

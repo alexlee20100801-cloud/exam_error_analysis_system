@@ -103,6 +103,7 @@ import { aiClassificationOptimizationRouter } from "./routers/aiClassificationOp
 import { paperAlgorithmOptimizationRouter } from "./routers/paperAlgorithmOptimization";
 import { crawlerRouter } from "./routers/crawler";
 import { aiExamPaperRouter } from "./routers/aiExamPaper";
+import { optimizationRouter } from "./routers/optimization";
 
 export const appRouter = router({
   system: systemRouter,
@@ -220,6 +221,9 @@ export const appRouter = router({
   // 组卷算法优化
   paperAlgorithmOptimization: paperAlgorithmOptimizationRouter,
   aiExamPaper: aiExamPaperRouter,
+  
+  // 性能优化管理
+  optimization: optimizationRouter,
   
   // 打印预览
   printPreview: printPreviewRouter,

@@ -365,6 +365,13 @@
       "when": 1767875216143,
       "tag": "0055_last_wolfpack",
       "breakpoints": true
+    },
+    {
+      "idx": 56,
+      "version": "5",
+      "when": 1767876298500,
+      "tag": "0056_amazing_miss_america",
+      "breakpoints": true
     }
   ]
 }

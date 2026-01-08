@@ -54,6 +54,31 @@ export {
   type NewSeoPriorityHistory
 } from "./seo_management_schema";
 
+// 导入性能优化和告警 schema
+export {
+  aiClassificationMetrics,
+  paperAlgorithmMetrics,
+  crawlerPerformanceMetrics,
+  performanceAlertRules,
+  performanceAlerts,
+  weeklyReports,
+  scheduledTaskLogs,
+  type AiClassificationMetric,
+  type NewAiClassificationMetric,
+  type PaperAlgorithmMetric,
+  type NewPaperAlgorithmMetric,
+  type CrawlerPerformanceMetric,
+  type NewCrawlerPerformanceMetric,
+  type PerformanceAlertRule,
+  type NewPerformanceAlertRule,
+  type PerformanceAlert,
+  type NewPerformanceAlert,
+  type WeeklyReport,
+  type NewWeeklyReport,
+  type ScheduledTaskLog,
+  type NewScheduledTaskLog
+} from "./optimization_schema";
+
 // 导入查重去噪 schema
 export { 
   questionSimilarities, 

@@ -80,6 +80,8 @@ import SeoManagement from "@/pages/SeoManagement";
 import CrawlerManagement from "@/pages/CrawlerManagement";
 import AIExamPaperGeneration from "@/pages/AIExamPaperGeneration";
 import CrawlerConfigManagement from "@/pages/CrawlerConfigManagement";
+import AiClassificationOptimization from "@/pages/AiClassificationOptimization";
+import PaperAlgorithmOptimization from "@/pages/PaperAlgorithmOptimization";
 
 function Router() {
   return (
@@ -159,6 +161,8 @@ function Router() {
         <Route path="/knowledge-graph" component={KnowledgeGraph} />
       <Route path="/my-favorite-questions" component={MyFavoriteQuestions} />
       <Route path="/admin/crawler-config" component={CrawlerConfigManagement} />
+      <Route path="/admin/ai-classification" component={AiClassificationOptimization} />
+      <Route path="/admin/paper-algorithm" component={PaperAlgorithmOptimization} />
       <Route component={NotFound} />
     </Switch>
   );

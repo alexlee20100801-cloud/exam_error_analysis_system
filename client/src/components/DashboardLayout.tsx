@@ -123,6 +123,8 @@ const adminMenuGroup: MenuGroup = {
     { id: "experiments", icon: Activity, label: "实验监控仪表板", path: "/admin/experiments" },
     { id: "audit", icon: FileSearch, label: "审计报告查询", path: "/admin/audit" },
     { id: "notification-config", icon: Bell, label: "通知配置管理", path: "/notification-config" },
+    { id: "ai-classification", icon: Brain, label: "AI分类优化", path: "/admin/ai-classification" },
+    { id: "paper-algorithm", icon: Sparkles, label: "组卷算法优化", path: "/admin/paper-algorithm" },
   ]
 };
 
