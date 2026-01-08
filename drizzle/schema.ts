@@ -123,10 +123,16 @@ export {
 export {
   notificationConfigs,
   notificationHistory,
+  userNotifications,
+  notificationSettings,
   type NotificationConfig,
   type NewNotificationConfig,
   type NotificationHistory,
-  type NewNotificationHistory
+  type NewNotificationHistory,
+  type UserNotification,
+  type NewUserNotification,
+  type NotificationSetting,
+  type NewNotificationSetting
 } from "./notification_schema";
 
 // 导入缓存预热和A/B测试 schema

@@ -48,12 +48,11 @@ export default function Home() {
         <section className="py-20 bg-gradient-to-b from-background to-muted/30">
           <div className="container mx-auto px-4 text-center">
             <h1 className="text-5xl font-bold mb-6 text-foreground">
-              深圳初高中学生的
-              <span className="text-primary"> AI 学习助手</span>
+              深圳初高中错题分析学习系统 - AI智能错题本与个性化学习助手
             </h1>
-            <p className="text-xl text-muted-foreground mb-8 max-w-2xl mx-auto">
-              智能分析错题，精准定位薄弱知识点，AI 生成针对性练习，助你高效提升学习成绩
-            </p>
+            <h2 className="text-xl text-muted-foreground mb-8 max-w-2xl mx-auto font-normal">
+              专为深圳初高中学生打造的AI智能错题分析系统，提供错题拍照识别、智能分析、知识图谱、个性化推荐、协作学习等功能，帮助学生高效掌握知识点，提升学习成绩
+            </h2>
             <Button size="lg" asChild className="text-lg px-8 py-6">
               <a href={getLoginUrl()}>立即开始学习</a>
             </Button>
@@ -63,7 +62,7 @@ export default function Home() {
         {/* 功能特性 */}
         <section className="py-16 bg-card">
           <div className="container mx-auto px-4">
-            <h2 className="text-3xl font-bold text-center mb-12 text-foreground">核心功能</h2>
+            <h2 className="text-3xl font-bold text-center mb-12 text-foreground">核心功能：错题管理、AI分析、智能推荐、学习追踪</h2>
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
               <Card className="border-2 hover:border-primary transition-colors">
                 <CardHeader>
@@ -143,7 +142,7 @@ export default function Home() {
         {/* 使用流程 */}
         <section className="py-16 bg-muted/30">
           <div className="container mx-auto px-4">
-            <h2 className="text-3xl font-bold text-center mb-12 text-foreground">使用流程</h2>
+            <h2 className="text-3xl font-bold text-center mb-12 text-foreground">四步使用流程：上传错题、AI分析、针对练习、持续提升</h2>
             <div className="max-w-4xl mx-auto space-y-8">
               <div className="flex items-start space-x-4">
                 <div className="flex-shrink-0 w-12 h-12 bg-primary text-primary-foreground rounded-full flex items-center justify-center font-bold text-lg">

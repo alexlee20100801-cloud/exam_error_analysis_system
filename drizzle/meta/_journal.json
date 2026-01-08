@@ -330,6 +330,13 @@
       "when": 1767856793879,
       "tag": "0050_handy_human_torch",
       "breakpoints": true
+    },
+    {
+      "idx": 51,
+      "version": "5",
+      "when": 1767858995777,
+      "tag": "0051_amused_scourge",
+      "breakpoints": true
     }
   ]
 }

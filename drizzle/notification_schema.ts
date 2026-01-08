@@ -96,3 +96,47 @@ export const notificationHistory = mysqlTable("notification_history", {
 
 export type NotificationHistory = typeof notificationHistory.$inferSelect;
 export type NewNotificationHistory = typeof notificationHistory.$inferInsert;
+
+/**
+ * 用户通知表 - 存储用户接收的实时通知
+ */
+export const userNotifications = mysqlTable("user_notifications", {
+  id: int().autoincrement().primaryKey(),
+  userId: int("user_id").notNull(), // 接收通知的用户ID
+  type: varchar({ length: 50 }).notNull(), // 通知类型：member_joined, new_comment, new_question, etc.
+  title: varchar({ length: 255 }).notNull(), // 通知标题
+  content: text().notNull(), // 通知内容
+  relatedId: int("related_id"), // 关联ID（如错题集ID、评论ID等）
+  relatedType: varchar("related_type", { length: 50 }), // 关联类型：collection, comment, question
+  isRead: int("is_read").notNull().default(0), // 是否已读：0-未读，1-已读
+  createdAt: timestamp("created_at", { mode: "date" }).notNull().default(sql`CURRENT_TIMESTAMP`),
+  readAt: timestamp("read_at", { mode: "date" }), // 阅读时间
+}, (table) => ({
+  userIdIdx: index("user_id_idx").on(table.userId),
+  typeIdx: index("type_idx").on(table.type),
+  isReadIdx: index("is_read_idx").on(table.isRead),
+  createdAtIdx: index("created_at_idx").on(table.createdAt),
+}));
+
+export type UserNotification = typeof userNotifications.$inferSelect;
+export type NewUserNotification = typeof userNotifications.$inferInsert;
+
+/**
+ * 通知设置表 - 用户通知偏好设置
+ */
+export const notificationSettings = mysqlTable("notification_settings", {
+  id: int().autoincrement().primaryKey(),
+  userId: int("user_id").notNull().unique(), // 用户ID
+  memberJoined: int("member_joined").notNull().default(1), // 新成员加入通知：0-关闭，1-开启
+  newComment: int("new_comment").notNull().default(1), // 新评论通知
+  newQuestion: int("new_question").notNull().default(1), // 新错题通知
+  reviewReminder: int("review_reminder").notNull().default(1), // 复习提醒通知
+  systemNotice: int("system_notice").notNull().default(1), // 系统通知
+  createdAt: timestamp("created_at", { mode: "date" }).notNull().default(sql`CURRENT_TIMESTAMP`),
+  updatedAt: timestamp("updated_at", { mode: "date" }).notNull().default(sql`CURRENT_TIMESTAMP`).onUpdateNow(),
+}, (table) => ({
+  userIdIdx: index("user_id_idx").on(table.userId),
+}));
+
+export type NotificationSetting = typeof notificationSettings.$inferSelect;
+export type NewNotificationSetting = typeof notificationSettings.$inferInsert;
