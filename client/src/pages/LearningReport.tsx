@@ -71,6 +71,22 @@ function SubjectReportCard({ subject }: { subject: string }) {
  * 展示学习数据可视化图表
  */
 export default function LearningReport() {
+  const seoData = {
+    title: '学习报告',
+    description: '个人学习数据分析报告,展示学习时长趋势、学科掌握度、错题分布、薄弱知识点等关键指标,帮助学生全面了解学习情况。',
+    keywords: '学习报告,学习分析,学习统计,掌握度分析,薄弱知识点,深圳初中,深圳高中',
+    ogImage: 'https://example.com/og-learning-report.jpg',
+    structuredData: {
+      '@context': 'https://schema.org',
+      '@type': 'WebPage',
+      name: '学习报告 - 深圳初高中错题分析学习系统',
+      description: '个人学习数据分析,全面展示学习进度和掌握情况',
+      provider: {
+        '@type': 'Organization',
+        name: '深圳初高中错题分析学习系统'
+      }
+    }
+  };
   const { user, loading: authLoading } = useAuth();
   const [exportDialogOpen, setExportDialogOpen] = useState(false);
   const [exportingCalendar, setExportingCalendar] = useState(false);
@@ -278,20 +294,7 @@ export default function LearningReport() {
 
   return (
     <>
-      <SEO
-        title="学习报告"
-        description="查看你的学习进度、掌握度分析、薄弱知识点和AI学习建议，全面了解你的学习情况。"
-        keywords="学习报告,学习分析,掌握度,薄弱知识点,AI建议,学习进度"
-        canonical="https://exam-error-analysis.manus.space/learning-report"
-        structuredData={{
-          "@context": "https://schema.org",
-          "@type": "WebPage",
-          "name": "学习报告",
-          "description": "查看你的学习进度、掌握度分析、薄弱知识点和AI学习建议",
-          "url": "https://exam-error-analysis.manus.space/learning-report",
-          "inLanguage": "zh-CN"
-        }}
-      />
+      <SEO {...seoData} />
       <DashboardLayout>
       <div className="space-y-6">
         {/* 页面标题 */}

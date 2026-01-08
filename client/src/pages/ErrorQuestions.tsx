@@ -32,10 +32,20 @@ import { SEO } from "@/components/SEO";
 export default function ErrorQuestions() {
   // SEO优化
   const seoData = {
-    title: "错题管理",
-    description: "管理和分析你的错题，通过AI智能分析找出知识薄弱点，获取个性化学习建议，提高学习效率。",
-    keywords: "错题管理,错题分析,AI分析,知识点,学习建议,个性化学习",
-    canonical: "https://exam-error-analysis.manus.space/error-questions",
+    title: '错题管理',
+    description: '管理和分析你的错题,通过AI智能分析找出知识薄弱点,获取个性化学习建议,支持批量操作和导出功能。',
+    keywords: '错题管理,错题分析,AI分析,知识点,学习建议,批量操作,深圳初中,深圳高中',
+    ogImage: 'https://example.com/og-error-questions.jpg',
+    structuredData: {
+      '@context': 'https://schema.org',
+      '@type': 'WebPage',
+      name: '错题管理 - 深圳初高中错题分析学习系统',
+      description: '管理和分析错题,AI智能分析知识薄弱点',
+      provider: {
+        '@type': 'Organization',
+        name: '深圳初高中错题分析学习系统'
+      }
+    }
   };
   const [, setLocation] = useLocation();
   const searchParams = new URLSearchParams(useSearch());

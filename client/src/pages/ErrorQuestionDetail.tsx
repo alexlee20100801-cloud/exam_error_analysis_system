@@ -38,6 +38,7 @@ import { ErrorAnalysisCard } from "@/components/ErrorAnalysisCard";
 import { ShareDialog } from "@/components/ShareDialog";
 import { useState } from "react";
 import { useSwipeGesture } from "@/hooks/useSwipeGesture";
+import { SEO } from "@/components/SEO";
 import { useIsMobile } from "@/hooks/useMobile";
 import { ChevronLeft, ChevronRight, Trash2, Share2 } from "lucide-react";
 import {
@@ -73,6 +74,23 @@ export default function ErrorQuestionDetail() {
   const [, setLocation] = useLocation();
   
   const questionId = params?.id ? parseInt(params.id) : 0;
+  
+  const seoData = {
+    title: `错题详情 #${questionId}`,
+    description: '查看错题详细信息,包括题目内容、AI分析、知识点、学习建议和相似题目推荐,帮助学生深入理解和掌握知识点。',
+    keywords: '错题详情,错题分析,AI分析,知识点,学习建议,相似题目,深圳初中,深圳高中',
+    ogImage: 'https://example.com/og-error-question.jpg',
+    structuredData: {
+      '@context': 'https://schema.org',
+      '@type': 'WebPage',
+      name: `错题详情 #${questionId} - 深圳初高中错题分析学习系统`,
+      description: '错题详细信息和AI分析,帮助学生深入理解知识点',
+      provider: {
+        '@type': 'Organization',
+        name: '深圳初高中错题分析学习系统'
+      }
+    }
+  };
   const [showVoicePlayer, setShowVoicePlayer] = useState(false);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [shareDialogOpen, setShareDialogOpen] = useState(false);
@@ -187,7 +205,9 @@ export default function ErrorQuestionDetail() {
 
   if (authLoading || questionLoading) {
     return (
-      <DashboardLayout>
+      <>
+        <SEO {...seoData} />
+        <DashboardLayout>
         <div className="flex items-center justify-center min-h-[400px]">
           <div className="text-center">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
@@ -195,12 +215,15 @@ export default function ErrorQuestionDetail() {
           </div>
         </div>
       </DashboardLayout>
+      </>
     );
   }
 
   if (!question) {
     return (
-      <DashboardLayout>
+      <>
+        <SEO {...seoData} />
+        <DashboardLayout>
         <div className="container py-8">
           <Alert>
             <AlertCircle className="h-4 w-4" />
@@ -212,6 +235,7 @@ export default function ErrorQuestionDetail() {
           </Button>
         </div>
       </DashboardLayout>
+      </>
     );
   }
 
@@ -247,7 +271,9 @@ export default function ErrorQuestionDetail() {
   };
 
   return (
-    <DashboardLayout>
+    <>
+      <SEO {...seoData} />
+      <DashboardLayout>
       <div ref={swipeRef} className="container py-8 max-w-6xl relative">
         {/* 移动端滑动提示 */}
         {isMobile && swipeState.isSwiping && (
@@ -897,5 +923,6 @@ export default function ErrorQuestionDetail() {
         selectedQuestionIds={[questionId]}
       />
     </DashboardLayout>
+    </>
   );
 }

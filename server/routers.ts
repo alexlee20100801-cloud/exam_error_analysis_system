@@ -93,6 +93,7 @@ import { smartReviewReminderRouter } from "./routers/smartReviewReminder";
 import { learningReportGenerationRouter } from "./routers/learningReportGeneration";
 import { printPreviewRouter } from "./routers/printPreview";
 import { collaborativeCollectionsRouter } from "./routers/collaborativeCollections";
+import { ogImageRouter } from "./routers/ogImage";
 
 export const appRouter = router({
   system: systemRouter,
@@ -222,6 +223,9 @@ export const appRouter = router({
   
   // 分享功能
   share: shareRouter,
+  
+  // OG图片生成
+  ogImage: ogImageRouter,
 
   // 学习提醒
   reviewReminders: reviewRemindersRouter,

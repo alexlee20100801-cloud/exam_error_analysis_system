@@ -1,19 +1,31 @@
 import { publicProcedure, router } from "../_core/trpc";
 import { db } from "../db";
-import { errorQuestionShares } from "../../drizzle/schema";
-import { desc } from "drizzle-orm";
+import { errorQuestionShares, collaborativeCollections } from "../../drizzle/schema";
+import { desc, eq } from "drizzle-orm";
 
 export const sitemapRouter = router({
   generate: publicProcedure.query(async () => {
     // 获取所有公开分享的错题
     const publicShares = await db
       .select({
-        shareId: errorQuestionShares.shareId,
+        shareCode: errorQuestionShares.shareCode,
         createdAt: errorQuestionShares.createdAt,
       })
       .from(errorQuestionShares)
+      .where(eq(errorQuestionShares.isActive, true))
       .orderBy(desc(errorQuestionShares.createdAt))
-      .limit(1000); // 限制最多1000条
+      .limit(1000); // 限制最変1000条
+    
+    // 获取所有公开的协作错题集
+    const publicCollections = await db
+      .select({
+        id: collaborativeCollections.id,
+        updatedAt: collaborativeCollections.updatedAt,
+      })
+      .from(collaborativeCollections)
+      .where(eq(collaborativeCollections.visibility, 'public'))
+      .orderBy(desc(collaborativeCollections.updatedAt))
+      .limit(500); // 限制最大500条
 
     // 构建sitemap XML
     const baseUrl = "https://exam-error-analysis.manus.space";
@@ -27,16 +39,28 @@ export const sitemapRouter = router({
       { url: "/error-questions", priority: "0.8", changefreq: "daily" },
       { url: "/knowledge-graph", priority: "0.7", changefreq: "weekly" },
       { url: "/learning-report", priority: "0.7", changefreq: "daily" },
+      { url: "/collaborative-collections", priority: "0.7", changefreq: "daily" },
+      { url: "/print-preview", priority: "0.6", changefreq: "weekly" },
       { url: "/settings", priority: "0.5", changefreq: "monthly" },
     ];
 
     // 动态页面（公开分享的错题）
-    const dynamicPages = publicShares.map((share) => ({
-      url: `/share/${share.shareId}`,
+    const sharedQuestionPages = publicShares.map((share) => ({
+      url: `/shared/${share.shareCode}`,
       priority: "0.6",
       changefreq: "weekly",
       lastmod: share.createdAt.toISOString().split("T")[0],
     }));
+    
+    // 动态页面（公开的协作错题集）
+    const collectionPages = publicCollections.map((collection) => ({
+      url: `/collaborative-collections/${collection.id}`,
+      priority: "0.6",
+      changefreq: "daily",
+      lastmod: collection.updatedAt.toISOString().split("T")[0],
+    }));
+    
+    const dynamicPages = [...sharedQuestionPages, ...collectionPages];
 
     const allPages = [...staticPages, ...dynamicPages];
 
@@ -60,6 +84,8 @@ ${allPages
       totalUrls: allPages.length,
       staticUrls: staticPages.length,
       dynamicUrls: dynamicPages.length,
+      sharedQuestions: sharedQuestionPages.length,
+      publicCollections: collectionPages.length,
     };
   }),
 });

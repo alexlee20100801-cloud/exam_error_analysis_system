@@ -5,8 +5,25 @@ import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Loader2, ZoomIn, ZoomOut, Maximize2, RefreshCw } from 'lucide-react';
+import { SEO } from '@/components/SEO';
 
 export default function KnowledgeGraph() {
+  const seoData = {
+    title: '知识图谱',
+    description: '深圳初高中知识图谱可视化系统,展示各学科知识点之间的关联关系,帮助学生系统化理解学科知识结构,发现知识点之间的内在联系。',
+    keywords: '知识图谱,知识点关系,学科知识结构,深圳初中,深圳高中,可视化学习',
+    ogImage: 'https://example.com/og-knowledge-graph.jpg',
+    structuredData: {
+      '@context': 'https://schema.org',
+      '@type': 'WebPage',
+      name: '知识图谱 - 深圳初高中错题分析学习系统',
+      description: '可视化展示各学科知识点关联关系,帮助学生系统化理解知识结构',
+      provider: {
+        '@type': 'Organization',
+        name: '深圳初高中错题分析学习系统'
+      }
+    }
+  };
   const cyRef = useRef<cytoscape.Core | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const [selectedSubject, setSelectedSubject] = useState<string>('math');
@@ -193,7 +210,9 @@ export default function KnowledgeGraph() {
   };
 
   return (
-    <div className="h-screen flex flex-col bg-background">
+    <>
+      <SEO {...seoData} />
+      <div className="h-screen flex flex-col bg-background">
       {/* 顶部控制栏 */}
       <div className="flex items-center justify-between p-4 border-b">
         <div className="flex items-center gap-4">
@@ -336,5 +355,6 @@ export default function KnowledgeGraph() {
         )}
       </div>
     </div>
+    </>
   );
 }

@@ -12,6 +12,7 @@ import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { toast } from "sonner";
 import { Loader2, Printer, FileDown, Save, Settings2, BookOpen, FileText, List } from "lucide-react";
+import { SEO } from "@/components/SEO";
 
 // 打印模板类型
 type PrintTemplate = "standard" | "notebook" | "exam" | "minimal";
@@ -45,6 +46,22 @@ const PRINT_TEMPLATES = {
 };
 
 export default function EnhancedPrintPreview() {
+  const seoData = {
+    title: '错题打印预览',
+    description: '错题打印预览和导出功能,支持多种打印模板,自定义排版设置,生成专业的错题本打印文档。',
+    keywords: '错题打印,打印预览,PDF导出,错题本,打印模板,深圳初中,深圳高中',
+    ogImage: 'https://example.com/og-print-preview.jpg',
+    structuredData: {
+      '@context': 'https://schema.org',
+      '@type': 'WebPage',
+      name: '错题打印预览 - 深圳初高中错题分析学习系统',
+      description: '专业的错题打印和导出功能,支持多种模板和自定义排版',
+      provider: {
+        '@type': 'Organization',
+        name: '深圳初高中错题分析学习系统'
+      }
+    }
+  };
   const [, params] = useRoute("/enhanced-print-preview/:questionIds");
   const [, navigate] = useLocation();
 
@@ -138,7 +155,9 @@ export default function EnhancedPrintPreview() {
 
   if (questionIds.length === 0) {
     return (
-      <div className="container py-8">
+      <>
+        <SEO {...seoData} />
+        <div className="container py-8">
         <Card className="p-6">
           <p className="text-center text-muted-foreground">
             请从错题列表选择要打印的错题
@@ -150,19 +169,25 @@ export default function EnhancedPrintPreview() {
           </div>
         </Card>
       </div>
+      </>
     );
   }
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
+      <>
+        <SEO {...seoData} />
+        <div className="flex items-center justify-center min-h-screen">
         <Loader2 className="h-8 w-8 animate-spin" />
       </div>
+      </>
     );
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <>
+      <SEO {...seoData} />
+      <div className="min-h-screen bg-background">
       {/* 工具栏 - 不打印 */}
       <div className="print:hidden border-b bg-card sticky top-0 z-10">
         <div className="container py-4">
@@ -585,5 +610,6 @@ export default function EnhancedPrintPreview() {
         }
       `}</style>
     </div>
+    </>
   );
 }

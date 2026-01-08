@@ -11,8 +11,25 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Plus, Users, FileText, MessageSquare, Lock, Globe, Link as LinkIcon } from "lucide-react";
 import { useLocation } from "wouter";
 import { toast } from "sonner";
+import { SEO } from "@/components/SEO";
 
 export default function CollaborativeCollections() {
+  const seoData = {
+    title: '协作错题集',
+    description: '创建和管理协作错题集,邀请同学和老师共同构建错题库,分享学习经验,互相讨论和评论,提升学习效率。',
+    keywords: '协作学习,错题集,团队学习,共享错题,学习小组,深圳初中,深圳高中',
+    ogImage: 'https://example.com/og-collaborative.jpg',
+    structuredData: {
+      '@context': 'https://schema.org',
+      '@type': 'WebPage',
+      name: '协作错题集 - 深圳初高中错题分析学习系统',
+      description: '团队协作学习平台,共同构建错题库,分享学习经验',
+      provider: {
+        '@type': 'Organization',
+        name: '深圳初高中错题分析学习系统'
+      }
+    }
+  };
   const [, setLocation] = useLocation();
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const [newCollectionName, setNewCollectionName] = useState("");
@@ -73,16 +90,21 @@ export default function CollaborativeCollections() {
 
   if (isLoading) {
     return (
-      <div className="container mx-auto py-8">
-        <div className="flex items-center justify-center h-64">
-          <div className="text-muted-foreground">加载中...</div>
+      <>
+        <SEO {...seoData} />
+        <div className="container mx-auto py-8">
+          <div className="flex items-center justify-center h-64">
+            <div className="text-muted-foreground">加载中...</div>
+          </div>
         </div>
-      </div>
+      </>
     );
   }
 
   return (
-    <div className="container mx-auto py-8">
+    <>
+      <SEO {...seoData} />
+      <div className="container mx-auto py-8">
       <div className="flex items-center justify-between mb-8">
         <div>
           <h1 className="text-3xl font-bold">协作错题集</h1>
@@ -276,5 +298,6 @@ export default function CollaborativeCollections() {
         </TabsContent>
       </Tabs>
     </div>
+    </>
   );
 }
