@@ -97,6 +97,7 @@ import { ogImageRouter } from "./routers/ogImage";
 import { sitemapAutoUpdateRouter } from "./routers/sitemapAutoUpdate";
 import { sitemapHistoryRouter } from "./routers/sitemapHistory";
 import { structuredDataValidationRouter } from "./routers/structuredDataValidation";
+import { seoRouter } from "./seoRouter";
 
 export const appRouter = router({
   system: systemRouter,
@@ -200,6 +201,9 @@ export const appRouter = router({
   
   // 结构化数据验证
   structuredDataValidation: structuredDataValidationRouter,
+  
+  // SEO管理
+  seo: seoRouter,
   
   // 打印预览
   printPreview: printPreviewRouter,

@@ -76,6 +76,7 @@ import CollaborativeCollections from "@/pages/CollaborativeCollections";
 import CollaborativeCollectionDetail from "@/pages/CollaborativeCollectionDetail";
 import BatchUploadWithCrop from "@/pages/BatchUploadWithCrop";
 import EnhancedPrintPreview from "@/pages/EnhancedPrintPreview";
+import SeoManagement from "@/pages/SeoManagement";
 
 function Router() {
   return (
@@ -98,6 +99,7 @@ function Router() {
       <Route path="/learning-dashboard" component={LearningDashboard} />
       <Route path="/learning-analytics" component={LearningAnalytics} />
       <Route path="/smart-review-reminder" component={SmartReviewReminder} />
+      <Route path="/admin/seo" component={SeoManagement} />
       <Route path="/learning-report-generation" component={LearningReportGeneration} />
       <Route path="/print-preview/:questionIds" component={PrintPreview} />
       <Route path="/enhanced-print-preview/:questionIds" component={EnhancedPrintPreview} />

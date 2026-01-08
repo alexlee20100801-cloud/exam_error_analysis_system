@@ -35,6 +35,25 @@ export { idCards, type IdCard, type NewIdCard } from "./id_card_schema";
 // 导入Sitemap更新历史schema
 export { sitemapUpdateHistory } from "./sitemap_history_schema";
 
+// 导入SEO管理schema
+export {
+  sitemapHistory,
+  schemaValidationResults,
+  seoStats,
+  gscDataCache,
+  seoPriorityHistory,
+  type SitemapHistory,
+  type NewSitemapHistory,
+  type SchemaValidationResult,
+  type NewSchemaValidationResult,
+  type SeoStat,
+  type NewSeoStat,
+  type GscDataCache,
+  type NewGscDataCache,
+  type SeoPriorityHistory,
+  type NewSeoPriorityHistory
+} from "./seo_management_schema";
+
 // 导入查重去噪 schema
 export { 
   questionSimilarities, 
