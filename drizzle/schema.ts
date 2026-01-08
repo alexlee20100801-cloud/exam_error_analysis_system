@@ -1239,6 +1239,13 @@ export const users = mysqlTable("users", {
 	theme: mysqlEnum(['light','dark','system']).default('system'),
 	points: int().default(0).notNull(),
 	total_feedback_count: int("total_feedback_count").default(0).notNull(),
+	subjectPreferences: json("subject_preferences"),
+	learningGoals: json("learning_goals"),
+	dailyStudyTime: int("daily_study_time").default(30),
+	preferredReviewTime: varchar("preferred_review_time", { length: 10 }).default('20:00'),
+	notificationEnabled: tinyint("notification_enabled").default(1),
+	reviewReminderEnabled: tinyint("review_reminder_enabled").default(1),
+	goalReminderEnabled: tinyint("goal_reminder_enabled").default(1),
 },
 (table) => [
 	index("users_openId_unique").on(table.openId),

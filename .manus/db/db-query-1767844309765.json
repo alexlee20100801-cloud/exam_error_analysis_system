@@ -1,0 +1,9 @@
+{
+  "query": "ALTER TABLE users \nADD COLUMN subject_preferences JSON,\nADD COLUMN learning_goals JSON,\nADD COLUMN daily_study_time INT DEFAULT 30,\nADD COLUMN preferred_review_time VARCHAR(10) DEFAULT '20:00',\nADD COLUMN notification_enabled TINYINT DEFAULT 1,\nADD COLUMN review_reminder_enabled TINYINT DEFAULT 1,\nADD COLUMN goal_reminder_enabled TINYINT DEFAULT 1;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway03.us-east-1.prod.aws.tidbcloud.com --port 4000 --user Lfr9xqjx7LpxUD9.1efa314e7813 --database Yh4Z4ZSitSFdPWYxtKkkQS --execute ALTER TABLE users \nADD COLUMN subject_preferences JSON,\nADD COLUMN learning_goals JSON,\nADD COLUMN daily_study_time INT DEFAULT 30,\nADD COLUMN preferred_review_time VARCHAR(10) DEFAULT '20:00',\nADD COLUMN notification_enabled TINYINT DEFAULT 1,\nADD COLUMN review_reminder_enabled TINYINT DEFAULT 1,\nADD COLUMN goal_reminder_enabled TINYINT DEFAULT 1;",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 3592
+}

@@ -34,10 +34,10 @@ export default function Dashboard() {
             <p className="text-muted-foreground mt-2">欢迎回来！查看你的学习进度和待办任务</p>
           </div>
           <div className="flex gap-2">
-            <Button asChild size="lg">
-              <Link href="/error-questions">
+            <Button asChild size="lg" className="bg-gradient-to-r from-primary to-chart-2">
+              <Link href="/upload">
                 <Plus className="mr-2 h-4 w-4" />
-                添加错题
+                上传错题
               </Link>
             </Button>
             {reviewStats && reviewStats.pending > 0 && (
@@ -50,6 +50,68 @@ export default function Dashboard() {
             )}
           </div>
         </div>
+        
+        {/* 新用户引导卡片 */}
+        {totalQuestions === 0 && (
+          <Card className="border-primary bg-gradient-to-r from-primary/5 to-chart-2/5">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2 text-primary">
+                <Target className="h-5 w-5" />
+                开始你的学习之旅
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                <p className="text-sm text-muted-foreground">
+                  欢迎使用智能错题本！让我们帮助你快速开始：
+                </p>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                  <Button asChild variant="outline" className="h-auto py-4 flex-col items-start">
+                    <Link href="/upload">
+                      <div className="flex items-center gap-2 mb-2">
+                        <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
+                          <span className="font-bold text-primary">1</span>
+                        </div>
+                        <span className="font-semibold">上传错题</span>
+                      </div>
+                      <p className="text-xs text-muted-foreground text-left">
+                        拍照上传你的错题，体验AI智能分析
+                      </p>
+                    </Link>
+                  </Button>
+                  
+                  <Button asChild variant="outline" className="h-auto py-4 flex-col items-start">
+                    <Link href="/settings">
+                      <div className="flex items-center gap-2 mb-2">
+                        <div className="w-8 h-8 rounded-full bg-chart-2/10 flex items-center justify-center">
+                          <span className="font-bold text-chart-2">2</span>
+                        </div>
+                        <span className="font-semibold">完善资料</span>
+                      </div>
+                      <p className="text-xs text-muted-foreground text-left">
+                        填写年级、学科等信息，获得个性化推荐
+                      </p>
+                    </Link>
+                  </Button>
+                  
+                  <Button asChild variant="outline" className="h-auto py-4 flex-col items-start">
+                    <Link href="/settings">
+                      <div className="flex items-center gap-2 mb-2">
+                        <div className="w-8 h-8 rounded-full bg-chart-3/10 flex items-center justify-center">
+                          <span className="font-bold text-chart-3">3</span>
+                        </div>
+                        <span className="font-semibold">设置提醒</span>
+                      </div>
+                      <p className="text-xs text-muted-foreground text-left">
+                        配置复习提醒和学习目标，养成好习惯
+                      </p>
+                    </Link>
+                  </Button>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        )}
 
         {/* 今日待复习提醒卡片 */}
         {reminderStats && reminderStats.stats && reminderStats.stats.pendingDue > 0 && (

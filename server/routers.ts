@@ -86,6 +86,7 @@ import { auditEnhancementRouter } from "./routers/auditEnhancement";
 import { scheduledTasksManagementRouter } from "./routers/scheduledTasksManagement";
 import { notificationManagementRouter } from "./routers/notificationManagement";
 import { notificationConfigRouter } from "./routers/notificationConfig";
+import { userProfileRouter } from "./routers/userProfile";
 
 export const appRouter = router({
   system: systemRouter,
@@ -165,6 +166,9 @@ export const appRouter = router({
   // 通知管理
   notificationManagement: notificationManagementRouter,
   notificationConfig: notificationConfigRouter,
+  
+  // 用户资料管理
+  userProfile: userProfileRouter,
   
   // 积分系统
   points: pointsRouter,
