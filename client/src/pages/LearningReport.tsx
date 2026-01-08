@@ -3,6 +3,8 @@ import DashboardLayout from "@/components/DashboardLayout";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { trpc } from "@/lib/trpc";
+import { LearningReportSkeleton, ChartSkeleton, StatCardSkeleton } from "@/components/LearningReportSkeleton";
+import { ErrorRetry, ChartError } from "@/components/ErrorRetry";
 import { 
   BarChart3, 
   Brain, 
@@ -74,45 +76,95 @@ export default function LearningReport() {
   const [showNotificationSettings, setShowNotificationSettings] = useState(false);
 
   // 获取学习总览数据
-  const { data: overview, isLoading: overviewLoading } = trpc.learningStats.getOverview.useQuery(
+  const { data: overview, isLoading: overviewLoading, error: overviewError, refetch: refetchOverview } = trpc.learningStats.getOverview.useQuery(
     undefined,
-    { enabled: !!user }
+    { 
+      enabled: !!user,
+      staleTime: 5 * 60 * 1000, // 5分钟内数据视为新鲜
+      cacheTime: 10 * 60 * 1000, // 缓存保留10分钟
+      retry: 2, // 失败后重试2次
+      retryDelay: 1000, // 重试延迟1秒
+    }
   );
 
   // 获取知识点掌握度数据（雷达图）
-  const { data: masteryData, isLoading: masteryLoading } = trpc.learningStats.getKnowledgePointMastery.useQuery(
+  const { data: masteryData, isLoading: masteryLoading, error: masteryError, refetch: refetchMastery } = trpc.learningStats.getKnowledgePointMastery.useQuery(
     { limit: 8 },
-    { enabled: !!user }
+    { 
+      enabled: !!user,
+      staleTime: 5 * 60 * 1000,
+      cacheTime: 10 * 60 * 1000,
+      retry: 2,
+      retryDelay: 1000,
+    }
   );
 
   // 获取错题分布数据（饼图）
-  const { data: distributionData, isLoading: distributionLoading } = trpc.learningStats.getErrorDistribution.useQuery(
+  const { data: distributionData, isLoading: distributionLoading, error: distributionError, refetch: refetchDistribution } = trpc.learningStats.getErrorDistribution.useQuery(
     undefined,
-    { enabled: !!user }
+    { 
+      enabled: !!user,
+      staleTime: 5 * 60 * 1000,
+      cacheTime: 10 * 60 * 1000,
+      retry: 2,
+      retryDelay: 1000,
+    }
   );
 
   // 获取学习时长趋势数据（折线图）
-  const { data: trendData, isLoading: trendLoading } = trpc.learningStats.getLearningTimeTrend.useQuery(
+  const { data: trendData, isLoading: trendLoading, error: trendError, refetch: refetchTrend } = trpc.learningStats.getLearningTimeTrend.useQuery(
     { days: 30 },
-    { enabled: !!user }
+    { 
+      enabled: !!user,
+      staleTime: 5 * 60 * 1000,
+      cacheTime: 10 * 60 * 1000,
+      retry: 2,
+      retryDelay: 1000,
+    }
   );
 
   // 获取错题统计数据
-  const { data: errorSubjectDist } = trpc.errorQuestionStats.getSubjectDistribution.useQuery(
+  const { data: errorSubjectDist, error: errorSubjectError, refetch: refetchErrorSubject } = trpc.errorQuestionStats.getSubjectDistribution.useQuery(
     undefined,
-    { enabled: !!user }
+    { 
+      enabled: !!user,
+      staleTime: 5 * 60 * 1000,
+      cacheTime: 10 * 60 * 1000,
+      retry: 2,
+      retryDelay: 1000,
+    }
   );
-  const { data: errorDifficultyDist } = trpc.errorQuestionStats.getDifficultyDistribution.useQuery(
+  const { data: errorDifficultyDist, error: errorDifficultyError, refetch: refetchErrorDifficulty } = trpc.errorQuestionStats.getDifficultyDistribution.useQuery(
     undefined,
-    { enabled: !!user }
+    { 
+      enabled: !!user,
+      staleTime: 5 * 60 * 1000,
+      cacheTime: 10 * 60 * 1000,
+      retry: 2,
+      retryDelay: 1000,
+    }
   );
-  const { data: errorKnowledgeMastery } = trpc.errorQuestionStats.getKnowledgePointMastery.useQuery(
+  const { data: errorKnowledgeMastery, error: errorKnowledgeError, refetch: refetchErrorKnowledge } = trpc.errorQuestionStats.getKnowledgePointMastery.useQuery(
     { limit: 8 },
-    { enabled: !!user }
+    { 
+      enabled: !!user,
+      staleTime: 5 * 60 * 1000,
+      cacheTime: 10 * 60 * 1000,
+      retry: 2,
+      retryDelay: 1000,
+    }
   );
 
   // AI学习建议
-  const { data: aiAdvice, isLoading: aiAdviceLoading } = trpc.aiLearningAdvice.generate.useQuery();
+  const { data: aiAdvice, isLoading: aiAdviceLoading, error: aiAdviceError, refetch: refetchAiAdvice } = trpc.aiLearningAdvice.generate.useQuery(
+    undefined,
+    {
+      staleTime: 10 * 60 * 1000, // AI建议缓存10分钟
+      cacheTime: 30 * 60 * 1000, // 保留30分钟
+      retry: 1,
+      retryDelay: 2000,
+    }
+  );
   
   // 复习任务
   const { data: latestTasks, refetch: refetchTasks } = trpc.reviewTasks.getLatest.useQuery();
@@ -162,10 +214,7 @@ export default function LearningReport() {
   if (authLoading) {
     return (
       <DashboardLayout>
-        <div className="space-y-4">
-          <Skeleton className="h-12 w-full" />
-          <Skeleton className="h-64 w-full" />
-        </div>
+        <LearningReportSkeleton />
       </DashboardLayout>
     );
   }
@@ -249,7 +298,25 @@ export default function LearningReport() {
 
         {/* AI学习建议 */}
         {aiAdviceLoading ? (
-          <Skeleton className="h-96" />
+          <Card className="border-2 border-primary/20">
+            <CardHeader>
+              <div className="space-y-2">
+                <Skeleton className="h-6 w-48" />
+                <Skeleton className="h-4 w-32" />
+              </div>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <Skeleton className="h-24 w-full" />
+              <Skeleton className="h-24 w-full" />
+              <Skeleton className="h-24 w-full" />
+            </CardContent>
+          </Card>
+        ) : aiAdviceError ? (
+          <ErrorRetry 
+            title="AI学习建议加载失败" 
+            message="无法生成AI学习建议，请稍后重试" 
+            onRetry={() => refetchAiAdvice()} 
+          />
         ) : aiAdvice && aiAdvice.data ? (
           <Card className="border-2 border-primary/20 bg-gradient-to-br from-primary/5 to-transparent">
             <CardHeader>
@@ -529,7 +596,9 @@ export default function LearningReport() {
             </CardHeader>
             <CardContent>
               {masteryLoading ? (
-                <Skeleton className="h-[300px]" />
+                <ChartSkeleton height={300} />
+              ) : masteryError ? (
+                <ChartError message="知识点掌握度数据加载失败" onRetry={() => refetchMastery()} height={300} />
               ) : radarChartData.length > 0 ? (
                 <ResponsiveContainer width="100%" height={300}>
                   <RadarChart data={radarChartData}>
@@ -565,7 +634,9 @@ export default function LearningReport() {
             </CardHeader>
             <CardContent>
               {distributionLoading ? (
-                <Skeleton className="h-[300px]" />
+                <ChartSkeleton height={300} />
+              ) : distributionError ? (
+                <ChartError message="错题分布数据加载失败" onRetry={() => refetchDistribution()} height={300} />
               ) : pieChartData.length > 0 ? (
                 <ResponsiveContainer width="100%" height={300}>
                   <PieChart>
@@ -693,7 +764,9 @@ export default function LearningReport() {
               {/* 学科分布饼图 */}
               <div className="space-y-2">
                 <h3 className="text-sm font-medium text-center">学科分布</h3>
-                {errorSubjectDist && errorSubjectDist.data && errorSubjectDist.data.length > 0 ? (
+                {errorSubjectError ? (
+                  <ChartError message="学科分布数据加载失败" onRetry={() => refetchErrorSubject()} height={250} />
+                ) : errorSubjectDist && errorSubjectDist.data && errorSubjectDist.data.length > 0 ? (
                   <RechartsResponsiveContainer width="100%" height={250}>
                     <PieChart>
                       <Pie
@@ -726,7 +799,9 @@ export default function LearningReport() {
               {/* 难度分布柱状图 */}
               <div className="space-y-2">
                 <h3 className="text-sm font-medium text-center">难度分布</h3>
-                {errorDifficultyDist && errorDifficultyDist.data && errorDifficultyDist.data.length > 0 ? (
+                {errorDifficultyError ? (
+                  <ChartError message="难度分布数据加载失败" onRetry={() => refetchErrorDifficulty()} height={250} />
+                ) : errorDifficultyDist && errorDifficultyDist.data && errorDifficultyDist.data.length > 0 ? (
                   <RechartsResponsiveContainer width="100%" height={250}>
                     <BarChart data={errorDifficultyDist.data.map(item => ({
                       difficulty: item.difficulty === "easy" ? "简单" : item.difficulty === "medium" ? "中等" : "困难",
@@ -749,7 +824,9 @@ export default function LearningReport() {
               {/* 知识点掌握度雷达图 */}
               <div className="space-y-2">
                 <h3 className="text-sm font-medium text-center">知识点掌握度</h3>
-                {errorKnowledgeMastery && errorKnowledgeMastery.data && errorKnowledgeMastery.data.length > 0 ? (
+                {errorKnowledgeError ? (
+                  <ChartError message="知识点掌握度数据加载失败" onRetry={() => refetchErrorKnowledge()} height={250} />
+                ) : errorKnowledgeMastery && errorKnowledgeMastery.data && errorKnowledgeMastery.data.length > 0 ? (
                   <ResponsiveContainer width="100%" height={250}>
                     <RadarChart data={errorKnowledgeMastery.data.map(item => ({
                       subject: item.knowledgePointName.length > 6 ? item.knowledgePointName.slice(0, 6) + "..." : item.knowledgePointName,
