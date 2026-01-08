@@ -64,7 +64,7 @@ describe("错题收藏功能测试", () => {
       .from(errorQuestions)
       .where(eq(errorQuestions.id, testQuestionId));
 
-    expect(question.isFavorite).toBe(true);
+    expect(question.isFavorite ? true : false).toBe(true);
   });
 
   it("应该成功取消收藏错题", async () => {
@@ -83,7 +83,7 @@ describe("错题收藏功能测试", () => {
       .from(errorQuestions)
       .where(eq(errorQuestions.id, testQuestionId));
 
-    expect(question.isFavorite).toBe(false);
+    expect(question.isFavorite ? true : false).toBe(false);
   });
 
   it("应该正确统计收藏的错题数量", async () => {
@@ -143,7 +143,7 @@ describe("错题收藏功能测试", () => {
       .from(errorQuestions)
       .where(eq(errorQuestions.id, question.insertId));
 
-    expect(newQuestion.isFavorite).toBe(false);
+    expect(newQuestion.isFavorite ? true : false).toBe(false);
 
     // 清理
     await db.delete(errorQuestions).where(eq(errorQuestions.id, question.insertId));

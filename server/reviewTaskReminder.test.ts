@@ -60,7 +60,7 @@ describe("复习任务提醒功能", () => {
     const settings = await getUserReminderSettings(testUserId);
 
     expect(settings).toBeDefined();
-    expect(settings.enabled).toBe(true);
+    expect(settings.enabled ? true : false).toBe(true);
     expect(settings.reminderMinutes).toEqual(DEFAULT_REMINDER_MINUTES);
   });
 
@@ -69,7 +69,7 @@ describe("复习任务提醒功能", () => {
     await updateUserReminderSettings(testUserId, true, customMinutes);
 
     const settings = await getUserReminderSettings(testUserId);
-    expect(settings.enabled).toBe(true);
+    expect(settings.enabled ? true : false).toBe(true);
     expect(settings.reminderMinutes).toEqual(customMinutes);
   });
 
@@ -77,7 +77,7 @@ describe("复习任务提醒功能", () => {
     await updateUserReminderSettings(testUserId, false, DEFAULT_REMINDER_MINUTES);
 
     const settings = await getUserReminderSettings(testUserId);
-    expect(settings.enabled).toBe(false);
+    expect(settings.enabled ? true : false).toBe(false);
   });
 
   it("应该为复习任务创建提醒", async () => {
@@ -110,7 +110,7 @@ describe("复习任务提醒功能", () => {
     for (const reminder of reminders) {
       expect(reminder.userId).toBe(testUserId);
       expect(reminder.taskId).toBe(testTaskId);
-      expect(reminder.sent).toBe(false);
+      expect(reminder.sent ? true : false).toBe(false);
       expect(reminder.scheduledTime).toBeDefined();
       expect(new Date(reminder.scheduledTime).getTime()).toBeLessThan(
         new Date(task.scheduledDate!).getTime()

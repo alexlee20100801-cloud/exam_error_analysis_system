@@ -1335,3 +1335,57 @@ export async function getOcrProcessingLogs(rawQuestionId: number) {
     .where(eq(ocrProcessingLogs.rawQuestionId, rawQuestionId))
     .orderBy(desc(ocrProcessingLogs.createdAt));
 }
+
+
+/**
+ * 将数据库的tinyint类型转换为布尔值
+ * MySQL的tinyint(1)存储为0/1，需要转换为true/false
+ */
+export function convertTinyintToBoolean<T extends Record<string, any>>(
+  data: T,
+  booleanFields: (keyof T)[]
+): T {
+  const result = { ...data };
+  for (const field of booleanFields) {
+    if (field in result && result[field] !== null && result[field] !== undefined) {
+      result[field] = result[field] ? true : false;
+    }
+  }
+  return result;
+}
+
+/**
+ * 批量转换tinyint为布尔值
+ */
+export function convertTinyintToBooleanArray<T extends Record<string, any>>(
+  data: T[],
+  booleanFields: (keyof T)[]
+): T[] {
+  return data.map(item => convertTinyintToBoolean(item, booleanFields));
+}
+
+/**
+ * 将字符串日期转换为Date对象
+ */
+export function convertStringToDate<T extends Record<string, any>>(
+  data: T,
+  dateFields: (keyof T)[]
+): T {
+  const result = { ...data };
+  for (const field of dateFields) {
+    if (field in result && typeof result[field] === 'string') {
+      result[field] = new Date(result[field] as string) as any;
+    }
+  }
+  return result;
+}
+
+/**
+ * 批量转换字符串日期为Date对象
+ */
+export function convertStringToDateArray<T extends Record<string, any>>(
+  data: T[],
+  dateFields: (keyof T)[]
+): T[] {
+  return data.map(item => convertStringToDate(item, dateFields));
+}
