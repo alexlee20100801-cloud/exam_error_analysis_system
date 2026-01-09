@@ -202,7 +202,7 @@ export async function analyzeUserWeakness(userId: number): Promise<WeaknessAnaly
   }
 
   // 6. 计算整体掌握率
-  const masteredCount = userErrors.filter(e => e.isMastered === 1).length;
+  const masteredCount = userErrors.filter((e: any) => e.isMastered === 1).length;
   const overallMasteryRate = (masteredCount / userErrors.length) * 100;
 
   // 7. 生成学习建议

@@ -59,9 +59,7 @@ const coreMenuGroup: MenuGroup = {
     { id: "error-questions", icon: BookOpen, label: "错题本", path: "/error-questions", isCore: true },
     { id: "junior-errors", icon: School, label: "初中错题", path: "/error-questions?level=junior", indent: true, schoolLevel: "junior" },
     { id: "senior-errors", icon: GraduationCap, label: "高中错题", path: "/error-questions?level=senior", indent: true, schoolLevel: "senior" },
-    { id: "upload-error-question", icon: Upload, label: "上传错题", path: "/upload-error-question", isCore: true },
-    { id: "batch-upload-crop", icon: Crop, label: "批量上传裁剪", path: "/batch-upload-crop", indent: true },
-    { id: "document-upload", icon: Upload, label: "多格式上传", path: "/document-upload", indent: true },
+    { id: "upload-error-question", icon: Upload, label: "上传错题", path: "/upload-error-questions", isCore: true },
   ]
 };
 

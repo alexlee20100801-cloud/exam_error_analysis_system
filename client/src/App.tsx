@@ -76,6 +76,7 @@ import CollaborativeCollections from "@/pages/CollaborativeCollections";
 import CollaborativeCollectionDetail from "@/pages/CollaborativeCollectionDetail";
 import BatchUploadWithCrop from "@/pages/BatchUploadWithCrop";
 import EnhancedPrintPreview from "@/pages/EnhancedPrintPreview";
+import UnifiedUpload from "@/pages/UnifiedUpload";
 import SeoManagement from "@/pages/SeoManagement";
 import CrawlerManagement from "@/pages/CrawlerManagement";
 import AIExamPaperGeneration from "@/pages/AIExamPaperGeneration";
@@ -143,6 +144,7 @@ function Router() {
           <Route path="/practice-history" component={PracticeHistory} />
           <Route path="/smart-scanner" component={SmartScanner} />
           <Route path="/id-card-management" component={IdCardManagement} />
+      <Route path="/upload-error-questions" component={UnifiedUpload} />
       <Route path="/document-upload" component={DocumentUpload} />
       <Route path="/document-editor" component={DocumentEditor} />
       <Route path="/document-editor/:id" component={DocumentEditor} />
