@@ -1,7 +1,7 @@
 import DashboardLayout from "@/components/DashboardLayout";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { trpc } from "@/lib/trpc";
-import { BookOpen, Brain, Target, TrendingUp, Calendar, Video, Trophy, Flame, GraduationCap, BookMarked, Plus, Play, BarChart3, AlertCircle, Star, Bell, Clock } from "lucide-react";
+import { BookOpen, Brain, Target, TrendingUp, Calendar, Video, Trophy, Flame, GraduationCap, BookMarked, Play, BarChart3, AlertCircle, Star, Bell, Clock } from "lucide-react";
 import { SCHOOL_LEVELS, SUBJECTS } from "../../../shared/subjects";
 import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
@@ -34,12 +34,6 @@ export default function Dashboard() {
             <p className="text-muted-foreground mt-2">欢迎回来！查看你的学习进度和待办任务</p>
           </div>
           <div className="flex gap-2">
-            <Button asChild size="lg" className="bg-gradient-to-r from-primary to-chart-2">
-              <Link href="/upload">
-                <Plus className="mr-2 h-4 w-4" />
-                上传错题
-              </Link>
-            </Button>
             {reviewStats && reviewStats.pending > 0 && (
               <Button asChild size="lg" variant="outline">
                 <Link href="/review">
@@ -65,26 +59,12 @@ export default function Dashboard() {
                 <p className="text-sm text-muted-foreground">
                   欢迎使用智能错题本！让我们帮助你快速开始：
                 </p>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-                  <Button asChild variant="outline" className="h-auto py-4 flex-col items-start">
-                    <Link href="/upload">
-                      <div className="flex items-center gap-2 mb-2">
-                        <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
-                          <span className="font-bold text-primary">1</span>
-                        </div>
-                        <span className="font-semibold">上传错题</span>
-                      </div>
-                      <p className="text-xs text-muted-foreground text-left">
-                        拍照上传你的错题，体验AI智能分析
-                      </p>
-                    </Link>
-                  </Button>
-                  
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                   <Button asChild variant="outline" className="h-auto py-4 flex-col items-start">
                     <Link href="/settings">
                       <div className="flex items-center gap-2 mb-2">
                         <div className="w-8 h-8 rounded-full bg-chart-2/10 flex items-center justify-center">
-                          <span className="font-bold text-chart-2">2</span>
+                          <span className="font-bold text-chart-2">1</span>
                         </div>
                         <span className="font-semibold">完善资料</span>
                       </div>
@@ -98,7 +78,7 @@ export default function Dashboard() {
                     <Link href="/settings">
                       <div className="flex items-center gap-2 mb-2">
                         <div className="w-8 h-8 rounded-full bg-chart-3/10 flex items-center justify-center">
-                          <span className="font-bold text-chart-3">3</span>
+                          <span className="font-bold text-chart-3">2</span>
                         </div>
                         <span className="font-semibold">设置提醒</span>
                       </div>
