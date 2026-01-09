@@ -1,6 +1,9 @@
 import { mysqlTable, mysqlEnum, int, varchar, text, timestamp, json, decimal, tinyint, index, unique, primaryKey, mysqlView } from "drizzle-orm/mysql-core"
 import { sql } from "drizzle-orm"
 
+// 高级功能 schema将在后续的开发中逐步添加
+// 详见DEVELOPMENT_GUIDE.md中的实施指南
+
 // 导入分享功能的schema
 export { errorQuestionShares, shareAccessLogs, type ErrorQuestionShare, type NewErrorQuestionShare, type ShareAccessLog, type NewShareAccessLog } from "./share_schema";
 
@@ -627,43 +630,8 @@ export const exams = mysqlTable("exams", {
 	updatedAt: timestamp({ mode: 'string' }).defaultNow().onUpdateNow().notNull(),
 });
 
-export const exportTemplates = mysqlTable("export_templates", {
-	id: int().autoincrement().notNull(),
-	userId: int("user_id").notNull(),
-	name: varchar({ length: 100 }).notNull(),
-	isDefault: tinyint("is_default").default(0).notNull(),
-	isPublic: tinyint("is_public").default(0).notNull(),
-	logoUrl: varchar("logo_url", { length: 500 }),
-	logoPosition: mysqlEnum("logo_position", ['top-left','top-center','top-right']).default('top-left'),
-	logoWidth: int("logo_width").default(100),
-	headerText: varchar("header_text", { length: 500 }),
-	headerAlign: mysqlEnum("header_align", ['left','center','right']).default('center'),
-	headerFontSize: int("header_font_size").default(14),
-	footerText: varchar("footer_text", { length: 500 }),
-	footerAlign: mysqlEnum("footer_align", ['left','center','right']).default('center'),
-	footerFontSize: int("footer_font_size").default(12),
-	showPageNumber: tinyint("show_page_number").default(1).notNull(),
-	fontSize: int("font_size").default(12),
-	lineSpacing: int("line_spacing").default(150),
-	marginTop: int("margin_top").default(20),
-	marginBottom: int("margin_bottom").default(20),
-	marginLeft: int("margin_left").default(20),
-	marginRight: int("margin_right").default(20),
-	showQuestionNumber: tinyint("show_question_number").default(1).notNull(),
-	showDifficulty: tinyint("show_difficulty").default(1).notNull(),
-	showKnowledgePoints: tinyint("show_knowledge_points").default(1).notNull(),
-	showAnswer: tinyint("show_answer").default(1).notNull(),
-	showExplanation: tinyint("show_explanation").default(1).notNull(),
-	paperSize: mysqlEnum("paper_size", ['A4','A5','Letter']).default('A4'),
-	orientation: mysqlEnum(['portrait','landscape']).default('portrait'),
-	usageCount: int("usage_count").default(0).notNull(),
-	createdAt: timestamp("created_at", { mode: 'string' }).default('CURRENT_TIMESTAMP').notNull(),
-	updatedAt: timestamp("updated_at", { mode: 'string' }).defaultNow().onUpdateNow().notNull(),
-},
-(table) => [
-	index("user_id_idx").on(table.userId),
-	index("is_public_idx").on(table.isPublic),
-]);
+// 旧的exportTemplates已经改为advanced_features_schema中的新版本
+// 详见advanced_features_schema.ts
 
 export const favoriteFolders = mysqlTable("favorite_folders", {
 	id: int().autoincrement().notNull(),
@@ -861,7 +829,7 @@ export const paymentConfigs = mysqlTable("payment_configs", {
 ]);
 
 export const practicePools = mysqlTable("practice_pools", {
-	id: int().autoincrement().notNull(),
+	id: int().autoincrement().primaryKey().notNull(),
 	userId: int("user_id").notNull(),
 	sourceErrorQuestionId: int("source_error_question_id").notNull(),
 	practiceQuestionId: int("practice_question_id").notNull(),
@@ -872,10 +840,14 @@ export const practicePools = mysqlTable("practice_pools", {
 	score: int(),
 	createdAt: timestamp("created_at", { mode: 'string' }).default('CURRENT_TIMESTAMP').notNull(),
 	updatedAt: timestamp("updated_at", { mode: 'string' }).defaultNow().onUpdateNow().notNull(),
-});
+	});
 
+export type PracticePool = typeof practicePools.$inferSelect;
+export type NewPracticePool = typeof practicePools.$inferInsert;
+
+// 瑑练记录表
 export const practiceRecords = mysqlTable("practice_records", {
-	id: int().autoincrement().notNull(),
+	id: int().autoincrement().primaryKey().notNull(),
 	userId: int().notNull(),
 	questionId: int().notNull(),
 	questionType: mysqlEnum(['error_question','practice_question']).notNull(),
@@ -886,7 +858,7 @@ export const practiceRecords = mysqlTable("practice_records", {
 	subject: mysqlEnum(['chinese','math','english','physics','chemistry','biology','politics','history','geography']).notNull(),
 	grade: mysqlEnum(['junior1','junior2','junior3','senior1','senior2','senior3']).notNull(),
 	createdAt: timestamp({ mode: 'string' }).default('CURRENT_TIMESTAMP').notNull(),
-});
+	});
 
 // 练习会话表 - 跟踪每次练习的整体情况
 export const practiceSessions = mysqlTable("practice_sessions", {
@@ -1737,39 +1709,11 @@ export type CropHistory = typeof cropHistory.$inferSelect;
 export type NewCropHistory = typeof cropHistory.$inferInsert;
 
 // ==================== 第一阶段：基础数据采集和处理 ====================
-
-// 爬虫任务表
-export const crawlerTasks = mysqlTable("crawler_tasks", {
-	id: int().autoincrement().primaryKey().notNull(),
-	taskName: varchar("task_name", { length: 255 }).notNull(),
-	taskType: mysqlEnum("task_type", ['education_cloud', 'school_bank', 'web_crawler', 'manual_upload']).notNull(),
-	sourceUrl: varchar("source_url", { length: 500 }),
-	sourceType: varchar("source_type", { length: 100 }), // 来源类型：教育局、学校官网、教研网等
-	targetSubject: mysqlEnum("target_subject", ['chinese', 'math', 'english', 'physics', 'chemistry', 'biology', 'politics', 'history', 'geography']),
-	targetGrade: mysqlEnum("target_grade", ['junior1', 'junior2', 'junior3', 'senior1', 'senior2', 'senior3']),
-	scheduleType: mysqlEnum("schedule_type", ['once', 'daily', 'weekly', 'monthly']).default('once').notNull(),
-	scheduleTime: varchar("schedule_time", { length: 50 }), // cron表达式或时间字符串
-	status: mysqlEnum("status", ['pending', 'running', 'completed', 'failed', 'paused']).default('pending').notNull(),
-	totalItems: int("total_items").default(0).notNull(),
-	processedItems: int("processed_items").default(0).notNull(),
-	successItems: int("success_items").default(0).notNull(),
-	failedItems: int("failed_items").default(0).notNull(),
-	lastRunAt: timestamp("last_run_at", { mode: 'string' }),
-	nextRunAt: timestamp("next_run_at", { mode: 'string' }),
-	errorMessage: text("error_message"),
-	config: json(), // 爬虫配置：选择器、分页规则、反爬策略等
-	createdBy: int("created_by").notNull(),
-	createdAt: timestamp("created_at", { mode: 'string' }).default('CURRENT_TIMESTAMP').notNull(),
-	updatedAt: timestamp("updated_at", { mode: 'string' }).defaultNow().onUpdateNow().notNull(),
-},
-(table) => [
-	index("status_idx").on(table.status),
-	index("schedule_type_idx").on(table.scheduleType),
-	index("next_run_at_idx").on(table.nextRunAt),
-]);
-
-export type CrawlerTask = typeof crawlerTasks.$inferSelect;
-export type NewCrawlerTask = typeof crawlerTasks.$inferInsert;
+// 爆虫任务表已经改为advanced_features_schema中的新版本
+// 详见advanced_features_schema.ts
+// export const crawlerTasks = mysqlTable("crawler_tasks", { ... });
+// export type CrawlerTask = typeof crawlerTasks.$inferSelect;
+// export type NewCrawlerTask = typeof crawlerTasks.$inferInsert;
 
 // 原始试题表
 export const rawQuestions = mysqlTable("raw_questions", {

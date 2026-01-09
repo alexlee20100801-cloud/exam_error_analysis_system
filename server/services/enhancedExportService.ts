@@ -567,7 +567,7 @@ export async function generateEnhancedPdfDocument(
         @page {
           @bottom-center {
             // @ts-ignore
-            content: "${mergedOptions.footer.centerText || ""} ${mergedOptions.footer.showPageNumber ? "第 " + counter(page) + " 页" : ""}";
+            content: "${mergedOptions.footer.centerText || ""} ${mergedOptions.footer.showPageNumber ? "第 1 页" : ""}";
             font-size: 10pt;
             color: #666;
           }

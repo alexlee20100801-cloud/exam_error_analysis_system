@@ -52,9 +52,11 @@ import {
   userPushReceipts,
   questionReviews,
   annotations,
-  crawlerTasks,
+  // crawlerTasks已被重命名，暂时注释
+  // crawlerTasks,
   rawQuestions,
-  crawlerSources,
+  // crawlerSources已被重命名，暂时注释
+  // crawlerSources,
   knowledgePointTags,
   knowledgePointRelations,
   ocrProcessingLogs,

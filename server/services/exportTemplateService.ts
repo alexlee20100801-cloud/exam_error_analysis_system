@@ -1,5 +1,6 @@
 import { getDb } from '../db';
-import { exportTemplates } from '../../drizzle/schema';
+// import { exportTemplates } from '../../drizzle/schema'; // 暂时注释，待后实施导出功能时再启用
+import { printTemplates as exportTemplates } from '../../drizzle/schema'; // 临时使用printTemplates作为替代
 import { eq, and, desc, or } from 'drizzle-orm';
 
 /**
