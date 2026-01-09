@@ -544,7 +544,7 @@ export default function EnhancedPrintPreview() {
                   {config.includeAiAnalysis && question.aiAnalysis && (
                     <div className="mt-3 p-3 bg-blue-50 rounded">
                       <h4 className="font-semibold mb-2">AI分析：</h4>
-                      <p className="whitespace-pre-wrap text-sm">{question.aiAnalysis}</p>
+                      <p className="whitespace-pre-wrap text-sm">{question.aiAnalysis.detailedExplanation || question.errorAnalysis || ''}</p>
                     </div>
                   )}
 

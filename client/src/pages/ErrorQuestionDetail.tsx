@@ -118,8 +118,8 @@ export default function ErrorQuestionDetail() {
         answerCount: question.aiAnalysis ? 1 : 0,
         acceptedAnswer: question.aiAnalysis ? {
           '@type': 'Answer',
-          text: question.aiAnalysis,
-          dateCreated: question.analyzedAt?.toISOString(),
+          text: question.aiAnalysis.detailedExplanation || question.errorAnalysis || '',
+          dateCreated: question.updatedAt,
           author: {
             '@type': 'Organization',
             name: '深圳初高中错题分析学习系统 AI分析'
@@ -569,14 +569,7 @@ export default function ErrorQuestionDetail() {
         {/* AI分析结果 - 简单卡片展示 */}
         {question.isAnalyzed && question.aiAnalysis && (
           <ErrorAnalysisCard
-            analysis={{
-              knowledgePoints: question.aiAnalysis.knowledgePoints || [],
-              errorReason: question.aiAnalysis.errorReason || '未分析',
-              correctAnswer: question.aiAnalysis.correctAnswer || question.correctAnswer || '未提供',
-              detailedExplanation: question.aiAnalysis.detailedExplanation || '未分析',
-              studyAdvice: question.aiAnalysis.studyAdvice || '未提供',
-              difficulty: (question.difficulty || 'medium') as "easy" | "medium" | "hard",
-            }}
+            analysis={question.aiAnalysis}
             onReanalyze={() => handleDetailedAnalysis()}
             isReanalyzing={analyzeDetailedMutation.isPending}
           />

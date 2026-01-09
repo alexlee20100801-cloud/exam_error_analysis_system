@@ -15,6 +15,10 @@ import { extractTextFromImage, extractAndMergeTextFromImages } from "../ocrServi
 import { storagePut } from "../storage";
 import { createReviewReminder } from "../services/reviewReminderService";
 import { analyzeErrorQuestion } from "../services/errorAnalysisService";
+import { transformErrorQuestion } from "../transformers";
+import { getErrorQuestionsBySchoolLevel } from "../db";
+import { sql } from "drizzle-orm";
+import { z } from "zod";
 
 export const errorQuestionsRouter = router({
   /**
@@ -186,7 +190,7 @@ export const errorQuestionsRouter = router({
         ctx.user.id, 
         input?.limit || 50
       );
-      return questions;
+      return questions.map(transformErrorQuestion);
     }),
 
   /**
@@ -201,7 +205,7 @@ export const errorQuestionsRouter = router({
       const db = await getDb();
       if (!db) return [];
       
-      return await db
+      const questions = await db
         .select()
         .from(errorQuestions)
         .where(
@@ -212,6 +216,7 @@ export const errorQuestionsRouter = router({
         )
         .orderBy(desc(errorQuestions.createdAt))
         .limit(input.limit);
+      return questions.map(transformErrorQuestion);
     }),
 
   /**
@@ -227,7 +232,7 @@ export const errorQuestionsRouter = router({
       const db = await getDb();
       if (!db) return [];
       
-      return await db
+      const questions = await db
         .select()
         .from(errorQuestions)
         .where(
@@ -239,6 +244,7 @@ export const errorQuestionsRouter = router({
         )
         .orderBy(desc(errorQuestions.createdAt))
         .limit(input.limit);
+      return questions.map(transformErrorQuestion);
     }),
 
   /**
@@ -255,7 +261,7 @@ export const errorQuestionsRouter = router({
         input.subject,
         input.grade
       );
-      return questions;
+      return questions.map(transformErrorQuestion);
     }),
 
   /**
@@ -276,7 +282,7 @@ export const errorQuestionsRouter = router({
         throw new Error("无权访问此错题");
       }
       
-      return question;
+      return transformErrorQuestion(question);
     }),
 
   /**
