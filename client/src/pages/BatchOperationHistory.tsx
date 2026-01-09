@@ -152,7 +152,7 @@ export default function BatchOperationHistory() {
             <Undo2 className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{statistics?.undoableOperations || 0}</div>
+            <div className="text-2xl font-bold">{statistics?.totalOperations || 0}</div>
             <p className="text-xs text-muted-foreground">支持撤销的操作数</p>
           </CardContent>
         </Card>

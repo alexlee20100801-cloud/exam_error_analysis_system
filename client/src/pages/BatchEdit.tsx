@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useLocation, useRoute } from 'wouter';
+import { useRoute, useLocation } from 'wouter';
 import { trpc } from '@/lib/trpc';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -41,7 +41,7 @@ const DIFFICULTIES = [
 export default function BatchEdit() {
   const [, params] = useRoute('/batch-edit/:sessionId');
   const sessionId = params?.sessionId ? parseInt(params.sessionId) : null;
-  const [, navigate] = useLocation();
+  const [location, setLocation] = useLocation();
   // toast imported from sonner
 
   const [batchSubject, setBatchSubject] = useState<string>('');
@@ -49,41 +49,27 @@ export default function BatchEdit() {
   const [batchDifficulty, setBatchDifficulty] = useState<string>('');
   const [selectedItems, setSelectedItems] = useState<Set<number>>(new Set());
 
-  const { data: session, isLoading: sessionLoading } = trpc.errorQuestion.getBatchSession.useQuery(
+  const { data: session, isLoading: sessionLoading } = trpc.errorQuestions.getBatchSession.useQuery(
     { sessionId: sessionId! },
     { enabled: !!sessionId }
   );
 
-  const confirmMutation = trpc.errorQuestion.confirmBatchUpload.useMutation({
+  const confirmMutation = trpc.errorQuestions.confirmBatchUpload.useMutation({
     onSuccess: () => {
-      toast({
-        title: '批量确认成功',
-        description: '所有错题已保存到错题本',
-      });
-      navigate('/error-questions');
+      toast.success('批量确认成功', { description: '所有错题已保存到错题本' });
+      setLocation('/error-questions');
     },
     onError: (error: any) => {
-      toast({
-        title: '批量确认失败',
-        description: error.message,
-        variant: 'destructive',
-      });
+      toast.error('批量确认失败', { description: error.message });
     },
   });
 
-  const updateItemMutation = trpc.errorQuestion.updateBatchItem.useMutation({
+  const updateItemMutation = trpc.errorQuestions.updateBatchItem.useMutation({
     onSuccess: () => {
-      toast({
-        title: '更新成功',
-        description: '错题属性已更新',
-      });
+      toast.success('更新成功', { description: '错题属性已更新' });
     },
     onError: (error: any) => {
-      toast({
-        title: '更新失败',
-        description: error.message,
-        variant: 'destructive',
-      });
+      toast.error('更新失败', { description: error.message });
     },
   });
 

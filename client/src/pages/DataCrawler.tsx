@@ -35,33 +35,33 @@ export default function DataCrawler() {
   // 变更
   const createTask = trpc.dataCrawler.crawlerTasks.create.useMutation({
     onSuccess: () => {
-      toast({ title: '创建成功', description: '爬虫任务已创建' });
+      toast.success('创建成功', { description: '爬虫任务已创建'  });
       setCreateDialogOpen(false);
       refetchTasks();
       resetForm();
     },
     onError: (error) => {
-      toast({ title: '创建失败', description: error.message, variant: 'destructive' });
+      toast.error('创建失败', { description: error.message });
     },
   });
 
   const executeTask = trpc.dataCrawler.crawlerTasks.execute.useMutation({
     onSuccess: () => {
-      toast({ title: '执行成功', description: '爬虫任务已启动' });
+      toast.success('执行成功', { description: '爬虫任务已启动'  });
       refetchTasks();
     },
     onError: (error) => {
-      toast({ title: '执行失败', description: error.message, variant: 'destructive' });
+      toast.error('执行失败', { description: error.message });
     },
   });
 
   const deleteTask = trpc.dataCrawler.crawlerTasks.delete.useMutation({
     onSuccess: () => {
-      toast({ title: '删除成功', description: '爬虫任务已删除' });
+      toast.success('删除成功', { description: '爬虫任务已删除'  });
       refetchTasks();
     },
     onError: (error) => {
-      toast({ title: '删除失败', description: error.message, variant: 'destructive' });
+      toast.error('删除失败', { description: error.message });
     },
   });
 
@@ -76,7 +76,7 @@ export default function DataCrawler() {
 
   const handleCreateTask = () => {
     if (!taskName) {
-      toast({ title: '请填写任务名称', variant: 'destructive' });
+      toast.error('请填写任务名称');
       return;
     }
 

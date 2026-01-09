@@ -1,5 +1,5 @@
-import { useState, useRef } from "react";
-import { useLocation } from "wouter";
+import { useRef, useState } from 'react';
+import { useLocation } from 'wouter';
 import { trpc } from "@/lib/trpc";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -35,7 +35,7 @@ export default function BatchUploadWithCrop() {
   const [isUploading, setIsUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState({ total: 0, completed: 0 });
 
-  const uploadMutation = trpc.errorQuestion.uploadWithOCR.useMutation();
+  const uploadMutation = trpc.errorQuestions.uploadWithOCR.useMutation();
   const batchCreateMutation = trpc.batchUpload.createSession.useMutation();
 
   // 直接调用相机拍照(移动端)
@@ -191,7 +191,7 @@ export default function BatchUploadWithCrop() {
       });
 
       // 跳转到批量编辑页面
-      setLocation(`/batch-edit/${sessionData.sessionId}`);
+      setLocation(`/batch-edit/${sessionData.id}`);
     } catch (error) {
       console.error("Upload error:", error);
       toast.error("上传失败", {

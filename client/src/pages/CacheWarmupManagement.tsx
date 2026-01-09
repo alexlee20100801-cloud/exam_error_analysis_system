@@ -82,7 +82,10 @@ export default function CacheWarmupManagement() {
   // 自动预热
   const autoWarmupMutation = trpc.cacheWarmup.autoWarmup.useMutation({
     onSuccess: (data) => {
-      toast.success(`自动预热完成,生成了 ${data.cacheGeneratedCount} 条缓存`);
+      const message = data.success 
+        ? `自动预热完成,生成了 ${data.knowledgePointCount} 个知识点的缓存`
+        : data.message || '自动预热完成';
+      toast.success(message);
       refetchTasks();
     },
     onError: (error) => {

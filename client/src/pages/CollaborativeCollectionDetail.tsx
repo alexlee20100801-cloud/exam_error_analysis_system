@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useParams, useLocation } from "wouter";
 import { trpc } from "@/lib/trpc";
 import { Button } from "@/components/ui/button";
@@ -29,6 +29,7 @@ export default function CollaborativeCollectionDetail() {
 
   const [commentContent, setCommentContent] = useState("");
   const [replyToCommentId, setReplyToCommentId] = useState<number | null>(null);
+
 
   // 获取协作错题集详情
   const { data: detail, isLoading, refetch } = trpc.collaborativeCollections.detail.useQuery(
@@ -217,7 +218,7 @@ export default function CollaborativeCollectionDetail() {
         <Card>
           <CardContent className="flex flex-col items-center justify-center py-12">
             <p className="text-muted-foreground mb-4">协作错题集不存在或您没有权限访问</p>
-            <Button onClick={() => navigate("/collaborative-collections")}>返回列表</Button>
+            <Button onClick={() => setLocation("/collaborative-collections")}>返回列表</Button>
           </CardContent>
         </Card>
       </div>
@@ -230,7 +231,7 @@ export default function CollaborativeCollectionDetail() {
   return (
     <div className="container mx-auto py-8">
       <div className="mb-6">
-        <Button variant="ghost" onClick={() => navigate("/collaborative-collections")}>
+        <Button variant="ghost" onClick={() => setLocation('/collaborative-collections')}>
           <ArrowLeft className="mr-2 h-4 w-4" />
           返回列表
         </Button>
@@ -390,7 +391,7 @@ export default function CollaborativeCollectionDetail() {
                       <Button
                         variant="ghost"
                         size="sm"
-                        onClick={() => navigate(`/error-questions/${q.questionId}`)}
+                        onClick={() => setLocation(`/error-questions/${q.questionId}`)}
                       >
                         查看详情
                       </Button>
