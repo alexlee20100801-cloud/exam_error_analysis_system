@@ -1,0 +1,9 @@
+{
+  "query": "\n-- 错题表索引\nALTER TABLE `error_questions` ADD INDEX `idx_error_questions_userId` (`userId`);\nALTER TABLE `error_questions` ADD INDEX `idx_error_questions_subject_grade` (`subject`, `grade`);\nALTER TABLE `error_questions` ADD INDEX `idx_error_questions_schoolLevel` (`schoolLevel`);\nALTER TABLE `error_questions` ADD INDEX `idx_error_questions_isAnalyzed` (`isAnalyzed`);\nALTER TABLE `error_questions` ADD INDEX `idx_error_questions_isMastered` (`isMastered`);\nALTER TABLE `error_questions` ADD INDEX `idx_error_questions_createdAt` (`createdAt`);\nALTER TABLE `error_questions` ADD INDEX `idx_error_questions_userId_isAnalyzed` (`userId`, `isAnalyzed`);\nALTER TABLE `error_questions` ADD INDEX `idx_error_questions_userId_subject_grade` (`userId`, `subject`, `grade`);\n",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway03.us-east-1.prod.aws.tidbcloud.com --port 4000 --user Lfr9xqjx7LpxUD9.1efa314e7813 --database Yh4Z4ZSitSFdPWYxtKkkQS --execute \n-- 错题表索引\nALTER TABLE `error_questions` ADD INDEX `idx_error_questions_userId` (`userId`);\nALTER TABLE `error_questions` ADD INDEX `idx_error_questions_subject_grade` (`subject`, `grade`);\nALTER TABLE `error_questions` ADD INDEX `idx_error_questions_schoolLevel` (`schoolLevel`);\nALTER TABLE `error_questions` ADD INDEX `idx_error_questions_isAnalyzed` (`isAnalyzed`);\nALTER TABLE `error_questions` ADD INDEX `idx_error_questions_isMastered` (`isMastered`);\nALTER TABLE `error_questions` ADD INDEX `idx_error_questions_createdAt` (`createdAt`);\nALTER TABLE `error_questions` ADD INDEX `idx_error_questions_userId_isAnalyzed` (`userId`, `isAnalyzed`);\nALTER TABLE `error_questions` ADD INDEX `idx_error_questions_userId_subject_grade` (`userId`, `subject`, `grade`);\n",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 6642
+}
