@@ -90,7 +90,7 @@ export async function createReviewReminder(
 /**
  * 获取用户的待复习列表
  */
-export async function getPendingReviews(userId: string) {
+export async function getPendingReviews(userId: number) {
   const db = await getDb();
   if (!db) throw new Error("数据库不可用");
 
@@ -349,7 +349,7 @@ export async function deleteReminder(
 /**
  * 获取复习历史
  */
-export async function getReviewHistory(userId: string, reminderId?: number) {
+export async function getReviewHistory(userId: number, reminderId?: number) {
   const db = await getDb();
   if (!db) throw new Error("数据库不可用");
 
@@ -370,7 +370,7 @@ export async function getReviewHistory(userId: string, reminderId?: number) {
 /**
  * 获取提醒统计
  */
-export async function getReminderStats(userId: string) {
+export async function getReminderStats(userId: number) {
   const db = await getDb();
   if (!db) throw new Error("数据库不可用");
 

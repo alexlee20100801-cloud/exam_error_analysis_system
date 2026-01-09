@@ -6,7 +6,7 @@ import type { Subject } from "../shared/subjects";
 /**
  * 获取学科的知识点掌握度数据（用于雷达图）
  */
-export async function getSubjectKnowledgeMastery(userId: string, subject: Subject) {
+export async function getSubjectKnowledgeMastery(userId: number, subject: Subject) {
   const db = await getDb();
   if (!db) return [];
 
@@ -43,7 +43,7 @@ export async function getSubjectKnowledgeMastery(userId: string, subject: Subjec
 /**
  * 获取学科的错题趋势数据（按周统计）
  */
-export async function getSubjectErrorTrend(userId: string, subject: Subject, weeks: number = 8) {
+export async function getSubjectErrorTrend(userId: number, subject: Subject, weeks: number = 8) {
   const db = await getDb();
   if (!db) return [];
 
@@ -75,7 +75,7 @@ export async function getSubjectErrorTrend(userId: string, subject: Subject, wee
 /**
  * 获取学科的练习正确率趋势（按周统计）
  */
-export async function getSubjectAccuracyTrend(userId: string, subject: Subject, weeks: number = 8) {
+export async function getSubjectAccuracyTrend(userId: number, subject: Subject, weeks: number = 8) {
   const db = await getDb();
   if (!db) return [];
 
@@ -108,7 +108,7 @@ export async function getSubjectAccuracyTrend(userId: string, subject: Subject, 
 /**
  * 识别学科的薄弱章节
  */
-export async function getSubjectWeakChapters(userId: string, subject: Subject) {
+export async function getSubjectWeakChapters(userId: number, subject: Subject) {
   const db = await getDb();
   if (!db) return [];
 
@@ -165,7 +165,7 @@ export async function getSubjectWeakChapters(userId: string, subject: Subject) {
 /**
  * 生成学科学习建议
  */
-export async function generateSubjectAdvice(userId: string, subject: Subject) {
+export async function generateSubjectAdvice(userId: number, subject: Subject) {
   const weakChapters = await getSubjectWeakChapters(userId, subject);
   const mastery = await getSubjectKnowledgeMastery(userId, subject);
   
@@ -198,7 +198,7 @@ export async function generateSubjectAdvice(userId: string, subject: Subject) {
 /**
  * 获取学科的完整统计数据
  */
-export async function getSubjectFullStats(userId: string, subject: Subject) {
+export async function getSubjectFullStats(userId: number, subject: Subject) {
   const [mastery, errorTrend, accuracyTrend, weakChapters, advice] = await Promise.all([
     getSubjectKnowledgeMastery(userId, subject),
     getSubjectErrorTrend(userId, subject),

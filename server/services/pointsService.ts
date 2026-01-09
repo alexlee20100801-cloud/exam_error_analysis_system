@@ -299,7 +299,7 @@ export async function handleFeedbackRewards(
 /**
  * 获取用户积分和反馈统计
  */
-export async function getUserPointsStats(userId: string) {
+export async function getUserPointsStats(userId: number) {
   try {
     const [user] = await db
       .select({

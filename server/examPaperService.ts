@@ -110,7 +110,7 @@ function getScoreByType(type: string): number {
 /**
  * 获取用户的试卷列表
  */
-export async function getUserExamPapers(userId: string, limit = 20) {
+export async function getUserExamPapers(userId: number, limit = 20) {
   const db = await getDb();
   if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Database not initialized" });
 
@@ -126,7 +126,7 @@ export async function getUserExamPapers(userId: string, limit = 20) {
 /**
  * 获取试卷详情（包含完整题目）
  */
-export async function getExamPaperDetail(paperId: number, userId: string) {
+export async function getExamPaperDetail(paperId: number, userId: number) {
   const db = await getDb();
   if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Database not initialized" });
 
@@ -323,7 +323,7 @@ export async function generateQuestionsWithAI(params: {
 /**
  * 删除试卷（仅创建者可删除）
  */
-export async function deleteExamPaper(paperId: number, userId: string) {
+export async function deleteExamPaper(paperId: number, userId: number) {
   const db = await getDb();
   if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Database not initialized" });
 

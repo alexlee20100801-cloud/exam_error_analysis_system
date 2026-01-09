@@ -91,7 +91,7 @@ function parseSuggestedTimeToDate(suggestedTime: string): Date {
 /**
  * 获取用户的所有复习任务
  */
-export async function getUserReviewTasks(userId: string, includeCompleted = true) {
+export async function getUserReviewTasks(userId: number, includeCompleted = true) {
   const db = await getDb();
   if (!db) throw new Error("数据库不可用");
 
@@ -113,7 +113,7 @@ export async function getUserReviewTasks(userId: string, includeCompleted = true
 /**
  * 获取最新的AI建议及其任务
  */
-export async function getLatestAdviceWithTasks(userId: string) {
+export async function getLatestAdviceWithTasks(userId: number) {
   const db = await getDb();
   if (!db) throw new Error("数据库不可用");
 
@@ -145,7 +145,7 @@ export async function getLatestAdviceWithTasks(userId: string) {
 /**
  * 标记任务完成/未完成
  */
-export async function toggleTaskCompletion(taskId: number, userId: string) {
+export async function toggleTaskCompletion(taskId: number, userId: number) {
   const db = await getDb();
   if (!db) throw new Error("数据库不可用");
 
@@ -187,7 +187,7 @@ export async function toggleTaskCompletion(taskId: number, userId: string) {
 /**
  * 获取复习完成率统计
  */
-export async function getReviewCompletionStats(userId: string) {
+export async function getReviewCompletionStats(userId: number) {
   const db = await getDb();
   if (!db) throw new Error("数据库不可用");
 
@@ -243,7 +243,7 @@ export async function getReviewCompletionStats(userId: string) {
 /**
  * 获取复习任务历史（按建议分组）
  */
-export async function getReviewTaskHistory(userId: string, limit = 10) {
+export async function getReviewTaskHistory(userId: number, limit = 10) {
   const db = await getDb();
   if (!db) throw new Error("数据库不可用");
 

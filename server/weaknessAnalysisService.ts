@@ -202,7 +202,7 @@ export async function analyzeUserWeakness(userId: number): Promise<WeaknessAnaly
   }
 
   // 6. 计算整体掌握率
-  const masteredCount = userErrors.filter((e: any) => e.isMastered === 1).length;
+  const masteredCount = userErrors.filter((e) => (e as any).isMastered === 1).length;
   const overallMasteryRate = (masteredCount / userErrors.length) * 100;
 
   // 7. 生成学习建议
@@ -379,7 +379,7 @@ export async function getKnowledgeRadarData(userId: number) {
     .where(eq(learningProgress.userId, userId))
     .groupBy(sql`${knowledgePoints.subject}`);
 
-  return subjectMastery.map(s => ({
+  return subjectMastery.map((s: any) => ({
     subject: s.subject,
     mastery: Number(s.avgMastery) || 0,
     totalPoints: s.totalPoints,
@@ -416,7 +416,7 @@ export async function getKnowledgeHeatmapData(userId: number, subject: string) {
     )
     .where(sql`${knowledgePoints.subject} = ${subject}`);
 
-  return heatmapData.map(d => ({
+  return heatmapData.map((d: any) => ({
     knowledgePointId: d.knowledgePointId,
     name: d.name,
     grade: d.grade,

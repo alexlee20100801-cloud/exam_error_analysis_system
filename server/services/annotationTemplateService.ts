@@ -61,7 +61,7 @@ export async function getPublicTemplates(filters?: {
 /**
  * 获取用户创建的模板
  */
-export async function getUserTemplates(userId: string) {
+export async function getUserTemplates(userId: number) {
   const db = getDb();
   
   const templates = await db
@@ -144,7 +144,7 @@ export async function updateTemplate(
 /**
  * 删除模板
  */
-export async function deleteTemplate(templateId: number, userId: string) {
+export async function deleteTemplate(templateId: number, userId: number) {
   const db = getDb();
   
   // 验证权限

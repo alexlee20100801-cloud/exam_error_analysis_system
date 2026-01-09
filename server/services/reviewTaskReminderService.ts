@@ -23,7 +23,7 @@ const REMINDER_TYPE_MAP: Record<number, "one_day_before" | "three_hours_before" 
 /**
  * 获取用户的提醒设置
  */
-export async function getUserReminderSettings(userId: string) {
+export async function getUserReminderSettings(userId: number) {
   const db = await getDb();
   if (!db) throw new Error("数据库不可用");
 
@@ -279,7 +279,7 @@ export async function cancelRemindersForCompletedTask(taskId: number) {
 /**
  * 获取用户的提醒历史
  */
-export async function getUserReminderHistory(userId: string, limit: number = 20) {
+export async function getUserReminderHistory(userId: number, limit: number = 20) {
   const db = await getDb();
   if (!db) throw new Error("数据库不可用");
 

@@ -88,7 +88,7 @@ export async function getSharedAnnotationById(annotationId: number) {
 /**
  * 点赞标注
  */
-export async function likeAnnotation(annotationId: number, userId: string) {
+export async function likeAnnotation(annotationId: number, userId: number) {
   const db = getDb();
   
   try {
@@ -116,7 +116,7 @@ export async function likeAnnotation(annotationId: number, userId: string) {
 /**
  * 取消点赞
  */
-export async function unlikeAnnotation(annotationId: number, userId: string) {
+export async function unlikeAnnotation(annotationId: number, userId: number) {
   const db = getDb();
   
   const result = await db
@@ -140,7 +140,7 @@ export async function unlikeAnnotation(annotationId: number, userId: string) {
 /**
  * 检查用户是否已点赞
  */
-export async function checkUserLike(annotationId: number, userId: string) {
+export async function checkUserLike(annotationId: number, userId: number) {
   const db = getDb();
   
   const like = await db
@@ -191,7 +191,7 @@ export async function getComments(annotationId: number) {
 /**
  * 删除评论
  */
-export async function deleteComment(commentId: number, userId: string) {
+export async function deleteComment(commentId: number, userId: number) {
   const db = getDb();
   
   // 验证权限
@@ -215,7 +215,7 @@ export async function deleteComment(commentId: number, userId: string) {
 /**
  * 获取用户的标注贡献统计
  */
-export async function getUserAnnotationStats(userId: string) {
+export async function getUserAnnotationStats(userId: number) {
   const db = getDb();
   
   const annotations = await db

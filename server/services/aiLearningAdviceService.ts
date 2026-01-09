@@ -49,7 +49,7 @@ export interface LearningAdvice {
 /**
  * 生成AI学习建议
  */
-export async function generateLearningAdvice(userId: string): Promise<LearningAdvice> {
+export async function generateLearningAdvice(userId: number): Promise<LearningAdvice> {
   // 获取错题统计数据
   const overview = await getErrorQuestionOverview(userId);
   const subjectDist = await getSubjectDistribution(userId);

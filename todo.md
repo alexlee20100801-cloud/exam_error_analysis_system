@@ -1591,3 +1591,36 @@ if (error.knowledgePointIds) {
 - [ ] 保留或移除其他上传入口
 - [ ] 更新相关文档和帮助信息
 - [ ] 创建检查点并验证所有功能正常
+
+
+## TypeScript 类型修复和测试
+
+### 第一阶段：TypeScript 严格模式修复
+- [x] 诊断 TypeScript 错误 (1067 个错误)
+- [x] 修复 `server/tagService.ts` 中的 userId 类型
+- [x] 修复 `server/weaknessAnalysisService.ts` 中的参数类型
+- [x] 创建 TypeScript 修复指南 (`TYPESCRIPT_FIX_GUIDE.md`)
+- [x] 创建自动修复脚本 (`scripts/fix-typescript-types.mjs`)
+- [ ] 运行自动修复脚本
+- [ ] 启用 TypeScript 严格模式 (`strict: true`)
+- [ ] 验证 TypeScript 编译无错误 (`pnpm tsc --noEmit`)
+
+### 第二阶段：数据库迁移和种子数据
+- [x] 创建数据库初始化脚本 (`scripts/init-database.mjs`)
+- [x] 创建知识点种子数据脚本 (`scripts/seed-knowledge-points.mjs`)
+- [ ] 运行数据库初始化脚本
+- [ ] 运行种子数据脚本
+- [ ] 验证数据库连接和表结构
+
+### 第三阶段：API 端点测试
+- [x] 为薄弱点分析编写单元测试 (`server/routers/weakness.test.ts`)
+- [x] 为标签管理编写单元测试 (`server/routers/tags.test.ts`)
+- [ ] 运行 `pnpm test` 验证所有测试通过
+- [ ] 为其他关键路由编写测试
+- [ ] 验证测试覆盖率
+
+### 第四阶段：项目验证和交付
+- [ ] 验证 dev 服务器启动无错误
+- [ ] 验证前端可以正常加载
+- [ ] 验证 API 端点可以正常调用
+- [ ] 创建最终的项目检查点

@@ -34,7 +34,7 @@ export function calculateNextReviewTime(reviewRound: number, baseTime: Date = ne
 /**
  * 将错题加入复习计划
  */
-export async function addToReviewPlan(userId: string, errorQuestionId: number): Promise<boolean> {
+export async function addToReviewPlan(userId: number, errorQuestionId: number): Promise<boolean> {
   const db = await getDb();
   if (!db) return false;
 
@@ -88,7 +88,7 @@ export async function addToReviewPlan(userId: string, errorQuestionId: number): 
 /**
  * 标记错题已复习
  */
-export async function markAsReviewed(userId: string, errorQuestionId: number): Promise<boolean> {
+export async function markAsReviewed(userId: number, errorQuestionId: number): Promise<boolean> {
   const db = await getDb();
   if (!db) return false;
 
@@ -153,7 +153,7 @@ export async function markAsReviewed(userId: string, errorQuestionId: number): P
 /**
  * 获取用户待复习的错题列表
  */
-export async function getDueReviews(userId: string) {
+export async function getDueReviews(userId: number) {
   const db = await getDb();
   if (!db) return [];
 
@@ -193,7 +193,7 @@ export async function getDueReviews(userId: string) {
 /**
  * 获取用户的所有复习计划（包括未到期的）
  */
-export async function getAllReviewPlans(userId: string) {
+export async function getAllReviewPlans(userId: number) {
   const db = await getDb();
   if (!db) return [];
 
@@ -230,7 +230,7 @@ export async function getAllReviewPlans(userId: string) {
 /**
  * 暂停复习计划
  */
-export async function pauseReviewPlan(userId: string, errorQuestionId: number): Promise<boolean> {
+export async function pauseReviewPlan(userId: number, errorQuestionId: number): Promise<boolean> {
   const db = await getDb();
   if (!db) return false;
 
@@ -258,7 +258,7 @@ export async function pauseReviewPlan(userId: string, errorQuestionId: number): 
 /**
  * 获取复习统计信息
  */
-export async function getReviewStats(userId: string) {
+export async function getReviewStats(userId: number) {
   const db = await getDb();
   if (!db) return null;
 

@@ -323,7 +323,7 @@ export async function batchGeneratePracticeForUser(
  * 获取专项练习统计
  * @param userId 用户ID
  */
-export async function getPracticeStats(userId: string) {
+export async function getPracticeStats(userId: number) {
   const db = await getDb();
   if (!db) throw new Error('Database not available');
 

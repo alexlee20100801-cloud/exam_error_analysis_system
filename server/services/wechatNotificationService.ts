@@ -122,7 +122,7 @@ export async function sendReviewTaskReminderWechat(
  * 2. 用户扫码后，微信服务器会推送事件到你的服务器
  * 3. 在事件处理中完成用户绑定
  */
-export async function generateWechatBindQRCode(userId: string): Promise<{
+export async function generateWechatBindQRCode(userId: number): Promise<{
   qrCodeUrl: string;
   ticket: string;
 } | null> {
@@ -179,7 +179,7 @@ export async function bindWechatAccount(
 /**
  * 解绑微信账号
  */
-export async function unbindWechatAccount(userId: string): Promise<boolean> {
+export async function unbindWechatAccount(userId: number): Promise<boolean> {
   const db = await getDb();
   if (!db) {
     console.error("[WechatService] Database not available");

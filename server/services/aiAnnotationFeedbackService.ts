@@ -227,7 +227,7 @@ export async function getChartTypeAccuracyStats(): Promise<ChartTypeAccuracy[]> 
 /**
  * 获取用户的反馈历史
  */
-export async function getUserFeedbackHistory(userId: string, limit = 20) {
+export async function getUserFeedbackHistory(userId: number, limit = 20) {
   const db = getDb();
   
   return db

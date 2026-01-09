@@ -165,7 +165,7 @@ export async function recordRealExamPractice(data: {
 /**
  * 获取用户真题练习记录
  */
-export async function getUserRealExamPracticeRecords(userId: string, limit = 20) {
+export async function getUserRealExamPracticeRecords(userId: number, limit = 20) {
   const db = await getDb();
   if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Database not initialized" });
 
@@ -189,7 +189,7 @@ export async function getUserRealExamPracticeRecords(userId: string, limit = 20)
 /**
  * 收藏/取消收藏真题
  */
-export async function toggleRealExamBookmark(userId: string, questionId: number) {
+export async function toggleRealExamBookmark(userId: number, questionId: number) {
   const db = await getDb();
   if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Database not initialized" });
 
@@ -229,7 +229,7 @@ export async function toggleRealExamBookmark(userId: string, questionId: number)
 /**
  * 获取用户收藏的真题
  */
-export async function getUserBookmarkedRealExams(userId: string) {
+export async function getUserBookmarkedRealExams(userId: number) {
   const db = await getDb();
   if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Database not initialized" });
 
@@ -293,7 +293,7 @@ export async function getAvailableYears() {
 /**
  * 删除真题（仅管理员或题目创建者）
  */
-export async function deleteRealExamQuestion(questionId: number, userId: string) {
+export async function deleteRealExamQuestion(questionId: number, userId: number) {
   const db = await getDb();
   if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Database not initialized" });
 

@@ -6,7 +6,7 @@ import type { InsertErrorQuestionTag, InsertErrorQuestionTagRelation } from "../
 /**
  * 创建标签
  */
-export async function createTag(userId: string, data: { name: string; color?: string; description?: string }) {
+export async function createTag(userId: number, data: { name: string; color?: string; description?: string }) {
   const db = await getDb();
   if (!db) throw new Error("Database connection failed");
 
@@ -23,7 +23,7 @@ export async function createTag(userId: string, data: { name: string; color?: st
 /**
  * 获取用户的所有标签
  */
-export async function getUserTags(userId: string) {
+export async function getUserTags(userId: number) {
   const db = await getDb();
   if (!db) throw new Error("Database connection failed");
 
@@ -47,7 +47,7 @@ export async function getUserTags(userId: string) {
 /**
  * 更新标签
  */
-export async function updateTag(tagId: number, userId: string, data: { name?: string; color?: string; description?: string }) {
+export async function updateTag(tagId: number, userId: number, data: { name?: string; color?: string; description?: string }) {
   const db = await getDb();
   if (!db) throw new Error("Database connection failed");
 
@@ -64,7 +64,7 @@ export async function updateTag(tagId: number, userId: string, data: { name?: st
 /**
  * 删除标签
  */
-export async function deleteTag(tagId: number, userId: string) {
+export async function deleteTag(tagId: number, userId: number) {
   const db = await getDb();
   if (!db) throw new Error("Database connection failed");
 
@@ -167,7 +167,7 @@ export async function batchRemoveTags(errorQuestionIds: number[], tagIds: number
 /**
  * 按标签筛选错题
  */
-export async function getErrorQuestionsByTags(userId: string, tagIds: number[]) {
+export async function getErrorQuestionsByTags(userId: number, tagIds: number[]) {
   const db = await getDb();
   if (!db) throw new Error("Database connection failed");
 

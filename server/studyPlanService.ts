@@ -14,7 +14,7 @@ import { eq, and, gte, lte, desc, asc, sql } from "drizzle-orm";
  * @param examId 考试ID
  * @returns 生成的复习计划数量
  */
-export async function generateStudyPlan(userId: string, examId: number): Promise<number> {
+export async function generateStudyPlan(userId: number, examId: number): Promise<number> {
   const db = await getDb();
   if (!db) throw new Error("Database connection failed");
 
@@ -179,7 +179,7 @@ export async function generateStudyPlan(userId: string, examId: number): Promise
 /**
  * 获取指定日期的复习计划
  */
-export async function getStudyPlansByDate(userId: string, date: Date) {
+export async function getStudyPlansByDate(userId: number, date: Date) {
   const db = await getDb();
   if (!db) throw new Error("Database connection failed");
 
@@ -201,7 +201,7 @@ export async function getStudyPlansByDate(userId: string, date: Date) {
 /**
  * 获取指定日期范围的复习计划
  */
-export async function getStudyPlansByDateRange(userId: string, startDate: Date, endDate: Date) {
+export async function getStudyPlansByDateRange(userId: number, startDate: Date, endDate: Date) {
   const db = await getDb();
   if (!db) throw new Error("Database connection failed");
 
@@ -217,7 +217,7 @@ export async function getStudyPlansByDateRange(userId: string, startDate: Date, 
 /**
  * 标记计划为已完成
  */
-export async function markPlanAsCompleted(userId: string, planId: number) {
+export async function markPlanAsCompleted(userId: number, planId: number) {
   const db = await getDb();
   if (!db) throw new Error("Database connection failed");
 
@@ -230,7 +230,7 @@ export async function markPlanAsCompleted(userId: string, planId: number) {
 /**
  * 获取复习计划统计
  */
-export async function getStudyPlanStats(userId: string, examId: number) {
+export async function getStudyPlanStats(userId: number, examId: number) {
   const db = await getDb();
   if (!db) throw new Error("Database connection failed");
 

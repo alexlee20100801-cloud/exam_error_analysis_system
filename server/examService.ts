@@ -22,7 +22,7 @@ export async function createExam(examData: InsertExam) {
 /**
  * 更新考试
  */
-export async function updateExam(userId: string, examId: number, examData: Partial<InsertExam>) {
+export async function updateExam(userId: number, examId: number, examData: Partial<InsertExam>) {
   const db = await getDb();
   if (!db) throw new Error("Database connection failed");
 
@@ -32,7 +32,7 @@ export async function updateExam(userId: string, examId: number, examData: Parti
 /**
  * 删除考试
  */
-export async function deleteExam(userId: string, examId: number) {
+export async function deleteExam(userId: number, examId: number) {
   const db = await getDb();
   if (!db) throw new Error("Database connection failed");
 
@@ -42,7 +42,7 @@ export async function deleteExam(userId: string, examId: number) {
 /**
  * 获取用户的所有考试
  */
-export async function getUserExams(userId: string) {
+export async function getUserExams(userId: number) {
   const db = await getDb();
   if (!db) throw new Error("Database connection failed");
 
@@ -54,7 +54,7 @@ export async function getUserExams(userId: string) {
 /**
  * 获取即将到来的考试（未来30天内）
  */
-export async function getUpcomingExams(userId: string) {
+export async function getUpcomingExams(userId: number) {
   const db = await getDb();
   if (!db) throw new Error("Database connection failed");
 
@@ -73,7 +73,7 @@ export async function getUpcomingExams(userId: string) {
 /**
  * 获取单个考试详情
  */
-export async function getExamById(userId: string, examId: number) {
+export async function getExamById(userId: number, examId: number) {
   const db = await getDb();
   if (!db) throw new Error("Database connection failed");
 

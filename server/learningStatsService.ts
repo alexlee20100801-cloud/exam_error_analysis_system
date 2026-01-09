@@ -90,7 +90,7 @@ export async function getKnowledgePointMasteryData(
 /**
  * 获取错题分布数据（用于饼图）
  */
-export async function getErrorDistributionData(userId: string): Promise<ErrorDistribution[]> {
+export async function getErrorDistributionData(userId: number): Promise<ErrorDistribution[]> {
   const db = await getDb();
   if (!db) {
     return [];
@@ -209,7 +209,7 @@ export interface LearningOverview {
   weakKnowledgePoints: number;
 }
 
-export async function getLearningOverview(userId: string, subject?: string): Promise<LearningOverview> {
+export async function getLearningOverview(userId: number, subject?: string): Promise<LearningOverview> {
   const db = await getDb();
   if (!db) {
     return {

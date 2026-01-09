@@ -239,7 +239,7 @@ export async function resendVerificationEmail(
 /**
  * 检查邮箱是否已被验证
  */
-export async function isEmailVerified(userId: string): Promise<boolean> {
+export async function isEmailVerified(userId: number): Promise<boolean> {
   try {
     const db = await getDb();
     if (!db) throw new Error("Database not initialized");

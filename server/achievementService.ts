@@ -18,7 +18,7 @@ import {
 /**
  * 检查并解锁用户成就
  */
-export async function checkAndUnlockAchievements(userId: string): Promise<Achievement[]> {
+export async function checkAndUnlockAchievements(userId: number): Promise<Achievement[]> {
   const db = getDb();
   if (!db) throw new Error("Database not available");
 
@@ -185,7 +185,7 @@ async function checkAchievementRequirement(
 /**
  * 获取用户当前连续打卡天数
  */
-export async function getCurrentStreak(userId: string): Promise<number> {
+export async function getCurrentStreak(userId: number): Promise<number> {
   const db = getDb();
   if (!db) return 0;
 
@@ -278,7 +278,7 @@ export async function recordCheckIn(
 /**
  * 获取用户所有成就及进度
  */
-export async function getUserAchievements(userId: string): Promise<
+export async function getUserAchievements(userId: number): Promise<
   Array<{
     achievement: Achievement;
     unlocked: boolean;
@@ -406,7 +406,7 @@ async function getAchievementProgress(
 /**
  * 获取用户总积分
  */
-export async function getUserTotalPoints(userId: string): Promise<number> {
+export async function getUserTotalPoints(userId: number): Promise<number> {
   const db = getDb();
   if (!db) return 0;
 

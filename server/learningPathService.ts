@@ -30,7 +30,7 @@ export interface LearningPathData {
 /**
  * 分析用户的薄弱知识点
  */
-async function analyzeWeakKnowledgePoints(userId: string, subject?: string) {
+async function analyzeWeakKnowledgePoints(userId: number, subject?: string) {
   const db = await getDb();
   if (!db) throw new Error("Database not initialized");
 
@@ -333,7 +333,7 @@ export async function getLearningPathDetail(
 /**
  * 获取节点的题目详情
  */
-export async function getNodeQuestions(nodeId: string, pathId: number, userId: string) {
+export async function getNodeQuestions(nodeId: string, pathId: number, userId: number) {
   const db = await getDb();
   if (!db) throw new Error("Database not initialized");
 
@@ -361,7 +361,7 @@ export async function getNodeQuestions(nodeId: string, pathId: number, userId: s
 /**
  * 获取学习路径的统计数据
  */
-export async function getPathStatistics(pathId: number, userId: string) {
+export async function getPathStatistics(pathId: number, userId: number) {
   const db = await getDb();
   if (!db) throw new Error("Database not initialized");
 

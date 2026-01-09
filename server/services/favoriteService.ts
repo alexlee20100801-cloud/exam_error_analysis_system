@@ -206,7 +206,7 @@ export async function getFavorites(
  * 获取收藏统计
  * @param userId 用户ID
  */
-export async function getFavoriteStats(userId: string) {
+export async function getFavoriteStats(userId: number) {
   const db = await getDb();
   if (!db) throw new Error("Database not available");
 

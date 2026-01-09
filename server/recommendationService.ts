@@ -12,7 +12,7 @@ export interface RecommendedQuestion {
 /**
  * 获取用户的错题知识点分布
  */
-async function getUserErrorKnowledgePoints(userId: string) {
+async function getUserErrorKnowledgePoints(userId: number) {
   const db = getDb();
 
   // 获取用户最近的错题记录
@@ -202,7 +202,7 @@ export async function getRecommendedRealExams(
 /**
  * 获取推荐统计信息
  */
-export async function getRecommendationStats(userId: string) {
+export async function getRecommendationStats(userId: number) {
   const db = getDb();
 
   // 获取错题分析
