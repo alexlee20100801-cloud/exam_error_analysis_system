@@ -26,6 +26,9 @@ export default function CrawlerManagement() {
   // 获取AI分类统计
   const { data: statsData } = trpc.crawler.getClassificationStats.useQuery();
 
+  // 获取爬虫任务监控数据
+  const { data: monitoringData } = trpc.crawler.getTaskMonitoring.useQuery();
+
   // 手动触发爬虫
   const triggerCrawl = trpc.crawler.triggerCrawl.useMutation({
     onSuccess: () => {
@@ -144,6 +147,7 @@ export default function CrawlerManagement() {
         <TabsList>
           <TabsTrigger value="sources">数据源管理</TabsTrigger>
           <TabsTrigger value="tasks">爬虫任务</TabsTrigger>
+          <TabsTrigger value="monitoring">任务监控</TabsTrigger>
           <TabsTrigger value="questions">试题数据库</TabsTrigger>
         </TabsList>
 
@@ -222,6 +226,48 @@ export default function CrawlerManagement() {
           </Card>
         </TabsContent>
 
+        {/* 任务监控 */}
+        <TabsContent value="monitoring">
+          <Card>
+            <CardHeader>
+              <CardTitle>任务监控</CardTitle>
+              <CardDescription>
+                实时监控爬虫任务执行情况
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                {monitoringData?.tasks.map((task: any) => (
+                  <div key={task.id} className="border rounded-lg p-4">
+                    <div className="flex items-center justify-between mb-2">
+                      <h3 className="font-medium">任务 #{task.id}</h3>
+                      {getStatusBadge(task.status)}
+                    </div>
+                    <div className="grid grid-cols-4 gap-4 text-sm">
+                      <div>
+                        <p className="text-muted-foreground">进度</p>
+                        <p className="font-medium">{task.progress}%</p>
+                      </div>
+                      <div>
+                        <p className="text-muted-foreground">已处理</p>
+                        <p className="font-medium">{task.itemsProcessed}</p>
+                      </div>
+                      <div>
+                        <p className="text-muted-foreground">成功</p>
+                        <p className="font-medium text-green-600">{task.itemsSucceeded}</p>
+                      </div>
+                      <div>
+                        <p className="text-muted-foreground">失败</p>
+                        <p className="font-medium text-red-600">{task.itemsFailed}</p>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
         {/* 爬虫任务 */}
         <TabsContent value="tasks">
           <Card>
@@ -272,7 +318,6 @@ export default function CrawlerManagement() {
           </Card>
         </TabsContent>
 
-        {/* 试题数据库 */}
         <TabsContent value="questions">
           <Card>
             <CardHeader>

@@ -1,6 +1,5 @@
 import { db } from "../db";
-import { questions, questionSources } from "../../drizzle/schema";
-// import { crawlerTasks } from "../../drizzle/schema"; // 暂时注释，待后实施爆虫功能时再启用
+import { questions, questionSources, crawlTasks } from "../../drizzle/schema";
 import { eq, and, or, gte, lte, like, inArray, desc, asc, sql } from "drizzle-orm";
 
 /**
@@ -178,8 +177,8 @@ export async function getCrawlerTasks(
 ) {
   const tasks = await db
     .select()
-    .from(crawlerTasks)
-    .orderBy(desc(crawlerTasks.createdAt))
+    .from(crawlTasks)
+    .orderBy(desc(crawlTasks.createdAt))
     .limit(limit)
     .offset(offset);
 
@@ -192,8 +191,8 @@ export async function getCrawlerTasks(
 export async function getCrawlerTaskDetail(taskId: number) {
   const task = await db
     .select()
-    .from(crawlerTasks)
-    .where(eq(crawlerTasks.id, taskId))
+    .from(crawlTasks)
+    .where(eq(crawlTasks.id, taskId))
     .limit(1);
 
   return task[0] || null;
@@ -214,7 +213,7 @@ export async function createCrawlerTask(data: {
   config?: Record<string, any>;
   createdBy: number;
 }) {
-  const result = await db.insert(crawlerTasks).values({
+  const result = await db.insert(crawlTasks).values({
     taskName: data.taskName,
     taskType: data.taskType as any,
     sourceUrl: data.sourceUrl,
