@@ -1362,3 +1362,122 @@
 - [ ] 创建最终检查点
 - [ ] 生成系统文档
 - [ ] 准备部署清单
+
+
+## 第二十阶段：SQL 参数错误和超时修复完成 (2026-01-09)
+
+### 已完成的修复
+- [x] 修复 errorToPracticeService.ts 中的 knowledgePointIds JSON 处理
+  - 添加了 JSON 字符串解析逻辑
+  - 确保 knowledgePointIds 正确转换为数组
+  
+- [x] 修复 errorToPracticeService.ts 中的布尔值参数处理
+  - 将 `eq(errorQuestions.isMastered, false)` 改为 `eq(errorQuestions.isMastered, 0)`
+  - MySQL tinyint 类型使用 0/1 代表布尔值
+  
+- [x] 增加 vitest 超时时间配置
+  - testTimeout: 30000 毫秒（30 秒）
+  - hookTimeout: 30000 毫秒（30 秒）
+  - 适应 AI 分析功能的处理时间
+
+### 修复说明
+
+#### 1. SQL 参数错误修复
+**问题**：`knowledgePointIds` 是 JSON 类型字段，但代码直接当作数组使用，导致 `error.knowledgePointIds?.[0]` 返回字符串的第一个字符 `'['` 而不是数组元素。
+
+**解决方案**：
+```typescript
+// 处理 JSON 字段：确保 knowledgePointIds 是数组
+let knowledgePointIds: number[] = [];
+if (error.knowledgePointIds) {
+  if (typeof error.knowledgePointIds === 'string') {
+    try {
+      knowledgePointIds = JSON.parse(error.knowledgePointIds);
+    } catch {
+      knowledgePointIds = [];
+    }
+  } else if (Array.isArray(error.knowledgePointIds)) {
+    knowledgePointIds = error.knowledgePointIds;
+  }
+}
+```
+
+#### 2. 布尔值参数处理修复
+**问题**：MySQL 中 `tinyint` 类型使用 0/1 代表布尔值，但代码使用 `true/false`。
+
+**解决方案**：
+- 将 `eq(errorQuestions.isMastered, false)` 改为 `eq(errorQuestions.isMastered, 0)`
+- 简化了数据库查询，移除了不必要的 `leftJoin`
+
+#### 3. vitest 超时时间增加
+**原因**：AI 分析功能需要更长的处理时间，5 秒的默认超时时间不足。
+
+**解决方案**：
+- 在 vitest.config.ts 中设置 `testTimeout: 30000` 和 `hookTimeout: 30000`
+- 为 AI 分析相关的测试提供足够的执行时间
+
+### 下一步工作
+- 运行完整的测试套件验证修复效果
+- 检查是否还有其他 SQL 参数错误需要修复
+- 确保所有表都在数据库中正确创建
+
+
+---
+
+## 第十八阶段：全平台部署方案（2026-01-09 新增）
+
+### 项目规划和架构设计
+- [ ] 分析跨平台需求和技术方案
+- [ ] 创建共享代码库结构（monorepo）
+- [ ] 设计数据同步协议和冲突解决机制
+- [ ] 创建项目文档框架
+- [ ] 设计离线存储架构
+
+### Electron 桌面应用框架
+- [ ] 初始化 Electron 项目结构
+- [ ] 配置主进程和预加载脚本
+- [ ] 实现本地 SQLite 数据库集成
+- [ ] 创建离线工作模式
+- [ ] 实现数据同步机制
+- [ ] 配置 Windows .exe 打包
+- [ ] 配置 macOS .app 打包
+- [ ] 创建自动更新系统
+
+### React Native 移动应用框架
+- [ ] 初始化 React Native 项目
+- [ ] 配置 Android 开发环境
+- [ ] 配置 iOS 开发环境
+- [ ] 集成本地存储（SQLite/Realm）
+- [ ] 实现离线优先架构
+- [ ] 创建 Android APK 构建流程
+- [ ] 创建 iOS .ipa 构建流程
+- [ ] 实现推送通知支持
+
+### 离线存储和数据同步引擎
+- [ ] 设计本地数据库 schema
+- [ ] 实现数据同步引擎（冲突解决）
+- [ ] 创建同步队列管理
+- [ ] 实现增量同步
+- [ ] 添加数据加密支持
+- [ ] 创建同步监控和日志
+
+### 网页版本完善
+- [ ] 优化响应式设计
+- [ ] 添加 PWA 支持（离线访问）
+- [ ] 配置内部服务器部署
+- [ ] 创建 Docker 容器化配置
+- [ ] 实现内网部署文档
+
+### 部署和构建
+- [ ] 创建 CI/CD 流程
+- [ ] 编写构建脚本（所有平台）
+- [ ] 配置代码签名和证书
+- [ ] 创建版本管理系统
+- [ ] 设置自动化测试
+
+### 文档和交付
+- [ ] 编写架构设计文档
+- [ ] 创建部署指南（各平台）
+- [ ] 编写开发者文档
+- [ ] 创建用户使用手册
+- [ ] 编写故障排查指南
