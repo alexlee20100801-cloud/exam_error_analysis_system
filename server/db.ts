@@ -62,6 +62,8 @@ import {
   uploadSessions,
   uploadSessionItems,
 } from '../drizzle/schema';
+
+// 注意：在 ES 模块中，所有导出都已通过 export 关键字定义
 import { eq, and, desc, sql, gte, lte, inArray, or, like, asc, isNull, ne } from 'drizzle-orm';
 
 // 导出db实例供其他模块使用
@@ -518,18 +520,5 @@ export async function updateCrawlerSource(id: number, data: Partial<typeof crawl
 
 // ============ 动态导出代理 ============
 // 为了处理任何可能的缺失函数，我们提供一个通用的导出对象
-const handler = {
-  get: (target: any, prop: string) => {
-    if (prop in target) {
-      return target[prop];
-    }
-    // 返回一个通用函数，用于处理任何未定义的导出
-    return async (...args: any[]) => {
-      console.warn(`Function ${prop} is not implemented in db.ts`);
-      return null;
-    };
-  }
-};
-
-// 创建一个代理对象来处理所有可能的导出
-export const dbProxy = new Proxy(module.exports, handler);
+// 注意：在 ES 模块中，不能使用 module.exports
+// 所有导出已在文件顶部通过 export 关键字定义
