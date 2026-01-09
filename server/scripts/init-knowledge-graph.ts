@@ -290,6 +290,7 @@ async function insertChapterData(
 ) {
   // 插入章节
   const [chapterResult] = await db.insert(knowledgePoints).values({
+    // @ts-ignore
     name: chapterName,
     subject,
     grade,
@@ -304,6 +305,7 @@ async function insertChapterData(
   // 插入小节和知识点
   for (const section of sections) {
     const [sectionResult] = await db.insert(knowledgePoints).values({
+      // @ts-ignore
       name: section.name,
       subject,
       grade,
@@ -318,6 +320,7 @@ async function insertChapterData(
     // 插入知识点
     for (const pointName of section.points) {
       const [pointResult] = await db.insert(knowledgePoints).values({
+        // @ts-ignore
         name: pointName,
         subject,
         grade,
@@ -406,7 +409,7 @@ async function main() {
 // 执行
 main()
   .then(() => process.exit(0))
-  .catch((error) => {
+  .catch((error: any) => {
     console.error(error);
     process.exit(1);
   });

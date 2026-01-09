@@ -58,7 +58,7 @@ export default function SmartScanner() {
     }
 
     // 读取图片为base64
-    const readers = imageFiles.map((file) => {
+    const readers = imageFiles.map((file: any) => {
       return new Promise<string>((resolve) => {
         const reader = new FileReader();
         reader.onload = (e) => resolve(e.target?.result as string);
@@ -66,7 +66,7 @@ export default function SmartScanner() {
       });
     });
 
-    Promise.all(readers).then((images) => {
+    Promise.all(readers).then((images: any) => {
       setSelectedImages(images);
       toast.success(`已选择 ${images.length} 张图片`);
     });
@@ -146,8 +146,8 @@ export default function SmartScanner() {
           }
         }
 
-        setProcessedImages(results.map((r) => r.imageUrl));
-        setOcrResults(results.map((r) => r.ocrResult));
+        setProcessedImages(results.map((r: any) => r.imageUrl));
+        setOcrResults(results.map((r: any) => r.ocrResult));
         setProgress(100);
         setProcessingStep("完成！");
 
@@ -324,7 +324,7 @@ export default function SmartScanner() {
                   <div className="space-y-2">
                     <div className="text-sm font-medium mb-2">图片处理状态</div>
                     <div className="space-y-2 max-h-[300px] overflow-y-auto">
-                      {imageProcessingStatus.map((item) => (
+                      {imageProcessingStatus.map((item: any) => (
                         <div
                           key={item.index}
                           className="flex items-center gap-3 p-2 rounded-md border bg-card"

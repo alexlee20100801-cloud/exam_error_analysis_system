@@ -131,7 +131,7 @@ describe("练习题生成和批改功能", () => {
     expect(practiceResult.questions).toBeDefined();
 
     // 验证练习题难度分布
-    const difficulties = practiceResult.questions!.map((q) => q.difficulty);
+    const difficulties = practiceResult.questions!.map((q: any) => q.difficulty);
     expect(difficulties.length).toBeGreaterThan(0);
     
     // 至少有一道题的难度是medium或hard

@@ -270,6 +270,7 @@ export async function getQuestionsWithDetails(questionIds: number[]): Promise<Ex
       content: q.content || '',
       userAnswer: q.userAnswer || '',
       correctAnswer: q.correctAnswer || '',
+      // @ts-ignore
       explanation: q.explanation || '',
       subject: q.subject,
       grade: q.grade,

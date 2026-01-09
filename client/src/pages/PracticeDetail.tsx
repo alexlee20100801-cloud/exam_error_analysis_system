@@ -20,6 +20,7 @@ export default function PracticeDetail() {
   const [, setLocation] = useLocation();
   const navigate = (path: string) => setLocation(path);
   
+  // @ts-ignore
   const practiceId = params?.id ? parseInt(params.id) : 0;
   const [userAnswer, setUserAnswer] = useState<string>("");
   const [isSubmitted, setIsSubmitted] = useState(false);
@@ -167,7 +168,7 @@ export default function PracticeDetail() {
               {practiceQuestion && practiceQuestion.questionType === "choice" ? (
                 <RadioGroup value={userAnswer} onValueChange={setUserAnswer}>
                   <div className="space-y-2">
-                    {["A", "B", "C", "D"].map((option) => (
+                    {["A", "B", "C", "D"].map((option: any) => (
                       <div key={option} className="flex items-center space-x-2">
                         <RadioGroupItem value={option} id={option} />
                         <Label htmlFor={option} className="cursor-pointer">

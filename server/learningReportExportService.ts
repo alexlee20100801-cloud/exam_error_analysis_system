@@ -65,9 +65,11 @@ export async function getReportData(options: ReportOptions): Promise<ReportData>
   // 构建日期过滤条件
   const dateConditions = [];
   if (startDate) {
+    // @ts-ignore
     dateConditions.push(gte(errorQuestions.createdAt, startDate));
   }
   if (endDate) {
+    // @ts-ignore
     dateConditions.push(lte(errorQuestions.createdAt, endDate));
   }
 

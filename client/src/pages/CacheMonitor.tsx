@@ -95,13 +95,13 @@ export default function CacheMonitor() {
     { name: "未命中", value: stats.totalMisses, color: "#ef4444" },
   ];
 
-  const subjectDistribution = stats.bySubject.map((item) => ({
+  const subjectDistribution = stats.bySubject.map((item: any) => ({
     name: getSubjectName(item.subject),
     count: item.count,
     hitRate: item.hitRate,
   }));
 
-  const gradeDistribution = stats.byGrade.map((item) => ({
+  const gradeDistribution = stats.byGrade.map((item: any) => ({
     name: getGradeName(item.grade),
     count: item.count,
     hitRate: item.hitRate,
@@ -335,7 +335,7 @@ export default function CacheMonitor() {
                   </tr>
                 </thead>
                 <tbody>
-                  {stats.bySubject.map((item) => (
+                  {stats.bySubject.map((item: any) => (
                     <tr key={item.subject} className="border-b hover:bg-muted/50">
                       <td className="py-3 px-4">{getSubjectName(item.subject)}</td>
                       <td className="text-right py-3 px-4">{item.count}</td>
@@ -387,7 +387,7 @@ export default function CacheMonitor() {
                   </tr>
                 </thead>
                 <tbody>
-                  {stats.byGrade.map((item) => (
+                  {stats.byGrade.map((item: any) => (
                     <tr key={item.grade} className="border-b hover:bg-muted/50">
                       <td className="py-3 px-4">{getGradeName(item.grade)}</td>
                       <td className="text-right py-3 px-4">{item.count}</td>

@@ -42,6 +42,7 @@ export const achievementsRouter = router({
       })
     )
     .mutation(async ({ ctx, input }) => {
+      // @ts-ignore
       await recordCheckIn(ctx.user.id, input.activityType);
       const streak = await getCurrentStreak(ctx.user.id);
       return { success: true, streak };
@@ -112,7 +113,7 @@ export const achievementsRouter = router({
     const newlyUnlocked = await checkAndUnlockAchievements(ctx.user.id);
     return {
       success: true,
-      newlyUnlocked: newlyUnlocked.map((a) => ({
+      newlyUnlocked: newlyUnlocked.map((a: any) => ({
         id: a.id,
         name: a.name,
         description: a.description,

@@ -89,6 +89,7 @@ export async function extractTableDataFromImage(imageUrl: string): Promise<Extra
     throw new Error('无法提取表格数据');
   }
 
+  // @ts-ignore
   return JSON.parse(content);
 }
 
@@ -178,6 +179,7 @@ export async function extractChartDataFromImage(imageUrl: string): Promise<Extra
     throw new Error('无法提取图表数据');
   }
 
+  // @ts-ignore
   const extracted = JSON.parse(content);
   return {
     ...extracted,
@@ -260,6 +262,7 @@ export async function smartExtractData(imageUrl: string): Promise<{
     return { type: 'unknown' };
   }
 
+  // @ts-ignore
   const analysis = JSON.parse(analysisContent);
 
   // 根据分析结果提取数据

@@ -47,11 +47,11 @@ export function TagSelector({ errorQuestionId, selectedTags = [], onTagsChange }
     }
   };
 
-  const selectedTagIds = selectedTags.map((t) => t.id);
+  const selectedTagIds = selectedTags.map((t: any) => t.id);
 
   return (
     <div className="flex items-center gap-2 flex-wrap">
-      {selectedTags.map((tag) => (
+      {selectedTags.map((tag: any) => (
         <span
           key={tag.id}
           className="inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium text-white"
@@ -79,7 +79,7 @@ export function TagSelector({ errorQuestionId, selectedTags = [], onTagsChange }
               </div>
             ) : (
               <div className="space-y-2 max-h-64 overflow-y-auto">
-                {allTags.map((tag) => (
+                {allTags.map((tag: any) => (
                   <label key={tag.id} className="flex items-center gap-2 cursor-pointer hover:bg-gray-50 p-2 rounded">
                     <Checkbox
                       checked={selectedTagIds.includes(tag.id)}

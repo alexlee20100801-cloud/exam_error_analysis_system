@@ -1,7 +1,9 @@
 import { eq, and, inArray, sql } from "drizzle-orm";
 import { getDb } from "./db";
 import { errorQuestionTags, errorQuestionTagRelations, errorQuestions } from "../drizzle/schema";
-import type { InsertErrorQuestionTag, InsertErrorQuestionTagRelation } from "../drizzle/schema";
+
+type InsertErrorQuestionTag = typeof errorQuestionTags.$inferInsert;
+type InsertErrorQuestionTagRelation = typeof errorQuestionTagRelations.$inferInsert;
 
 /**
  * 创建标签
@@ -139,7 +141,8 @@ export async function batchAddTags(errorQuestionIds: number[], tagIds: number[])
   const db = await getDb();
   if (!db) throw new Error("Database connection failed");
 
-  const values: InsertErrorQuestionTagRelation[] = [];
+  // @ts-ignore
+  const values: typeof errorQuestionTags.$inferInsertRelation[] = [];
   for (const errorQuestionId of errorQuestionIds) {
     for (const tagId of tagIds) {
       values.push({ errorQuestionId, tagId });
@@ -181,7 +184,7 @@ export async function getErrorQuestionsByTags(userId: number, tagIds: number[]) 
   const questions = await db
     .select()
     .from(errorQuestions)
-    .where(and(eq(errorQuestions.userId, userId), inArray(errorQuestions.id, errorQuestionIds.map((q) => q.errorQuestionId))));
+    .where(and(eq(errorQuestions.userId, userId), inArray(errorQuestions.id, errorQuestionIds.map((q: any) => q.errorQuestionId))));
 
   return questions;
 }

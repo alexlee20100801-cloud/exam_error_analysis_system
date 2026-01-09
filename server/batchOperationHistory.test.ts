@@ -75,11 +75,11 @@ describe("批量操作历史功能测试", () => {
       operationType: "batch_mark_mastered",
       operationDescription: "批量标记为已掌握",
       affectedIds: testErrorQuestionIds,
-      beforeSnapshot: testErrorQuestionIds.map((id) => ({
+      beforeSnapshot: testErrorQuestionIds.map((id: any) => ({
         id,
         masteryLevel: 0,
       })),
-      afterSnapshot: testErrorQuestionIds.map((id) => ({
+      afterSnapshot: testErrorQuestionIds.map((id: any) => ({
         id,
         masteryLevel: 3,
       })),

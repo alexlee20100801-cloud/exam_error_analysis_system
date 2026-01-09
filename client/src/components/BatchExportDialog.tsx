@@ -96,7 +96,7 @@ export function BatchExportDialog({
                   <SelectValue placeholder="选择模板" />
                 </SelectTrigger>
                 <SelectContent>
-                  {templates.map((template) => (
+                  {templates.map((template: any) => (
                     <SelectItem key={template.id} value={template.id.toString()}>
                       {template.name}
                       {template.description && (

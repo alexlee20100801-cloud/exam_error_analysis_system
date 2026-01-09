@@ -146,8 +146,8 @@ export default function NotificationConfigManagement() {
       enableEmailNotification: formData.enableEmailNotification,
       enableSmsNotification: formData.enableSmsNotification,
       recipients: {
-        emails: formData.emails ? formData.emails.split(",").map((e) => e.trim()) : [],
-        phones: formData.phones ? formData.phones.split(",").map((p) => p.trim()) : [],
+        emails: formData.emails ? formData.emails.split(",").map((e: any) => e.trim()) : [],
+        phones: formData.phones ? formData.phones.split(",").map((p: any) => p.trim()) : [],
       },
       emailTemplate: formData.emailTemplate || undefined,
       smsTemplate: formData.smsTemplate || undefined,
@@ -185,8 +185,8 @@ export default function NotificationConfigManagement() {
       enableEmailNotification: formData.enableEmailNotification,
       enableSmsNotification: formData.enableSmsNotification,
       recipients: {
-        emails: formData.emails ? formData.emails.split(",").map((e) => e.trim()) : [],
-        phones: formData.phones ? formData.phones.split(",").map((p) => p.trim()) : [],
+        emails: formData.emails ? formData.emails.split(",").map((e: any) => e.trim()) : [],
+        phones: formData.phones ? formData.phones.split(",").map((p: any) => p.trim()) : [],
       },
       emailTemplate: formData.emailTemplate || undefined,
       smsTemplate: formData.smsTemplate || undefined,
@@ -289,7 +289,7 @@ export default function NotificationConfigManagement() {
 
           {/* 通知配置列表 */}
           <TabsContent value="configs" className="space-y-4">
-            {configs?.map((config) => (
+            {configs?.map((config: any) => (
               <Card key={config.id}>
                 <CardHeader>
                   <div className="flex items-start justify-between">
@@ -452,7 +452,7 @@ export default function NotificationConfigManagement() {
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    {notificationTypes.map((type) => (
+                    {notificationTypes.map((type: any) => (
                       <SelectItem key={type.value} value={type.value}>
                         {type.label}
                       </SelectItem>

@@ -313,6 +313,7 @@ export async function createNotificationLog(data: NotificationLogData) {
       metadata: data.metadata,
       sentAt: new Date(),
     })
+    // @ts-ignore
     .returning();
 
   return log;

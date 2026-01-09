@@ -355,7 +355,7 @@ export default function RealExamPractice() {
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="all">全部</SelectItem>
-                  {schools?.filter((school): school is string => school !== null).map((school) => (
+                  {schools?.filter((school): school is string => school !== null).map((school: any) => (
                     <SelectItem key={school} value={school}>{school}</SelectItem>
                   ))}
                 </SelectContent>

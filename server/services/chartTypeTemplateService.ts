@@ -1,6 +1,6 @@
 import { getDb } from '../db';
 import { chartTypeTemplates } from '../../drizzle/schema';
-import { eq } from 'drizzle-orm';
+import { eq , sql } from 'drizzle-orm';
 
 /**
  * 图表类型模板服务

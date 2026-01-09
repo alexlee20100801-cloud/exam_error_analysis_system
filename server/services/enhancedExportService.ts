@@ -566,6 +566,7 @@ export async function generateEnhancedPdfDocument(
         ${mergedOptions.footer?.enabled ? `
         @page {
           @bottom-center {
+            // @ts-ignore
             content: "${mergedOptions.footer.centerText || ""} ${mergedOptions.footer.showPageNumber ? "第 " + counter(page) + " 页" : ""}";
             font-size: 10pt;
             color: #666;

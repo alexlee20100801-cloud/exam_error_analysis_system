@@ -323,7 +323,7 @@ export async function batchExportQuestions(params: {
   // 为每个学科生成导出文件
   const results = await Promise.all(
     Object.entries(groupedQuestions).map(async ([subject, subjectQuestions]) => {
-      const questionIds = subjectQuestions.map((q) => q.id);
+      const questionIds = subjectQuestions.map((q: any) => q.id);
       const result = await exportQuestions({
         questionIds,
         format: params.format,

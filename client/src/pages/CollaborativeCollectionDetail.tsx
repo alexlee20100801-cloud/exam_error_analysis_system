@@ -17,6 +17,7 @@ import { toast } from "sonner";
 export default function CollaborativeCollectionDetail() {
   const params = useParams();
   const [, setLocation] = useLocation();
+  // @ts-ignore
   const collectionId = parseInt(params.id || "0");
 
   const [isInviteDialogOpen, setIsInviteDialogOpen] = useState(false);
@@ -383,7 +384,7 @@ export default function CollaborativeCollectionDetail() {
             </Card>
           ) : (
             <div className="space-y-4">
-              {detail.questions.map((q) => (
+              {detail.questions.map((q: any) => (
                 <Card key={q.id}>
                   <CardHeader>
                     <div className="flex items-start justify-between">
@@ -411,7 +412,7 @@ export default function CollaborativeCollectionDetail() {
 
         <TabsContent value="members" className="space-y-4">
           <div className="space-y-4">
-            {detail.members.map((member) => (
+            {detail.members.map((member: any) => (
               <Card key={member.id}>
                 <CardContent className="flex items-center justify-between py-4">
                   <div className="flex items-center gap-4">
@@ -482,7 +483,7 @@ export default function CollaborativeCollectionDetail() {
           </Card>
 
           <div className="space-y-4">
-            {comments?.map((comment) => (
+            {comments?.map((comment: any) => (
               <Card key={comment.id}>
                 <CardContent className="py-4">
                   <div className="flex items-start justify-between mb-2">
@@ -532,7 +533,7 @@ export default function CollaborativeCollectionDetail() {
 
         <TabsContent value="activities" className="space-y-4">
           <div className="space-y-4">
-            {activities?.map((activity) => (
+            {activities?.map((activity: any) => (
               <Card key={activity.id}>
                 <CardContent className="flex items-start gap-4 py-4">
                   <Clock className="h-5 w-5 text-muted-foreground mt-0.5" />

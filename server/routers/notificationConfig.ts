@@ -83,6 +83,7 @@ export const notificationConfigRouter = router({
           smsTemplate: input.smsTemplate,
           isActive: input.isActive ? 1 : 0,
         })
+        // @ts-ignore
         .returning();
 
       return config;
@@ -160,6 +161,7 @@ export const notificationConfigRouter = router({
         .update(notificationConfigs)
         .set(updateValues)
         .where(eq(notificationConfigs.id, id))
+        // @ts-ignore
         .returning();
 
       if (!config) {

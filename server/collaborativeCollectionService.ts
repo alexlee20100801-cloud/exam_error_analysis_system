@@ -65,7 +65,7 @@ export async function getUserCollections(userId: number) {
     return { owned: [], participated: [] };
   }
 
-  const collectionIds = memberCollections.map((m) => m.collectionId);
+  const collectionIds = memberCollections.map((m: any) => m.collectionId);
 
   // 获取错题集详情
   const collections = await db

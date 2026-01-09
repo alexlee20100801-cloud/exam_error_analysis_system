@@ -12,7 +12,7 @@ export const sitemapRouter = router({
         createdAt: errorQuestionShares.createdAt,
       })
       .from(errorQuestionShares)
-      .where(eq(errorQuestionShares.isActive, true))
+      .where(eq(errorQuestionShares.isActive, true as any))
       .orderBy(desc(errorQuestionShares.createdAt))
       .limit(1000); // 限制最変1000条
     
@@ -45,7 +45,7 @@ export const sitemapRouter = router({
     ];
 
     // 动态页面（公开分享的错题）
-    const sharedQuestionPages = publicShares.map((share) => ({
+    const sharedQuestionPages = publicShares.map((share: any) => ({
       url: `/shared/${share.shareCode}`,
       priority: "0.6",
       changefreq: "weekly",
@@ -53,7 +53,7 @@ export const sitemapRouter = router({
     }));
     
     // 动态页面（公开的协作错题集）
-    const collectionPages = publicCollections.map((collection) => ({
+    const collectionPages = publicCollections.map((collection: any) => ({
       url: `/collaborative-collections/${collection.id}`,
       priority: "0.6",
       changefreq: "daily",
@@ -68,8 +68,7 @@ export const sitemapRouter = router({
     const xml = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 ${allPages
-  .map(
-    (page) => `  <url>
+  .map((page: any) => `  <url>
     <loc>${baseUrl}${page.url}</loc>
     <lastmod>${page.lastmod || currentDate}</lastmod>
     <changefreq>${page.changefreq}</changefreq>

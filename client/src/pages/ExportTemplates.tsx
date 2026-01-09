@@ -150,7 +150,7 @@ export default function ExportTemplates({ selectedQuestionIds, onClose }: Export
         
         <TabsContent value="templates" className="mt-6">
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-        {quickTemplates.map((template) => (
+        {quickTemplates.map((template: any) => (
           <Card
             key={template.id}
             className={`cursor-pointer transition-all hover:shadow-lg ${
@@ -217,7 +217,7 @@ export default function ExportTemplates({ selectedQuestionIds, onClose }: Export
                 <CardDescription>点击模板查看预览效果</CardDescription>
               </CardHeader>
               <CardContent className="space-y-3">
-                {quickTemplates.map((template) => (
+                {quickTemplates.map((template: any) => (
                   <Button
                     key={template.id}
                     variant={previewTemplate === template.id ? 'default' : 'outline'}

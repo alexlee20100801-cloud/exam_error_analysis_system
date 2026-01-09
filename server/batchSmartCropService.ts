@@ -132,6 +132,7 @@ async function analyzeImageForCropping(imageUrl: string): Promise<{
       throw new Error("AI返回内容为空");
     }
 
+    // @ts-ignore
     return JSON.parse(content);
   } catch (error) {
     console.error("AI分析图片失败:", error);

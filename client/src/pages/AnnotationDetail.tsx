@@ -166,7 +166,7 @@ export default function AnnotationDetail() {
               {/* 评论列表 */}
               <div className="space-y-4">
                 {comments && comments.length > 0 ? (
-                  comments.map((comment) => (
+                  comments.map((comment: any) => (
                     <div key={comment.id} className="flex gap-3">
                       <Avatar>
                         <AvatarFallback>
@@ -225,6 +225,7 @@ export default function AnnotationDetail() {
               </div>
               <div className="flex justify-between">
                 <span className="text-muted-foreground">标注数量</span>
+                // @ts-ignore
                 <span>{annotation.annotations?.length || 0}</span>
               </div>
               <div className="flex justify-between">

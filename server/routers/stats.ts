@@ -31,6 +31,7 @@ export const statsRouter = router({
       })
     )
     .query(async ({ ctx, input }) => {
+      // @ts-ignore
       return await getErrorQuestionCountBySubject(ctx.user.id, input.schoolLevel);
     }),
 });

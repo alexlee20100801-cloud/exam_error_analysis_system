@@ -160,7 +160,7 @@ export default function ReviewPlan() {
         {/* 复习统计卡片 */}
         {statsLoading ? (
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-            {[1, 2, 3, 4].map((i) => (
+            {[1, 2, 3, 4].map((i: any) => (
               <Skeleton key={i} className="h-32" />
             ))}
           </div>
@@ -283,13 +283,13 @@ export default function ReviewPlan() {
           <CardContent>
             {listLoading ? (
               <div className="space-y-4">
-                {[1, 2, 3].map((i) => (
+                {[1, 2, 3].map((i: any) => (
                   <Skeleton key={i} className="h-24" />
                 ))}
               </div>
             ) : reviewList && reviewList.length > 0 ? (
               <div className="space-y-4">
-                {reviewList.map((item) => {
+                {reviewList.map((item: any) => {
                   const urgencyStyle = getUrgencyStyle(item.urgency);
                   const UrgencyIcon = urgencyStyle.icon;
 

@@ -158,8 +158,8 @@ async function collectExperimentMetrics(experimentId: number) {
     .from(abTestUserGroups)
     .where(eq(abTestUserGroups.experimentId, experimentId));
 
-  const controlUsers = userGroups.filter((u) => u.groupType === "control").map((u) => u.userId);
-  const treatmentUsers = userGroups.filter((u) => u.groupType === "treatment").map((u) => u.userId);
+  const controlUsers = userGroups.filter((u) => u.groupType === "control").map((u: any) => u.userId);
+  const treatmentUsers = userGroups.filter((u) => u.groupType === "treatment").map((u: any) => u.userId);
 
   // 收集反馈数据
   const feedback = await db
@@ -431,8 +431,7 @@ ${decisionResult.reason}
 
 统计检验结果:
 ${decisionResult.statisticalTests
-  .map(
-    (t) =>
+  .map((t: any) =>
       `- ${t.metricName}: ${t.isSignificant ? "显著" : "不显著"} (p=${t.pValue.toFixed(4)}), 提升${t.improvement.toFixed(2)}%`
   )
   .join("\n")}

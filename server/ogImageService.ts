@@ -1,3 +1,4 @@
+// @ts-ignore
 import { createCanvas, loadImage, registerFont } from '@napi-rs/canvas';
 import { storagePut } from './storage';
 

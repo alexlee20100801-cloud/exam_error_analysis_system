@@ -14,6 +14,7 @@ export default function ExamPaperDetail() {
   const { user } = useAuth();
   const [, setLocation] = useLocation();
   const [, params] = useRoute("/exam-paper/:id");
+  // @ts-ignore
   const paperId = params?.id ? parseInt(params.id) : 0;
 
   const [answers, setAnswers] = useState<Record<number, string>>({});

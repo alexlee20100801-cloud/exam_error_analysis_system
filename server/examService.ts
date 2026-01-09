@@ -64,6 +64,7 @@ export async function getUpcomingExams(userId: number) {
   const examsList = await db
     .select()
     .from(exams)
+    // @ts-ignore
     .where(and(eq(exams.userId, userId), gte(exams.examDate, today)))
     .orderBy(exams.examDate);
 

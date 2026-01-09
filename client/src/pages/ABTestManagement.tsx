@@ -185,7 +185,7 @@ export default function ABTestManagement() {
     if (!statistics || statistics.length === 0) return [];
 
     const metrics = ["CTR", "使用率", "满意度"];
-    return metrics.map((metricName) => {
+    return metrics.map((metricName: any) => {
       const metricData = statistics.find((s) => s.metricName === metricName);
       return {
         metric: metricName,
@@ -315,7 +315,7 @@ export default function ABTestManagement() {
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {experiments.map((experiment) => (
+                    {experiments.map((experiment: any) => (
                       <TableRow key={experiment.id}>
                         <TableCell className="font-medium">{experiment.experimentName}</TableCell>
                         <TableCell>{getStatusBadge(experiment.status)}</TableCell>
@@ -408,7 +408,7 @@ export default function ABTestManagement() {
                   <TableBody>
                     {experiments
                       ?.filter((e) => e.status === "running")
-                      .map((experiment) => (
+                      .map((experiment: any) => (
                         <TableRow key={experiment.id}>
                           <TableCell className="font-medium">{experiment.experimentName}</TableCell>
                           <TableCell>{experiment.controlGroupSize}</TableCell>
@@ -460,7 +460,7 @@ export default function ABTestManagement() {
                   <TableBody>
                     {experiments
                       ?.filter((e) => e.status === "completed")
-                      .map((experiment) => (
+                      .map((experiment: any) => (
                         <TableRow key={experiment.id}>
                           <TableCell className="font-medium">{experiment.experimentName}</TableCell>
                           <TableCell>{experiment.controlGroupSize}</TableCell>
@@ -561,7 +561,7 @@ export default function ABTestManagement() {
                       </TableRow>
                     </TableHeader>
                     <TableBody>
-                      {statistics.map((stat) => {
+                      {statistics.map((stat: any) => {
                         const improvement = ((stat.treatmentMean - stat.controlMean) / stat.controlMean) * 100;
                         return (
                           <TableRow key={stat.id}>
@@ -597,7 +597,7 @@ export default function ABTestManagement() {
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-2">
-                    {statistics.map((stat) => (
+                    {statistics.map((stat: any) => (
                       stat.recommendation && (
                         <div key={stat.id} className="p-3 bg-muted rounded-md">
                           <div className="font-medium text-sm mb-1">{stat.metricName}</div>

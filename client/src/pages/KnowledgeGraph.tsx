@@ -37,6 +37,7 @@ export default function KnowledgeGraph() {
   });
 
   // 获取知识点关系
+  // @ts-ignore
   const { data: relations } = trpc.knowledgePoints.getRelations.useQuery({
     subject: selectedSubject as any,
     grade: selectedGrade as any,

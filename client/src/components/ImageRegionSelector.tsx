@@ -215,7 +215,7 @@ export function ImageRegionSelector({
   // 更改区域类型
   const handleChangeRegionType = (type: Region['type']) => {
     if (selectedRegionId) {
-      const updatedRegions = regions.map((r) =>
+      const updatedRegions = regions.map((r: any) =>
         r.id === selectedRegionId ? { ...r, type } : r
       );
       onRegionsChange(updatedRegions);
@@ -256,7 +256,7 @@ export function ImageRegionSelector({
             <div className="flex items-center gap-2">
               <span className="text-sm font-medium">区域类型:</span>
               <div className="flex gap-1">
-                {(['text', 'formula', 'chart', 'table', 'image', 'mixed'] as const).map((type) => (
+                {(['text', 'formula', 'chart', 'table', 'image', 'mixed'] as const).map((type: any) => (
                   <Button
                     key={type}
                     variant={selectedRegion.type === type ? 'default' : 'outline'}
@@ -297,7 +297,7 @@ export function ImageRegionSelector({
       <Card className="p-4">
         <h3 className="text-sm font-medium mb-3">已框选区域 ({regions.length})</h3>
         <div className="space-y-2">
-          {regions.map((region) => (
+          {regions.map((region: any) => (
             <div
               key={region.id}
               className={`flex items-center justify-between p-2 rounded border cursor-pointer transition-colors ${

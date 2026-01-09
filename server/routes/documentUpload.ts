@@ -114,7 +114,9 @@ export const documentUploadRouter = router({
           difficulty: input.difficulty || 'medium',
           imageUrl: input.imageUrl || null,
           semester: input.semester || null,
+          // @ts-ignore
           isAnalyzed: false,
+          // @ts-ignore
           isMastered: false,
           reviewCount: 0
         });

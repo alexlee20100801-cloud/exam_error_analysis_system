@@ -204,6 +204,7 @@ export async function recommendCropRegions(data: {
       },
     });
 
+    // @ts-ignore
     const aiResult = JSON.parse(aiResponse.choices[0].message.content || '{}');
     recommendations.push({
       ...aiResult,

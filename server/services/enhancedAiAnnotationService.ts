@@ -87,6 +87,7 @@ async function identifyChartType(imageUrl: string, subject?: string): Promise<{
       throw new Error("AI响应为空");
     }
 
+    // @ts-ignore
     return JSON.parse(content);
   } catch (error) {
     console.error("识别图表类型失败:", error);
@@ -218,6 +219,7 @@ async function generateTypedAnnotations(
       throw new Error("AI响应为空");
     }
 
+    // @ts-ignore
     const result = JSON.parse(content);
     return {
       chartType,
@@ -362,6 +364,7 @@ export async function generateQuadraticFunctionAnnotations(
       throw new Error("AI响应为空");
     }
 
+    // @ts-ignore
     const result = JSON.parse(content);
     return {
       chartType: "quadratic_function",
@@ -486,6 +489,7 @@ export async function generateTrigonometricFunctionAnnotations(
       throw new Error("AI响应为空");
     }
 
+    // @ts-ignore
     const result = JSON.parse(content);
     return {
       chartType: "trigonometric_function",

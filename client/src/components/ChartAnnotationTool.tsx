@@ -528,7 +528,7 @@ export function ChartAnnotationTool({
 
             {/* 工具栏 */}
             <div className="flex flex-wrap gap-2 md:gap-2 sm:gap-1">
-              {tools.map((tool) => {
+              {tools.map((tool: any) => {
                 const Icon = tool.icon;
                 return (
                   <Button

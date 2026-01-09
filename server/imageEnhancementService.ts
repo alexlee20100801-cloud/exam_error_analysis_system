@@ -467,7 +467,7 @@ export async function batchProcessImages(
   }>
 > {
   const results = await Promise.all(
-    images.map((imageBuffer) => preprocessImage(imageBuffer, options))
+    images.map((imageBuffer: any) => preprocessImage(imageBuffer, options))
   );
 
   return results;

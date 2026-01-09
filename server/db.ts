@@ -311,7 +311,7 @@ export async function getRealExamQuestionById(id: number) {
   return result[0];
 }
 
-export async function getRealExamQuestionsByGrade(grade: string) {
+export async function getRealExamQuestionsByGrade(grade: "junior1" | "junior2" | "junior3" | "senior1" | "senior2" | "senior3") {
   return await db.select().from(realExamQuestions)
     .where(eq(realExamQuestions.grade, grade));
 }

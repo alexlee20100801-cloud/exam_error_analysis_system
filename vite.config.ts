@@ -41,8 +41,9 @@ export default defineConfig({
       deny: ["**/.*"],
     },
     hmr: {
-      clientPort: 443,
       protocol: "wss",
+      host: undefined, // 让浏览器自动使用当前 URL 的主机名
+      port: 443,
     },
   },
 });

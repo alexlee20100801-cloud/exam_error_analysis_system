@@ -122,7 +122,7 @@ export async function generateLearningReport(
     // 6. 识别薄弱知识点（掌握度 < 50%）
     const weakSubjects = subjectMastery
       .filter((item) => item.masteryRate < 50)
-      .map((item) => ({
+      .map((item: any) => ({
         subject: item.subject,
         masteryRate: item.masteryRate,
         totalQuestions: item.totalQuestions,
@@ -202,7 +202,7 @@ async function generateImprovementSuggestions(data: {
 ${Object.entries(data.subjectMastery).map(([subject, rate]) => `- ${subject}: ${rate.toFixed(1)}%`).join('\n')}
 
 薄弱学科：
-${data.weakSubjects.map((s) => `- ${s.subject}: ${s.masteryRate.toFixed(1)}%`).join('\n')}
+${data.weakSubjects.map((s: any) => `- ${s.subject}: ${s.masteryRate.toFixed(1)}%`).join('\n')}
 
 请提供：
 1. 学习情况总体评价
@@ -230,6 +230,7 @@ ${data.weakSubjects.map((s) => `- ${s.subject}: ${s.masteryRate.toFixed(1)}%`).j
       ],
     });
 
+    // @ts-ignore
     return response.choices[0]?.message?.content || '暂无改进建议';
   } catch (error) {
     console.error('Failed to generate improvement suggestions:', error);

@@ -74,7 +74,7 @@ export async function calculateAiClassificationTrend(days: number = 30) {
     .where(gte(aiClassificationMetrics.evaluationDate, startDate))
     .orderBy(aiClassificationMetrics.evaluationDate);
 
-  return metrics.map((m) => ({
+  return metrics.map((m: any) => ({
     date: m.evaluationDate,
     accuracy: parseFloat(m.accuracy as any),
     precision: m.precision ? parseFloat(m.precision as any) : null,
@@ -137,7 +137,7 @@ export async function calculatePaperAlgorithmTrend(days: number = 30) {
     .where(gte(paperAlgorithmMetrics.evaluationDate, startDate))
     .orderBy(paperAlgorithmMetrics.evaluationDate);
 
-  return metrics.map((m) => ({
+  return metrics.map((m: any) => ({
     date: m.evaluationDate,
     satisfactionScore: m.avgSatisfactionScore ? parseFloat(m.avgSatisfactionScore as any) : null,
     knowledgeCoverageScore: m.knowledgeCoverageScore ? parseFloat(m.knowledgeCoverageScore as any) : null,
@@ -155,7 +155,7 @@ export async function getWeightParametersComparison(configIds: number[]) {
     .select()
     .from(paperAlgorithmMetrics)
     .where(
-      sql`${paperAlgorithmMetrics.configId} IN (${sql.join(configIds.map((id) => sql`${id}`), sql`, `)})`
+      sql`${paperAlgorithmMetrics.configId} IN (${sql.join(configIds.map((id: any) => sql`${id}`), sql`, `)})`
     )
     .orderBy(desc(paperAlgorithmMetrics.evaluationDate));
 
@@ -167,7 +167,7 @@ export async function getWeightParametersComparison(configIds: number[]) {
     }
   }
 
-  return Array.from(latestMetrics.values()).map((m) => ({
+  return Array.from(latestMetrics.values()).map((m: any) => ({
     configId: m.configId,
     weightParameters: m.weightParameters,
     satisfactionScore: m.avgSatisfactionScore ? parseFloat(m.avgSatisfactionScore as any) : 0,

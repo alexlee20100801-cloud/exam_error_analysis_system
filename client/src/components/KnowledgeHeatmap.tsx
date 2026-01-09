@@ -73,7 +73,7 @@ export function KnowledgeHeatmap({ data, title = "学习热力图", description 
               </div>
 
               {/* 热力格子 */}
-              {weeks.map((week) => (
+              {weeks.map((week: any) => (
                 <div key={week} className="flex flex-col gap-1">
                   {/* 月份标签（仅在第一周显示） */}
                   {week === weeks[0] && (

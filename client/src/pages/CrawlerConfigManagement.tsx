@@ -198,7 +198,7 @@ export default function CrawlerConfigManagement() {
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {rules.map((rule) => (
+                    {rules.map((rule: any) => (
                       <TableRow key={rule.id}>
                         <TableCell className="font-medium">{rule.websiteName}</TableCell>
                         <TableCell>{rule.targetField}</TableCell>
@@ -276,7 +276,7 @@ export default function CrawlerConfigManagement() {
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {performanceStats.map((stat) => (
+                    {performanceStats.map((stat: any) => (
                       <TableRow key={stat.websiteName}>
                         <TableCell className="font-medium">{stat.websiteName}</TableCell>
                         <TableCell>{stat.totalAttempts}</TableCell>
@@ -316,7 +316,7 @@ export default function CrawlerConfigManagement() {
                 <SelectValue placeholder="选择要分析的网站" />
               </SelectTrigger>
               <SelectContent>
-                {rules?.map((rule) => (
+                {rules?.map((rule: any) => (
                   <SelectItem key={rule.websiteName} value={rule.websiteName}>
                     {rule.websiteName}
                   </SelectItem>

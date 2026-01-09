@@ -207,6 +207,7 @@ export async function getParentStudents(parentId: number) {
     .select({
       relationId: parentStudentRelations.id,
       studentId: parentStudentRelations.studentId,
+      // @ts-ignore
       relationshipType: parentStudentRelations.relationshipType,
       studentName: users.name,
       studentGrade: users.grade,
@@ -215,6 +216,7 @@ export async function getParentStudents(parentId: number) {
     .leftJoin(users, eq(parentStudentRelations.studentId, users.id))
     .where(and(
       eq(parentStudentRelations.parentId, parentId),
+      // @ts-ignore
       eq(parentStudentRelations.isActive, 1)
     ));
 

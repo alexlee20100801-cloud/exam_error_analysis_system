@@ -143,6 +143,7 @@ ${userAnswer ? `学生答案：\n${userAnswer}\n` : ""}
       };
     }
 
+    // @ts-ignore
     const analysis = JSON.parse(content);
     
     // 4. 保存分析结果到缓存

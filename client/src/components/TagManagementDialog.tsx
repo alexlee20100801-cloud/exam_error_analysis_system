@@ -141,7 +141,7 @@ export function TagManagementDialog({ open, onOpenChange }: TagManagementDialogP
                 <div>
                   <Label>标签颜色</Label>
                   <div className="flex gap-2 mt-2">
-                    {PRESET_COLORS.map((color) => (
+                    {PRESET_COLORS.map((color: any) => (
                       <button
                         key={color}
                         className={`w-8 h-8 rounded-full border-2 transition-all ${
@@ -190,7 +190,7 @@ export function TagManagementDialog({ open, onOpenChange }: TagManagementDialogP
               <div className="text-center py-8 text-muted-foreground">还没有创建任何标签</div>
             ) : (
               <div className="space-y-2">
-                {tags.map((tag) => (
+                {tags.map((tag: any) => (
                   <div key={tag.id} className="flex items-center justify-between p-3 border rounded-lg hover:bg-gray-50">
                     <div className="flex items-center gap-3">
                       <div className="w-4 h-4 rounded-full" style={{ backgroundColor: tag.color || '#6366f1' }} />

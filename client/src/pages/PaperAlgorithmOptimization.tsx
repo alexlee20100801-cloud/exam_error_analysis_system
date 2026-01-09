@@ -60,24 +60,24 @@ export default function PaperAlgorithmOptimization() {
   };
 
   // 准备雷达图数据
-  const radarData = weightComparison?.map((config) => ({
+  const radarData = weightComparison?.map((config: any) => ({
     subject: "满意度",
     value: config.satisfactionScore,
     configId: config.configId,
   })).concat(
-    weightComparison?.map((config) => ({
+    weightComparison?.map((config: any) => ({
       subject: "知识覆盖",
       value: config.knowledgeCoverageScore,
       configId: config.configId,
     })) || []
   ).concat(
-    weightComparison?.map((config) => ({
+    weightComparison?.map((config: any) => ({
       subject: "难度分布",
       value: config.difficultyDistributionScore,
       configId: config.configId,
     })) || []
   ).concat(
-    weightComparison?.map((config) => ({
+    weightComparison?.map((config: any) => ({
       subject: "题型多样性",
       value: config.questionTypeVarietyScore,
       configId: config.configId,
@@ -334,7 +334,7 @@ export default function PaperAlgorithmOptimization() {
                 </div>
               ) : metricsHistory && metricsHistory.length > 0 ? (
                 <div className="space-y-4">
-                  {metricsHistory.map((metric) => (
+                  {metricsHistory.map((metric: any) => (
                     <div
                       key={metric.id}
                       className="flex items-center justify-between p-4 border rounded-lg"
@@ -388,7 +388,7 @@ export default function PaperAlgorithmOptimization() {
                 <div className="space-y-4">
                   {pendingAlerts
                     .filter(a => a.metricType === "paper_algorithm")
-                    .map((alert) => (
+                    .map((alert: any) => (
                       <Alert key={alert.id} variant={alert.severity === "critical" ? "destructive" : "default"}>
                         <AlertCircle className="h-4 w-4" />
                         <AlertDescription>

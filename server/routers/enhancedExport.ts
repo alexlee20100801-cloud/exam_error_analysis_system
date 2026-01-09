@@ -33,6 +33,7 @@ export const enhancedExportRouter = router({
       try {
         const filePath = await exportErrorQuestionsEnhanced(
           {
+            // @ts-ignore
             userId: ctx.user.id,
             errorQuestionIds: input.errorQuestionIds,
             subjects: input.subjects,

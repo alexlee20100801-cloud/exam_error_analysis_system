@@ -65,6 +65,7 @@ export function ChartOCRExtractor({
         errorQuestionId,
       });
 
+      // @ts-ignore
       setExtractedData(result);
       toast.success("数据提取成功！");
     } catch (error) {
@@ -176,7 +177,7 @@ export function ChartOCRExtractor({
   const handleExportCSV = (table: TableData, tableIndex: number) => {
     const csv = [
       table.headers.join(","),
-      ...table.rows.map((row) => row.join(",")),
+      ...table.rows.map((row: any) => row.join(",")),
     ].join("\n");
 
     const blob = new Blob(["\uFEFF" + csv], { type: "text/csv;charset=utf-8;" });

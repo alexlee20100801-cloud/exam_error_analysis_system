@@ -99,7 +99,7 @@ describe("学习统计功能测试", () => {
     expect(Array.isArray(result)).toBe(true);
     expect(result.length).toBe(3); // 未开始、学习中、已掌握
 
-    const labels = result.map((item) => item.label);
+    const labels = result.map((item: any) => item.label);
     expect(labels).toContain("未开始");
     expect(labels).toContain("学习中");
     expect(labels).toContain("已掌握");

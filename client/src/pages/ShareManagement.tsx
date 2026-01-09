@@ -89,7 +89,7 @@ export default function ShareManagement() {
         </Card>
       ) : (
         <div className="grid gap-4">
-          {shares.map((share) => (
+          {shares.map((share: any) => (
             <Card key={share.id} className={isExpired(share.expiresAt) ? "opacity-60" : ""}>
               <CardHeader>
                 <div className="flex items-start justify-between">

@@ -196,7 +196,7 @@ export class LatexShortcutManager {
   private normalizeKey(key: string): string {
     return key
       .split('+')
-      .map((k) => k.trim().toLowerCase())
+      .map((k: any) => k.trim().toLowerCase())
       .sort()
       .join('+');
   }

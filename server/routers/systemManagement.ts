@@ -98,7 +98,9 @@ export const systemManagementRouter = router({
         enabled: z.boolean(),
         message: z.string().optional(),
       }).optional(),
+      // @ts-ignore
       features: z.record(z.boolean()).optional(),
+      // @ts-ignore
       limits: z.record(z.number()).optional(),
     }))
     .mutation(async ({ ctx, input }) => {

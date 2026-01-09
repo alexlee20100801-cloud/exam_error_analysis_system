@@ -25,6 +25,7 @@ export const emailVerificationRouter = router({
     .mutation(async ({ input, ctx }) => {
       try {
         // 创建验证令牌
+        // @ts-ignore
         const token = await createEmailVerificationToken(ctx.user.id, input.email);
 
         // 发送验证邮件
@@ -76,6 +77,7 @@ export const emailVerificationRouter = router({
     )
     .mutation(async ({ input, ctx }) => {
       try {
+        // @ts-ignore
         await resendVerificationEmail(ctx.user.id, input.email, ctx.user.name || undefined);
 
         return {

@@ -203,7 +203,7 @@ export default function CollaborativeCollections() {
             </Card>
           ) : (
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-              {collections?.owned.map((collection) => (
+              {collections?.owned.map((collection: any) => (
                 <Card
                   key={collection.id}
                   className="cursor-pointer hover:shadow-lg transition-shadow"
@@ -255,7 +255,7 @@ export default function CollaborativeCollections() {
             </Card>
           ) : (
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-              {collections?.participated.map((collection) => (
+              {collections?.participated.map((collection: any) => (
                 <Card
                   key={collection.id}
                   className="cursor-pointer hover:shadow-lg transition-shadow"

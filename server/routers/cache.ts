@@ -44,7 +44,7 @@ export const cacheRouter = router({
       .from(questionAnalysisCache)
       .groupBy(questionAnalysisCache.subject);
 
-    const subjectStats = bySubject.map((item) => {
+    const subjectStats = bySubject.map((item: any) => {
       const itemCount = Number(item.count) || 0;
       const itemHits = Number(item.totalHits) || 0;
       const itemRequests = itemCount + itemHits;
@@ -67,7 +67,7 @@ export const cacheRouter = router({
       .from(questionAnalysisCache)
       .groupBy(questionAnalysisCache.grade);
 
-    const gradeStats = byGrade.map((item) => {
+    const gradeStats = byGrade.map((item: any) => {
       const itemCount = Number(item.count) || 0;
       const itemHits = Number(item.totalHits) || 0;
       const itemRequests = itemCount + itemHits;

@@ -133,7 +133,7 @@ export function registerPWA() {
     window.addEventListener('load', () => {
       navigator.serviceWorker
         .register('/sw.js')
-        .then((registration) => {
+        .then((registration: any) => {
           console.log('✓ Service Worker registered:', registration.scope);
 
           // 检查更新
@@ -155,7 +155,7 @@ export function registerPWA() {
             }
           });
         })
-        .catch((error) => {
+        .catch((error: any) => {
           console.error('✗ Service Worker registration failed:', error);
         });
     });

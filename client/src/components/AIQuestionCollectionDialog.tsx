@@ -270,7 +270,7 @@ export function AIQuestionCollectionDialog({
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    {[3, 5, 8, 10].map((n) => (
+                    {[3, 5, 8, 10].map((n: any) => (
                       <SelectItem key={n} value={n.toString()}>
                         {n} 道题
                       </SelectItem>
@@ -305,7 +305,7 @@ export function AIQuestionCollectionDialog({
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    {[2024, 2023, 2022, 2021].map((y) => (
+                    {[2024, 2023, 2022, 2021].map((y: any) => (
                       <SelectItem key={y} value={y.toString()}>
                         {y}年
                       </SelectItem>
@@ -352,7 +352,7 @@ export function AIQuestionCollectionDialog({
                 选择学校（至少选择1所）
               </Label>
               <div className="grid grid-cols-2 gap-2 max-h-48 overflow-y-auto p-4 border rounded-lg bg-muted/30">
-                {schoolsData?.schools.map((school) => (
+                {schoolsData?.schools.map((school: any) => (
                   <div key={school} className="flex items-center space-x-2">
                     <Checkbox
                       id={school}
@@ -370,7 +370,7 @@ export function AIQuestionCollectionDialog({
               </div>
               {selectedSchools.length > 0 && (
                 <div className="flex flex-wrap gap-2">
-                  {selectedSchools.map((school) => (
+                  {selectedSchools.map((school: any) => (
                     <Badge key={school} variant="secondary">
                       {school}
                     </Badge>

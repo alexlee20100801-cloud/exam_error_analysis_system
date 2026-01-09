@@ -62,7 +62,7 @@ export default function ParentNotifications() {
         </Card>
       ) : (
         <div className="space-y-4">
-          {reminders.map((reminder) => (
+          {reminders.map((reminder: any) => (
             <ReminderCard
               key={reminder.id}
               reminder={reminder}

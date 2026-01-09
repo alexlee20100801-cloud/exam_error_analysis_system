@@ -347,7 +347,7 @@ export function LatexHelpPanel() {
           <div className="space-y-2 pt-2 border-t">
             <h4 className="text-sm font-semibold">快捷键列表</h4>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-              {shortcuts.slice(0, 8).map((shortcut) => (
+              {shortcuts.slice(0, 8).map((shortcut: any) => (
                 <div
                   key={shortcut.id}
                   className="flex items-center justify-between p-2 rounded bg-muted/30 text-sm"

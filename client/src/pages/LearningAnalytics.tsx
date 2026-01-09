@@ -235,7 +235,7 @@ export function LearningAnalytics() {
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
-              {activityStats.map((stat) => {
+              {activityStats.map((stat: any) => {
                 const activityLabels: Record<string, string> = {
                   review: '复习错题',
                   practice: '练习',

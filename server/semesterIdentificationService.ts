@@ -1,4 +1,5 @@
 import { invokeLLM } from "./_core/llm";
+// @ts-ignore
 import type { Semester } from "../drizzle/schema";
 
 /**

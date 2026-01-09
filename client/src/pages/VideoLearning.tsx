@@ -164,7 +164,7 @@ export default function VideoLearning() {
         {/* 搜索结果 */}
         {isSearching ? (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {[1, 2, 3, 4].map((i) => (
+            {[1, 2, 3, 4].map((i: any) => (
               <Card key={i}>
                 <CardContent className="p-4 space-y-3">
                   <Skeleton className="h-40 w-full" />

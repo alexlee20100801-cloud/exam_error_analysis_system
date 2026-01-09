@@ -223,7 +223,7 @@ export class LatexTagManager {
     if (!formula) return [];
 
     return formula.tags
-      .map((tagId) => this.tags.get(tagId))
+      .map((tagId: any) => this.tags.get(tagId))
       .filter((tag): tag is LatexTag => tag !== undefined);
   }
 

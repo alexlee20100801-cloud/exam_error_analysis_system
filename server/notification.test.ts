@@ -282,7 +282,7 @@ describe("Notification Service", () => {
 
       const channels = ["email", "sms", "in_app"];
       const results = await Promise.all(
-        channels.map((channel) =>
+        channels.map((channel: any) =>
           sendNotification({
             userId: 1,
             type: "urgent_alert",

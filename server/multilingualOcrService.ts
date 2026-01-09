@@ -300,7 +300,7 @@ export async function batchRecognizeMultilingual(
   targetLanguages?: string[]
 ): Promise<MultilingualOCRResult[]> {
   const results = await Promise.all(
-    imageUrls.map((url) => recognizeMultilingualText(url, targetLanguages))
+    imageUrls.map((url: any) => recognizeMultilingualText(url, targetLanguages))
   );
   return results;
 }
@@ -313,7 +313,7 @@ export async function batchRecognizeComplexScene(
   sceneType?: "table" | "handwriting" | "invoice" | "certificate" | "form" | "auto"
 ): Promise<ComplexSceneOCRResult[]> {
   const results = await Promise.all(
-    imageUrls.map((url) => recognizeComplexScene(url, sceneType))
+    imageUrls.map((url: any) => recognizeComplexScene(url, sceneType))
   );
   return results;
 }

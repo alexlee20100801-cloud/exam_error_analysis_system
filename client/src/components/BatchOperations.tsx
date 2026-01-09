@@ -185,13 +185,13 @@ export function BatchOperations({ questionIds, onComplete }: BatchOperationsProp
   const handleExport = () => {
     const csvContent = [
       ["题目ID", "状态", "消息"],
-      ...results.map((r) => [
+      ...results.map((r: any) => [
         r.questionId,
         r.success ? "成功" : "失败",
         r.message || "",
       ]),
     ]
-      .map((row) => row.join(","))
+      .map((row: any) => row.join(","))
       .join("\n");
 
     const blob = new Blob(["\ufeff" + csvContent], { type: "text/csv;charset=utf-8;" });
@@ -329,7 +329,7 @@ export function BatchOperations({ questionIds, onComplete }: BatchOperationsProp
           </CardHeader>
           <CardContent>
             <div className="max-h-60 overflow-y-auto space-y-2">
-              {results.map((result) => {
+              {results.map((result: any) => {
                 const question = selectedQuestionsData.find(
                   (q: any) => q.id === result.questionId
                 );

@@ -34,7 +34,7 @@ export function LearningReportSkeleton() {
 
       {/* 统计卡片骨架屏 */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        {[1, 2, 3, 4].map((i) => (
+        {[1, 2, 3, 4].map((i: any) => (
           <Card key={i}>
             <CardHeader className="pb-2">
               <Skeleton className="h-5 w-24" />
@@ -49,7 +49,7 @@ export function LearningReportSkeleton() {
 
       {/* 图表区域骨架屏 */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {[1, 2].map((i) => (
+        {[1, 2].map((i: any) => (
           <Card key={i}>
             <CardHeader>
               <Skeleton className="h-6 w-40" />
@@ -70,7 +70,7 @@ export function LearningReportSkeleton() {
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3">
-            {[1, 2, 3, 4, 5].map((i) => (
+            {[1, 2, 3, 4, 5].map((i: any) => (
               <Skeleton key={i} className="h-24 w-full" />
             ))}
           </div>
@@ -85,7 +85,7 @@ export function LearningReportSkeleton() {
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            {[1, 2, 3].map((i) => (
+            {[1, 2, 3].map((i: any) => (
               <div key={i} className="space-y-2">
                 <Skeleton className="h-5 w-24 mx-auto" />
                 <Skeleton className="h-[250px] w-full" />

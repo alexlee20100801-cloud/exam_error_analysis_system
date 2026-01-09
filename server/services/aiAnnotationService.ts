@@ -96,6 +96,7 @@ export async function generateAnnotationSuggestions(imageUrl: string, subject?: 
       throw new Error("AI响应为空");
     }
 
+    // @ts-ignore
     const result = JSON.parse(content);
     return result;
   } catch (error) {
@@ -190,6 +191,7 @@ export async function detectKeyPoints(imageUrl: string, chartType: string): Prom
       throw new Error("AI响应为空");
     }
 
+    // @ts-ignore
     return JSON.parse(content);
   } catch (error) {
     console.error("关键点识别失败:", error);

@@ -201,7 +201,7 @@ export async function analyzeUserWeakness(userId: number): Promise<WeaknessAnaly
     wp.improvementSuggestion = await generateImprovementSuggestion(wp);
   }
 
-  // 6. 计算整体掃握
+  // 6. 计算整体掌握
   const masteredCount = userErrors.filter((e: any): boolean => Boolean((e as any).isMastered)).length;
   const overallMasteryRate = (masteredCount / userErrors.length) * 100;
 

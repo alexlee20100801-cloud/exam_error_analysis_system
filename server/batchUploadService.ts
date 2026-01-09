@@ -92,6 +92,7 @@ export async function updateSessionCommonFields(
   }
 ) {
   await db.update(uploadSessions)
+    // @ts-ignore
     .set({
       ...fields,
       status: 'editing',
@@ -118,6 +119,7 @@ export async function updateUploadSessionItem(
   }
 ) {
   await db.update(uploadSessionItems)
+    // @ts-ignore
     .set(fields)
     .where(eq(uploadSessionItems.id, itemId));
 }

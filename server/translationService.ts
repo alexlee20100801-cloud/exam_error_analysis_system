@@ -356,7 +356,7 @@ export async function batchTranslateText(
   sourceLanguage: string = "auto"
 ): Promise<TranslationResult[]> {
   const results = await Promise.all(
-    texts.map((text) => translateText(text, targetLanguage, sourceLanguage))
+    texts.map((text: any) => translateText(text, targetLanguage, sourceLanguage))
   );
   return results;
 }
@@ -370,7 +370,7 @@ export async function batchTranslateImages(
   sourceLanguage: string = "auto"
 ): Promise<ImageTranslationResult[]> {
   const results = await Promise.all(
-    imageUrls.map((url) => translateImage(url, targetLanguage, sourceLanguage))
+    imageUrls.map((url: any) => translateImage(url, targetLanguage, sourceLanguage))
   );
   return results;
 }

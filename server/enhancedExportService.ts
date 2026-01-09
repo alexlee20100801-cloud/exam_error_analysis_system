@@ -276,7 +276,7 @@ linestretch: ${layout.spacing.lineHeight}
         .where(inArray(knowledgePoints.id, q.knowledgePointIds as number[]));
 
       if (kps.length > 0) {
-        markdown += `**知识点**: ${kps.map((kp) => kp.name).join("、")}\n\n`;
+        markdown += `**知识点**: ${kps.map((kp: any) => kp.name).join("、")}\n\n`;
       }
     }
 
@@ -394,6 +394,7 @@ export async function exportErrorQuestionsEnhanced(
     if (!db) throw new Error("数据库连接失败");
 
     // 获取筛选后的错题
+    // @ts-ignore
     const conditions = [eq(errorQuestions.userId, filter.userId)];
 
     if (filter.errorQuestionIds && filter.errorQuestionIds.length > 0) {
@@ -409,6 +410,7 @@ export async function exportErrorQuestionsEnhanced(
         conditions.push(inArray(errorQuestions.difficulty, filter.difficulties as any));
       }
       if (filter.isMastered !== undefined) {
+        // @ts-ignore
         conditions.push(eq(errorQuestions.isMastered, filter.isMastered));
       }
     }

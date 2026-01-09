@@ -135,7 +135,7 @@ export function LatexTagManager({ open, onOpenChange }: LatexTagManagerProps) {
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    {TAG_COLORS.map((color) => (
+                    {TAG_COLORS.map((color: any) => (
                       <SelectItem key={color.value} value={color.value}>
                         <div className="flex items-center gap-2">
                           <div className={`w-4 h-4 rounded ${color.class}`} />
@@ -199,7 +199,7 @@ export function LatexTagManager({ open, onOpenChange }: LatexTagManagerProps) {
               </p>
             ) : (
               <div className="space-y-2">
-                {tags.map((tag) => (
+                {tags.map((tag: any) => (
                   <div
                     key={tag.id}
                     className="flex items-center justify-between p-3 border rounded-lg hover:bg-accent/50 transition-colors"

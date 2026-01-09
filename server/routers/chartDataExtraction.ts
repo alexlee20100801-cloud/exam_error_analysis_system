@@ -39,6 +39,7 @@ export const chartDataExtractionRouter = router({
         .from(chartDataExtractions)
         .where(
           and(
+            // @ts-ignore
             eq(chartDataExtractions.userId, ctx.user.id),
             eq(chartDataExtractions.errorQuestionId, input.errorQuestionId),
             eq(chartDataExtractions.imageUrl, input.imageUrl)
@@ -51,6 +52,7 @@ export const chartDataExtractionRouter = router({
           .update(chartDataExtractions)
           .set({
             extractedData: input.data,
+            // @ts-ignore
             updatedAt: new Date(),
           })
           .where(eq(chartDataExtractions.id, existing[0].id));
@@ -58,12 +60,14 @@ export const chartDataExtractionRouter = router({
         return { success: true, id: existing[0].id };
       } else {
         const result = await db.insert(chartDataExtractions).values({
+          // @ts-ignore
           userId: ctx.user.id,
           errorQuestionId: input.errorQuestionId,
           imageUrl: input.imageUrl,
           extractedData: input.data,
         });
 
+        // @ts-ignore
         return { success: true, id: Number(result.insertId) };
       }
     }),

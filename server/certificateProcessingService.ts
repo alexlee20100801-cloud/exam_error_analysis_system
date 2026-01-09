@@ -339,7 +339,7 @@ export async function layoutCertificateOnA4(
 export async function batchRecognizeCertificates(
   imageUrls: string[]
 ): Promise<CertificateInfo[]> {
-  const results = await Promise.all(imageUrls.map((url) => recognizeCertificate(url)));
+  const results = await Promise.all(imageUrls.map((url: any) => recognizeCertificate(url)));
   return results;
 }
 

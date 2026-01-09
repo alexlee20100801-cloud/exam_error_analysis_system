@@ -222,6 +222,7 @@ export const smartScannerRouter = router({
           autoCrop: true,
           enhanceContrast: true,
         });
+        // @ts-ignore
         processedBuffer = preprocessResult.processedImage;
         appliedEnhancements = preprocessResult.appliedEnhancements;
         quality = preprocessResult.quality;
@@ -332,7 +333,7 @@ export const smartScannerRouter = router({
     )
     .mutation(async ({ input }) => {
       // 将base64转换为Buffer数组
-      const imageBuffers = input.images.map((img) =>
+      const imageBuffers = input.images.map((img: any) =>
         Buffer.from(img.replace(/^data:image\/\w+;base64,/, ""), "base64")
       );
 

@@ -14,6 +14,7 @@ import { getSubjectName } from "@shared/subjects";
 export default function KnowledgePointDetail() {
   const params = useParams();
   const [, setLocation] = useLocation();
+  // @ts-ignore
   const knowledgePointId = parseInt(params.id || "0");
   const [exportDialogOpen, setExportDialogOpen] = useState(false);
 
@@ -233,7 +234,7 @@ export default function KnowledgePointDetail() {
                         <span className="font-medium">共同模式：</span>{group.commonPattern}
                       </p>
                       <div className="space-y-2">
-                        {group.errors.map((error) => (
+                        {group.errors.map((error: any) => (
                           <div
                             key={error.id}
                             className="p-2 bg-gray-50 rounded text-sm hover:bg-gray-100 transition-colors cursor-pointer"
@@ -322,7 +323,7 @@ export default function KnowledgePointDetail() {
           <CardContent>
             {errors.length > 0 ? (
               <div className="space-y-3">
-                {errors.slice(0, 10).map((error) => (
+                {errors.slice(0, 10).map((error: any) => (
                   <div
                     key={error.id}
                     className="p-4 border rounded-lg hover:bg-accent/50 transition-colors cursor-pointer"

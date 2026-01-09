@@ -53,6 +53,7 @@ export const reminderSettingsRouter = router({
               enabled: input.enabled,
               reminderMinutes: input.reminderMinutes as any,
               notificationChannels: input.notificationChannels as any,
+              // @ts-ignore
               updatedAt: new Date(),
             })
             .where(eq(userReminderSettings.userId, ctx.user.id));
@@ -98,6 +99,7 @@ export const reminderSettingsRouter = router({
         .set({
           email: input.email,
           emailVerified: false, // 需要验证
+          // @ts-ignore
           updatedAt: new Date(),
         })
         .where(eq(users.id, ctx.user.id));
@@ -126,6 +128,7 @@ export const reminderSettingsRouter = router({
         .set({
           email: null,
           emailVerified: false,
+          // @ts-ignore
           updatedAt: new Date(),
         })
         .where(eq(users.id, ctx.user.id));

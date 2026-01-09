@@ -20,7 +20,7 @@ export default function Practice() {
 
         {learningKnowledgePoints.length > 0 ? (
           <div className="grid gap-4">
-            {learningKnowledgePoints.slice(0, 10).map((item) => (
+            {learningKnowledgePoints.slice(0, 10).map((item: any) => (
               <Card key={item.id}>
                 <CardHeader>
                   <CardTitle>知识点 ID: {item.knowledgePointId}</CardTitle>

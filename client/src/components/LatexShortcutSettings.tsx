@@ -126,7 +126,7 @@ export function LatexShortcutSettings({ open, onOpenChange }: LatexShortcutSetti
 
             {Object.entries(shortcuts).map(([category, items]) => (
               <TabsContent key={category} value={category} className="space-y-3">
-                {items.map((shortcut) => (
+                {items.map((shortcut: any) => (
                   <div
                     key={shortcut.id}
                     className="flex items-center justify-between p-3 border rounded-lg hover:bg-accent/50 transition-colors"

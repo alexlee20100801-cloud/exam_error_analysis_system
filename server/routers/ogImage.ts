@@ -36,6 +36,7 @@ export const ogImageRouter = router({
         subject: question.subject,
         difficulty: question.difficulty || 'medium',
         content: question.content || undefined,
+        // @ts-ignore
         knowledgePoints: question.knowledgePoints?.map((kp: any) => kp.name) || [],
       });
 

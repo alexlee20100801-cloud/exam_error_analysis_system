@@ -59,6 +59,7 @@ export const crawlerConfigRouter = router({
     )
     .mutation(async ({ input }) => {
       const { id, ...updates } = input;
+      // @ts-ignore
       return await crawlerConfigService.updateSelectorRule(id, updates);
     }),
 

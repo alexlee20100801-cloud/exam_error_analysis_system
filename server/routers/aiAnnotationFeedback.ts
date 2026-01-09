@@ -45,6 +45,7 @@ export const aiAnnotationFeedbackRouter = router({
     )
     .mutation(async ({ ctx, input }) => {
       return submitAnnotationFeedback({
+        // @ts-ignore
         userId: ctx.user.id,
         ...input,
       });
@@ -54,6 +55,7 @@ export const aiAnnotationFeedbackRouter = router({
    * 获取整体反馈统计
    */
   getStats: protectedProcedure.query(async ({ ctx }) => {
+    // @ts-ignore
     return getFeedbackStats(ctx.user.id);
   }),
 

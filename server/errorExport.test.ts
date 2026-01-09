@@ -120,7 +120,7 @@ describe("错题导出功能测试", () => {
     });
 
     expect(questions.length).toBe(2);
-    expect(questions.map((q) => q.id)).toEqual(
+    expect(questions.map((q: any) => q.id)).toEqual(
       expect.arrayContaining([testErrorQuestionIds[0], testErrorQuestionIds[1]])
     );
   });

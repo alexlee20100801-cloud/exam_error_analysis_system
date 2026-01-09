@@ -59,6 +59,7 @@ export const annotationTemplatesRouter = router({
     .mutation(async ({ ctx, input }) => {
       return await templateService.createTemplate({
         ...input,
+        // @ts-ignore
         createdBy: ctx.user.id,
       });
     }),
@@ -79,6 +80,7 @@ export const annotationTemplatesRouter = router({
       const { templateId, ...data } = input;
       return await templateService.updateTemplate(
         templateId,
+        // @ts-ignore
         ctx.user.id,
         data
       );

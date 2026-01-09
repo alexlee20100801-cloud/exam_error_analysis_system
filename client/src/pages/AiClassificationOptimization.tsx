@@ -228,7 +228,7 @@ export default function AiClassificationOptimization() {
                 </div>
               ) : metricsHistory && metricsHistory.length > 0 ? (
                 <div className="space-y-4">
-                  {metricsHistory.map((metric) => (
+                  {metricsHistory.map((metric: any) => (
                     <div
                       key={metric.id}
                       className="flex items-center justify-between p-4 border rounded-lg"
@@ -279,7 +279,7 @@ export default function AiClassificationOptimization() {
                 <div className="space-y-4">
                   {pendingAlerts
                     .filter(a => a.metricType === "ai_classification")
-                    .map((alert) => (
+                    .map((alert: any) => (
                       <Alert key={alert.id} variant={alert.severity === "critical" ? "destructive" : "default"}>
                         <AlertCircle className="h-4 w-4" />
                         <AlertDescription>

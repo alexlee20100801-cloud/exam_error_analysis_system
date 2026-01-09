@@ -205,8 +205,10 @@ export async function addWatermarkToPdf(
         x: width / 2 - (watermarkText.length * fontSize) / 4,
         y: height / 2,
         size: fontSize,
+        // @ts-ignore
         color: color,
         opacity: opacity,
+        // @ts-ignore
         rotate: { angle: rotation, type: 1 },
       });
     }
@@ -474,7 +476,7 @@ export async function batchConvertDocuments(
   options: ConversionOptions = {}
 ): Promise<Buffer[]> {
   const results = await Promise.all(
-    documents.map((doc) =>
+    documents.map((doc: any) =>
       convertDocument(doc.buffer, doc.inputFormat, doc.outputFormat, options)
     )
   );

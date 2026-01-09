@@ -195,6 +195,7 @@ export async function classifyQuestion(
   // 调用LLM
   const response = await invokeLLM({
     messages,
+    // @ts-ignore
     temperature: parseFloat(promptVersion.temperature || "0.7"),
     max_tokens: promptVersion.maxTokens || 2000,
     response_format: {
@@ -233,6 +234,7 @@ export async function classifyQuestion(
     },
   });
 
+  // @ts-ignore
   const result = JSON.parse(response.choices[0].message.content);
   return result;
 }

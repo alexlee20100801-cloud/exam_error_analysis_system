@@ -46,16 +46,19 @@ export const exportRouter = router({
 
       if (input.startDate) {
         const startDate = new Date(input.startDate);
+        // @ts-ignore
         conditions.push(gte(errorQuestions.createdAt, startDate));
       }
 
       if (input.endDate) {
         const endDate = new Date(input.endDate);
         endDate.setHours(23, 59, 59, 999); // 包含当天结束时间
+        // @ts-ignore
         conditions.push(lte(errorQuestions.createdAt, endDate));
       }
 
       if (input.isMastered !== undefined) {
+        // @ts-ignore
         conditions.push(eq(errorQuestions.isMastered, input.isMastered));
       }
 
@@ -142,11 +145,11 @@ export const exportRouter = router({
 
     return {
       total: totalResult[0]?.count || 0,
-      bySubject: subjectStats.map((s) => ({
+      bySubject: subjectStats.map((s: any) => ({
         subject: s.subject,
         count: Number(s.count),
       })),
-      byGrade: gradeStats.map((g) => ({
+      byGrade: gradeStats.map((g: any) => ({
         grade: g.grade,
         count: Number(g.count),
       })),

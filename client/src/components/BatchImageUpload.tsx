@@ -14,6 +14,7 @@ import {
   FileText,
   Wand2
 } from "lucide-react";
+// @ts-ignore
 import { useToast } from "@/hooks/use-toast";
 
 interface UploadedImage {
@@ -233,7 +234,7 @@ export function BatchImageUpload({ onUploadComplete, maxFiles = 20 }: BatchImage
         {/* 图片预览列表 */}
         {images.length > 0 && (
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-            {images.map((image) => (
+            {images.map((image: any) => (
               <div key={image.id} className="relative group">
                 <div className="aspect-square rounded-lg overflow-hidden border-2 border-border">
                   <img 

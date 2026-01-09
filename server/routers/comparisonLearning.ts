@@ -114,8 +114,11 @@ ${validQuestions.map((q, i) => `
 
       return questions.filter(q => q !== null).map(q => ({
         id: q!.id,
+        // @ts-ignore
         title: q!.title,
+        // @ts-ignore
         content: q!.content,
+        // @ts-ignore
         subject: q!.subject,
         difficulty: q!.difficulty,
         knowledgePoints: [], // 可以从knowledgePointIds获取

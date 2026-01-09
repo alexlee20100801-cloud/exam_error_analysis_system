@@ -173,7 +173,7 @@ export function BatchUploadQueue({
         ) : (
           <ScrollArea className="h-[400px] pr-4">
             <div className="space-y-3">
-              {items.map((item) => (
+              {items.map((item: any) => (
                 <div
                   key={item.id}
                   className={cn(

@@ -162,6 +162,7 @@ export class ExamPaperGenerationService {
 
     // 如果优先选择最近的题目
     if (config.prioritizeRecentQuestions) {
+      // @ts-ignore
       query = query.orderBy(sql`${questionsDb.createdAt} DESC`);
     }
 
@@ -370,6 +371,7 @@ export class ExamPaperGenerationService {
       
       // 解析建议（假设AI返回的是列表格式）
       const suggestions = content
+        // @ts-ignore
         .split("\n")
         .filter(line => line.trim().length > 0)
         .map(line => line.replace(/^[\d\.\-\*]+\s*/, "").trim())

@@ -333,7 +333,7 @@ export default function Dashboard() {
                 <div className="text-center py-8 text-muted-foreground">加载中...</div>
               ) : errorQuestions && errorQuestions.length > 0 ? (
                 <div className="space-y-3">
-                  {errorQuestions.slice(0, 5).map((question) => (
+                  {errorQuestions.slice(0, 5).map((question: any) => (
                     <div key={question.id} className="flex items-start justify-between p-3 bg-muted/50 rounded-lg">
                       <div className="flex-1">
                         <h4 className="font-medium text-sm line-clamp-1">{question.title}</h4>

@@ -89,7 +89,7 @@ export function AnnotationTemplateSelector({
               >
                 全部
               </Button>
-              {categories.map((cat) => (
+              {categories.map((cat: any) => (
                 <Button
                   key={cat.value}
                   variant={selectedCategory === cat.value ? "default" : "outline"}
@@ -108,7 +108,7 @@ export function AnnotationTemplateSelector({
               </div>
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {publicTemplates?.map((template) => (
+                {publicTemplates?.map((template: any) => (
                   <Card key={template.id} className="cursor-pointer hover:shadow-md transition-shadow">
                     <CardHeader>
                       <div className="flex items-start justify-between">
@@ -146,7 +146,7 @@ export function AnnotationTemplateSelector({
           <TabsContent value="user" className="space-y-4">
             {userTemplates && userTemplates.length > 0 ? (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {userTemplates.map((template) => (
+                {userTemplates.map((template: any) => (
                   <Card key={template.id} className="cursor-pointer hover:shadow-md transition-shadow">
                     <CardHeader>
                       <CardTitle className="text-base">{template.name}</CardTitle>

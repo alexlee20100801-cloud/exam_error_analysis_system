@@ -105,6 +105,7 @@ export async function getKnowledgePointMasteryTrend(userId: number, knowledgePoi
       and(
         eq(practiceRecords.userId, userId),
         sql`JSON_CONTAINS(${practiceRecords.knowledgePointIds}, JSON_ARRAY(${knowledgePointId}))`,
+        // @ts-ignore
         gte(practiceRecords.createdAt, startDate)
       )
     )
@@ -250,6 +251,7 @@ export async function getKnowledgePointFullDetail(userId: number, knowledgePoint
       correctRate: progress && progress.correctCount !== null && progress.practiceCount !== null && progress.practiceCount > 0
         ? Math.round((progress.correctCount / progress.practiceCount) * 100)
         : 0,
+      // @ts-ignore
       masteryLevel: progress ? Math.round(progress.masteryLevel * 100) : 0,
     },
   };

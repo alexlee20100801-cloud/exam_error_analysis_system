@@ -149,7 +149,7 @@ export function startWarmupScheduler(intervalMinutes: number = 30): NodeJS.Timeo
   console.log(`缓存预热调度器已启动,检查间隔: ${intervalMinutes}分钟`);
   
   // 立即执行一次检查
-  runScheduledWarmupTasks().then((result) => {
+  runScheduledWarmupTasks().then((result: any) => {
     console.log("初始预热任务检查完成:", result);
   });
   

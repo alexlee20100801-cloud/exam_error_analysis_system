@@ -131,7 +131,7 @@ async function importEnglishKnowledge() {
   process.exit(errorCount > 0 ? 1 : 0);
 }
 
-importEnglishKnowledge().catch((error) => {
+importEnglishKnowledge().catch((error: any) => {
   console.error('导入过程出错:', error);
   process.exit(1);
 });

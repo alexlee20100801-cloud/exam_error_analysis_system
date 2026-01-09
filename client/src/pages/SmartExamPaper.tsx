@@ -446,7 +446,7 @@ export default function SmartExamPaper() {
         </CardHeader>
         <CardContent>
           <div className="space-y-3">
-            {[1, 2, 3].map((i) => (
+            {[1, 2, 3].map((i: any) => (
               <Card key={i} className="border">
                 <CardContent className="p-4">
                   <div className="flex items-center justify-between">

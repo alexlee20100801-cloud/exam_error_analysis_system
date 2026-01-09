@@ -142,6 +142,7 @@ export async function detectHandwriting(imageUrl: string): Promise<HandwritingDe
     });
 
     const content = response.choices[0].message.content || '{}';
+    // @ts-ignore
     const result = JSON.parse(content);
     return result;
   } catch (error) {
@@ -224,6 +225,7 @@ export async function removeHandwritingFromImage(
     });
 
     // 应用锐化来保持打印文字的清晰度
+    // @ts-ignore
     image = image.sharpen({
       sigma: 1,
       m1: 0.5,
@@ -329,7 +331,9 @@ export async function evaluateRemovalQuality(
     let evaluation: any = {};
     
     try {
+      // @ts-ignore
       const jsonMatch = content.match(/```json\s*([\s\S]*?)\s*```/) || 
+                       // @ts-ignore
                        content.match(/```\s*([\s\S]*?)\s*```/) ||
                        [null, content];
       const jsonStr = jsonMatch[1] || content;

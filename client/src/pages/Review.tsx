@@ -295,7 +295,7 @@ export default function Review() {
               </Alert>
             ) : (
               <div className="space-y-4">
-                {dueReviews.map((review) => (
+                {dueReviews.map((review: any) => (
                   <Card key={review.id} className="hover:shadow-md transition-shadow">
                     <CardHeader>
                       <div className="flex items-start justify-between">
@@ -363,7 +363,7 @@ export default function Review() {
               </Alert>
             ) : (
               <div className="space-y-4">
-                {allPlans.map((plan) => (
+                {allPlans.map((plan: any) => (
                   <Card key={plan.id} className={plan.isDue ? "border-orange-200 bg-orange-50/30" : ""}>
                     <CardHeader>
                       <div className="flex items-start justify-between">

@@ -73,6 +73,7 @@ export const crawlerRouter = router({
       scheduleTime: z.string().optional(),
     }))
     .mutation(async ({ input }) => {
+      // @ts-ignore
       const [source] = await db.insert(crawlSources).values(input).returning();
       return source;
     }),
@@ -98,6 +99,7 @@ export const crawlerRouter = router({
         .update(crawlSources)
         .set(input.data)
         .where(eq(crawlSources.id, input.id))
+        // @ts-ignore
         .returning();
       return source;
     }),

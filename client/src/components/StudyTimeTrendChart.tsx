@@ -69,12 +69,12 @@ export function StudyTimeTrendChart({ data }: StudyTimeTrendChartProps) {
   const dates = Array.from(dateMap.keys()).sort();
 
   // 获取所有学科
-  const subjects = Array.from(new Set(data.map((item) => item.subject)));
+  const subjects = Array.from(new Set(data.map((item: any) => item.subject)));
 
   // 构建Chart.js数据集
-  const datasets = subjects.map((subject) => ({
+  const datasets = subjects.map((subject: any) => ({
     label: SUBJECT_NAMES[subject] || subject,
-    data: dates.map((date) => dateMap.get(date)?.get(subject) || 0),
+    data: dates.map((date: any) => dateMap.get(date)?.get(subject) || 0),
     borderColor: SUBJECT_COLORS[subject]?.border || 'rgb(156, 163, 175)',
     backgroundColor: SUBJECT_COLORS[subject]?.bg || 'rgba(156, 163, 175, 0.2)',
     fill: true,
@@ -82,7 +82,7 @@ export function StudyTimeTrendChart({ data }: StudyTimeTrendChartProps) {
   }));
 
   const chartData = {
-    labels: dates.map((date) => {
+    labels: dates.map((date: any) => {
       const d = new Date(date);
       return `${d.getMonth() + 1}/${d.getDate()}`;
     }),

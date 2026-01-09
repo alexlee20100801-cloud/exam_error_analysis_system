@@ -100,7 +100,7 @@ async function importChineseKnowledge() {
   process.exit(errorCount > 0 ? 1 : 0);
 }
 
-importChineseKnowledge().catch((error) => {
+importChineseKnowledge().catch((error: any) => {
   console.error('导入过程出错:', error);
   process.exit(1);
 });

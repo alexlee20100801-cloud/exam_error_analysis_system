@@ -42,11 +42,11 @@ const SUBJECT_NAMES: Record<string, string> = {
 
 export function SubjectMasteryRadarChart({ data }: SubjectMasteryRadarChartProps) {
   const chartData = {
-    labels: data.map((item) => SUBJECT_NAMES[item.subject] || item.subject),
+    labels: data.map((item: any) => SUBJECT_NAMES[item.subject] || item.subject),
     datasets: [
       {
         label: '掌握度 (%)',
-        data: data.map((item) => item.masteryRate),
+        data: data.map((item: any) => item.masteryRate),
         backgroundColor: 'rgba(59, 130, 246, 0.2)',
         borderColor: 'rgb(59, 130, 246)',
         borderWidth: 2,

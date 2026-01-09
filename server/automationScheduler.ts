@@ -16,6 +16,7 @@ import {
 import { notifyOwner } from "./_core/notification";
 
 // 存储所有定时任务
+// @ts-ignore
 const scheduledTasks = new Map<string, cron.ScheduledTask>();
 
 /**
@@ -262,6 +263,7 @@ async function alertCheckTask() {
 export function stopAllScheduledTasks() {
   console.log("[Automation Scheduler] Stopping all scheduled tasks...");
   
+  // @ts-ignore
   for (const [name, task] of scheduledTasks.entries()) {
     task.stop();
     console.log(`[Automation Scheduler] Task stopped: ${name}`);

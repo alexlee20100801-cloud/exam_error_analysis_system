@@ -232,6 +232,7 @@ ${searchResults}
       return [];
     }
 
+    // @ts-ignore
     const parsed = JSON.parse(content);
     return parsed.results.map((r: any) => ({
       ...r,
@@ -345,6 +346,7 @@ export async function generateQuestionFromSource(
       throw new Error('Failed to generate question');
     }
 
+    // @ts-ignore
     const question = JSON.parse(content);
     return question;
   } catch (error) {

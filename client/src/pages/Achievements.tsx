@@ -204,7 +204,7 @@ export default function Achievements() {
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-10 gap-2">
-              {calendarDays.map((day) => (
+              {calendarDays.map((day: any) => (
                 <div
                   key={day.date}
                   className={`aspect-square rounded-md flex items-center justify-center text-xs font-medium transition-colors ${
@@ -224,7 +224,7 @@ export default function Achievements() {
         {/* 成就列表 */}
         <Tabs value={selectedCategory} onValueChange={setSelectedCategory}>
           <TabsList>
-            {categories.map((cat) => (
+            {categories.map((cat: any) => (
               <TabsTrigger key={cat.value} value={cat.value}>
                 {cat.label}
               </TabsTrigger>
@@ -239,7 +239,7 @@ export default function Achievements() {
                 <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
                   {filteredAchievements
                     ?.filter((a) => a.unlocked)
-                    .map((item) => {
+                    .map((item: any) => {
                       const Icon = iconMap[item.achievement.icon || 'Award'] || Award;
                       return (
                         <Card key={item.achievement.id} className="relative overflow-hidden">
@@ -284,7 +284,7 @@ export default function Achievements() {
                 <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
                   {filteredAchievements
                     ?.filter((a) => !a.unlocked)
-                    .map((item) => {
+                    .map((item: any) => {
                       const Icon = iconMap[item.achievement.icon || 'Award'] || Award;
                       const progressPercent = Math.floor(
                         (item.progress / item.achievement.requirement) * 100

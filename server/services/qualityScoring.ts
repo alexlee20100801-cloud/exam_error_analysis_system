@@ -176,6 +176,7 @@ async function assessDifficulty(
       }
     });
     
+    // @ts-ignore
     const result = JSON.parse(response.choices[0].message.content || "{}");
     return result.score || 70;
   } catch (error) {

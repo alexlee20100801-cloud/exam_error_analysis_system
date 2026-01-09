@@ -152,7 +152,7 @@ export function MyFavoriteQuestions() {
 
           {folders && folders.length > 0 && (
             <div className="space-y-1">
-              {folders.map((folder) => (
+              {folders.map((folder: any) => (
                 <div key={folder.id} className="group relative">
                   <Button
                     variant={selectedFolderId === folder.id ? 'default' : 'ghost'}
@@ -190,7 +190,7 @@ export function MyFavoriteQuestions() {
             <div className="text-center py-12 text-muted-foreground">加载中...</div>
           ) : favorites && favorites.length > 0 ? (
             <div className="grid gap-4">
-              {favorites.map((fav) => (
+              {favorites.map((fav: any) => (
                 <Card key={fav.id}>
                   <CardHeader>
                     <div className="flex items-start justify-between">

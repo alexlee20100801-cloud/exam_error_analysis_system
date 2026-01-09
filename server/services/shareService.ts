@@ -220,7 +220,7 @@ export async function getUserShares(userId: number) {
     .where(eq(errorQuestionShares.userId, userId))
     .orderBy(desc(errorQuestionShares.createdAt));
 
-  return shares.map((share) => ({
+  return shares.map((share: any) => ({
     ...share,
     questionCount: (JSON.parse(share.questionIds as string) as number[]).length,
   }));

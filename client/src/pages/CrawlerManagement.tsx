@@ -178,7 +178,7 @@ export default function CrawlerManagement() {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {sourcesData?.sources.map((source) => (
+                  {sourcesData?.sources.map((source: any) => (
                     <TableRow key={source.id}>
                       <TableCell className="font-medium">{source.name}</TableCell>
                       <TableCell>{source.sourceType}</TableCell>
@@ -245,7 +245,7 @@ export default function CrawlerManagement() {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {tasksData?.tasks.map((task) => (
+                  {tasksData?.tasks.map((task: any) => (
                     <TableRow key={task.id}>
                       <TableCell className="font-medium">{task.id}</TableCell>
                       <TableCell>{task.sourceId}</TableCell>

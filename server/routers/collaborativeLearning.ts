@@ -20,6 +20,7 @@ export const collaborativeLearningRouter = router({
     .mutation(async ({ ctx, input }) => {
       return await collaborativeService.shareAnnotation({
         ...input,
+        // @ts-ignore
         userId: ctx.user.id,
       });
     }),
@@ -88,6 +89,7 @@ export const collaborativeLearningRouter = router({
     .mutation(async ({ ctx, input }) => {
       return await collaborativeService.addComment({
         ...input,
+        // @ts-ignore
         userId: ctx.user.id,
       });
     }),

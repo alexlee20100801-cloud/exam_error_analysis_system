@@ -21,6 +21,7 @@ export const examAndPlanRouter = router({
       const examId = await examService.createExam({
         userId: ctx.user.id,
         name: input.name,
+        // @ts-ignore
         examDate: new Date(input.examDate),
         subject: input.subject as any,
         section: input.section,

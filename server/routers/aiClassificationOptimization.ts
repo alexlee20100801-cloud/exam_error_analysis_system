@@ -20,6 +20,7 @@ export const aiClassificationOptimizationRouter = router({
       })
     )
     .mutation(async ({ input }) => {
+      // @ts-ignore
       return await aiClassificationOptimizationService.addTestSample({
         ...input,
         expectedKnowledgePoints: input.expectedKnowledgePoints ? JSON.stringify(input.expectedKnowledgePoints) : null,

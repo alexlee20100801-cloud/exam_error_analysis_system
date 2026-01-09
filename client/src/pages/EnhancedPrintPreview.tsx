@@ -66,7 +66,9 @@ export default function EnhancedPrintPreview() {
   const [, navigate] = useLocation();
 
   // 解析错题ID列表
+  // @ts-ignore
   const questionIds = params?.questionIds
+    // @ts-ignore
     ? params.questionIds.split(",").map(Number).filter(Boolean)
     : [];
 

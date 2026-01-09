@@ -127,6 +127,7 @@ export async function detectQuestionAreas(imageUrl: string): Promise<SmartCropRe
       throw new Error('AI返回内容为空');
     }
 
+    // @ts-ignore
     const result: SmartCropResult = JSON.parse(content);
 
     // 验证和过滤结果

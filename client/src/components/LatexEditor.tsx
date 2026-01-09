@@ -406,7 +406,7 @@ export function LatexEditor({
 
     // 设置占位符
     if (placeholders.length > 0) {
-      const adjustedPlaceholders = placeholders.map((p) => ({
+      const adjustedPlaceholders = placeholders.map((p: any) => ({
         start: lastBackslash + p.start,
         end: lastBackslash + p.end,
         text: p.text,
@@ -501,7 +501,7 @@ export function LatexEditor({
           <PopoverContent className="w-[500px] max-h-[400px] overflow-y-auto">
             <Tabs defaultValue="基础运算">
               <TabsList className="grid w-full grid-cols-5">
-                {Object.keys(latexSymbols).map((category) => (
+                {Object.keys(latexSymbols).map((category: any) => (
                   <TabsTrigger key={category} value={category} className="text-xs">
                     {category}
                   </TabsTrigger>
@@ -553,13 +553,13 @@ export function LatexEditor({
           <PopoverContent className="w-[600px] max-h-[500px] overflow-y-auto">
             <Tabs defaultValue={latexTemplateCategories[0]?.title}>
               <TabsList className="grid w-full grid-cols-4">
-                {latexTemplateCategories.map((category) => (
+                {latexTemplateCategories.map((category: any) => (
                   <TabsTrigger key={category.title} value={category.title} className="text-xs">
                     {category.icon} {category.title}
                   </TabsTrigger>
                 ))}
               </TabsList>
-              {latexTemplateCategories.map((category) => (
+              {latexTemplateCategories.map((category: any) => (
                 <TabsContent key={category.title} value={category.title} className="space-y-2">
                   <div className="space-y-2">
                     {category.templates.map((template, index) => (
@@ -677,7 +677,7 @@ export function LatexEditor({
                               <span>使用 {item.usageCount} 次</span>
                               <span>•</span>
                               <span>{formatHistoryTime(item.timestamp)}</span>
-                              {latexTagManager.getFormulaTags(item.latex).map((tag) => (
+                              {latexTagManager.getFormulaTags(item.latex).map((tag: any) => (
                                 <span
                                   key={tag.id}
                                   className={`px-1.5 py-0.5 rounded text-xs text-white bg-${tag.color}-500`}

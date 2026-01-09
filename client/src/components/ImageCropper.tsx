@@ -785,7 +785,7 @@ export function ImageCropper({ imageUrl, onCropComplete, onSkip, onCancel }: Ima
                 </DialogHeader>
                 <div className="space-y-4 py-4">
                   <div className="grid grid-cols-2 gap-4">
-                    {PRESET_CROP_TEMPLATES.map((template) => (
+                    {PRESET_CROP_TEMPLATES.map((template: any) => (
                       <Card
                         key={template.id}
                         className={`cursor-pointer transition-all hover:border-primary ${

@@ -200,7 +200,7 @@ export function getFilteredMenu(
   userSemester?: Semester | null,
   disabledItems: string[] = []
 ): MenuSection[] {
-  return MENU_CONFIG.map((section) => ({
+  return MENU_CONFIG.map((section: any) => ({
     ...section,
     items: section.items.filter((item) =>
       isMenuItemVisible(item, userGrade, userSemester, disabledItems)

@@ -118,7 +118,7 @@ export default function ParentDashboard() {
         </Card>
       ) : (
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-          {students.map((student) => (
+          {students.map((student: any) => (
             <StudentCard
               key={student.studentId}
               student={student}

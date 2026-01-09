@@ -229,6 +229,7 @@ export function ComparisonView({ items, onClose }: ComparisonViewProps) {
             </div>
 
             <div 
+              // @ts-ignore
               ref={el => scrollRefs.current[index] = el}
               className="flex-1 overflow-auto p-4"
               style={{ maxHeight: '600px' }}

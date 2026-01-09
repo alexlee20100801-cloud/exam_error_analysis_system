@@ -171,7 +171,7 @@ export default function PracticeHistory() {
             <CardContent>
               <div className="space-y-4">
                 {history && history.length > 0 ? (
-                  history.map((session) => (
+                  history.map((session: any) => (
                     <Card key={session.id} className="border-l-4" style={{
                       borderLeftColor: session.status === 'completed' ? '#10b981' : 
                                       session.status === 'in_progress' ? '#3b82f6' : '#6b7280'
@@ -319,7 +319,7 @@ export default function PracticeHistory() {
             <CardContent>
               <div className="space-y-3">
                 {stats?.subjectStats && stats.subjectStats.length > 0 ? (
-                  stats.subjectStats.map((subject) => (
+                  stats.subjectStats.map((subject: any) => (
                     <div key={subject.subject} className="flex items-center gap-4">
                       <div className="w-20 font-medium">{subject.subject}</div>
                       <div className="flex-1">
@@ -348,7 +348,7 @@ export default function PracticeHistory() {
             <CardContent>
               <div className="space-y-3">
                 {stats?.modeStats && stats.modeStats.length > 0 ? (
-                  stats.modeStats.map((mode) => (
+                  stats.modeStats.map((mode: any) => (
                     <div key={mode.practiceMode} className="flex items-center gap-4">
                       <div className="w-28 font-medium">
                         {mode.practiceMode ? practiceModeName[mode.practiceMode] : '未知'}
@@ -384,7 +384,7 @@ export default function PracticeHistory() {
             <CardContent>
               <div className="space-y-3">
                 {errorsForReview && errorsForReview.length > 0 ? (
-                  errorsForReview.map((error) => (
+                  errorsForReview.map((error: any) => (
                     <Card key={error.questionId} className="border-l-4 border-l-red-500">
                       <CardHeader>
                         <div className="flex items-start justify-between">

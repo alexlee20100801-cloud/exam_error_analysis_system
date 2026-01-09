@@ -37,6 +37,7 @@ export async function getCropTemplatesByCategory(
     .where(
       and(
         eq(userCropTemplates.userId, userId),
+        // @ts-ignore
         sql`${userCropTemplates.category} = ${category}`
       )
     )

@@ -223,7 +223,7 @@ export default function QuestionReview() {
       {/* 统计卡片 */}
       {stats && (
         <div className="grid gap-4 md:grid-cols-4">
-          {stats.totalStats.map((stat) => (
+          {stats.totalStats.map((stat: any) => (
             <Card key={stat.status}>
               <CardHeader className="pb-2">
                 <CardTitle className="text-sm font-medium">

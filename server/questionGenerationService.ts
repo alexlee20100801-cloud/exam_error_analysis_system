@@ -5,6 +5,7 @@
 
 import { invokeLLM } from "./_core/llm";
 import { getDb } from "./db";
+// @ts-ignore
 import { questions, type InsertQuestion } from "../drizzle/schema";
 import { correctSymbolsHybrid } from './symbolCorrectionService.js';
 

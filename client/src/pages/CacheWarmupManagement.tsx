@@ -327,7 +327,7 @@ export default function CacheWarmupManagement() {
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {tasks.map((task) => (
+                    {tasks.map((task: any) => (
                       <TableRow key={task.id}>
                         <TableCell>
                           <div className="flex items-center gap-2">

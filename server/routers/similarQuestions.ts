@@ -16,6 +16,7 @@ export const similarQuestionsRouter = router({
     .query(async ({ ctx, input }) => {
       const similarQuestions = await recommendSimilarQuestions(
         input.questionId,
+        // @ts-ignore
         ctx.user.id,
         input.limit
       );

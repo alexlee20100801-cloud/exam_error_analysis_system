@@ -25,12 +25,14 @@ export default function ExperimentDashboard() {
   const [detailDialogOpen, setDetailDialogOpen] = useState(false);
 
   // 查询所有实验
+  // @ts-ignore
   const { data: experiments, isLoading, refetch } = trpc.abTest.listExperiments.useQuery({
     status: "all",
     limit: 50,
   });
 
   // 查询实验统计
+  // @ts-ignore
   const { data: stats } = trpc.abTest.getExperimentStats.useQuery();
 
   // 手动触发A/B测试决策检查

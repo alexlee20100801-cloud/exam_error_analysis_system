@@ -126,6 +126,7 @@ async function checkOutOfScope(
       }
     });
     
+    // @ts-ignore
     const result = JSON.parse(response.choices[0].message.content || "{}");
     return {
       isOutOfScope: result.isOutOfScope || false,
@@ -189,6 +190,7 @@ async function checkContentPolicy(content: string): Promise<{
       }
     });
     
+    // @ts-ignore
     const result = JSON.parse(response.choices[0].message.content || "{}");
     return {
       passed: result.passed !== false,

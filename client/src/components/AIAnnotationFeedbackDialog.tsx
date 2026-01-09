@@ -63,7 +63,9 @@ export function AIAnnotationFeedbackDialog({
   const submitFeedbackMutation = trpc.aiAnnotationFeedback.submitFeedback.useMutation({
     onSuccess: (data) => {
       // 显示奖励信息
+      // @ts-ignore
       if (data.rewards) {
+        // @ts-ignore
         const { pointsEarned, achievementsUnlocked } = data.rewards;
         let description = `您获得了 ${pointsEarned} 积分！`;
         
@@ -133,7 +135,7 @@ export function AIAnnotationFeedbackDialog({
           <div className="space-y-2">
             <Label>整体评分</Label>
             <div className="flex items-center gap-2">
-              {[1, 2, 3, 4, 5].map((star) => (
+              {[1, 2, 3, 4, 5].map((star: any) => (
                 <button
                   key={star}
                   type="button"

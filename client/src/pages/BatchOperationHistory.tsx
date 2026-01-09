@@ -192,7 +192,7 @@ export default function BatchOperationHistory() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {history.map((operation) => (
+                {history.map((operation: any) => (
                   <TableRow key={operation.id}>
                     <TableCell>
                       <div className="flex items-center gap-2">
@@ -284,7 +284,7 @@ export default function BatchOperationHistory() {
                 <Card>
                   <CardContent className="pt-4">
                     <div className="flex flex-wrap gap-2">
-                      {(operationDetail.affectedIds as number[]).slice(0, 50).map((id) => (
+                      {(operationDetail.affectedIds as number[]).slice(0, 50).map((id: any) => (
                         <Badge key={id} variant="outline">
                           {id}
                         </Badge>

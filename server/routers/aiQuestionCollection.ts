@@ -84,7 +84,7 @@ export const aiQuestionCollectionRouter = router({
 
       // 去重并按相关性排序
       const uniqueResults = Array.from(
-        new Map(analyzedResults.map((r) => [r.sourceName, r])).values()
+        new Map(analyzedResults.map((r: any) => [r.sourceName, r])).values()
       ).sort((a, b) => b.relevanceScore - a.relevanceScore);
 
       return {

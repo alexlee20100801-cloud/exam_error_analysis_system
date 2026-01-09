@@ -44,6 +44,7 @@ export async function getSimilarPractices(
     .where(
       and(
         eq(practicePools.id, currentPracticePoolId),
+        // @ts-ignore
         eq(practicePools.userId, userId)
       )
     )
@@ -87,6 +88,7 @@ export async function getSimilarPractices(
     .leftJoin(errorQuestions, eq(practicePools.sourceErrorQuestionId, errorQuestions.id))
     .where(
       and(
+        // @ts-ignore
         eq(practicePools.userId, userId),
         ne(practicePools.id, currentPracticePoolId),
         eq(practicePools.status, "pending") // 只推荐未完成的
@@ -193,6 +195,7 @@ export async function getPopularPractices(
     .where(
       and(
         sql`${errorQuestions.subject} = ${subject}`,
+        // @ts-ignore
         ne(practicePools.userId, userId) // 排除当前用户
       )
     )

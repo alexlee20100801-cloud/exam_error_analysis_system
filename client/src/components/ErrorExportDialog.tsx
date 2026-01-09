@@ -118,7 +118,7 @@ export function ErrorExportDialog({
                 <div className="space-y-2">
                   <p className="text-sm text-muted-foreground">预览（前5道）：</p>
                   <div className="space-y-1">
-                    {preview.preview.map((q) => (
+                    {preview.preview.map((q: any) => (
                       <div
                         key={q.id}
                         className="text-sm flex items-center gap-2 text-muted-foreground"

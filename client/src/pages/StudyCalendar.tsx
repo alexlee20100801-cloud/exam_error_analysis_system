@@ -204,7 +204,7 @@ export default function StudyCalendar() {
                     <SelectValue placeholder="选择科目" />
                   </SelectTrigger>
                   <SelectContent>
-                    {SUBJECTS.map((subject) => (
+                    {SUBJECTS.map((subject: any) => (
                       <SelectItem key={subject.value} value={subject.value}>
                         {subject.label}
                       </SelectItem>
@@ -219,7 +219,7 @@ export default function StudyCalendar() {
                     <SelectValue placeholder="选择年级" />
                   </SelectTrigger>
                   <SelectContent>
-                    {GRADES.map((grade) => (
+                    {GRADES.map((grade: any) => (
                       <SelectItem key={grade.value} value={grade.value}>
                         {grade.label}
                       </SelectItem>
@@ -260,7 +260,7 @@ export default function StudyCalendar() {
             </CardHeader>
             <CardContent>
               <div className="grid grid-cols-7 gap-0 mb-2">
-                {["日", "一", "二", "三", "四", "五", "六"].map((day) => (
+                {["日", "一", "二", "三", "四", "五", "六"].map((day: any) => (
                   <div key={day} className="text-center text-sm font-medium text-gray-600 py-2">
                     {day}
                   </div>
@@ -279,7 +279,7 @@ export default function StudyCalendar() {
               </CardHeader>
               <CardContent>
                 <div className="space-y-3">
-                  {dayPlans.map((plan) => (
+                  {dayPlans.map((plan: any) => (
                     <div
                       key={plan.id}
                       className={`flex items-center justify-between p-3 rounded-lg border ${
@@ -321,7 +321,7 @@ export default function StudyCalendar() {
             <CardContent>
               {upcomingExams && upcomingExams.length > 0 ? (
                 <div className="space-y-4">
-                  {upcomingExams.map((exam) => (
+                  {upcomingExams.map((exam: any) => (
                     <div key={exam.id} className="border rounded-lg p-4">
                       <h3 className="font-semibold text-lg">{exam.name}</h3>
                       <p className="text-sm text-gray-600 mt-1">

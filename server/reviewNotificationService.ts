@@ -93,7 +93,7 @@ export async function getReviewReminderSummary(userId: number) {
       dueCount: stats.dueCount,
       totalCount: stats.totalCount,
       completedCount: stats.completedCount,
-      topDueReviews: dueReviews.slice(0, 3).map((q) => ({
+      topDueReviews: dueReviews.slice(0, 3).map((q: any) => ({
         id: q.id,
         title: q.title,
         subject: q.subject,

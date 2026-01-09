@@ -264,7 +264,7 @@ export default function IdCardManagement() {
       {/* 证件列表 */}
       {cardsData?.cards && cardsData.cards.length > 0 ? (
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-          {cardsData.cards.map((card) => (
+          {cardsData.cards.map((card: any) => (
             <Card key={card.id}>
               <CardHeader>
                 <CardTitle className="flex items-center justify-between">

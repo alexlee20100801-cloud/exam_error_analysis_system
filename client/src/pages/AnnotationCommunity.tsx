@@ -106,7 +106,7 @@ export default function AnnotationCommunity() {
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">全部学科</SelectItem>
-                {subjects.map((subject) => (
+                {subjects.map((subject: any) => (
                   <SelectItem key={subject.value} value={subject.value}>
                     {subject.label}
                   </SelectItem>
@@ -119,7 +119,7 @@ export default function AnnotationCommunity() {
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">全部年级</SelectItem>
-                {grades.map((grade) => (
+                {grades.map((grade: any) => (
                   <SelectItem key={grade.value} value={grade.value}>
                     {grade.label}
                   </SelectItem>
@@ -147,7 +147,7 @@ export default function AnnotationCommunity() {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {filteredAnnotations
                 .sort((a, b) => (b.likeCount || 0) - (a.likeCount || 0))
-                .map((annotation) => (
+                .map((annotation: any) => (
                   <Card
                     key={annotation.id}
                     className="cursor-pointer hover:shadow-lg transition-shadow"
@@ -210,7 +210,7 @@ export default function AnnotationCommunity() {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {filteredAnnotations
                 .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
-                .map((annotation) => (
+                .map((annotation: any) => (
                   <Card
                     key={annotation.id}
                     className="cursor-pointer hover:shadow-lg transition-shadow"

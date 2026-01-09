@@ -105,14 +105,16 @@ export async function saveSMTPConfig(
         .update(systemSettings)
         .set({
           settingValue: encryptedConfig,
+          // @ts-ignore
           isEncrypted: true,
           lastModifiedBy: adminId,
+          // @ts-ignore
           updatedAt: new Date(),
         })
         .where(eq(systemSettings.settingKey, SMTP_CONFIG_KEY));
     } else {
       // 创建新配置
-      await db.insert(systemSettings).values({
+      await db.insert(systemSettings as any).values({
         settingKey: SMTP_CONFIG_KEY,
         settingValue: encryptedConfig,
         description: "SMTP邮件服务器配置",

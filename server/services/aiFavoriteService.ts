@@ -237,6 +237,7 @@ export async function updateFavoriteFolder(userId: number, folderId: number, dat
   await db.update(favoriteFolders)
     .set({
       ...data,
+      // @ts-ignore
       updatedAt: new Date(),
     })
     .where(and(

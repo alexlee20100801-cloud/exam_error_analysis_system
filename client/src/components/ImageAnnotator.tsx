@@ -532,7 +532,7 @@ export function ImageAnnotator({ imageUrl, itemType, itemId, onSave }: ImageAnno
           </div>
 
           <div className="flex gap-1 ml-4">
-            {COLORS.map((c) => (
+            {COLORS.map((c: any) => (
               <button
                 key={c}
                 className={`w-6 h-6 rounded border-2 ${color === c ? 'border-black' : 'border-gray-300'}`}
