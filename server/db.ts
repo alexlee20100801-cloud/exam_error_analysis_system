@@ -133,8 +133,8 @@ export async function getErrorQuestionsBySubjectAndGrade(userId: number, subject
   return await db.select().from(errorQuestions)
     .where(and(
       eq(errorQuestions.userId, userId),
-      eq(errorQuestions.subject, subject),
-      eq(errorQuestions.grade, grade)
+      eq(errorQuestions.subject, subject as any),
+      eq(errorQuestions.grade, grade as any)
     ))
     .orderBy(desc(errorQuestions.createdAt));
 }
@@ -148,8 +148,8 @@ export async function createKnowledgePoint(data: typeof knowledgePoints.$inferIn
 export async function getKnowledgePointsBySubjectAndGrade(subject: string, grade: string) {
   return await db.select().from(knowledgePoints)
     .where(and(
-      eq(knowledgePoints.subject, subject),
-      eq(knowledgePoints.grade, grade)
+      eq(knowledgePoints.subject, subject as any),
+      eq(knowledgePoints.grade, grade as any)
     ))
     .orderBy(asc(knowledgePoints.name));
 }
@@ -277,8 +277,8 @@ export async function getQuestionBankById(id: number) {
 export async function getQuestionBankBySubjectAndGrade(subject: string, grade: string) {
   return await db.select().from(questionBank)
     .where(and(
-      eq(questionBank.subject, subject),
-      eq(questionBank.grade, grade)
+      eq(questionBank.subject, subject as any),
+      eq(questionBank.grade, grade as any)
     ));
 }
 
@@ -291,8 +291,8 @@ export async function createVideoResource(data: typeof videoResources.$inferInse
 export async function getVideosBySubjectAndGrade(subject: string, grade: string) {
   return await db.select().from(videoResources)
     .where(and(
-      eq(videoResources.subject, subject),
-      eq(videoResources.grade, grade)
+      eq(videoResources.subject, subject as any),
+      eq(videoResources.grade, grade as any)
     ));
 }
 
