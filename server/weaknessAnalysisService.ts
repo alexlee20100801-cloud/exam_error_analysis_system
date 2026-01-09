@@ -202,7 +202,7 @@ export async function analyzeUserWeakness(userId: number): Promise<WeaknessAnaly
   }
 
   // 6. 计算整体掌握率
-  const masteredCount = userErrors.filter((e) => (e as any).isMastered === 1).length;
+  const masteredCount = userErrors.filter((e: any) => (e as any).isMastered === 1).length;
   const overallMasteryRate = (masteredCount / userErrors.length) * 100;
 
   // 7. 生成学习建议
@@ -254,7 +254,7 @@ async function generateImprovementSuggestion(wp: WeakKnowledgePoint): Promise<st
 
     const content = response.choices[0]?.message?.content;
     return typeof content === 'string' ? content : "建议加强该知识点的练习";
-  } catch (error) {
+  } catch (error: unknown) {
     console.error("生成改进建议失败:", error);
     return "建议加强该知识点的练习，多做相关题目";
   }
@@ -289,7 +289,7 @@ async function generateRecommendations(
 
   // 学科分布建议
   const subjectGroups = new Map<string, number>();
-  weakPoints.forEach(wp => {
+  weakPoints.forEach((wp: WeakKnowledgePoint) => {
     subjectGroups.set(wp.subject, (subjectGroups.get(wp.subject) || 0) + wp.errorCount);
   });
 
@@ -315,7 +315,7 @@ async function generateLearningPath(weakPoints: WeakKnowledgePoint[]): Promise<L
 
   // 按难度和错误率排序，先易后难
   const sortedPoints = [...weakPoints].sort((a, b) => {
-    const difficultyOrder = { easy: 1, medium: 2, hard: 3 };
+    const difficultyOrder: Record<string, number> = { easy: 1, medium: 2, hard: 3 };
     if (difficultyOrder[a.difficulty] !== difficultyOrder[b.difficulty]) {
       return difficultyOrder[a.difficulty] - difficultyOrder[b.difficulty];
     }
