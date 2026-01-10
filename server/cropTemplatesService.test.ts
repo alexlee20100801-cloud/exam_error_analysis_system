@@ -28,7 +28,6 @@ describe("cropTemplatesService", () => {
         { x: 10, y: 70, width: 200, height: 100, label: "选项" },
       ],
       category: "choice",
-      isPublic: 0,
     });
 
     expect(template).toBeDefined();

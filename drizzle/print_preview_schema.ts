@@ -35,6 +35,20 @@ export const printTemplates = mysqlTable("print_templates", {
   orientation: varchar("orientation", { length: 20 }).notNull().default("portrait"), // 方向 portrait/landscape
   
   isDefault: boolean("is_default").notNull().default(false), // 是否为默认模板
+  isPublic: boolean("is_public").notNull().default(false), // 是否公开
+  usageCount: int("usage_count").notNull().default(0), // 使用次数
+  logoUrl: text("logo_url"), // Logo URL
+  logoPosition: varchar("logo_position", { length: 50 }).default("top-left"), // Logo 位置
+  logoWidth: int("logo_width").default(100), // Logo 宽度
+  headerAlign: varchar("header_align", { length: 20 }).default("center"), // 页眉对齐
+  headerFontSize: int("header_font_size").default(14), // 页眉字体大小
+  footerAlign: varchar("footer_align", { length: 20 }).default("center"), // 页脚对齐
+  footerFontSize: int("footer_font_size").default(12), // 页脚字体大小
+  questionSpacing: int("question_spacing").default(20), // 题目间距
+  showQuestionNumber: boolean("show_question_number").default(true), // 显示题号
+  showDifficulty: boolean("show_difficulty").default(true), // 显示难度
+  showSubject: boolean("show_subject").default(true), // 显示科目
+  answerPosition: varchar("answer_position", { length: 50 }).default("after-question"), // 答案位置
   
   createdAt: timestamp("created_at").notNull().default(sql`CURRENT_TIMESTAMP`),
   updatedAt: timestamp("updated_at").notNull().default(sql`CURRENT_TIMESTAMP`).onUpdateNow(),

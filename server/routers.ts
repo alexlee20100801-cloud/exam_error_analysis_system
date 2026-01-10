@@ -106,6 +106,8 @@ import { aiExamPaperRouter } from "./routers/aiExamPaper";
 import { optimizationRouter } from "./routers/optimization";
 import { systemManagementRouter } from "./routers/systemManagement";
 import { passwordAuthRouter } from "./routers/passwordAuth";
+import { smsAuthRouter } from "./routers/smsAuth";
+import { accountBindingRouter } from "./routers/accountBinding";
 
 export const appRouter = router({
   system: systemRouter,
@@ -402,6 +404,12 @@ export const appRouter = router({
   
   // 密码认证
   passwordAuth: passwordAuthRouter,
+  
+  // 短信验证码认证
+  smsAuth: smsAuthRouter,
+  
+  // 账号绑定管理
+  accountBinding: accountBindingRouter,
 });
 
 export type AppRouter = typeof appRouter;

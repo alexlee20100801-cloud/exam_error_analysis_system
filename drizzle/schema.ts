@@ -1365,6 +1365,9 @@ export const users = mysqlTable("users", {
 	// 用户名密码登录字段
 	username: varchar({ length: 64 }),
 	passwordHash: varchar("password_hash", { length: 255 }),
+	// 手机号登录字段
+	phone: varchar({ length: 20 }),
+	phoneVerified: tinyint("phone_verified").default(0),
 },
 (table) => [
 	index("users_openId_unique").on(table.openId),
@@ -1845,3 +1848,64 @@ export const ocrProcessingLogs = mysqlTable("ocr_processing_logs", {
 
 export type OcrProcessingLog = typeof ocrProcessingLogs.$inferSelect;
 export type NewOcrProcessingLog = typeof ocrProcessingLogs.$inferInsert;
+
+// ==================== 高级登录认证相关表 ====================
+
+// 验证码表 - 用于手机验证码登录
+export const verificationCodes = mysqlTable("verification_codes", {
+  id: int().autoincrement().primaryKey().notNull(),
+  phone: varchar({ length: 20 }).notNull(),
+  code: varchar({ length: 10 }).notNull(),
+  type: mysqlEnum(['login', 'register', 'bind', 'reset']).notNull(),
+  used: tinyint().default(0).notNull(),
+  expiresAt: timestamp("expires_at", { mode: 'date' }).notNull(),
+  createdAt: timestamp("created_at", { mode: 'string' }).default('CURRENT_TIMESTAMP').notNull(),
+},
+(table) => [
+  index("phone_idx").on(table.phone),
+  index("code_idx").on(table.code),
+  index("expires_at_idx").on(table.expiresAt),
+]);
+
+export type VerificationCode = typeof verificationCodes.$inferSelect;
+export type NewVerificationCode = typeof verificationCodes.$inferInsert;
+
+// 微信OAuth状态表 - 用于微信扫码登录
+export const wechatOAuthStates = mysqlTable("wechat_oauth_states", {
+  id: int().autoincrement().primaryKey().notNull(),
+  state: varchar({ length: 64 }).notNull(),
+  redirectUrl: varchar("redirect_url", { length: 500 }),
+  userId: int("user_id"), // 如果是绑定操作，关联用户ID
+  action: mysqlEnum(['login', 'bind']).default('login').notNull(),
+  used: tinyint().default(0).notNull(),
+  expiresAt: timestamp("expires_at", { mode: 'date' }).notNull(),
+  createdAt: timestamp("created_at", { mode: 'string' }).default('CURRENT_TIMESTAMP').notNull(),
+},
+(table) => [
+  index("state_idx").on(table.state),
+  index("expires_at_idx").on(table.expiresAt),
+]);
+
+export type WechatOAuthState = typeof wechatOAuthStates.$inferSelect;
+export type NewWechatOAuthState = typeof wechatOAuthStates.$inferInsert;
+
+// 账号绑定历史表 - 记录用户账号绑定/解绑操作
+export const accountBindingHistory = mysqlTable("account_binding_history", {
+  id: int().autoincrement().primaryKey().notNull(),
+  userId: int("user_id").notNull(),
+  bindingType: mysqlEnum("binding_type", ['phone', 'wechat', 'username', 'email']).notNull(),
+  action: mysqlEnum(['bind', 'unbind']).notNull(),
+  oldValue: varchar("old_value", { length: 255 }),
+  newValue: varchar("new_value", { length: 255 }),
+  ipAddress: varchar("ip_address", { length: 50 }),
+  userAgent: text("user_agent"),
+  createdAt: timestamp("created_at", { mode: 'string' }).default('CURRENT_TIMESTAMP').notNull(),
+},
+(table) => [
+  index("user_id_idx").on(table.userId),
+  index("binding_type_idx").on(table.bindingType),
+  index("created_at_idx").on(table.createdAt),
+]);
+
+export type AccountBindingHistory = typeof accountBindingHistory.$inferSelect;
+export type NewAccountBindingHistory = typeof accountBindingHistory.$inferInsert;

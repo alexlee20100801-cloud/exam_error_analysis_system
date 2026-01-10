@@ -1,0 +1,9 @@
+{
+  "query": "CREATE TABLE IF NOT EXISTS wechat_oauth_states (\n  id INT AUTO_INCREMENT PRIMARY KEY,\n  state VARCHAR(64) NOT NULL,\n  redirect_url VARCHAR(500),\n  user_id INT,\n  action ENUM('login', 'bind') DEFAULT 'login' NOT NULL,\n  used TINYINT DEFAULT 0 NOT NULL,\n  expires_at TIMESTAMP NOT NULL,\n  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,\n  INDEX state_idx (state),\n  INDEX expires_at_idx (expires_at)\n);",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway03.us-east-1.prod.aws.tidbcloud.com --port 4000 --user Lfr9xqjx7LpxUD9.1efa314e7813 --database Yh4Z4ZSitSFdPWYxtKkkQS --execute CREATE TABLE IF NOT EXISTS wechat_oauth_states (\n  id INT AUTO_INCREMENT PRIMARY KEY,\n  state VARCHAR(64) NOT NULL,\n  redirect_url VARCHAR(500),\n  user_id INT,\n  action ENUM('login', 'bind') DEFAULT 'login' NOT NULL,\n  used TINYINT DEFAULT 0 NOT NULL,\n  expires_at TIMESTAMP NOT NULL,\n  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,\n  INDEX state_idx (state),\n  INDEX expires_at_idx (expires_at)\n);",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 1557
+}

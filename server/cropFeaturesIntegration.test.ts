@@ -23,7 +23,6 @@ describe("Crop Features Integration Tests", () => {
           { x: 10, y: 10, width: 200, height: 50, label: "题目" },
         ],
         category: "choice",
-        isPublic: 0,
       });
 
       expect(template).toBeDefined();
@@ -115,7 +114,6 @@ describe("Crop Features Integration Tests", () => {
           { x: 5, y: 30, width: 90, height: 60, label: "选项" },
         ],
         category: "choice",
-        isPublic: 0,
       });
 
       expect(template).toBeDefined();

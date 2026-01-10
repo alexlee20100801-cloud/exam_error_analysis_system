@@ -1,0 +1,9 @@
+{
+  "query": "CREATE TABLE IF NOT EXISTS account_binding_history (\n  id INT AUTO_INCREMENT PRIMARY KEY,\n  user_id INT NOT NULL,\n  binding_type ENUM('phone', 'wechat', 'username', 'email') NOT NULL,\n  action ENUM('bind', 'unbind') NOT NULL,\n  old_value VARCHAR(255),\n  new_value VARCHAR(255),\n  ip_address VARCHAR(50),\n  user_agent TEXT,\n  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,\n  INDEX user_id_idx (user_id),\n  INDEX binding_type_idx (binding_type),\n  INDEX created_at_idx (created_at)\n);",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway03.us-east-1.prod.aws.tidbcloud.com --port 4000 --user Lfr9xqjx7LpxUD9.1efa314e7813 --database Yh4Z4ZSitSFdPWYxtKkkQS --execute CREATE TABLE IF NOT EXISTS account_binding_history (\n  id INT AUTO_INCREMENT PRIMARY KEY,\n  user_id INT NOT NULL,\n  binding_type ENUM('phone', 'wechat', 'username', 'email') NOT NULL,\n  action ENUM('bind', 'unbind') NOT NULL,\n  old_value VARCHAR(255),\n  new_value VARCHAR(255),\n  ip_address VARCHAR(50),\n  user_agent TEXT,\n  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,\n  INDEX user_id_idx (user_id),\n  INDEX binding_type_idx (binding_type),\n  INDEX created_at_idx (created_at)\n);",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 1587
+}

@@ -86,6 +86,7 @@ import PaperAlgorithmOptimization from "@/pages/PaperAlgorithmOptimization";
 import QuestionBank from "@/pages/QuestionBank";
 import Login from "@/pages/Login";
 import Register from "@/pages/Register";
+import AccountBinding from "@/pages/AccountBinding";
 
 function Router() {
   return (
@@ -171,6 +172,7 @@ function Router() {
       <Route path="/question-bank" component={QuestionBank} />
       <Route path="/login" component={Login} />
       <Route path="/register" component={Register} />
+      <Route path="/account-binding" component={AccountBinding} />
       <Route component={NotFound} />
     </Switch>
   );
