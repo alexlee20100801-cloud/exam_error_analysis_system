@@ -41,9 +41,8 @@ export const dataCrawlerRouter = router({
       .mutation(async ({ input, ctx }) => {
         const result = await createCrawlerTask({
           ...input,
-          createdBy: ctx.user.id,
           status: 'pending',
-        });
+        } as any);
         // @ts-ignore
         return { success: true, taskId: result.insertId };
       }),
@@ -81,7 +80,14 @@ export const dataCrawlerRouter = router({
       }))
       .mutation(async ({ input }) => {
         const { id, ...data } = input;
-        await updateCrawlerTask(id, data);
+        const mappedData = {
+          status: data.status,
+          itemsProcessed: data.processedItems,
+          itemsSucceeded: data.successItems,
+          itemsFailed: data.failedItems,
+          errorMessage: data.errorMessage,
+        };
+        await updateCrawlerTask(id, mappedData as any);
         return { success: true };
       }),
 

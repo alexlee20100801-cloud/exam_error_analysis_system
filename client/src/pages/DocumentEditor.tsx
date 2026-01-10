@@ -152,8 +152,7 @@ export default function DocumentEditor() {
           </Button>
           <div>
             <h1 className="text-3xl font-bold">
-              // @ts-ignore
-              {params?.id ? '编辑错题' : '新建错题'}
+              {params && (params as any).id ? '编辑错题' : '新建错题'}
             </h1>
             <p className="text-muted-foreground mt-1">
               使用富文本编辑器编辑题目内容

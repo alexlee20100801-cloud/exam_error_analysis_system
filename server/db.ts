@@ -2,6 +2,7 @@ import { drizzle } from 'drizzle-orm/mysql2';
 import mysql from 'mysql2/promise';
 import { ENV } from './_core/env';
 import * as schema from '../drizzle/schema';
+import { crawlTasks, crawlSources } from '../drizzle/crawler_question_db_schema';
 
 const connection = mysql.createPool(ENV.databaseUrl);
 export const db = drizzle(connection, { schema, mode: 'default' });
@@ -52,17 +53,14 @@ import {
   userPushReceipts,
   questionReviews,
   annotations,
-  // crawlerTasks已被重命名，暂时注释
-  // crawlerTasks,
   rawQuestions,
-  // crawlerSources已被重命名，暂时注释
-  // crawlerSources,
   knowledgePointTags,
   knowledgePointRelations,
   ocrProcessingLogs,
   uploadHistory,
   uploadSessions,
   uploadSessionItems,
+  crawlerSources,
 } from '../drizzle/schema';
 
 // 注意：在 ES 模块中，所有导出都已通过 export 关键字定义
@@ -460,29 +458,33 @@ export async function deleteFromTable<T>(table: any, id: number): Promise<any> {
 }
 
 // ============ 爬虫任务相关 ============
-export async function createCrawlerTask(data: typeof crawlerTasks.$inferInsert) {
-  const result = await db.insert(crawlerTasks).values(data);
+export async function createCrawlerTask(data: typeof crawlTasks.$inferInsert) {
+  const result = await db.insert(crawlTasks).values(data);
   return result;
 }
 
-export async function getCrawlerTasks() {
-  return await db.select().from(crawlerTasks);
+export async function getCrawlerTasks(filters?: any, limit: number = 20, offset: number = 0) {
+  let query: any = db.select().from(crawlTasks);
+  if (filters?.status) {
+    query = query.where(eq(crawlTasks.status, filters.status as any));
+  }
+  return await query.limit(limit).offset(offset) as any;
 }
 
 export async function getCrawlerTaskById(id: number) {
-  const result = await db.select().from(crawlerTasks)
-    .where(eq(crawlerTasks.id, id))
+  const result = await db.select().from(crawlTasks)
+    .where(eq(crawlTasks.id, id))
     .limit(1);
   return result[0];
 }
 
-export async function updateCrawlerTask(id: number, data: Partial<typeof crawlerTasks.$inferInsert>) {
-  const result = await db.update(crawlerTasks).set(data).where(eq(crawlerTasks.id, id));
+export async function updateCrawlerTask(id: number, data: Partial<typeof crawlTasks.$inferInsert>) {
+  const result = await db.update(crawlTasks).set(data).where(eq(crawlTasks.id, id));
   return result;
 }
 
 export async function deleteCrawlerTask(id: number) {
-  return await db.delete(crawlerTasks).where(eq(crawlerTasks.id, id));
+  return await db.delete(crawlTasks).where(eq(crawlTasks.id, id));
 }
 
 export async function createRawQuestion(data: typeof rawQuestions.$inferInsert) {
@@ -506,21 +508,37 @@ export async function updateRawQuestion(id: number, data: Partial<typeof rawQues
   return result;
 }
 
-export async function createCrawlerSource(data: typeof crawlerSources.$inferInsert) {
-  const result = await db.insert(crawlerSources).values(data);
+// ============ 爬虫来源相关 ============
+export async function createCrawlerSource(data: typeof crawlSources.$inferInsert) {
+  const result = await db.insert(crawlSources).values(data);
   return result;
 }
 
-export async function getCrawlerSources() {
-  return await db.select().from(crawlerSources);
+export async function getCrawlerSources(limit: number = 20, offset: number = 0) {
+  return await db.select().from(crawlSources).limit(limit).offset(offset);
 }
 
-export async function updateCrawlerSource(id: number, data: Partial<typeof crawlerSources.$inferInsert>) {
-  const result = await db.update(crawlerSources).set(data).where(eq(crawlerSources.id, id));
+export async function getCrawlerSourceById(id: number) {
+  const result = await db.select().from(crawlSources)
+    .where(eq(crawlSources.id, id))
+    .limit(1);
+  return result[0];
+}
+
+export async function updateCrawlerSource(id: number, data: Partial<typeof crawlSources.$inferInsert>) {
+  const result = await db.update(crawlSources).set(data).where(eq(crawlSources.id, id));
   return result;
+}
+
+export async function deleteCrawlerSource(id: number) {
+  return await db.delete(crawlSources).where(eq(crawlSources.id, id));
 }
 
 // ============ 动态导出代理 ============
 // 为了处理任何可能的缺失函数，我们提供一个通用的导出对象
 // 注意：在 ES 模块中，不能使用 module.exports
 // 所有导出已在文件顶部通过 export 关键字定义
+
+// 确保所有函数都被正确导出
+// 爬虫相关函数已在上方定义
+// crawler functions are exported above

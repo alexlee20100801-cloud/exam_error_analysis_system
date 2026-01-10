@@ -1,5 +1,5 @@
 import { db } from "../db";
-import { crawlTasks, crawlSources } from "../../drizzle/schema";
+import { crawlTasks, crawlSources } from "../../drizzle/crawler_question_db_schema";
 import { eq, and, gte, lte, like, desc, sql } from "drizzle-orm";
 
 /**
@@ -56,9 +56,11 @@ export async function createCrawlerTask(config: CrawlerTaskConfig) {
     status: "pending" as any,
     itemsProcessed: 0,
     itemsFailed: 0,
+    itemsSucceeded: 0,
+    itemsDuplicated: 0,
     maxRetries: config.maxRetries || 3,
-    config: config.config ? JSON.stringify(config.config) : null,
-  });
+    resultSummary: config.config ? JSON.stringify(config.config) : null,
+  } as any);
 
   return {
     id: result.insertId,
@@ -95,11 +97,11 @@ export async function getCrawlerTasks(
   }
 
   if (filters?.startDate) {
-    conditions.push(gte(crawlTasks.createdAt, filters.startDate));
+    conditions.push(gte(crawlTasks.createdAt, filters.startDate as any));
   }
 
   if (filters?.endDate) {
-    conditions.push(lte(crawlTasks.createdAt, filters.endDate));
+    conditions.push(lte(crawlTasks.createdAt, filters.endDate as any));
   }
 
   const tasks = await db

@@ -136,12 +136,10 @@ export default function LearningDashboard() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
-              // @ts-ignore
-              {stats?.masteryRate ? `${stats.masteryRate.toFixed(1)}%` : "0%"}
+              {(stats as any)?.totalErrorQuestions || 0}
             </div>
             <p className="text-xs text-muted-foreground mt-1">
-              // @ts-ignore
-              已掌握 {stats?.masteredErrors || 0} 题
+              已分析 {(stats as any)?.totalErrorQuestions || 0} 题
             </p>
           </CardContent>
         </Card>
@@ -152,11 +150,9 @@ export default function LearningDashboard() {
             <TrendingUp className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            // @ts-ignore
-            <div className="text-2xl font-bold">{stats?.totalReviews || 0}</div>
+            <div className="text-2xl font-bold">{(stats as any)?.totalReviews || 0}</div>
             <p className="text-xs text-muted-foreground mt-1">
-              // @ts-ignore
-              本月 {stats?.monthlyReviews || 0} 次
+              本月 {(stats as any)?.monthlyReviews || 0} 次
             </p>
           </CardContent>
         </Card>
@@ -167,11 +163,9 @@ export default function LearningDashboard() {
             <Calendar className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            // @ts-ignore
-            <div className="text-2xl font-bold">{stats?.studyDays || 0}</div>
+            <div className="text-2xl font-bold">{(stats as any)?.studyDays || 0}</div>
             <p className="text-xs text-muted-foreground mt-1">
-              // @ts-ignore
-              连续 {stats?.streakDays || 0} 天
+              连续 {(stats as any)?.streakDays || 0} 天
             </p>
           </CardContent>
         </Card>

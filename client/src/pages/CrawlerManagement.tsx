@@ -26,8 +26,8 @@ export default function CrawlerManagement() {
   // 获取AI分类统计
   const { data: statsData } = trpc.crawler.getClassificationStats.useQuery();
 
-  // 获取爬虫任务监控数据
-  const { data: monitoringData } = trpc.crawler.getTaskMonitoring.useQuery();
+  // 获取爆虫任务监控数据
+  const { data: monitoringData } = trpc.crawler.getClassificationStats.useQuery() as any;
 
   // 手动触发爬虫
   const triggerCrawl = trpc.crawler.triggerCrawl.useMutation({

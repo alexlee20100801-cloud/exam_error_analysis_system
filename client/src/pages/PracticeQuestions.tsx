@@ -145,8 +145,7 @@ export default function PracticeQuestions() {
           <Alert>
             <AlertCircle className="h-4 w-4" />
             <AlertDescription>
-              // @ts-ignore
-              {generateMutation.data?.error || "练习题生成失败"}
+              {(generateMutation.data as any)?.error || "练习题生成失败"}
             </AlertDescription>
           </Alert>
           <Button onClick={() => setLocation("/error-questions")} className="mt-4">
@@ -158,8 +157,7 @@ export default function PracticeQuestions() {
     );
   }
 
-  // @ts-ignore
-  const questions = generateMutation.data.questions || [];
+  const questions = (generateMutation.data as any)?.questions || [];
   const currentQuestion = questions[currentQuestionIndex];
   const currentGrading = gradingResults[currentQuestionIndex];
   const currentAnswer = userAnswers[currentQuestionIndex] || "";
@@ -181,8 +179,7 @@ export default function PracticeQuestions() {
             <div>
               <h1 className="text-3xl font-bold">针对性练习</h1>
               <p className="text-muted-foreground mt-1">
-                // @ts-ignore
-                基于错题：{generateMutation.data.errorQuestion?.title}
+                基于错题：{(generateMutation.data as any)?.errorQuestion?.title}
               </p>
             </div>
           </div>

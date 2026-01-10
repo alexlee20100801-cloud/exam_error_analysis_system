@@ -95,8 +95,7 @@ export default function BatchEdit() {
             <CardDescription>请从上传页面进入批量编辑</CardDescription>
           </CardHeader>
           <CardContent>
-            // @ts-ignore
-            <Button onClick={() => navigate('/upload-error-question')}>
+            <Button onClick={() => setLocation('/upload-error-question')}>
               返回上传页面
             </Button>
           </CardContent>
@@ -125,8 +124,7 @@ export default function BatchEdit() {
             <CardDescription>该批量上传会话不存在或已过期</CardDescription>
           </CardHeader>
           <CardContent>
-            // @ts-ignore
-            <Button onClick={() => navigate('/upload-error-question')}>
+            <Button onClick={() => setLocation('/upload-error-question')}>
               返回上传页面
             </Button>
           </CardContent>

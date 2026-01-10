@@ -1,528 +1,418 @@
-import { useState, useEffect } from "react";
-import { useLocation, useRoute } from "wouter";
-import { trpc } from "@/lib/trpc";
-import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
-import { Label } from "@/components/ui/label";
-import { Input } from "@/components/ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Switch } from "@/components/ui/switch";
-import { Textarea } from "@/components/ui/textarea";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { toast } from "sonner";
-import { Loader2, Printer, FileDown, Save, Settings2 } from "lucide-react";
+import React, { useState, useRef } from 'react';
+import { Button } from '@/components/ui/button';
+import { Card } from '@/components/ui/card';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Input } from '@/components/ui/input';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
+import { Slider } from '@/components/ui/slider';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { trpc } from '@/lib/trpc';
+import { useAuth } from '@/_core/hooks/useAuth';
+import { toast } from 'sonner';
 
-/**
- * 打印预览页面
- * 支持实时预览、排版调整和内容选择
- */
+const useToast = () => ({ toast });
+
+interface PrintConfig {
+  layout: 'single' | 'double';
+  fontSize: number;
+  margin: number;
+  includeAnswer: boolean;
+  includeExplanation: boolean;
+  includeAiAnalysis: boolean;
+  includeErrorSources: boolean;
+  includeKnowledgePoints: boolean;
+  headerText: string;
+  footerText: string;
+  showPageNumber: boolean;
+  templateStyle: 'notebook' | 'exam' | 'custom';
+}
+
+const DEFAULT_CONFIG: PrintConfig = {
+  layout: 'single',
+  fontSize: 14,
+  margin: 20,
+  includeAnswer: true,
+  includeExplanation: true,
+  includeAiAnalysis: false,
+  includeErrorSources: false,
+  includeKnowledgePoints: true,
+  headerText: '错题本',
+  footerText: '',
+  showPageNumber: true,
+  templateStyle: 'notebook',
+};
+
 export default function PrintPreview() {
-  const [, params] = useRoute("/print-preview/:questionIds");
-  const [, navigate] = useLocation();
-  
-  // 解析错题ID列表
-  // @ts-ignore
-  const questionIds = params?.questionIds 
-    // @ts-ignore
-    ? params.questionIds.split(',').map(Number).filter(Boolean)
-    : [];
+  const { user } = useAuth();
+  const [config, setConfig] = useState<PrintConfig>(DEFAULT_CONFIG);
+  const [selectedQuestions, setSelectedQuestions] = useState<number[]>([]);
+  const [previewMode, setPreviewMode] = useState(true);
+  const printRef = useRef<HTMLDivElement>(null);
 
-  // 打印配置状态
-  const [config, setConfig] = useState({
-    layout: 'single' as 'single' | 'double',
-    fontSize: 14,
-    marginTop: 20,
-    marginBottom: 20,
-    marginLeft: 20,
-    marginRight: 20,
-    includeAiAnalysis: true,
-    includeAnswer: true,
-    includeExplanation: true,
-    includeKnowledgePoints: true,
-    includeImage: true,
-    headerText: '',
-    footerText: '',
-    showPageNumber: true,
-    paperSize: 'A4' as 'A4' | 'A5' | 'Letter',
-    orientation: 'portrait' as 'portrait' | 'landscape',
-  });
-
-  const [templateName, setTemplateName] = useState('');
-  const [selectedTemplateId, setSelectedTemplateId] = useState<number | undefined>();
-
-  // 获取打印预览数据
-  const { data: previewData, isLoading } = trpc.printPreview.getPreviewData.useQuery(
-    { questionIds, templateId: selectedTemplateId },
-    { enabled: questionIds.length > 0 }
+  // 获取用户的错题
+  const { data: questions = [], isLoading } = trpc.errorQuestions.list.useQuery(
+    { userId: user?.id || 0 },
+    { enabled: !!user?.id }
   );
 
-  // 获取用户模板列表
-  const { data: templates } = trpc.printPreview.getTemplates.useQuery();
-
-  // 保存模板
-  const saveTemplateMutation = trpc.printPreview.createTemplate.useMutation({
-    onSuccess: () => {
-      toast.success('模板保存成功');
-      setTemplateName('');
-    },
-    onError: (error) => {
-      toast.error(`保存失败: ${error.message}`);
-    },
-  });
-
-  // 记录打印历史
-  const recordHistoryMutation = trpc.printPreview.recordHistory.useMutation();
-
-  // 当加载模板时更新配置
-  useEffect(() => {
-    if (previewData?.template) {
-      setConfig({
-        layout: previewData.template.layout as 'single' | 'double',
-        fontSize: previewData.template.fontSize,
-        marginTop: previewData.template.marginTop,
-        marginBottom: previewData.template.marginBottom,
-        marginLeft: previewData.template.marginLeft,
-        marginRight: previewData.template.marginRight,
-        includeAiAnalysis: previewData.template.includeAiAnalysis,
-        includeAnswer: previewData.template.includeAnswer,
-        includeExplanation: previewData.template.includeExplanation,
-        includeKnowledgePoints: previewData.template.includeKnowledgePoints,
-        includeImage: previewData.template.includeImage,
-        headerText: previewData.template.headerText || '',
-        footerText: previewData.template.footerText || '',
-        showPageNumber: previewData.template.showPageNumber,
-        paperSize: previewData.template.paperSize as 'A4' | 'A5' | 'Letter',
-        orientation: previewData.template.orientation as 'portrait' | 'landscape',
-      });
-    }
-  }, [previewData]);
-
-  // 处理打印
   const handlePrint = () => {
-    recordHistoryMutation.mutate({
-      questionIds,
-      exportType: 'print',
-      configSnapshot: config,
-      templateId: selectedTemplateId,
-    });
-    window.print();
-  };
-
-  // 处理导出PDF
-  const handleExportPDF = () => {
-    recordHistoryMutation.mutate({
-      questionIds,
-      exportType: 'pdf',
-      configSnapshot: config,
-      templateId: selectedTemplateId,
-    });
-    window.print();
-    toast.success('请在打印对话框中选择"另存为PDF"');
-  };
-
-  // 保存模板
-  const handleSaveTemplate = () => {
-    if (!templateName.trim()) {
-      toast.error('请输入模板名称');
-      return;
+    if (printRef.current) {
+      const printWindow = window.open('', '', 'width=800,height=600');
+      if (printWindow) {
+        printWindow.document.write(printRef.current.innerHTML);
+        printWindow.document.close();
+        printWindow.print();
+      }
     }
-
-    saveTemplateMutation.mutate({
-      name: templateName,
-      ...config,
-    });
   };
 
-  // 加载模板
-  const handleLoadTemplate = (templateId: string) => {
-    const id = parseInt(templateId);
-    setSelectedTemplateId(id);
+  const handleExportPDF = async () => {
+    try {
+      // 此功能待实现
+      toast.info('功能开发中: PDF 导出功能正在开发中');
+    } catch (error) {
+      toast.error('导出失败: 请稍后重试');
+    }
   };
 
-  if (questionIds.length === 0) {
-    return (
-      <div className="container py-8">
-        <Card className="p-6">
-          <p className="text-center text-muted-foreground">
-            请从错题列表选择要打印的错题
-          </p>
-          <div className="flex justify-center mt-4">
-            <Button onClick={() => navigate('/error-questions')}>
-              返回错题列表
-            </Button>
-          </div>
-        </Card>
-      </div>
-    );
-  }
+  const handleExportWord = async () => {
+    try {
+      // 此功能待实现
+      toast.info('功能开发中: Word 导出功能正在开发中');
+    } catch (error) {
+      toast.error('导出失败: 请稍后重试');
+    }
+  };
 
-  if (isLoading) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <Loader2 className="h-8 w-8 animate-spin" />
-      </div>
-    );
-  }
+  const questionsToPreview = selectedQuestions.length > 0
+    ? questions.filter(q => selectedQuestions.includes(q.id))
+    : questions;
 
   return (
-    <div className="min-h-screen bg-background">
-      {/* 工具栏 - 不打印 */}
-      <div className="print:hidden border-b bg-card sticky top-0 z-10">
-        <div className="container py-4">
-          <div className="flex items-center justify-between">
-            <h1 className="text-2xl font-bold">打印预览</h1>
-            <div className="flex gap-2">
-              <Button variant="outline" onClick={() => navigate('/error-questions')}>
-                返回
-              </Button>
-              <Button variant="outline" onClick={handleExportPDF}>
-                <FileDown className="h-4 w-4 mr-2" />
-                导出PDF
-              </Button>
-              <Button onClick={handlePrint}>
-                <Printer className="h-4 w-4 mr-2" />
+    <div className="container mx-auto py-8">
+      <h1 className="text-3xl font-bold mb-6">打印预览</h1>
+
+      <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+        {/* 配置面板 */}
+        <div className="lg:col-span-1">
+          <Card className="p-4">
+            <h2 className="text-lg font-semibold mb-4">打印配置</h2>
+
+            <Tabs defaultValue="layout" className="w-full">
+              <TabsList className="grid w-full grid-cols-2">
+                <TabsTrigger value="layout">布局</TabsTrigger>
+                <TabsTrigger value="content">内容</TabsTrigger>
+              </TabsList>
+
+              <TabsContent value="layout" className="space-y-4">
+                <div>
+                  <Label>模板风格</Label>
+                  <Select value={config.templateStyle} onValueChange={(value) =>
+                    setConfig({ ...config, templateStyle: value as any })
+                  }>
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="notebook">错题本风格</SelectItem>
+                      <SelectItem value="exam">试卷风格</SelectItem>
+                      <SelectItem value="custom">自定义</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div>
+                  <Label>页面布局</Label>
+                  <Select value={config.layout} onValueChange={(value) =>
+                    setConfig({ ...config, layout: value as any })
+                  }>
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="single">单列</SelectItem>
+                      <SelectItem value="double">双列</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div>
+                  <Label>字体大小: {config.fontSize}px</Label>
+                  <Slider
+                    value={[config.fontSize]}
+                    onValueChange={([value]) => setConfig({ ...config, fontSize: value })}
+                    min={10}
+                    max={20}
+                    step={1}
+                  />
+                </div>
+
+                <div>
+                  <Label>边距: {config.margin}px</Label>
+                  <Slider
+                    value={[config.margin]}
+                    onValueChange={([value]) => setConfig({ ...config, margin: value })}
+                    min={10}
+                    max={50}
+                    step={5}
+                  />
+                </div>
+
+                <div>
+                  <Label>页眉</Label>
+                  <Input
+                    value={config.headerText}
+                    onChange={(e) => setConfig({ ...config, headerText: e.target.value })}
+                    placeholder="输入页眉文字"
+                  />
+                </div>
+
+                <div>
+                  <Label>页脚</Label>
+                  <Input
+                    value={config.footerText}
+                    onChange={(e) => setConfig({ ...config, footerText: e.target.value })}
+                    placeholder="输入页脚文字"
+                  />
+                </div>
+
+                <div className="flex items-center space-x-2">
+                  <Checkbox
+                    id="showPageNumber"
+                    checked={config.showPageNumber}
+                    onCheckedChange={(checked) =>
+                      setConfig({ ...config, showPageNumber: !!checked })
+                    }
+                  />
+                  <Label htmlFor="showPageNumber">显示页码</Label>
+                </div>
+              </TabsContent>
+
+              <TabsContent value="content" className="space-y-4">
+                <div className="flex items-center space-x-2">
+                  <Checkbox
+                    id="includeAnswer"
+                    checked={config.includeAnswer}
+                    onCheckedChange={(checked) =>
+                      setConfig({ ...config, includeAnswer: !!checked })
+                    }
+                  />
+                  <Label htmlFor="includeAnswer">包含答案</Label>
+                </div>
+
+                <div className="flex items-center space-x-2">
+                  <Checkbox
+                    id="includeExplanation"
+                    checked={config.includeExplanation}
+                    onCheckedChange={(checked) =>
+                      setConfig({ ...config, includeExplanation: !!checked })
+                    }
+                  />
+                  <Label htmlFor="includeExplanation">包含解析</Label>
+                </div>
+
+                <div className="flex items-center space-x-2">
+                  <Checkbox
+                    id="includeAiAnalysis"
+                    checked={config.includeAiAnalysis}
+                    onCheckedChange={(checked) =>
+                      setConfig({ ...config, includeAiAnalysis: !!checked })
+                    }
+                  />
+                  <Label htmlFor="includeAiAnalysis">包含 AI 分析</Label>
+                </div>
+
+                <div className="flex items-center space-x-2">
+                  <Checkbox
+                    id="includeErrorSources"
+                    checked={config.includeErrorSources}
+                    onCheckedChange={(checked) =>
+                      setConfig({ ...config, includeErrorSources: !!checked })
+                    }
+                  />
+                  <Label htmlFor="includeErrorSources">包含错误来源</Label>
+                </div>
+
+                <div className="flex items-center space-x-2">
+                  <Checkbox
+                    id="includeKnowledgePoints"
+                    checked={config.includeKnowledgePoints}
+                    onCheckedChange={(checked) =>
+                      setConfig({ ...config, includeKnowledgePoints: !!checked })
+                    }
+                  />
+                  <Label htmlFor="includeKnowledgePoints">包含知识点</Label>
+                </div>
+              </TabsContent>
+            </Tabs>
+
+            <div className="mt-6 space-y-2">
+              <Button onClick={handlePrint} className="w-full" variant="outline">
                 打印
               </Button>
+              <Button onClick={handleExportPDF} className="w-full" variant="outline">
+                导出 PDF
+              </Button>
+              <Button onClick={handleExportWord} className="w-full" variant="outline">
+                导出 Word
+              </Button>
             </div>
-          </div>
+          </Card>
         </div>
-      </div>
 
-      <div className="container py-6 print:p-0">
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-          {/* 配置面板 - 不打印 */}
-          <div className="lg:col-span-1 print:hidden">
-            <Card className="p-4 sticky top-24">
-              <Tabs defaultValue="layout">
-                <TabsList className="grid w-full grid-cols-2">
-                  <TabsTrigger value="layout">
-                    <Settings2 className="h-4 w-4 mr-2" />
-                    排版
-                  </TabsTrigger>
-                  <TabsTrigger value="content">内容</TabsTrigger>
-                </TabsList>
-
-                <TabsContent value="layout" className="space-y-4 mt-4">
-                  {/* 模板选择 */}
-                  <div className="space-y-2">
-                    <Label>选择模板</Label>
-                    <Select value={selectedTemplateId?.toString()} onValueChange={handleLoadTemplate}>
-                      <SelectTrigger>
-                        <SelectValue placeholder="选择已保存的模板" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {templates?.map((template: any) => (
-                          <SelectItem key={template.id} value={template.id.toString()}>
-                            {template.name}
-                            {template.isDefault && ' (默认)'}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-
-                  {/* 布局 */}
-                  <div className="space-y-2">
-                    <Label>布局</Label>
-                    <Select value={config.layout} onValueChange={(value) => setConfig({ ...config, layout: value as 'single' | 'double' })}>
-                      <SelectTrigger>
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="single">单列</SelectItem>
-                        <SelectItem value="double">双列</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-
-                  {/* 字体大小 */}
-                  <div className="space-y-2">
-                    <Label>字体大小: {config.fontSize}px</Label>
-                    <Input
-                      type="range"
-                      min="8"
-                      max="24"
-                      value={config.fontSize}
-                      onChange={(e) => setConfig({ ...config, fontSize: parseInt(e.target.value) })}
-                    />
-                  </div>
-
-                  {/* 纸张大小 */}
-                  <div className="space-y-2">
-                    <Label>纸张大小</Label>
-                    <Select value={config.paperSize} onValueChange={(value) => setConfig({ ...config, paperSize: value as 'A4' | 'A5' | 'Letter' })}>
-                      <SelectTrigger>
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="A4">A4</SelectItem>
-                        <SelectItem value="A5">A5</SelectItem>
-                        <SelectItem value="Letter">Letter</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-
-                  {/* 方向 */}
-                  <div className="space-y-2">
-                    <Label>方向</Label>
-                    <Select value={config.orientation} onValueChange={(value) => setConfig({ ...config, orientation: value as 'portrait' | 'landscape' })}>
-                      <SelectTrigger>
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="portrait">纵向</SelectItem>
-                        <SelectItem value="landscape">横向</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-
-                  {/* 边距 */}
-                  <div className="space-y-2">
-                    <Label>边距 (mm)</Label>
-                    <div className="grid grid-cols-2 gap-2">
-                      <div>
-                        <Label className="text-xs">上</Label>
-                        <Input
-                          type="number"
-                          min="0"
-                          max="50"
-                          value={config.marginTop}
-                          onChange={(e) => setConfig({ ...config, marginTop: parseInt(e.target.value) })}
-                        />
-                      </div>
-                      <div>
-                        <Label className="text-xs">下</Label>
-                        <Input
-                          type="number"
-                          min="0"
-                          max="50"
-                          value={config.marginBottom}
-                          onChange={(e) => setConfig({ ...config, marginBottom: parseInt(e.target.value) })}
-                        />
-                      </div>
-                      <div>
-                        <Label className="text-xs">左</Label>
-                        <Input
-                          type="number"
-                          min="0"
-                          max="50"
-                          value={config.marginLeft}
-                          onChange={(e) => setConfig({ ...config, marginLeft: parseInt(e.target.value) })}
-                        />
-                      </div>
-                      <div>
-                        <Label className="text-xs">右</Label>
-                        <Input
-                          type="number"
-                          min="0"
-                          max="50"
-                          value={config.marginRight}
-                          onChange={(e) => setConfig({ ...config, marginRight: parseInt(e.target.value) })}
-                        />
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* 页眉页脚 */}
-                  <div className="space-y-2">
-                    <Label>页眉</Label>
-                    <Input
-                      placeholder="页眉文字"
-                      value={config.headerText}
-                      onChange={(e) => setConfig({ ...config, headerText: e.target.value })}
-                    />
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label>页脚</Label>
-                    <Input
-                      placeholder="页脚文字"
-                      value={config.footerText}
-                      onChange={(e) => setConfig({ ...config, footerText: e.target.value })}
-                    />
-                  </div>
-
-                  <div className="flex items-center space-x-2">
-                    <Switch
-                      checked={config.showPageNumber}
-                      onCheckedChange={(checked) => setConfig({ ...config, showPageNumber: checked })}
-                    />
-                    <Label>显示页码</Label>
-                  </div>
-                </TabsContent>
-
-                <TabsContent value="content" className="space-y-4 mt-4">
-                  <div className="space-y-3">
-                    <div className="flex items-center space-x-2">
-                      <Switch
-                        checked={config.includeImage}
-                        onCheckedChange={(checked) => setConfig({ ...config, includeImage: checked })}
-                      />
-                      <Label>包含原题图片</Label>
-                    </div>
-
-                    <div className="flex items-center space-x-2">
-                      <Switch
-                        checked={config.includeAnswer}
-                        onCheckedChange={(checked) => setConfig({ ...config, includeAnswer: checked })}
-                      />
-                      <Label>包含答案</Label>
-                    </div>
-
-                    <div className="flex items-center space-x-2">
-                      <Switch
-                        checked={config.includeExplanation}
-                        onCheckedChange={(checked) => setConfig({ ...config, includeExplanation: checked })}
-                      />
-                      <Label>包含解析</Label>
-                    </div>
-
-                    <div className="flex items-center space-x-2">
-                      <Switch
-                        checked={config.includeKnowledgePoints}
-                        onCheckedChange={(checked) => setConfig({ ...config, includeKnowledgePoints: checked })}
-                      />
-                      <Label>包含知识点</Label>
-                    </div>
-
-                    <div className="flex items-center space-x-2">
-                      <Switch
-                        checked={config.includeAiAnalysis}
-                        onCheckedChange={(checked) => setConfig({ ...config, includeAiAnalysis: checked })}
-                      />
-                      <Label>包含AI分析</Label>
-                    </div>
-                  </div>
-
-                  {/* 保存模板 */}
-                  <div className="pt-4 border-t space-y-2">
-                    <Label>保存为模板</Label>
-                    <Input
-                      placeholder="模板名称"
-                      value={templateName}
-                      onChange={(e) => setTemplateName(e.target.value)}
-                    />
-                    <Button
-                      className="w-full"
-                      variant="outline"
-                      onClick={handleSaveTemplate}
-                      disabled={saveTemplateMutation.isPending}
-                    >
-                      {saveTemplateMutation.isPending ? (
-                        <Loader2 className="h-4 w-4 animate-spin mr-2" />
-                      ) : (
-                        <Save className="h-4 w-4 mr-2" />
-                      )}
-                      保存模板
-                    </Button>
-                  </div>
-                </TabsContent>
-              </Tabs>
-            </Card>
-          </div>
-
-          {/* 预览区域 */}
-          <div className="lg:col-span-3">
-            <div
-              className="bg-white shadow-lg mx-auto print:shadow-none"
-              style={{
-                width: config.paperSize === 'A4' ? '210mm' : config.paperSize === 'A5' ? '148mm' : '8.5in',
-                minHeight: config.paperSize === 'A4' ? '297mm' : config.paperSize === 'A5' ? '210mm' : '11in',
-                padding: `${config.marginTop}mm ${config.marginRight}mm ${config.marginBottom}mm ${config.marginLeft}mm`,
-                fontSize: `${config.fontSize}px`,
-              }}
-            >
-              {/* 页眉 */}
-              {config.headerText && (
-                <div className="text-center mb-4 pb-2 border-b">
-                  {config.headerText}
-                </div>
-              )}
-
-              {/* 错题内容 */}
-              <div className={config.layout === 'double' ? 'columns-2 gap-4' : ''}>
-                {previewData?.questions.map((question, index) => (
-                  <div key={question.id} className="mb-6 break-inside-avoid">
-                    <div className="font-bold mb-2">
-                      {index + 1}. {question.subject} - {question.difficulty}
-                    </div>
-
-                    {/* 原题图片 */}
-                    {config.includeImage && question.imageUrl && (
-                      <div className="mb-3">
-                        <img
-                          src={question.imageUrl}
-                          alt="错题"
-                          className="max-w-full h-auto"
-                        />
-                      </div>
-                    )}
-
-                    {/* 题目内容 */}
-                    {question.content && (
-                      <div className="mb-2">
-                        <div className="font-semibold">题目:</div>
-                        <div className="whitespace-pre-wrap">{question.content}</div>
-                      </div>
-                    )}
-
-                    {/* 答案 */}
-                    {config.includeAnswer && question.correctAnswer && (
-                      <div className="mb-2">
-                        <div className="font-semibold">答案:</div>
-                        <div>{question.correctAnswer}</div>
-                      </div>
-                    )}
-
-                    {/* 解析 */}
-                    // @ts-ignore
-                    {config.includeExplanation && question.explanation && (
-                      <div className="mb-2">
-                        <div className="font-semibold">解析:</div>
-                        // @ts-ignore
-                        <div className="whitespace-pre-wrap">{question.explanation}</div>
-                      </div>
-                    )}
-
-                    {/* 知识点 */}
-                    // @ts-ignore
-                    {config.includeKnowledgePoints && question.knowledgePoints && (
-                      <div className="mb-2">
-                        <div className="font-semibold">知识点:</div>
-                        <div className="flex flex-wrap gap-1">
-                          // @ts-ignore
-                          {question.knowledgePoints.split(',').map((kp, i) => (
-                            <span key={i} className="text-xs bg-gray-100 px-2 py-1 rounded">
-                              {kp.trim()}
-                            </span>
-                          ))}
-                        </div>
-                      </div>
-                    )}
-
-                    {/* AI分析 */}
-                    // @ts-ignore
-                    {config.includeAiAnalysis && question.aiAnalysis && (
-                      <div className="mb-2">
-                        <div className="font-semibold">AI分析:</div>
-                        // @ts-ignore
-                        <div className="text-sm whitespace-pre-wrap">{question.aiAnalysis}</div>
-                      </div>
-                    )}
-                  </div>
-                ))}
+        {/* 预览面板 */}
+        <div className="lg:col-span-3">
+          <Card className="p-4">
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-lg font-semibold">预览</h2>
+              <div className="space-x-2">
+                <Button
+                  variant={previewMode ? 'default' : 'outline'}
+                  onClick={() => setPreviewMode(true)}
+                >
+                  预览模式
+                </Button>
+                <Button
+                  variant={!previewMode ? 'default' : 'outline'}
+                  onClick={() => setPreviewMode(false)}
+                >
+                  选择模式
+                </Button>
               </div>
-
-              {/* 页脚 */}
-              {(config.footerText || config.showPageNumber) && (
-                <div className="text-center mt-4 pt-2 border-t text-sm">
-                  {config.footerText}
-                  {config.showPageNumber && config.footerText && ' - '}
-                  {config.showPageNumber && '第 1 页'}
-                </div>
-              )}
             </div>
-          </div>
+
+            {previewMode ? (
+              <div
+                ref={printRef}
+                className="bg-white p-8 rounded border"
+                style={{
+                  fontSize: `${config.fontSize}px`,
+                  padding: `${config.margin}px`,
+                  columnCount: config.layout === 'double' ? 2 : 1,
+                }}
+              >
+                {/* 页眉 */}
+                {config.headerText && (
+                  <div className="text-center mb-4 pb-2 border-b">
+                    <h1 className="text-2xl font-bold">{config.headerText}</h1>
+                  </div>
+                )}
+
+                {/* 题目列表 */}
+                <div>
+                  {questionsToPreview.map((question, index) => (
+                    <div key={question.id} className="mb-6 pb-4 border-b">
+                      <div className="font-semibold mb-2">
+                        {index + 1}. {question.title}
+                      </div>
+
+                      {/* 题目内容 */}
+                      {question.content && (
+                        <div className="mb-2">
+                          <div className="font-semibold">题目:</div>
+                          <div className="whitespace-pre-wrap">{question.content}</div>
+                        </div>
+                      )}
+
+                      {/* 答案 */}
+                      {config.includeAnswer && question.correctAnswer && (
+                        <div className="mb-2">
+                          <div className="font-semibold">答案:</div>
+                          <div>{question.correctAnswer}</div>
+                        </div>
+                      )}
+
+                      {/* 解析 */}
+                      {config.includeExplanation && (question as any).explanation && (
+                        <div className="mb-2">
+                          <div className="font-semibold">解析:</div>
+                          <div className="whitespace-pre-wrap">{(question as any).explanation}</div>
+                        </div>
+                      )}
+
+                      {/* 知识点 */}
+                      {config.includeKnowledgePoints && (question as any).knowledgePoints && (
+                        <div className="mb-2">
+                          <div className="font-semibold">知识点:</div>
+                          <div className="flex flex-wrap gap-1">
+                            {((question as any).knowledgePoints || '').split(',').map((kp: string, i: number) => (
+                              <span key={i} className="text-xs bg-gray-100 px-2 py-1 rounded">
+                                {kp.trim()}
+                              </span>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+
+                      {/* AI 分析 */}
+                      {config.includeAiAnalysis && (question as any).aiAnalysis && (
+                        <div className="mb-2">
+                          <div className="font-semibold">AI 分析:</div>
+                          <div className="text-sm whitespace-pre-wrap">{(question as any).aiAnalysis}</div>
+                        </div>
+                      )}
+
+                      {/* 错误来源 */}
+                      {config.includeErrorSources && (question as any).errorSources && (
+                        <div className="mb-2">
+                          <div className="font-semibold">错误来源:</div>
+                          <div className="text-sm">{(question as any).errorSources}</div>
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+
+                {/* 页脚 */}
+                {(config.footerText || config.showPageNumber) && (
+                  <div className="text-center mt-4 pt-2 border-t text-sm">
+                    {config.footerText}
+                    {config.showPageNumber && config.footerText && ' - '}
+                    {config.showPageNumber && '第 1 页'}
+                  </div>
+                )}
+              </div>
+            ) : (
+              <div className="space-y-2">
+                <div className="flex items-center justify-between p-2 bg-gray-50 rounded">
+                  <span>全选</span>
+                  <Checkbox
+                    checked={selectedQuestions.length === questions.length && questions.length > 0}
+                    onCheckedChange={(checked) => {
+                      if (checked) {
+                        setSelectedQuestions(questions.map(q => q.id));
+                      } else {
+                        setSelectedQuestions([]);
+                      }
+                    }}
+                  />
+                </div>
+
+                <div className="max-h-96 overflow-y-auto space-y-2">
+                  {questions.map((question) => (
+                    <div key={question.id} className="flex items-center justify-between p-2 border rounded">
+                      <span className="truncate">{question.title}</span>
+                      <Checkbox
+                        checked={selectedQuestions.includes(question.id)}
+                        onCheckedChange={(checked) => {
+                          if (checked) {
+                            setSelectedQuestions([...selectedQuestions, question.id]);
+                          } else {
+                            setSelectedQuestions(
+                              selectedQuestions.filter(id => id !== question.id)
+                            );
+                          }
+                        }}
+                      />
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </Card>
         </div>
       </div>
     </div>

@@ -133,12 +133,10 @@ export default function RecommendationManagement() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
-              // @ts-ignore
-              {recommendationStats?.hitRate ? `${recommendationStats.hitRate.toFixed(1)}%` : "0%"}
+              {recommendationStats?.totalCaches > 0 ? Math.round((recommendationStats.totalHits / recommendationStats.totalCaches) * 100) : 0}%
             </div>
             <p className="text-xs text-muted-foreground">
-              // @ts-ignore
-              总请求: {recommendationStats?.totalRequests || 0}
+              总请求: {recommendationStats?.totalCaches || 0}
             </p>
           </CardContent>
         </Card>
