@@ -1,0 +1,1 @@
+ALTER TABLE `crawl_tasks` ADD `task_name` varchar(255);

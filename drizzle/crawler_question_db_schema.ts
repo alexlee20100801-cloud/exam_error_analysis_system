@@ -161,6 +161,7 @@ export const crawlTasks = mysqlTable("crawl_tasks", {
   sourceId: int("source_id").notNull(), // 数据源ID
   
   // 任务信息
+  taskName: varchar("task_name", { length: 255 }), // 任务名称
   taskType: mysqlEnum("task_type", ["scheduled", "manual", "retry"]).notNull(), // 任务类型
   status: mysqlEnum(["pending", "running", "completed", "failed", "cancelled"]).default("pending").notNull(), // 任务状态
   

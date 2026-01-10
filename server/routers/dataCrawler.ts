@@ -39,12 +39,14 @@ export const dataCrawlerRouter = router({
         config: z.any().optional(),
       }))
       .mutation(async ({ input, ctx }) => {
-        const result = await createCrawlerTask({
-          ...input,
-          status: 'pending',
-        } as any);
-        // @ts-ignore
-        return { success: true, taskId: result.insertId };
+        const taskData = {
+          sourceId: 1,
+          taskName: input.taskName,
+          taskType: input.taskType as any,
+          status: 'pending' as const,
+        };
+        const result = await createCrawlerTask(taskData);
+        return { success: true, taskId: (result as any).insertId };
       }),
 
     // 获取爬虫任务列表

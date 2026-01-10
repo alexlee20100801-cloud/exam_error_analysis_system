@@ -213,18 +213,12 @@ export async function createCrawlerTask(data: {
   config?: Record<string, any>;
   createdBy: number;
 }) {
+  // Only insert valid crawlTasks fields
   const result = await db.insert(crawlTasks).values({
+    sourceId: 1, // TODO: Get actual sourceId from input or create source first
     taskName: data.taskName,
     taskType: data.taskType as any,
-    sourceUrl: data.sourceUrl,
-    sourceType: data.sourceType,
-    targetSubject: data.targetSubject as any,
-    targetGrade: data.targetGrade as any,
-    scheduleType: (data.scheduleType || 'once') as any,
-    scheduleTime: data.scheduleTime,
-    config: data.config,
-    createdBy: data.createdBy,
-    status: 'pending' as any
+    status: 'pending' as const
   });
 
   return result;
