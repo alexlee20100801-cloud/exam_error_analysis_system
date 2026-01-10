@@ -105,6 +105,7 @@ import { crawlerRouter } from "./routers/crawler";
 import { aiExamPaperRouter } from "./routers/aiExamPaper";
 import { optimizationRouter } from "./routers/optimization";
 import { systemManagementRouter } from "./routers/systemManagement";
+import { passwordAuthRouter } from "./routers/passwordAuth";
 
 export const appRouter = router({
   system: systemRouter,
@@ -398,6 +399,9 @@ export const appRouter = router({
   
   // 系统管理
   systemManagement: systemManagementRouter,
+  
+  // 密码认证
+  passwordAuth: passwordAuthRouter,
 });
 
 export type AppRouter = typeof appRouter;

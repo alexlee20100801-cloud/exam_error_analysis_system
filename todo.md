@@ -2149,3 +2149,40 @@ if (error.knowledgePointIds) {
 - [ ] 记录优化效果和性能指标
 - [ ] 创建优化总结报告
 - [ ] 创建最终检查点
+
+
+## 紧急Bug修复 (2026-01-10)
+- [ ] 修复React版本冲突导致的"Invalid hook call"错误
+- [ ] 修复Vite WebSocket HMR连接失败问题
+
+
+## 紧急Bug修复 (2026-01-10)
+- [x] 修复React版本冲突导致的"Invalid hook call"错误 (清理Vite缓存解决)
+- [x] 修复Vite WebSocket HMR连接失败问题 (重启服务器解决)
+
+
+## 用户名密码注册登录功能（2026-01-10）
+
+### 数据库扩展
+- [x] 扩展用户表添加username和password_hash字段
+- [x] 添加email字段用于找回密码
+- [x] 推送数据库schema变更
+
+### 后端API实现
+- [x] 实现密码哈希工具函数（bcrypt）
+- [x] 创建用户注册tRPC procedure
+- [x] 创建用户登录tRPC procedure
+- [x] 创建密码修改tRPC procedure
+- [x] 实现JWT token生成和验证
+
+### 前端页面实现
+- [x] 创建注册页面UI
+- [x] 创建登录页面UI
+- [x] 实现表单验证
+- [x] 集成认证状态管理
+- [x] 添加登录/注册页面路由
+
+### 测试验证
+- [x] 编写注册功能vitest测试
+- [x] 编写登录功能vitest测试
+- [x] 验证认证流程完整性

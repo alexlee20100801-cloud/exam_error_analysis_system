@@ -1362,9 +1362,13 @@ export const users = mysqlTable("users", {
 	notificationEnabled: tinyint("notification_enabled").default(1),
 	reviewReminderEnabled: tinyint("review_reminder_enabled").default(1),
 	goalReminderEnabled: tinyint("goal_reminder_enabled").default(1),
+	// 用户名密码登录字段
+	username: varchar({ length: 64 }),
+	passwordHash: varchar("password_hash", { length: 255 }),
 },
 (table) => [
 	index("users_openId_unique").on(table.openId),
+	index("users_username_unique").on(table.username),
 ]);
 
 export const videoResources = mysqlTable("video_resources", {

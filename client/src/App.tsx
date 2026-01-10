@@ -84,6 +84,8 @@ import CrawlerConfigManagement from "@/pages/CrawlerConfigManagement";
 import AiClassificationOptimization from "@/pages/AiClassificationOptimization";
 import PaperAlgorithmOptimization from "@/pages/PaperAlgorithmOptimization";
 import QuestionBank from "@/pages/QuestionBank";
+import Login from "@/pages/Login";
+import Register from "@/pages/Register";
 
 function Router() {
   return (
@@ -167,6 +169,8 @@ function Router() {
       <Route path="/admin/ai-classification" component={AiClassificationOptimization} />
       <Route path="/admin/paper-algorithm" component={PaperAlgorithmOptimization} />
       <Route path="/question-bank" component={QuestionBank} />
+      <Route path="/login" component={Login} />
+      <Route path="/register" component={Register} />
       <Route component={NotFound} />
     </Switch>
   );
