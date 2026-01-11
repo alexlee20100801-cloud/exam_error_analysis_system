@@ -1,6 +1,6 @@
 import { getDb } from '../db';
-// import { exportTemplates } from '../../drizzle/schema'; // 暂时注释，待后实施导出功能时再启用
-import { printTemplates as exportTemplates } from '../../drizzle/schema'; // 临时使用printTemplates作为替代
+// 使用printTemplates作为导出模板表
+import { printTemplates as exportTemplates } from '../../drizzle/print_preview_schema';
 import { eq, and, desc, or } from 'drizzle-orm';
 
 /**
@@ -45,7 +45,6 @@ export async function createExportTemplate(userId: number, templateData: {
   }
   
   const [template] = await db.insert(exportTemplates).values({
-    // @ts-ignore
     userId,
     name: templateData.name,
     isDefault: templateData.isDefault || false,
@@ -61,16 +60,17 @@ export async function createExportTemplate(userId: number, templateData: {
     footerFontSize: templateData.footerFontSize || 12,
     showPageNumber: templateData.showPageNumber !== false,
     fontSize: templateData.fontSize || 12,
-    lineSpacing: templateData.lineSpacing || 150,
+    // lineSpacing 字段在printTemplates表中不存在，使用questionSpacing代替
+    questionSpacing: templateData.lineSpacing || 150,
     marginTop: templateData.marginTop || 20,
     marginBottom: templateData.marginBottom || 20,
     marginLeft: templateData.marginLeft || 20,
     marginRight: templateData.marginRight || 20,
     showQuestionNumber: templateData.showQuestionNumber !== false,
     showDifficulty: templateData.showDifficulty !== false,
-    showKnowledgePoints: templateData.showKnowledgePoints !== false,
-    showAnswer: templateData.showAnswer !== false,
-    showExplanation: templateData.showExplanation !== false,
+    includeKnowledgePoints: templateData.showKnowledgePoints !== false,
+    includeAnswer: templateData.showAnswer !== false,
+    includeExplanation: templateData.showExplanation !== false,
     paperSize: templateData.paperSize || 'A4',
     orientation: templateData.orientation || 'portrait',
     usageCount: 0,

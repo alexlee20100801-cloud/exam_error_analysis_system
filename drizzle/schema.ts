@@ -1909,3 +1909,155 @@ export const accountBindingHistory = mysqlTable("account_binding_history", {
 
 export type AccountBindingHistory = typeof accountBindingHistory.$inferSelect;
 export type NewAccountBindingHistory = typeof accountBindingHistory.$inferInsert;
+
+
+// ==================== 登录安全策略相关表 ====================
+
+// 登录尝试记录表 - 记录所有登录尝试
+export const loginAttempts = mysqlTable("login_attempts", {
+  id: int().autoincrement().primaryKey().notNull(),
+  identifier: varchar({ length: 255 }).notNull(), // 登录标识符（手机号/用户名/邮箱/微信openid）
+  identifierType: mysqlEnum("identifier_type", ['phone', 'username', 'email', 'wechat']).notNull(),
+  ipAddress: varchar("ip_address", { length: 50 }).notNull(),
+  userAgent: text("user_agent"),
+  success: tinyint().default(0).notNull(),
+  failReason: varchar("fail_reason", { length: 255 }),
+  createdAt: timestamp("created_at", { mode: 'string' }).default('CURRENT_TIMESTAMP').notNull(),
+},
+(table) => [
+  index("identifier_idx").on(table.identifier),
+  index("identifier_type_idx").on(table.identifierType),
+  index("ip_address_idx").on(table.ipAddress),
+  index("created_at_idx").on(table.createdAt),
+]);
+
+export type LoginAttempt = typeof loginAttempts.$inferSelect;
+export type NewLoginAttempt = typeof loginAttempts.$inferInsert;
+
+// 登录锁定表 - 记录被锁定的账号
+export const loginLocks = mysqlTable("login_locks", {
+  id: int().autoincrement().primaryKey().notNull(),
+  identifier: varchar({ length: 255 }).notNull(),
+  identifierType: mysqlEnum("identifier_type", ['phone', 'username', 'email', 'wechat']).notNull(),
+  lockReason: varchar("lock_reason", { length: 255 }),
+  failedAttempts: int("failed_attempts").default(0).notNull(),
+  unlocksAt: timestamp("unlocks_at", { mode: 'string' }).notNull(),
+  createdAt: timestamp("created_at", { mode: 'string' }).default('CURRENT_TIMESTAMP').notNull(),
+},
+(table) => [
+  index("identifier_idx").on(table.identifier),
+  index("identifier_type_idx").on(table.identifierType),
+  index("unlocks_at_idx").on(table.unlocksAt),
+]);
+
+export type LoginLock = typeof loginLocks.$inferSelect;
+export type NewLoginLock = typeof loginLocks.$inferInsert;
+
+// 用户设备表 - 记录用户登录过的设备
+export const userDevices = mysqlTable("user_devices", {
+  id: int().autoincrement().primaryKey().notNull(),
+  userId: int("user_id").notNull(),
+  deviceId: varchar("device_id", { length: 64 }).notNull(), // 设备唯一标识
+  deviceType: mysqlEnum("device_type", ['mobile', 'tablet', 'desktop', 'unknown']).default('unknown').notNull(),
+  browser: varchar({ length: 50 }),
+  os: varchar({ length: 50 }),
+  ipAddress: varchar("ip_address", { length: 50 }),
+  isTrusted: tinyint("is_trusted").default(0).notNull(),
+  lastActiveAt: timestamp("last_active_at", { mode: 'string' }).default('CURRENT_TIMESTAMP').notNull(),
+  createdAt: timestamp("created_at", { mode: 'string' }).default('CURRENT_TIMESTAMP').notNull(),
+},
+(table) => [
+  index("user_id_idx").on(table.userId),
+  index("device_id_idx").on(table.deviceId),
+  index("last_active_at_idx").on(table.lastActiveAt),
+]);
+
+export type UserDevice = typeof userDevices.$inferSelect;
+export type NewUserDevice = typeof userDevices.$inferInsert;
+
+// 登录日志表 - 记录成功的登录
+export const loginLogs = mysqlTable("login_logs", {
+  id: int().autoincrement().primaryKey().notNull(),
+  userId: int("user_id"),
+  loginMethod: mysqlEnum("login_method", ['phone', 'username', 'wechat', 'oauth', 'email']).notNull(),
+  ipAddress: varchar("ip_address", { length: 50 }).notNull(),
+  deviceId: varchar("device_id", { length: 64 }),
+  userAgent: text("user_agent"),
+  success: tinyint().default(1).notNull(),
+  failReason: varchar("fail_reason", { length: 255 }),
+  isNewDevice: tinyint("is_new_device").default(0).notNull(),
+  isNewLocation: tinyint("is_new_location").default(0).notNull(),
+  riskLevel: mysqlEnum("risk_level", ['low', 'medium', 'high']).default('low').notNull(),
+  createdAt: timestamp("created_at", { mode: 'string' }).default('CURRENT_TIMESTAMP').notNull(),
+},
+(table) => [
+  index("user_id_idx").on(table.userId),
+  index("ip_address_idx").on(table.ipAddress),
+  index("created_at_idx").on(table.createdAt),
+  index("risk_level_idx").on(table.riskLevel),
+]);
+
+export type LoginLog = typeof loginLogs.$inferSelect;
+export type NewLoginLog = typeof loginLogs.$inferInsert;
+
+// 安全告警表 - 记录安全相关的告警
+export const securityAlerts = mysqlTable("security_alerts", {
+  id: int().autoincrement().primaryKey().notNull(),
+  userId: int("user_id").notNull(),
+  alertType: mysqlEnum("alert_type", ['new_device', 'new_location', 'multiple_failures', 'suspicious_activity', 'account_locked']).notNull(),
+  title: varchar({ length: 255 }).notNull(),
+  description: text(),
+  ipAddress: varchar("ip_address", { length: 50 }),
+  location: varchar({ length: 255 }),
+  deviceInfo: text("device_info"),
+  isRead: tinyint("is_read").default(0).notNull(),
+  createdAt: timestamp("created_at", { mode: 'string' }).default('CURRENT_TIMESTAMP').notNull(),
+},
+(table) => [
+  index("user_id_idx").on(table.userId),
+  index("alert_type_idx").on(table.alertType),
+  index("is_read_idx").on(table.isRead),
+  index("created_at_idx").on(table.createdAt),
+]);
+
+export type SecurityAlert = typeof securityAlerts.$inferSelect;
+export type NewSecurityAlert = typeof securityAlerts.$inferInsert;
+
+// 短信服务配置表 - 存储短信服务商配置
+export const smsServiceConfig = mysqlTable("sms_service_config", {
+  id: int().autoincrement().primaryKey().notNull(),
+  provider: mysqlEnum(['aliyun', 'tencent', 'custom']).notNull(),
+  accessKeyId: varchar("access_key_id", { length: 255 }),
+  accessKeySecret: varchar("access_key_secret", { length: 255 }),
+  signName: varchar("sign_name", { length: 100 }),
+  templateCode: varchar("template_code", { length: 100 }),
+  region: varchar({ length: 50 }),
+  isActive: tinyint("is_active").default(0).notNull(),
+  createdAt: timestamp("created_at", { mode: 'string' }).default('CURRENT_TIMESTAMP').notNull(),
+  updatedAt: timestamp("updated_at", { mode: 'string' }).default('CURRENT_TIMESTAMP').notNull(),
+},
+(table) => [
+  index("provider_idx").on(table.provider),
+  index("is_active_idx").on(table.isActive),
+]);
+
+export type SmsServiceConfig = typeof smsServiceConfig.$inferSelect;
+export type NewSmsServiceConfig = typeof smsServiceConfig.$inferInsert;
+
+// 微信配置表 - 存储微信开放平台配置
+export const wechatConfig = mysqlTable("wechat_config", {
+  id: int().autoincrement().primaryKey().notNull(),
+  appId: varchar("app_id", { length: 100 }).notNull(),
+  appSecret: varchar("app_secret", { length: 255 }).notNull(),
+  redirectUri: varchar("redirect_uri", { length: 500 }),
+  scope: varchar({ length: 100 }).default('snsapi_login'),
+  isActive: tinyint("is_active").default(0).notNull(),
+  createdAt: timestamp("created_at", { mode: 'string' }).default('CURRENT_TIMESTAMP').notNull(),
+  updatedAt: timestamp("updated_at", { mode: 'string' }).default('CURRENT_TIMESTAMP').notNull(),
+},
+(table) => [
+  index("is_active_idx").on(table.isActive),
+]);
+
+export type WechatConfig = typeof wechatConfig.$inferSelect;
+export type NewWechatConfig = typeof wechatConfig.$inferInsert;
