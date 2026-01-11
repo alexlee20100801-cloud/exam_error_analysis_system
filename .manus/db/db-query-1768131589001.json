@@ -1,0 +1,9 @@
+{
+  "query": "CREATE TABLE IF NOT EXISTS `scheduled_task_logs` (\n  `id` int AUTO_INCREMENT PRIMARY KEY,\n  `task_name` varchar(255) NOT NULL,\n  `task_type` enum('performance_evaluation','weekly_report_generation','alert_check','cache_warmup','ab_test_decision') NOT NULL,\n  `execution_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,\n  `status` enum('success','failed','partial') NOT NULL,\n  `duration` int,\n  `details` json,\n  `error_message` text,\n  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP\n);",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway03.us-east-1.prod.aws.tidbcloud.com --port 4000 --user Lfr9xqjx7LpxUD9.1efa314e7813 --database Yh4Z4ZSitSFdPWYxtKkkQS --execute CREATE TABLE IF NOT EXISTS `scheduled_task_logs` (\n  `id` int AUTO_INCREMENT PRIMARY KEY,\n  `task_name` varchar(255) NOT NULL,\n  `task_type` enum('performance_evaluation','weekly_report_generation','alert_check','cache_warmup','ab_test_decision') NOT NULL,\n  `execution_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,\n  `status` enum('success','failed','partial') NOT NULL,\n  `duration` int,\n  `details` json,\n  `error_message` text,\n  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP\n);",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 1667
+}

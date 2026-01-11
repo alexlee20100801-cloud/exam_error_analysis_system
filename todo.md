@@ -2340,3 +2340,8 @@ if (error.knowledgePointIds) {
 - [x] 实现手动解封功能
 - [x] 添加IP封禁统计图表
 - [ ] 为IP管理功能编写vitest测试
+
+
+## Bug Fixes - 2026-01-11
+- [x] 修复数据库表缺失：scheduled_task_logs 和 ai_classification_metrics 表不存在
+- [x] 修复 API 查询错误：tRPC 返回 HTML 而非 JSON（重启服务器后已解决）

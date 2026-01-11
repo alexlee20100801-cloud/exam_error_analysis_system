@@ -1,0 +1,9 @@
+{
+  "query": "CREATE TABLE IF NOT EXISTS `ai_classification_metrics` (\n  `id` int AUTO_INCREMENT PRIMARY KEY,\n  `prompt_version_id` int NOT NULL,\n  `evaluation_date` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,\n  `accuracy` decimal(5,4) NOT NULL,\n  `precision` decimal(5,4),\n  `recall` decimal(5,4),\n  `f1_score` decimal(5,4),\n  `test_sample_count` int NOT NULL,\n  `confusion_matrix` json,\n  `error_cases` json,\n  `avg_response_time` int,\n  `notes` text,\n  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP\n);",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway03.us-east-1.prod.aws.tidbcloud.com --port 4000 --user Lfr9xqjx7LpxUD9.1efa314e7813 --database Yh4Z4ZSitSFdPWYxtKkkQS --execute CREATE TABLE IF NOT EXISTS `ai_classification_metrics` (\n  `id` int AUTO_INCREMENT PRIMARY KEY,\n  `prompt_version_id` int NOT NULL,\n  `evaluation_date` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,\n  `accuracy` decimal(5,4) NOT NULL,\n  `precision` decimal(5,4),\n  `recall` decimal(5,4),\n  `f1_score` decimal(5,4),\n  `test_sample_count` int NOT NULL,\n  `confusion_matrix` json,\n  `error_cases` json,\n  `avg_response_time` int,\n  `notes` text,\n  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP\n);",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 1658
+}
