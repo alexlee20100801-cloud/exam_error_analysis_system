@@ -1,0 +1,9 @@
+{
+  "query": "CREATE TABLE IF NOT EXISTS `captcha_codes` (\n  `id` int AUTO_INCREMENT NOT NULL,\n  `captcha_id` varchar(64) NOT NULL,\n  `code` varchar(10) NOT NULL,\n  `used` tinyint DEFAULT 0 NOT NULL,\n  `expires_at` timestamp NOT NULL,\n  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,\n  CONSTRAINT `captcha_codes_id` PRIMARY KEY(`id`),\n  INDEX `captcha_id_idx` (`captcha_id`),\n  INDEX `expires_at_idx` (`expires_at`)\n);",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway03.us-east-1.prod.aws.tidbcloud.com --port 4000 --user Lfr9xqjx7LpxUD9.1efa314e7813 --database Yh4Z4ZSitSFdPWYxtKkkQS --execute CREATE TABLE IF NOT EXISTS `captcha_codes` (\n  `id` int AUTO_INCREMENT NOT NULL,\n  `captcha_id` varchar(64) NOT NULL,\n  `code` varchar(10) NOT NULL,\n  `used` tinyint DEFAULT 0 NOT NULL,\n  `expires_at` timestamp NOT NULL,\n  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,\n  CONSTRAINT `captcha_codes_id` PRIMARY KEY(`id`),\n  INDEX `captcha_id_idx` (`captcha_id`),\n  INDEX `expires_at_idx` (`expires_at`)\n);",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 1668
+}

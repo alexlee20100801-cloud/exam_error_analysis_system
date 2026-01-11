@@ -12,12 +12,14 @@ import {
 } from "../services/smsAuth";
 
 export const smsAuthRouter = router({
-  // 发送验证码
+  // 发送验证码（支持图形验证码校验）
   sendCode: publicProcedure
     .input(
       z.object({
         phone: z.string().regex(/^1[3-9]\d{9}$/, "手机号格式不正确"),
         type: z.enum(["login", "register", "bind", "reset"]),
+        captchaId: z.string().optional(),
+        captchaCode: z.string().optional(),
       })
     )
     .mutation(async ({ input }) => {

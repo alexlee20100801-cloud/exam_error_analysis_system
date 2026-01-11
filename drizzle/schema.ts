@@ -2061,3 +2061,23 @@ export const wechatConfig = mysqlTable("wechat_config", {
 
 export type WechatConfig = typeof wechatConfig.$inferSelect;
 export type NewWechatConfig = typeof wechatConfig.$inferInsert;
+
+
+// ==================== 图形验证码相关表 ====================
+
+// 图形验证码表 - 用于防止短信轰炸
+export const captchaCodes = mysqlTable("captcha_codes", {
+  id: int().autoincrement().primaryKey().notNull(),
+  captchaId: varchar("captcha_id", { length: 64 }).notNull(), // 唯一标识
+  code: varchar({ length: 10 }).notNull(), // 验证码文本
+  used: tinyint().default(0).notNull(),
+  expiresAt: timestamp("expires_at", { mode: 'date' }).notNull(),
+  createdAt: timestamp("created_at", { mode: 'string' }).default('CURRENT_TIMESTAMP').notNull(),
+},
+(table) => [
+  index("captcha_id_idx").on(table.captchaId),
+  index("expires_at_idx").on(table.expiresAt),
+]);
+
+export type CaptchaCode = typeof captchaCodes.$inferSelect;
+export type NewCaptchaCode = typeof captchaCodes.$inferInsert;

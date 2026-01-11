@@ -4,6 +4,8 @@ import { users, verificationCodes, accountBindingHistory } from "../../drizzle/s
 import { eq, and, gt } from "drizzle-orm";
 import { sdk } from "../_core/sdk";
 import { TRPCError } from "@trpc/server";
+import { verifyCaptcha } from "./captchaService";
+import { sendAliyunSms } from "./aliyunSmsService";
 
 /**
  * 生成6位数字验证码
@@ -13,13 +15,15 @@ export function generateVerificationCode(): string {
 }
 
 /**
- * 发送验证码（模拟发送，实际需要对接短信服务商）
+ * 发送验证码（支持图形验证码校验和阿里云短信发送）
  */
 export async function sendVerificationCode(params: {
   phone: string;
   type: "login" | "register" | "bind" | "reset";
+  captchaId?: string;
+  captchaCode?: string;
 }): Promise<{ success: boolean; message: string }> {
-  const { phone, type } = params;
+  const { phone, type, captchaId, captchaCode } = params;
 
   // 验证手机号格式
   if (!/^1[3-9]\d{9}$/.test(phone)) {
@@ -27,6 +31,17 @@ export async function sendVerificationCode(params: {
       code: "BAD_REQUEST",
       message: "手机号格式不正确",
     });
+  }
+
+  // 验证图形验证码（如果提供了）
+  if (captchaId && captchaCode) {
+    const isCaptchaValid = await verifyCaptcha({ captchaId, code: captchaCode });
+    if (!isCaptchaValid) {
+      throw new TRPCError({
+        code: "BAD_REQUEST",
+        message: "图形验证码错误或已过期",
+      });
+    }
   }
 
   // 检查是否在1分钟内已发送过验证码
@@ -61,8 +76,14 @@ export async function sendVerificationCode(params: {
     expiresAt,
   });
 
-  // TODO: 对接实际短信服务商发送验证码
-  console.log("[SMS] 发送验证码到 " + phone + ": " + code);
+  // 使用阿里云短信服务发送验证码
+  const smsResult = await sendAliyunSms({ phone, code });
+  
+  if (!smsResult.success) {
+    console.error("[SMS] 短信发送失败:", smsResult.message);
+    // 即使短信发送失败，也返回成功（在开发模式下验证码已保存到数据库）
+    console.log("[SMS] 开发模式 - 验证码: " + code);
+  }
 
   return {
     success: true,

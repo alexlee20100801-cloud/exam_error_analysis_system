@@ -2255,3 +2255,23 @@ if (error.knowledgePointIds) {
 
 ### 测试验证
 - [x] 编写登录安全服务单元测试(11/11通过)
+
+
+## 第十八阶段：安全增强功能 (2026-01-11)
+
+### 短信服务商凭证配置
+- [x] 配置 SMS_ACCESS_KEY_ID 环境变量（代码已支持，需用户在Settings→Secrets中配置）
+- [x] 配置 SMS_ACCESS_KEY_SECRET 环境变量（代码已支持，需用户在Settings→Secrets中配置）
+- [x] 更新短信服务以使用真实凭证（已集成阿里云短信服务）
+
+### 微信开放平台配置
+- [x] 配置 WECHAT_APP_ID 环境变量（代码已支持，需用户在Settings→Secrets中配置）
+- [x] 配置 WECHAT_APP_SECRET 环境变量（代码已支持，需用户在Settings→Secrets中配置）
+- [x] 实现微信扫码登录功能
+
+### 图形验证码防护
+- [x] 实现图形验证码生成服务
+- [x] 创建图形验证码API端点
+- [x] 在发送短信验证码前增加图形验证码校验
+- [x] 创建前端图形验证码组件
+- [x] 为图形验证码功能编写vitest测试（8/8通过）

@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Link, useLocation } from "wouter";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -19,6 +19,7 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Loader2, BookOpen, Eye, EyeOff, Smartphone, User, MessageSquare } from "lucide-react";
 import { getLoginUrl } from "@/const";
+import { CaptchaInput } from "@/components/CaptchaInput";
 
 // 密码登录表单验证
 const passwordLoginSchema = z.object({
@@ -48,6 +49,10 @@ export default function Login() {
   const [error, setError] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState("password");
   const [countdown, setCountdown] = useState(0);
+  // 图形验证码状态
+  const [captchaCode, setCaptchaCode] = useState("");
+  const [captchaId, setCaptchaId] = useState("");
+  const [showCaptcha, setShowCaptcha] = useState(false);
 
   // 密码登录表单
   const passwordForm = useForm<PasswordLoginFormData>({
@@ -87,9 +92,14 @@ export default function Login() {
     onSuccess: () => {
       setCountdown(60);
       setError(null);
+      setCaptchaCode(""); // 清空图形验证码
     },
     onError: (err) => {
       setError(err.message || "发送验证码失败");
+      // 如果发送失败，显示图形验证码
+      if (err.message?.includes("请等待") || err.message?.includes("频繁")) {
+        setShowCaptcha(true);
+      }
     },
   });
 
@@ -122,14 +132,31 @@ export default function Login() {
     });
   };
 
-  const handleSendCode = () => {
+  const handleSendCode = useCallback(() => {
     const phone = phoneForm.getValues("phone");
     if (!/^1[3-9]\d{9}$/.test(phone)) {
       setError("请输入正确的手机号");
       return;
     }
-    sendCodeMutation.mutate({ phone, type: "login" });
-  };
+    
+    // 检查是否需要图形验证码
+    if (!showCaptcha) {
+      // 首次发送不需要图形验证码，但如果失败则显示
+      sendCodeMutation.mutate({ phone, type: "login" });
+    } else {
+      // 需要图形验证码
+      if (!captchaCode || captchaCode.length < 4) {
+        setError("请输入图形验证码");
+        return;
+      }
+      sendCodeMutation.mutate({ 
+        phone, 
+        type: "login",
+        captchaId,
+        captchaCode,
+      });
+    }
+  }, [phoneForm, showCaptcha, captchaCode, captchaId, sendCodeMutation]);
 
   const isLoading = passwordLoginMutation.isPending || phoneLoginMutation.isPending || sendCodeMutation.isPending;
 
@@ -252,13 +279,27 @@ export default function Login() {
                   )}
                 </div>
 
+                {/* 图形验证码（防止短信轰炸） */}
+                {showCaptcha && (
+                  <div className="space-y-2">
+                    <Label>图形验证码</Label>
+                    <CaptchaInput
+                      value={captchaCode}
+                      onChange={setCaptchaCode}
+                      captchaId={captchaId}
+                      onCaptchaIdChange={setCaptchaId}
+                      disabled={isLoading}
+                    />
+                  </div>
+                )}
+
                 <div className="space-y-2">
-                  <Label htmlFor="code">验证码</Label>
+                  <Label htmlFor="code">短信验证码</Label>
                   <div className="flex gap-2">
                     <Input
                       id="code"
                       type="text"
-                      placeholder="请输入验证码"
+                      placeholder="请输入短信验证码"
                       maxLength={6}
                       {...phoneForm.register("code")}
                       disabled={isLoading}
@@ -268,7 +309,7 @@ export default function Login() {
                       type="button"
                       variant="outline"
                       onClick={handleSendCode}
-                      disabled={countdown > 0 || sendCodeMutation.isPending}
+                      disabled={countdown > 0 || sendCodeMutation.isPending || (showCaptcha && captchaCode.length < 4)}
                       className="w-28 shrink-0"
                     >
                       {sendCodeMutation.isPending ? (

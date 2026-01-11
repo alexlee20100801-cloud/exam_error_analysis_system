@@ -108,6 +108,8 @@ import { systemManagementRouter } from "./routers/systemManagement";
 import { passwordAuthRouter } from "./routers/passwordAuth";
 import { smsAuthRouter } from "./routers/smsAuth";
 import { accountBindingRouter } from "./routers/accountBinding";
+import { captchaRouter } from "./routers/captcha";
+import { wechatAuthRouter } from "./routers/wechatAuth";
 
 export const appRouter = router({
   system: systemRouter,
@@ -407,6 +409,12 @@ export const appRouter = router({
   
   // 短信验证码认证
   smsAuth: smsAuthRouter,
+  
+  // 图形验证码
+  captcha: captchaRouter,
+  
+  // 微信扫码登录
+  wechatAuth: wechatAuthRouter,
   
   // 账号绑定管理
   accountBinding: accountBindingRouter,
