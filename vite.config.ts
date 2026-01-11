@@ -20,6 +20,7 @@ export default defineConfig({
   },
   optimizeDeps: {
     include: ["react", "react-dom", "@tanstack/react-query", "@trpc/react-query"],
+    force: true,
   },
   envDir: path.resolve(import.meta.dirname),
   root: path.resolve(import.meta.dirname, "client"),
@@ -50,3 +51,4 @@ export default defineConfig({
     },
   },
 });
+// Cache bust: 1768123900

@@ -1,0 +1,60 @@
+{
+  "query": "SELECT id, name, role FROM users LIMIT 10;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway03.us-east-1.prod.aws.tidbcloud.com --port 4000 --user Lfr9xqjx7LpxUD9.1efa314e7813 --database Yh4Z4ZSitSFdPWYxtKkkQS --execute SELECT id, name, role FROM users LIMIT 10;",
+  "rows": [
+    {
+      "id": "150258",
+      "name": "测试学生",
+      "role": "user"
+    },
+    {
+      "id": "150259",
+      "name": "测试家长",
+      "role": "user"
+    },
+    {
+      "id": "150260",
+      "name": "导出测试用户",
+      "role": "user"
+    },
+    {
+      "id": "150261",
+      "name": "测试用户",
+      "role": "user"
+    },
+    {
+      "id": "150262",
+      "name": "错题对比测试用户",
+      "role": "user"
+    },
+    {
+      "id": "150264",
+      "name": "知识点详情测试用户",
+      "role": "user"
+    },
+    {
+      "id": "150266",
+      "name": "无任务用户",
+      "role": "user"
+    },
+    {
+      "id": "150267",
+      "name": "测试学生",
+      "role": "user"
+    },
+    {
+      "id": "150268",
+      "name": "AI建议测试用户",
+      "role": "user"
+    },
+    {
+      "id": "150271",
+      "name": "测试用户",
+      "role": "user"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tname\trole\n150258\t测试学生\tuser\n150259\t测试家长\tuser\n150260\t导出测试用户\tuser\n150261\t测试用户\tuser\n150262\t错题对比测试用户\tuser\n150264\t知识点详情测试用户\tuser\n150266\t无任务用户\tuser\n150267\t测试学生\tuser\n150268\tAI建议测试用户\tuser\n150271\t测试用户\tuser\n",
+  "stderr": "",
+  "execution_time_ms": 1542
+}

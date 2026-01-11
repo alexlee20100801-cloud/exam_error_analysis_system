@@ -435,6 +435,13 @@
       "when": 1768110225922,
       "tag": "0065_complex_nuke",
       "breakpoints": true
+    },
+    {
+      "idx": 66,
+      "version": "5",
+      "when": 1768110984125,
+      "tag": "0066_solid_misty_knight",
+      "breakpoints": true
     }
   ]
 }

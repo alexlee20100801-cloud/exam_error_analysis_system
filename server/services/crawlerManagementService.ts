@@ -62,8 +62,11 @@ export async function createCrawlerTask(config: CrawlerTaskConfig) {
     resultSummary: config.config ? JSON.stringify(config.config) : null,
   } as any);
 
+  // 获取插入的ID
+  const insertedId = Number(result[0].insertId);
+
   return {
-    id: result.insertId,
+    id: insertedId,
     ...config,
   };
 }
@@ -130,7 +133,12 @@ export async function getCrawlerTaskDetail(taskId: number) {
   }
 
   const taskData = task[0];
-  const config = taskData.config ? JSON.parse(taskData.config) : null;
+  // 解析resultSummary字段作为配置
+  const config = taskData.resultSummary 
+    ? (typeof taskData.resultSummary === 'string' 
+        ? JSON.parse(taskData.resultSummary) 
+        : taskData.resultSummary)
+    : null;
 
   return {
     ...taskData,
@@ -200,8 +208,9 @@ export async function resumeCrawlerTask(taskId: number) {
     throw new Error("任务不存在");
   }
 
-  if (task.status !== "paused") {
-    throw new Error("只能恢复已暂停的任务");
+  // 注：数据库中没有paused状态，检查pending状态
+  if (task.status !== "pending") {
+    throw new Error("只能恢复待执行的任务");
   }
 
   await updateCrawlerTaskStatus(taskId, {
@@ -261,7 +270,7 @@ export async function getCrawlerTaskStats() {
     GROUP BY status
   `);
 
-  return stats.rows || [];
+  return stats[0] || [];
 }
 
 /**
@@ -284,21 +293,24 @@ export async function getCrawlerSources(limit: number = 20, offset: number = 0) 
 export async function createCrawlerSource(data: {
   sourceName: string;
   sourceUrl: string;
-  sourceType: string;
+  sourceType: "static_web" | "dynamic_web" | "api" | "file";
   description?: string;
-  crawlerConfig?: Record<string, any>;
+  selectorConfig?: Record<string, any>;
   createdBy: number;
 }) {
   const result = await db.insert(crawlSources).values({
-    sourceName: data.sourceName,
-    sourceUrl: data.sourceUrl,
+    name: data.sourceName,
+    websiteUrl: data.sourceUrl,
     sourceType: data.sourceType,
     description: data.description,
-    crawlerConfig: data.crawlerConfig ? JSON.stringify(data.crawlerConfig) : null,
+    selectorConfig: data.selectorConfig ? JSON.stringify(data.selectorConfig) : null,
   });
 
+  // 获取插入的ID
+  const insertedId = Number(result[0].insertId);
+
   return {
-    id: result.insertId,
+    id: insertedId,
     ...data,
   };
 }
@@ -318,13 +330,34 @@ export async function getCrawlerSourceDetail(sourceId: number) {
   }
 
   const sourceData = source[0];
-  const config = sourceData.crawlerConfig
-    ? JSON.parse(sourceData.crawlerConfig)
+  // 解析JSON配置字段
+  const selectorConfig = sourceData.selectorConfig
+    ? (typeof sourceData.selectorConfig === 'string' 
+        ? JSON.parse(sourceData.selectorConfig) 
+        : sourceData.selectorConfig)
+    : null;
+  const paginationConfig = sourceData.paginationConfig
+    ? (typeof sourceData.paginationConfig === 'string' 
+        ? JSON.parse(sourceData.paginationConfig) 
+        : sourceData.paginationConfig)
+    : null;
+  const authConfig = sourceData.authConfig
+    ? (typeof sourceData.authConfig === 'string' 
+        ? JSON.parse(sourceData.authConfig) 
+        : sourceData.authConfig)
+    : null;
+  const contentExtractors = sourceData.contentExtractors
+    ? (typeof sourceData.contentExtractors === 'string' 
+        ? JSON.parse(sourceData.contentExtractors) 
+        : sourceData.contentExtractors)
     : null;
 
   return {
     ...sourceData,
-    crawlerConfig: config,
+    selectorConfig,
+    paginationConfig,
+    authConfig,
+    contentExtractors,
   };
 }
 
@@ -421,7 +454,7 @@ export async function getCrawlerTaskMetrics(taskId: number) {
     successRate: Math.round(successRate * 100) / 100,
     itemsPerSecond: Math.round(itemsPerSecond * 100) / 100,
     status: task.status,
-    progress: task.progress,
+    progress: Math.round((task.itemsProcessed / (task.itemsProcessed + task.itemsFailed + 1)) * 100),
   };
 }
 
@@ -471,7 +504,7 @@ export async function getCrawlerTaskHistory(
     {
       taskId,
       status: task.status,
-      progress: task.progress,
+      progress: Math.round((task.itemsProcessed / (task.itemsProcessed + task.itemsFailed + 1)) * 100),
       itemsProcessed: task.itemsProcessed,
       itemsFailed: task.itemsFailed,
       duration: task.duration,

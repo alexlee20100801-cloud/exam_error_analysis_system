@@ -347,7 +347,7 @@ export default function QuestionBankManagement() {
                             size="sm"
                             onClick={() => {
                               if (confirm("确定要删除这道题目吗？")) {
-                                deleteMutation.mutate({ id: question.id });
+                                deleteMutation.mutate({ title: `删除题目: ${question.id}`, content: `用户请求删除题目 ID: ${question.id}` });
                               }
                             }}
                           >

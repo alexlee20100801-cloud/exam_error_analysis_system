@@ -123,6 +123,7 @@ const adminMenuGroup: MenuGroup = {
     { id: "notification-config", icon: Bell, label: "通知配置管理", path: "/notification-config" },
     { id: "ai-classification", icon: Brain, label: "AI分类优化", path: "/admin/ai-classification" },
     { id: "paper-algorithm", icon: Sparkles, label: "组卷算法优化", path: "/admin/paper-algorithm" },
+    { id: "ip-blacklist", icon: Shield, label: "IP黑名单管理", path: "/admin/ip-manager" },
   ]
 };
 

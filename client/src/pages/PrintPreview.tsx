@@ -54,7 +54,7 @@ export default function PrintPreview() {
 
   // 获取用户的错题
   const { data: questions = [], isLoading } = trpc.errorQuestions.list.useQuery(
-    { userId: user?.id || 0 },
+    { limit: 100 },
     { enabled: !!user?.id }
   );
 

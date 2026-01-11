@@ -2295,3 +2295,48 @@ if (error.knowledgePointIds) {
 - [x] 配置IP限制参数（每IP每小时最大请求数）
 - [x] 在短信发送前增加IP频率检查
 - [x] 为IP频率限制功能编写vitest测试(12/13通过)
+
+
+## 第二十阶段：第三方服务集成和管理后台增强 (2026-01-11)
+
+### TypeScript类型修复 (2026-01-11)
+- [x] 修复crawlerManagementService.ts中crawlerConfig字段不存在的错误
+- [x] 修复crawlerManagementService.ts中insertId字段访问错误
+- [x] 修复crawlerManagementService.ts中progress字段不存在的错误
+- [x] 修复crawlerManagementService.ts中paused状态不存在的错误
+- [x] 修复dataCrawler.ts中lastRunAt字段错误
+- [x] 修复dataCrawler.ts中sourceType类型不匹配错误
+- [x] 修复IpBlockManager.tsx中todayAdded字段不存在的错误
+- [x] 修复LearningDashboard.tsx中totalErrors字段错误
+- [x] 修复AccountBinding.tsx中wechatId和isLoading字段错误
+- [x] 修复CaptchaInput.tsx中onSuccess回调用法错误
+- [x] 修复PrintPreview.tsx中userId参数错误
+- [x] 修复QuestionBankManagement.tsx中deleteMutation参数错误
+- [x] 重写cacheService.ts使用内存缓存代替Redis
+
+### 阿里云短信服务配置
+- [x] 创建阿里云短信服务配置文件
+- [x] 实现短信发送核心逻辑（使用阿里云SDK）
+- [x] 创建短信验证码发送API
+- [x] 添加短信发送频率限制（防止滥用）
+- [x] 创建短信配置管理界面（签名、模板配置）
+- [x] 添加短信发送日志记录
+- [ ] 为阿里云短信功能编写vitest测试
+
+### 微信扫码登录
+- [x] 创建微信开放平台OAuth配置
+- [x] 实现微信授权回调处理
+- [x] 创建微信用户绑定逻辑
+- [x] 在登录页面添加微信扫码登录入口
+- [x] 实现微信用户信息同步
+- [x] 添加微信登录状态管理
+- [ ] 为微信登录功能编写vitest测试
+
+### IP限制管理界面
+- [x] 创建IP黑名单管理API（查询、添加、删除）
+- [x] 实现IP封禁状态查询功能
+- [x] 创建IP黑名单管理页面UI
+- [x] 添加IP封禁原因和时间显示
+- [x] 实现手动解封功能
+- [x] 添加IP封禁统计图表
+- [ ] 为IP管理功能编写vitest测试

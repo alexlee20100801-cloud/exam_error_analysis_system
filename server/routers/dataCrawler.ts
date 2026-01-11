@@ -113,7 +113,7 @@ export const dataCrawlerRouter = router({
         // 更新任务状态为运行中
         await updateCrawlerTask(input.id, {
           status: 'running',
-          lastRunAt: new Date().toISOString(),
+          startedAt: new Date(),
         });
 
         // 这里将在后续实现具体的爬虫逻辑
@@ -381,9 +381,24 @@ export const dataCrawlerRouter = router({
         notes: z.string().optional(),
       }))
       .mutation(async ({ input }) => {
-        const result = await createCrawlerSource(input);
-        // @ts-ignore
-        return { success: true, sourceId: result.insertId };
+        // 转换输入格式以匹配新的数据库结构
+        const sourceTypeMap: Record<string, "static_web" | "dynamic_web" | "api" | "file"> = {
+          'education_cloud': 'api',
+          'school_bank': 'api',
+          'education_website': 'static_web',
+          'research_website': 'static_web',
+          'famous_school': 'static_web',
+        };
+        const result = await createCrawlerSource({
+          name: input.sourceName,
+          websiteUrl: input.sourceUrl || '',
+          sourceType: sourceTypeMap[input.sourceType] || 'static_web',
+          description: input.notes,
+          selectorConfig: input.crawlerConfig ? JSON.stringify(input.crawlerConfig) : null,
+        });
+        // 获取插入的ID
+        const insertedId = Number(result[0].insertId);
+        return { success: true, sourceId: insertedId };
       }),
 
     // 获取爬虫来源列表

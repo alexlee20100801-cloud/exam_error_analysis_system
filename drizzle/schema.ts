@@ -2124,3 +2124,65 @@ export const ipBlacklist = mysqlTable("ip_blacklist", {
 
 export type IpBlacklist = typeof ipBlacklist.$inferSelect;
 export type NewIpBlacklist = typeof ipBlacklist.$inferInsert;
+
+
+// ==================== 短信发送日志表 ====================
+
+// 短信发送日志表 - 记录所有短信发送记录
+export const smsSendLogs = mysqlTable("sms_send_logs", {
+  id: int().autoincrement().primaryKey().notNull(),
+  phoneNumber: varchar("phone_number", { length: 20 }).notNull(), // 手机号
+  templateCode: varchar("template_code", { length: 100 }), // 模板代码
+  templateParam: text("template_param"), // 模板参数JSON
+  status: mysqlEnum(['pending', 'success', 'failed']).default('pending').notNull(),
+  requestId: varchar("request_id", { length: 100 }), // 阿里云请求ID
+  bizId: varchar("biz_id", { length: 100 }), // 阿里云业务ID
+  errorCode: varchar("error_code", { length: 50 }), // 错误代码
+  errorMessage: text("error_message"), // 错误信息
+  ipAddress: varchar("ip_address", { length: 45 }), // 发送请求的IP
+  userId: int("user_id"), // 关联用户ID
+  sentAt: timestamp("sent_at", { mode: 'date' }).notNull(),
+  createdAt: timestamp("created_at", { mode: 'string' }).default('CURRENT_TIMESTAMP').notNull(),
+},
+(table) => [
+  index("phone_idx").on(table.phoneNumber),
+  index("status_idx").on(table.status),
+  index("sent_at_idx").on(table.sentAt),
+  index("ip_idx").on(table.ipAddress),
+  index("user_id_idx").on(table.userId),
+]);
+
+export type SmsSendLog = typeof smsSendLogs.$inferSelect;
+export type NewSmsSendLog = typeof smsSendLogs.$inferInsert;
+
+// ==================== 微信用户绑定表 ====================
+
+// 微信用户绑定表 - 存储微信用户与系统用户的绑定关系
+export const wechatUserBindings = mysqlTable("wechat_user_bindings", {
+  id: int().autoincrement().primaryKey().notNull(),
+  userId: int("user_id").notNull(), // 系统用户ID
+  openId: varchar("open_id", { length: 100 }).notNull(), // 微信OpenID
+  unionId: varchar("union_id", { length: 100 }), // 微信UnionID（可选）
+  nickname: varchar({ length: 100 }), // 微信昵称
+  avatarUrl: varchar("avatar_url", { length: 500 }), // 微信头像
+  gender: tinyint(), // 性别：0未知，1男，2女
+  province: varchar({ length: 50 }), // 省份
+  city: varchar({ length: 50 }), // 城市
+  country: varchar({ length: 50 }), // 国家
+  accessToken: varchar("access_token", { length: 255 }), // 访问令牌
+  refreshToken: varchar("refresh_token", { length: 255 }), // 刷新令牌
+  tokenExpiresAt: timestamp("token_expires_at", { mode: 'date' }), // 令牌过期时间
+  isActive: tinyint("is_active").default(1).notNull(),
+  boundAt: timestamp("bound_at", { mode: 'date' }).notNull(),
+  lastLoginAt: timestamp("last_login_at", { mode: 'date' }),
+  createdAt: timestamp("created_at", { mode: 'string' }).default('CURRENT_TIMESTAMP').notNull(),
+  updatedAt: timestamp("updated_at", { mode: 'string' }).default('CURRENT_TIMESTAMP').notNull(),
+},
+(table) => [
+  index("user_id_idx").on(table.userId),
+  index("open_id_idx").on(table.openId),
+  index("union_id_idx").on(table.unionId),
+]);
+
+export type WechatUserBinding = typeof wechatUserBindings.$inferSelect;
+export type NewWechatUserBinding = typeof wechatUserBindings.$inferInsert;

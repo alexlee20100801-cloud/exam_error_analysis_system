@@ -1,0 +1,16 @@
+{
+  "query": "SELECT id, name, email, role FROM users WHERE name LIKE '%ALEX%' OR email LIKE '%alexlee%';",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway03.us-east-1.prod.aws.tidbcloud.com --port 4000 --user Lfr9xqjx7LpxUD9.1efa314e7813 --database Yh4Z4ZSitSFdPWYxtKkkQS --execute SELECT id, name, email, role FROM users WHERE name LIKE '%ALEX%' OR email LIKE '%alexlee%';",
+  "rows": [
+    {
+      "id": "150287",
+      "name": "ALEX LEE",
+      "email": "alexlee20100801@gmail.com",
+      "role": "admin"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tname\temail\trole\n150287\tALEX LEE\talexlee20100801@gmail.com\tadmin\n",
+  "stderr": "",
+  "execution_time_ms": 1567
+}

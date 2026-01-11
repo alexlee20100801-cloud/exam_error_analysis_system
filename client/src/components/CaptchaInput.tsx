@@ -24,13 +24,17 @@ export function CaptchaInput({
 }: CaptchaInputProps) {
   const [svgContent, setSvgContent] = useState<string>("");
   
-  const { refetch, isLoading, isFetching } = trpc.captcha.getCaptcha.useQuery(undefined, {
+  const { data, refetch, isLoading, isFetching } = trpc.captcha.getCaptcha.useQuery(undefined, {
     enabled: false,
-    onSuccess: (data) => {
+  });
+
+  // 处理验证码数据更新
+  useEffect(() => {
+    if (data) {
       setSvgContent(data.svg);
       onCaptchaIdChange(data.captchaId);
-    },
-  });
+    }
+  }, [data, onCaptchaIdChange]);
 
   // 初始化时获取验证码
   useEffect(() => {

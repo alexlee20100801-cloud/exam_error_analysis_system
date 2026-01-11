@@ -1,9 +1,13 @@
-import { createClient, RedisClientType } from "redis";
-
 /**
- * Redis缓存服务
+ * 内存缓存服务（代替Redis）
  * 提供统一的缓存键规范、TTL策略和高频查询缓存
  */
+
+// 缓存条目类型
+type CacheEntry = { value: string; expireAt: number | null };
+
+// 内存缓存存储
+const memoryCache = new Map<string, CacheEntry>();
 
 // 缓存键前缀
 export const CACHE_KEYS = {
@@ -28,32 +32,33 @@ export const CACHE_KEYS = {
   RECOMMENDATION: "rec:",
   RECOMMENDATION_CACHE: "recc:",
 
-  // 爬虫相关
-  CRAWLER_TASK: "ct:",
-  CRAWLER_TASK_LIST: "ctl:",
-  CRAWLER_TASK_STATUS: "cts:",
+  // 学习路径
+  LEARNING_PATH: "lp:",
+  LEARNING_PATH_PROGRESS: "lpp:",
 
-  // 分析相关
-  ANALYSIS_CACHE: "ac:",
-  ANALYSIS_RESULT: "ar:",
+  // 统计相关
+  STATS_DAILY: "sd:",
+  STATS_WEEKLY: "sw:",
+  STATS_MONTHLY: "sm:",
 
-  // 其他
-  GENERAL: "g:",
+  // 排行榜
+  LEADERBOARD: "lb:",
+  LEADERBOARD_WEEKLY: "lbw:",
 };
 
 // TTL策略（秒）
 export const TTL_POLICIES = {
-  // 短期缓存（5分钟）
-  SHORT: 5 * 60,
+  // 短期缓存（1分钟）- 用于频繁变化的数据
+  SHORT: 60,
 
-  // 中期缓存（30分钟）
-  MEDIUM: 30 * 60,
+  // 中期缓存（5分钟）- 用于一般查询
+  MEDIUM: 300,
 
-  // 长期缓存（1小时）
-  LONG: 60 * 60,
+  // 长期缓存（30分钟）- 用于不常变化的数据
+  LONG: 1800,
 
-  // 超长期缓存（24小时）
-  VERY_LONG: 24 * 60 * 60,
+  // 超长缓存（1小时）- 用于静态数据
+  EXTRA_LONG: 3600,
 
   // 实时数据（1分钟）
   REALTIME: 60,
@@ -63,53 +68,50 @@ export const TTL_POLICIES = {
 };
 
 class CacheService {
-  private client: RedisClientType | null = null;
-  private isConnected = false;
+  private isConnected = true; // 内存缓存始终可用
 
   /**
-   * 初始化Redis连接
+   * 初始化缓存服务
    */
   async initialize() {
-    try {
-      const redisUrl = process.env.REDIS_URL || "redis://localhost:6379";
-      this.client = createClient({ url: redisUrl });
+    console.log("内存缓存服务初始化成功");
+    // 定期清理过期缓存
+    setInterval(() => this.cleanupExpired(), 60000);
+  }
 
-      this.client.on("error", (err) => {
-        console.error("Redis错误:", err);
-        this.isConnected = false;
-      });
-
-      this.client.on("connect", () => {
-        console.log("Redis已连接");
-        this.isConnected = true;
-      });
-
-      await this.client.connect();
-      this.isConnected = true;
-      console.log("Redis缓存服务初始化成功");
-    } catch (error) {
-      console.warn("Redis连接失败，缓存功能将被禁用:", error);
-      this.isConnected = false;
-    }
+  /**
+   * 清理过期缓存
+   */
+  private cleanupExpired() {
+    const now = Date.now();
+    const keysToDelete: string[] = [];
+    memoryCache.forEach((entry, key) => {
+      if (entry.expireAt && entry.expireAt < now) {
+        keysToDelete.push(key);
+      }
+    });
+    keysToDelete.forEach(key => memoryCache.delete(key));
   }
 
   /**
    * 获取缓存值
    */
   async get<T>(key: string): Promise<T | null> {
-    if (!this.isConnected || !this.client) {
+    const entry = memoryCache.get(key);
+    if (!entry) {
+      return null;
+    }
+
+    // 检查是否过期
+    if (entry.expireAt && entry.expireAt < Date.now()) {
+      memoryCache.delete(key);
       return null;
     }
 
     try {
-      const value = await this.client.get(key);
-      if (!value) {
-        return null;
-      }
-
-      return JSON.parse(value) as T;
+      return JSON.parse(entry.value) as T;
     } catch (error) {
-      console.error(`获取缓存失败 [${key}]:`, error);
+      console.error(`解析缓存失败 [${key}]:`, error);
       return null;
     }
   }
@@ -122,19 +124,11 @@ class CacheService {
     value: T,
     ttl: number = TTL_POLICIES.MEDIUM
   ): Promise<boolean> {
-    if (!this.isConnected || !this.client) {
-      return false;
-    }
-
     try {
       const serialized = JSON.stringify(value);
-
-      if (ttl === TTL_POLICIES.NEVER) {
-        await this.client.set(key, serialized);
-      } else {
-        await this.client.setEx(key, ttl, serialized);
-      }
-
+      const expireAt = ttl === TTL_POLICIES.NEVER ? null : Date.now() + ttl * 1000;
+      
+      memoryCache.set(key, { value: serialized, expireAt });
       return true;
     } catch (error) {
       console.error(`设置缓存失败 [${key}]:`, error);
@@ -146,170 +140,132 @@ class CacheService {
    * 删除缓存
    */
   async delete(key: string): Promise<boolean> {
-    if (!this.isConnected || !this.client) {
-      return false;
-    }
-
-    try {
-      await this.client.del(key);
-      return true;
-    } catch (error) {
-      console.error(`删除缓存失败 [${key}]:`, error);
-      return false;
-    }
+    memoryCache.delete(key);
+    return true;
   }
 
   /**
    * 删除匹配模式的所有缓存
    */
   async deletePattern(pattern: string): Promise<number> {
-    if (!this.isConnected || !this.client) {
-      return 0;
-    }
-
-    try {
-      const keys = await this.client.keys(pattern);
-      if (keys.length === 0) {
-        return 0;
+    const regex = new RegExp(pattern.replace(/\*/g, ".*"));
+    let count = 0;
+    
+    const keysToDelete: string[] = [];
+    memoryCache.forEach((_, key) => {
+      if (regex.test(key)) {
+        keysToDelete.push(key);
       }
-
-      await this.client.del(keys);
-      return keys.length;
-    } catch (error) {
-      console.error(`删除模式缓存失败 [${pattern}]:`, error);
-      return 0;
-    }
+    });
+    keysToDelete.forEach(key => memoryCache.delete(key));
+    count = keysToDelete.length;
+    
+    return count;
   }
 
   /**
    * 检查缓存是否存在
    */
   async exists(key: string): Promise<boolean> {
-    if (!this.isConnected || !this.client) {
+    const entry = memoryCache.get(key);
+    if (!entry) {
       return false;
     }
 
-    try {
-      const result = await this.client.exists(key);
-      return result === 1;
-    } catch (error) {
-      console.error(`检查缓存失败 [${key}]:`, error);
+    // 检查是否过期
+    if (entry.expireAt && entry.expireAt < Date.now()) {
+      memoryCache.delete(key);
       return false;
     }
+
+    return true;
   }
 
   /**
-   * 获取缓存的剩余TTL
+   * 获取缓存TTL
    */
   async getTTL(key: string): Promise<number> {
-    if (!this.isConnected || !this.client) {
+    const entry = memoryCache.get(key);
+    if (!entry || !entry.expireAt) {
       return -1;
     }
 
-    try {
-      return await this.client.ttl(key);
-    } catch (error) {
-      console.error(`获取TTL失败 [${key}]:`, error);
-      return -1;
-    }
+    const remaining = Math.floor((entry.expireAt - Date.now()) / 1000);
+    return remaining > 0 ? remaining : -1;
   }
 
   /**
-   * 设置缓存的新TTL
+   * 增加计数器
    */
-  async setTTL(key: string, ttl: number): Promise<boolean> {
-    if (!this.isConnected || !this.client) {
-      return false;
+  async increment(key: string, amount: number = 1): Promise<number> {
+    const current = await this.get<number>(key) || 0;
+    const newValue = current + amount;
+    await this.set(key, newValue);
+    return newValue;
+  }
+
+  /**
+   * 获取或设置缓存（缓存穿透保护）
+   */
+  async getOrSet<T>(
+    key: string,
+    fetcher: () => Promise<T>,
+    ttl: number = TTL_POLICIES.MEDIUM
+  ): Promise<T> {
+    const cached = await this.get<T>(key);
+    if (cached !== null) {
+      return cached;
     }
 
-    try {
-      if (ttl === TTL_POLICIES.NEVER) {
-        await this.client.persist(key);
-      } else {
-        await this.client.expire(key, ttl);
-      }
+    const value = await fetcher();
+    await this.set(key, value, ttl);
+    return value;
+  }
 
-      return true;
-    } catch (error) {
-      console.error(`设置TTL失败 [${key}]:`, error);
-      return false;
+  /**
+   * 批量获取缓存
+   */
+  async mget<T>(keys: string[]): Promise<(T | null)[]> {
+    return Promise.all(keys.map((key) => this.get<T>(key)));
+  }
+
+  /**
+   * 批量设置缓存
+   */
+  async mset<T>(
+    entries: { key: string; value: T; ttl?: number }[]
+  ): Promise<boolean> {
+    for (const entry of entries) {
+      await this.set(entry.key, entry.value, entry.ttl);
     }
+    return true;
   }
 
   /**
    * 获取缓存统计信息
    */
   async getStats(): Promise<{
-    isConnected: boolean;
-    info?: Record<string, any>;
+    totalKeys: number;
+    memoryUsage: string;
+    hitRate: number;
   }> {
-    if (!this.isConnected || !this.client) {
-      return { isConnected: false };
-    }
-
-    try {
-      const info = await this.client.info();
-      return {
-        isConnected: true,
-        info: this.parseRedisInfo(info),
-      };
-    } catch (error) {
-      console.error("获取Redis统计信息失败:", error);
-      return { isConnected: false };
-    }
+    return {
+      totalKeys: memoryCache.size,
+      memoryUsage: `${Math.round(process.memoryUsage().heapUsed / 1024 / 1024)}MB`,
+      hitRate: 0, // 内存缓存不追踪命中率
+    };
   }
 
   /**
    * 清空所有缓存
    */
-  async flushAll(): Promise<boolean> {
-    if (!this.isConnected || !this.client) {
-      return false;
-    }
-
-    try {
-      await this.client.flushAll();
-      return true;
-    } catch (error) {
-      console.error("清空缓存失败:", error);
-      return false;
-    }
+  async flush(): Promise<boolean> {
+    memoryCache.clear();
+    return true;
   }
 
   /**
-   * 关闭Redis连接
-   */
-  async disconnect(): Promise<void> {
-    if (this.client) {
-      await this.client.quit();
-      this.isConnected = false;
-      console.log("Redis连接已关闭");
-    }
-  }
-
-  /**
-   * 解析Redis INFO命令的输出
-   */
-  private parseRedisInfo(info: string): Record<string, any> {
-    const lines = info.split("\r\n");
-    const result: Record<string, any> = {};
-
-    for (const line of lines) {
-      if (line.startsWith("#")) {
-        continue;
-      }
-
-      const [key, value] = line.split(":");
-      if (key && value) {
-        result[key] = value;
-      }
-    }
-
-    return result;
-  }
-
-  /**
-   * 获取连接状态
+   * 检查连接状态
    */
   isReady(): boolean {
     return this.isConnected;
@@ -319,71 +275,54 @@ class CacheService {
 // 导出单例
 export const cacheService = new CacheService();
 
-/**
- * 缓存装饰器 - 用于自动缓存函数结果
- */
-export function Cacheable(
-  keyBuilder: (...args: any[]) => string,
-  ttl: number = TTL_POLICIES.MEDIUM
-) {
-  return function (
-    target: any,
-    propertyKey: string,
-    descriptor: PropertyDescriptor
-  ) {
-    const originalMethod = descriptor.value;
+// 便捷函数
+export const cacheGet = <T>(key: string) => cacheService.get<T>(key);
+export const cacheSet = <T>(key: string, value: T, ttl?: number) =>
+  cacheService.set(key, value, ttl);
+export const cacheDelete = (key: string) => cacheService.delete(key);
+export const cacheGetOrSet = <T>(
+  key: string,
+  fetcher: () => Promise<T>,
+  ttl?: number
+) => cacheService.getOrSet(key, fetcher, ttl);
 
-    descriptor.value = async function (...args: any[]) {
-      const cacheKey = keyBuilder(...args);
-
-      // 尝试从缓存获取
-      const cached = await cacheService.get(cacheKey);
-      if (cached !== null) {
-        console.log(`缓存命中: ${cacheKey}`);
-        return cached;
-      }
-
-      // 执行原始方法
-      const result = await originalMethod.apply(this, args);
-
-      // 存储到缓存
-      await cacheService.set(cacheKey, result, ttl);
-
-      return result;
-    };
-
-    return descriptor;
-  };
+// 生成缓存键的辅助函数
+export function buildCacheKey(prefix: string, ...parts: (string | number)[]): string {
+  return `${prefix}${parts.join(":")}`;
 }
 
-/**
- * 缓存清除装饰器 - 用于在修改数据后清除相关缓存
- */
-export function CacheInvalidate(
-  keyPatterns: string[] | ((args: any[]) => string[])
-) {
-  return function (
-    target: any,
-    propertyKey: string,
-    descriptor: PropertyDescriptor
-  ) {
-    const originalMethod = descriptor.value;
+// 题目缓存键生成器
+export const questionCacheKey = {
+  detail: (id: number) => buildCacheKey(CACHE_KEYS.QUESTION_DETAIL, id),
+  list: (userId: number, page: number, filters?: string) =>
+    buildCacheKey(CACHE_KEYS.QUESTION_LIST, userId, page, filters || "all"),
+  stats: (userId: number) => buildCacheKey(CACHE_KEYS.QUESTION_STATS, userId),
+  difficulty: (id: number) =>
+    buildCacheKey(CACHE_KEYS.QUESTION_DIFFICULTY, id),
+};
 
-    descriptor.value = async function (...args: any[]) {
-      // 执行原始方法
-      const result = await originalMethod.apply(this, args);
+// 知识点缓存键生成器
+export const knowledgeCacheKey = {
+  detail: (id: number) => buildCacheKey(CACHE_KEYS.KNOWLEDGE_POINT, id),
+  list: (subject?: string) =>
+    buildCacheKey(CACHE_KEYS.KNOWLEDGE_POINT_LIST, subject || "all"),
+  stats: (userId: number) =>
+    buildCacheKey(CACHE_KEYS.KNOWLEDGE_POINT_STATS, userId),
+};
 
-      // 清除缓存
-      const patterns =
-        typeof keyPatterns === "function" ? keyPatterns(args) : keyPatterns;
+// 用户缓存键生成器
+export const userCacheKey = {
+  profile: (id: number) => buildCacheKey(CACHE_KEYS.USER_PROFILE, id),
+  learningStats: (id: number) =>
+    buildCacheKey(CACHE_KEYS.USER_LEARNING_STATS, id),
+  errorQuestions: (id: number, page: number) =>
+    buildCacheKey(CACHE_KEYS.USER_ERROR_QUESTIONS, id, page),
+};
 
-      for (const pattern of patterns) {
-        await cacheService.deletePattern(pattern);
-      }
-
-      return result;
-    };
-
-    return descriptor;
-  };
-}
+// 推荐缓存键生成器
+export const recommendationCacheKey = {
+  forUser: (userId: number, type: string) =>
+    buildCacheKey(CACHE_KEYS.RECOMMENDATION, userId, type),
+  cache: (userId: number) =>
+    buildCacheKey(CACHE_KEYS.RECOMMENDATION_CACHE, userId),
+};

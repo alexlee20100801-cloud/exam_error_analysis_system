@@ -28,7 +28,7 @@ import { toast } from "sonner";
 
 export default function AccountBinding() {
   const [, setLocation] = useLocation();
-  const { user, isLoading: authLoading } = useAuth();
+  const { user, loading: authLoading } = useAuth();
   const [error, setError] = useState<string | null>(null);
   const [countdown, setCountdown] = useState(0);
   
@@ -178,9 +178,9 @@ export default function AccountBinding() {
   }
 
   const bindingCount = [
-    bindingStatus?.phone,
-    bindingStatus?.wechatId,
-    bindingStatus?.username,
+    bindingStatus?.phone?.bound,
+    bindingStatus?.wechat?.bound,
+    bindingStatus?.username?.bound,
   ].filter(Boolean).length;
 
   return (
@@ -216,9 +216,9 @@ export default function AccountBinding() {
                 </div>
                 <div>
                   <p className="font-medium">手机号</p>
-                  {bindingStatus?.phone ? (
+                  {bindingStatus?.phone?.bound ? (
                     <p className="text-sm text-muted-foreground">
-                      {bindingStatus.phone.replace(/(\d{3})\d{4}(\d{4})/, "$1****$2")}
+                      {bindingStatus.phone.value}
                     </p>
                   ) : (
                     <p className="text-sm text-muted-foreground">未绑定</p>
@@ -226,7 +226,7 @@ export default function AccountBinding() {
                 </div>
               </div>
               <div className="flex items-center gap-2">
-                {bindingStatus?.phone ? (
+                {bindingStatus?.phone?.bound ? (
                   <>
                     <Badge variant="secondary" className="bg-green-100 text-green-700">
                       <Check className="h-3 w-3 mr-1" />
@@ -263,9 +263,9 @@ export default function AccountBinding() {
                 </div>
                 <div>
                   <p className="font-medium">微信号</p>
-                  {bindingStatus?.wechatId ? (
+                  {bindingStatus?.wechat?.bound ? (
                     <p className="text-sm text-muted-foreground">
-                      {bindingStatus.wechatId}
+                      {bindingStatus.wechat.nickname || '已绑定'}
                     </p>
                   ) : (
                     <p className="text-sm text-muted-foreground">未绑定</p>
@@ -273,7 +273,7 @@ export default function AccountBinding() {
                 </div>
               </div>
               <div className="flex items-center gap-2">
-                {bindingStatus?.wechatId ? (
+                {bindingStatus?.wechat?.bound ? (
                   <Badge variant="secondary" className="bg-green-100 text-green-700">
                     <Check className="h-3 w-3 mr-1" />
                     已绑定
@@ -295,9 +295,9 @@ export default function AccountBinding() {
                 </div>
                 <div>
                   <p className="font-medium">用户名密码</p>
-                  {bindingStatus?.username ? (
+                  {bindingStatus?.username?.bound ? (
                     <p className="text-sm text-muted-foreground">
-                      {bindingStatus.username}
+                      {bindingStatus.username.value}
                     </p>
                   ) : (
                     <p className="text-sm text-muted-foreground">未绑定</p>
@@ -305,7 +305,7 @@ export default function AccountBinding() {
                 </div>
               </div>
               <div className="flex items-center gap-2">
-                {bindingStatus?.username ? (
+                {bindingStatus?.username?.bound ? (
                   <>
                     <Badge variant="secondary" className="bg-green-100 text-green-700">
                       <Check className="h-3 w-3 mr-1" />

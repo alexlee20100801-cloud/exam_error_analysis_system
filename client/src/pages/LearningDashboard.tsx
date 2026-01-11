@@ -120,11 +120,9 @@ export default function LearningDashboard() {
             <BookOpen className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            // @ts-ignore
-            <div className="text-2xl font-bold">{stats?.totalErrors || 0}</div>
+            <div className="text-2xl font-bold">{stats?.totalErrorQuestions || 0}</div>
             <p className="text-xs text-muted-foreground mt-1">
-              // @ts-ignore
-              已分析 {stats?.analyzedErrors || 0} 题
+              已掌握 {stats?.masteredKnowledgePoints || 0} 个知识点
             </p>
           </CardContent>
         </Card>

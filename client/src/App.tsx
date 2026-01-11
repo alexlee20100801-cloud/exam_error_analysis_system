@@ -87,6 +87,7 @@ import QuestionBank from "@/pages/QuestionBank";
 import Login from "@/pages/Login";
 import Register from "@/pages/Register";
 import AccountBinding from "@/pages/AccountBinding";
+import IpBlockManager from "@/pages/admin/IpBlockManager";
 
 function Router() {
   return (
@@ -173,6 +174,7 @@ function Router() {
       <Route path="/login" component={Login} />
       <Route path="/register" component={Register} />
       <Route path="/account-binding" component={AccountBinding} />
+      <Route path="/admin/ip-manager" component={IpBlockManager} />
       <Route component={NotFound} />
     </Switch>
   );
