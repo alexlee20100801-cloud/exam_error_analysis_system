@@ -88,6 +88,8 @@ import Login from "@/pages/Login";
 import Register from "@/pages/Register";
 import AccountBinding from "@/pages/AccountBinding";
 import IpBlockManager from "@/pages/admin/IpBlockManager";
+import ExportCenter from "@/pages/ExportCenter";
+import ParentSupervisionDashboard from "@/pages/ParentSupervisionDashboard";
 
 function Router() {
   return (
@@ -175,6 +177,8 @@ function Router() {
       <Route path="/register" component={Register} />
       <Route path="/account-binding" component={AccountBinding} />
       <Route path="/admin/ip-manager" component={IpBlockManager} />
+      <Route path="/export-center" component={ExportCenter} />
+      <Route path="/parent-supervision" component={ParentSupervisionDashboard} />
       <Route component={NotFound} />
     </Switch>
   );

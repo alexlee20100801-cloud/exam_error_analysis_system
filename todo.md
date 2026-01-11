@@ -2345,3 +2345,10 @@ if (error.knowledgePointIds) {
 ## Bug Fixes - 2026-01-11
 - [x] 修复数据库表缺失：scheduled_task_logs 和 ai_classification_metrics 表不存在
 - [x] 修复 API 查询错误：tRPC 返回 HTML 而非 JSON（重启服务器后已解决）
+
+
+## 第十八阶段：数据导出和家长监督功能 (2026-01-11)
+
+- [x] 数据导出功能 - 支持PDF/Word文档导出
+- [x] 家长监督账号 - 查看孩子学习进度和错题统计
+- [x] 移动端适配优化 - 拍照上传体验优化
