@@ -6,6 +6,7 @@ import { sdk } from "../_core/sdk";
 import { TRPCError } from "@trpc/server";
 import { verifyCaptcha } from "./captchaService";
 import { sendAliyunSms } from "./aliyunSmsService";
+import { checkIpRateLimit, recordIpRequest } from "./ipRateLimitService";
 
 /**
  * 生成6位数字验证码
@@ -15,15 +16,16 @@ export function generateVerificationCode(): string {
 }
 
 /**
- * 发送验证码（支持图形验证码校验和阿里云短信发送）
+ * 发送验证码（支持图形验证码校验、IP频率限制和阿里云短信发送）
  */
 export async function sendVerificationCode(params: {
   phone: string;
   type: "login" | "register" | "bind" | "reset";
   captchaId?: string;
   captchaCode?: string;
-}): Promise<{ success: boolean; message: string }> {
-  const { phone, type, captchaId, captchaCode } = params;
+  ipAddress?: string;
+}): Promise<{ success: boolean; message: string; remainingRequests?: number }> {
+  const { phone, type, captchaId, captchaCode, ipAddress } = params;
 
   // 验证手机号格式
   if (!/^1[3-9]\d{9}$/.test(phone)) {
@@ -31,6 +33,17 @@ export async function sendVerificationCode(params: {
       code: "BAD_REQUEST",
       message: "手机号格式不正确",
     });
+  }
+
+  // IP频率限制检查
+  if (ipAddress) {
+    const rateLimitResult = await checkIpRateLimit(ipAddress, "SMS_SEND");
+    if (!rateLimitResult.allowed) {
+      throw new TRPCError({
+        code: "TOO_MANY_REQUESTS",
+        message: rateLimitResult.reason || "请求过于频繁，请稍后再试",
+      });
+    }
   }
 
   // 验证图形验证码（如果提供了）
@@ -83,6 +96,17 @@ export async function sendVerificationCode(params: {
     console.error("[SMS] 短信发送失败:", smsResult.message);
     // 即使短信发送失败，也返回成功（在开发模式下验证码已保存到数据库）
     console.log("[SMS] 开发模式 - 验证码: " + code);
+  }
+
+  // 记录IP请求（用于频率限制统计）
+  if (ipAddress) {
+    await recordIpRequest(ipAddress, "SMS_SEND");
+    const updatedRateLimit = await checkIpRateLimit(ipAddress, "SMS_SEND");
+    return {
+      success: true,
+      message: "验证码已发送",
+      remainingRequests: updatedRateLimit.remainingRequests,
+    };
   }
 
   return {

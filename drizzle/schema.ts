@@ -2081,3 +2081,46 @@ export const captchaCodes = mysqlTable("captcha_codes", {
 
 export type CaptchaCode = typeof captchaCodes.$inferSelect;
 export type NewCaptchaCode = typeof captchaCodes.$inferInsert;
+
+
+// ==================== IP频率限制相关表 ====================
+
+// IP频率限制表 - 用于限制短信发送频率
+export const ipRateLimits = mysqlTable("ip_rate_limits", {
+  id: int().autoincrement().primaryKey().notNull(),
+  ipAddress: varchar("ip_address", { length: 45 }).notNull(), // 支持IPv6
+  action: varchar({ length: 50 }).notNull(), // 操作类型：sms_send, captcha_request等
+  requestCount: int("request_count").default(1).notNull(), // 请求次数
+  windowStart: timestamp("window_start", { mode: 'date' }).notNull(), // 时间窗口开始时间
+  windowEnd: timestamp("window_end", { mode: 'date' }).notNull(), // 时间窗口结束时间
+  blocked: tinyint().default(0).notNull(), // 是否被封禁
+  blockedUntil: timestamp("blocked_until", { mode: 'date' }), // 封禁截止时间
+  createdAt: timestamp("created_at", { mode: 'string' }).default('CURRENT_TIMESTAMP').notNull(),
+  updatedAt: timestamp("updated_at", { mode: 'string' }).default('CURRENT_TIMESTAMP').notNull(),
+},
+(table) => [
+  index("ip_action_idx").on(table.ipAddress, table.action),
+  index("window_end_idx").on(table.windowEnd),
+  index("blocked_idx").on(table.blocked),
+]);
+
+export type IpRateLimit = typeof ipRateLimits.$inferSelect;
+export type NewIpRateLimit = typeof ipRateLimits.$inferInsert;
+
+// IP黑名单表 - 用于永久封禁恶意IP
+export const ipBlacklist = mysqlTable("ip_blacklist", {
+  id: int().autoincrement().primaryKey().notNull(),
+  ipAddress: varchar("ip_address", { length: 45 }).notNull().unique(), // IP地址
+  reason: varchar({ length: 255 }).notNull(), // 封禁原因
+  blockedBy: varchar("blocked_by", { length: 100 }), // 封禁操作人（系统自动或管理员）
+  blockedAt: timestamp("blocked_at", { mode: 'date' }).notNull(),
+  expiresAt: timestamp("expires_at", { mode: 'date' }), // 过期时间，null表示永久封禁
+  isActive: tinyint("is_active").default(1).notNull(),
+  createdAt: timestamp("created_at", { mode: 'string' }).default('CURRENT_TIMESTAMP').notNull(),
+},
+(table) => [
+  index("ip_active_idx").on(table.ipAddress, table.isActive),
+]);
+
+export type IpBlacklist = typeof ipBlacklist.$inferSelect;
+export type NewIpBlacklist = typeof ipBlacklist.$inferInsert;

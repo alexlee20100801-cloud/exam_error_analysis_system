@@ -12,7 +12,7 @@ import {
 } from "../services/smsAuth";
 
 export const smsAuthRouter = router({
-  // 发送验证码（支持图形验证码校验）
+  // 发送验证码（支持图形验证码校验和IP频率限制）
   sendCode: publicProcedure
     .input(
       z.object({
@@ -22,8 +22,19 @@ export const smsAuthRouter = router({
         captchaCode: z.string().optional(),
       })
     )
-    .mutation(async ({ input }) => {
-      return sendVerificationCode(input);
+    .mutation(async ({ input, ctx }) => {
+      // 获取客户端IP地址
+      const ipAddress = ctx.req.headers['x-forwarded-for'] as string || 
+                        ctx.req.headers['x-real-ip'] as string || 
+                        ctx.req.socket?.remoteAddress || 
+                        'unknown';
+      // 如果是多个IP（通过代理），取第一个
+      const clientIp = ipAddress.split(',')[0].trim();
+      
+      return sendVerificationCode({
+        ...input,
+        ipAddress: clientIp,
+      });
     }),
 
   // 手机号验证码登录
