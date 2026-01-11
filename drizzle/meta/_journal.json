@@ -442,6 +442,13 @@
       "when": 1768110984125,
       "tag": "0066_solid_misty_knight",
       "breakpoints": true
+    },
+    {
+      "idx": 67,
+      "version": "5",
+      "when": 1768150188020,
+      "tag": "0067_whole_professor_monster",
+      "breakpoints": true
     }
   ]
 }

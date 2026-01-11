@@ -98,6 +98,19 @@ export {
   type NewDeduplicationConfig
 } from "./deduplication_schema";
 
+// 导入增强版导出模板 schema
+export {
+  exportTemplatesEnhanced,
+  quickExportConfigs,
+  exportHistoryRecords,
+  type ExportTemplateEnhanced,
+  type NewExportTemplateEnhanced,
+  type QuickExportConfig,
+  type NewQuickExportConfig,
+  type ExportHistoryRecord,
+  type NewExportHistoryRecord
+} from "./export_template_enhanced_schema";
+
 // 导入合规审核 schema
 export {
   complianceRules,

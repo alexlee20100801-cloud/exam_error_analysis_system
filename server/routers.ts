@@ -111,6 +111,9 @@ import { accountBindingRouter } from "./routers/accountBinding";
 import { captchaRouter } from "./routers/captcha";
 import { wechatAuthRouter } from "./routers/wechatAuth";
 import { ipBlacklistRouter } from "./routers/ipBlacklist";
+import { exportTemplatesEnhancedRouter } from "./routers/exportTemplatesEnhanced";
+import { parentNotificationRouter } from "./routers/parentNotification";
+import { ocrEnhancedRouter } from "./routers/ocrEnhanced";
 
 export const appRouter = router({
   system: systemRouter,
@@ -422,6 +425,15 @@ export const appRouter = router({
   
   // IP黑名单管理
   ipBlacklist: ipBlacklistRouter,
+  
+  // 增强版导出模板
+  exportTemplatesEnhanced: exportTemplatesEnhancedRouter,
+  
+  // 家长通知系统
+  parentNotification: parentNotificationRouter,
+  
+  // OCR增强
+  ocrEnhanced: ocrEnhancedRouter,
 });
 
 export type AppRouter = typeof appRouter;
