@@ -2529,3 +2529,33 @@ if (error.knowledgePointIds) {
 - [x] 显示纸张大小、方向、字体大小等样式效果
 - [x] 显示内容配置（题号、难度、知识点、答案、解析等）
 - [x] 添加预览信息摘要
+
+
+## 第二十一阶段：浏览器兼容性和国际化适配修复 (2026-01-12)
+
+### 浏览器兼容性修复
+- [x] 添加CSS浏览器前缀和兼容性polyfills
+- [x] 修复Safari/iOS特有的CSS兼容性问题
+- [x] 修复Firefox特有的CSS兼容性问题
+- [x] 添加ES6+语法的浏览器兼容性处理
+- [x] 修复移动端浏览器兼容性问题(Chrome/Safari/Firefox移动版)
+- [x] 添加浏览器特性检测和降级方案
+- [x] 修复CSS oklch()颜色格式的浏览器兼容性
+
+### 国际化和地区适配
+- [x] 修复时区处理问题(确保UTC时间正确转换为用户本地时间)
+- [x] 添加日期格式国际化支持
+- [x] 添加数字格式国际化支持
+- [x] 修复中文字体在不同系统的显示问题
+- [x] 添加RTL(从右到左)语言布局支持基础
+- [x] 优化不同地区网络环境下的资源加载
+
+### 新增文件
+- [x] client/src/lib/i18n.ts - 国际化和日期时间格式化工具库
+- [x] client/src/lib/browserCompat.ts - 浏览器兼容性检测工具
+- [x] client/src/styles/compat.css - CSS兼容性样式文件
+- [x] client/src/hooks/useBrowserCompat.ts - 浏览器兼容性React Hooks
+- [x] client/src/components/FormattedDate.tsx - 日期时间格式化组件
+- [x] client/src/components/FormattedNumber.tsx - 数字格式化组件
+- [x] server/utils/timezone.ts - 服务端时区处理工具
+- [x] server/compat.test.ts - 兼容性工具单元测试
