@@ -1,0 +1,264 @@
+{
+  "common": {
+    "appName": "Shenzhen Middle & High School Error Analysis Learning System",
+    "loading": "Loading...",
+    "error": "Error occurred",
+    "retry": "Retry",
+    "save": "Save",
+    "cancel": "Cancel",
+    "confirm": "Confirm",
+    "delete": "Delete",
+    "edit": "Edit",
+    "search": "Search",
+    "filter": "Filter",
+    "reset": "Reset",
+    "submit": "Submit",
+    "back": "Back",
+    "next": "Next",
+    "previous": "Previous",
+    "close": "Close",
+    "more": "More",
+    "all": "All",
+    "none": "None",
+    "yes": "Yes",
+    "no": "No",
+    "success": "Success",
+    "failed": "Failed",
+    "noData": "No data available",
+    "comingSoon": "Coming soon"
+  },
+  "nav": {
+    "home": "Home",
+    "dashboard": "Dashboard",
+    "errorQuestions": "Error Book",
+    "upload": "Upload",
+    "practice": "Practice",
+    "review": "Review",
+    "report": "Learning Report",
+    "settings": "Settings",
+    "profile": "Profile",
+    "logout": "Logout",
+    "login": "Login",
+    "register": "Register"
+  },
+  "home": {
+    "title": "AI-Powered Error Analysis Learning System",
+    "subtitle": "Personalized learning assistant for Shenzhen middle and high school students",
+    "features": {
+      "ocr": {
+        "title": "Smart OCR Recognition",
+        "desc": "Take a photo to recognize errors, supports handwriting and print"
+      },
+      "ai": {
+        "title": "AI Deep Analysis",
+        "desc": "Intelligent analysis of error causes, pinpoint knowledge gaps"
+      },
+      "knowledge": {
+        "title": "Knowledge Graph",
+        "desc": "Visualize knowledge structure, master learning paths"
+      },
+      "recommend": {
+        "title": "Personalized Recommendations",
+        "desc": "Smart practice recommendations based on learning data"
+      }
+    },
+    "cta": {
+      "start": "Get Started",
+      "learn": "Learn More"
+    },
+    "stats": {
+      "users": "Active Users",
+      "questions": "Error Questions",
+      "accuracy": "Recognition Accuracy"
+    }
+  },
+  "errorQuestion": {
+    "title": "My Error Book",
+    "upload": "Upload Error",
+    "batchUpload": "Batch Upload",
+    "filter": {
+      "subject": "Subject",
+      "grade": "Grade",
+      "difficulty": "Difficulty",
+      "mastery": "Mastery",
+      "dateRange": "Date Range"
+    },
+    "subjects": {
+      "math": "Math",
+      "physics": "Physics",
+      "chemistry": "Chemistry",
+      "chinese": "Chinese",
+      "english": "English",
+      "biology": "Biology",
+      "history": "History",
+      "geography": "Geography",
+      "politics": "Politics"
+    },
+    "grades": {
+      "junior1": "Grade 7",
+      "junior2": "Grade 8",
+      "junior3": "Grade 9",
+      "senior1": "Grade 10",
+      "senior2": "Grade 11",
+      "senior3": "Grade 12"
+    },
+    "difficulty": {
+      "easy": "Easy",
+      "medium": "Medium",
+      "hard": "Hard"
+    },
+    "mastery": {
+      "notMastered": "Not Mastered",
+      "learning": "Learning",
+      "mastered": "Mastered"
+    },
+    "detail": {
+      "content": "Question Content",
+      "answer": "Correct Answer",
+      "myAnswer": "My Answer",
+      "analysis": "Analysis",
+      "knowledgePoints": "Related Knowledge Points",
+      "similarQuestions": "Similar Questions",
+      "aiAnalysis": "AI Analysis",
+      "reviewHistory": "Review History"
+    },
+    "actions": {
+      "analyze": "AI Analysis",
+      "practice": "Practice Similar",
+      "markMastered": "Mark as Mastered",
+      "addToReview": "Add to Review Plan",
+      "export": "Export",
+      "share": "Share"
+    },
+    "empty": "No error questions yet, upload some!",
+    "uploadHint": "Take a photo or select an image to upload"
+  },
+  "upload": {
+    "title": "Upload Error Question",
+    "dragHint": "Drag image here, or click to select",
+    "selectFile": "Select File",
+    "takePhoto": "Take Photo",
+    "processing": "Processing...",
+    "ocrResult": "OCR Result",
+    "editContent": "Edit Content",
+    "selectSubject": "Select Subject",
+    "selectGrade": "Select Grade",
+    "selectDifficulty": "Select Difficulty",
+    "addTags": "Add Tags",
+    "uploadSuccess": "Upload successful",
+    "uploadFailed": "Upload failed, please retry",
+    "batchMode": "Batch Mode",
+    "singleMode": "Single Mode"
+  },
+  "practice": {
+    "title": "Practice",
+    "startPractice": "Start Practice",
+    "continuePractice": "Continue Practice",
+    "todayGoal": "Today's Goal",
+    "completed": "Completed",
+    "remaining": "Remaining",
+    "accuracy": "Accuracy",
+    "timeSpent": "Time Spent",
+    "submit": "Submit Answer",
+    "showAnswer": "Show Answer",
+    "nextQuestion": "Next Question",
+    "finish": "Finish Practice",
+    "result": {
+      "title": "Practice Result",
+      "correct": "Correct",
+      "wrong": "Wrong",
+      "score": "Score",
+      "suggestion": "Learning Suggestions"
+    }
+  },
+  "review": {
+    "title": "Review Plan",
+    "todayReview": "Today's Review",
+    "overdue": "Overdue",
+    "upcoming": "Upcoming",
+    "completed": "Completed",
+    "startReview": "Start Review",
+    "markCompleted": "Mark Complete",
+    "reschedule": "Reschedule",
+    "reminder": {
+      "title": "Review Reminder",
+      "enable": "Enable Reminder",
+      "time": "Reminder Time",
+      "frequency": "Frequency"
+    }
+  },
+  "report": {
+    "title": "Learning Report",
+    "overview": "Overview",
+    "trend": "Learning Trend",
+    "subjectAnalysis": "Subject Analysis",
+    "weakPoints": "Weak Points",
+    "improvement": "Improvement",
+    "timeRange": {
+      "week": "This Week",
+      "month": "This Month",
+      "year": "This Year"
+    },
+    "metrics": {
+      "totalQuestions": "Total Errors",
+      "masteredQuestions": "Mastered",
+      "studyTime": "Study Time",
+      "practiceCount": "Practice Count"
+    }
+  },
+  "settings": {
+    "title": "Settings",
+    "profile": {
+      "title": "Profile",
+      "avatar": "Avatar",
+      "nickname": "Nickname",
+      "grade": "Grade",
+      "school": "School"
+    },
+    "preferences": {
+      "title": "Preferences",
+      "language": "Language",
+      "theme": "Theme",
+      "notification": "Notifications",
+      "darkMode": "Dark Mode",
+      "autoMode": "Follow System"
+    },
+    "notification": {
+      "title": "Notification Settings",
+      "reviewReminder": "Review Reminder",
+      "dailyReport": "Daily Report",
+      "achievementAlert": "Achievement Alert"
+    },
+    "account": {
+      "title": "Account Security",
+      "changePassword": "Change Password",
+      "bindPhone": "Bind Phone",
+      "bindEmail": "Bind Email"
+    },
+    "about": {
+      "title": "About",
+      "version": "Version",
+      "feedback": "Feedback",
+      "privacy": "Privacy Policy",
+      "terms": "Terms of Service"
+    }
+  },
+  "pwa": {
+    "installTitle": "Install to Home Screen",
+    "installDesc": "Add to home screen for native app experience with offline support",
+    "install": "Install Now",
+    "later": "Later",
+    "installed": "App successfully installed to home screen!",
+    "newVersion": "New version available, refresh to update",
+    "refresh": "Refresh",
+    "offline": "You are currently offline",
+    "online": "Network connection restored"
+  },
+  "errors": {
+    "networkError": "Network connection failed, please check your settings",
+    "serverError": "Server error, please try again later",
+    "authError": "Session expired, please login again",
+    "notFound": "Page not found",
+    "permissionDenied": "Permission denied"
+  }
+}

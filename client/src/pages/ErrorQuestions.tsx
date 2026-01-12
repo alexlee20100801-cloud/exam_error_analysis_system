@@ -1,5 +1,6 @@
 import DashboardLayout from "@/components/DashboardLayout";
 import { Button } from "@/components/ui/button";
+import { ErrorQuestionImage } from "@/components/LazyImage";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
@@ -1236,13 +1237,12 @@ export default function ErrorQuestions() {
                 <CardContent>
                   <div className="space-y-3">
                     {question.imageUrl && (
-                      <div className="relative overflow-hidden rounded-lg border bg-muted/30">
-                        <img 
-                          src={question.imageUrl} 
-                          alt="题目" 
-                          className="max-h-48 w-auto mx-auto object-contain group-hover:scale-105 transition-transform duration-200" 
-                        />
-                      </div>
+                      <ErrorQuestionImage
+                        src={question.imageUrl}
+                        alt="题目"
+                        questionId={question.id}
+                        className="max-h-48 w-full group-hover:scale-[1.02] transition-transform duration-200"
+                      />
                     )}
                     <p className="text-sm text-foreground whitespace-pre-wrap line-clamp-3 leading-relaxed">
                       {question.content}

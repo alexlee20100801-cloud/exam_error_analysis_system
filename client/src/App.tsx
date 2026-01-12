@@ -48,6 +48,7 @@ import ComplianceManagement from "@/pages/admin/ComplianceManagement";
 import QualityManagement from "@/pages/admin/QualityManagement";
 import { SmartDocumentProcessor } from "@/pages/SmartDocumentProcessor";
 import { PWAInstallPrompt } from "@/components/PWAInstallPrompt";
+import { OfflineIndicator } from "@/components/OfflineIndicator";
 import { MobileBottomNav } from "@/components/MobileBottomNav";
 import WeaknessAnalysis from "@/pages/WeaknessAnalysis";
 import SmartExamPaper from "@/pages/SmartExamPaper";
@@ -199,6 +200,7 @@ function App() {
         <TooltipProvider>
           <Toaster />
           <PWAInstallPrompt />
+          <OfflineIndicator />
           <Router />
           <MobileBottomNav />
         </TooltipProvider>

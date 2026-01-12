@@ -1,19 +1,57 @@
 // Service Worker for PWA offline support
-const CACHE_NAME = 'exam-error-analysis-v1';
-const RUNTIME_CACHE = 'runtime-cache-v1';
+// Version: 2.0.0 - Enhanced with error question caching
+const CACHE_VERSION = 'v2';
+const STATIC_CACHE = `exam-error-analysis-static-${CACHE_VERSION}`;
+const RUNTIME_CACHE = `exam-error-analysis-runtime-${CACHE_VERSION}`;
+const IMAGE_CACHE = `exam-error-analysis-images-${CACHE_VERSION}`;
+const API_CACHE = `exam-error-analysis-api-${CACHE_VERSION}`;
 
 // 需要预缓存的静态资源
 const PRECACHE_URLS = [
   '/',
   '/manifest.json',
+  '/icon-72x72.png',
+  '/icon-96x96.png',
+  '/icon-128x128.png',
+  '/icon-144x144.png',
+  '/icon-152x152.png',
   '/icon-192x192.png',
+  '/icon-384x384.png',
   '/icon-512x512.png',
 ];
+
+// 需要缓存的API路径模式
+const CACHEABLE_API_PATTERNS = [
+  /\/api\/trpc\/errorQuestions\.list/,
+  /\/api\/trpc\/errorQuestions\.getById/,
+  /\/api\/trpc\/knowledgeGraph\.getTree/,
+  /\/api\/trpc\/stats\.getByLevel/,
+  /\/api\/trpc\/userSettings\.getSettings/,
+];
+
+// 图片URL模式
+const IMAGE_URL_PATTERNS = [
+  /\.(?:png|jpg|jpeg|gif|webp|svg)$/i,
+  /\/storage\//,
+  /s3\.amazonaws\.com/,
+  /cloudfront\.net/,
+];
+
+// 检查URL是否为可缓存的API
+function isCacheableApi(url) {
+  return CACHEABLE_API_PATTERNS.some(pattern => pattern.test(url));
+}
+
+// 检查URL是否为图片
+function isImageUrl(url) {
+  return IMAGE_URL_PATTERNS.some(pattern => pattern.test(url));
+}
 
 // 安装事件 - 预缓存静态资源
 self.addEventListener('install', (event) => {
   event.waitUntil(
-    caches.open(CACHE_NAME).then((cache) => {
+    caches.open(STATIC_CACHE).then((cache) => {
+      console.log('[SW] Pre-caching static assets');
       return cache.addAll(PRECACHE_URLS);
     })
   );
@@ -27,7 +65,12 @@ self.addEventListener('activate', (event) => {
     caches.keys().then((cacheNames) => {
       return Promise.all(
         cacheNames.map((cacheName) => {
-          if (cacheName !== CACHE_NAME && cacheName !== RUNTIME_CACHE) {
+          // 删除旧版本的缓存
+          if (
+            cacheName.startsWith('exam-error-analysis-') &&
+            !cacheName.endsWith(CACHE_VERSION)
+          ) {
+            console.log('[SW] Deleting old cache:', cacheName);
             return caches.delete(cacheName);
           }
         })
@@ -38,7 +81,7 @@ self.addEventListener('activate', (event) => {
   return self.clients.claim();
 });
 
-// Fetch事件 - 网络优先，失败时使用缓存
+// Fetch事件 - 智能缓存策略
 self.addEventListener('fetch', (event) => {
   const { request } = event;
   const url = new URL(request.url);
@@ -53,65 +96,268 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  // API请求：网络优先
-  if (url.pathname.startsWith('/api/')) {
-    event.respondWith(
-      fetch(request)
-        .then((response) => {
-          // 只缓存成功的响应
-          if (response && response.status === 200) {
-            const responseClone = response.clone();
-            caches.open(RUNTIME_CACHE).then((cache) => {
-              cache.put(request, responseClone);
-            });
-          }
-          return response;
-        })
-        .catch(() => {
-          // 网络失败时尝试从缓存获取
-          return caches.match(request);
-        })
-    );
+  // 跳过WebSocket请求
+  if (url.protocol === 'ws:' || url.protocol === 'wss:') {
     return;
   }
 
-  // 静态资源：缓存优先
-  event.respondWith(
-    caches.match(request).then((cachedResponse) => {
-      if (cachedResponse) {
-        return cachedResponse;
+  // 图片资源：缓存优先策略
+  if (isImageUrl(url.href)) {
+    event.respondWith(handleImageRequest(request));
+    return;
+  }
+
+  // 可缓存的API请求：网络优先，失败时使用缓存
+  if (isCacheableApi(url.href)) {
+    event.respondWith(handleApiRequest(request));
+    return;
+  }
+
+  // 其他API请求：仅网络
+  if (url.pathname.startsWith('/api/')) {
+    event.respondWith(fetch(request));
+    return;
+  }
+
+  // 静态资源：缓存优先，网络回退
+  event.respondWith(handleStaticRequest(request));
+});
+
+// 处理图片请求 - 缓存优先策略
+async function handleImageRequest(request) {
+  const cache = await caches.open(IMAGE_CACHE);
+  const cachedResponse = await cache.match(request);
+
+  if (cachedResponse) {
+    // 后台更新缓存
+    fetchAndCache(request, IMAGE_CACHE);
+    return cachedResponse;
+  }
+
+  try {
+    const networkResponse = await fetch(request);
+    if (networkResponse && networkResponse.ok) {
+      cache.put(request, networkResponse.clone());
+    }
+    return networkResponse;
+  } catch (error) {
+    // 返回占位图片
+    return new Response(
+      `<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="0 0 200 200">
+        <rect fill="#f0f0f0" width="200" height="200"/>
+        <text fill="#999" font-family="sans-serif" font-size="14" x="50%" y="50%" text-anchor="middle" dominant-baseline="middle">
+          离线图片
+        </text>
+      </svg>`,
+      {
+        headers: { 'Content-Type': 'image/svg+xml' },
       }
+    );
+  }
+}
 
-      return fetch(request).then((response) => {
-        // 只缓存成功的响应
-        if (!response || response.status !== 200 || response.type === 'error') {
-          return response;
+// 处理API请求 - 网络优先策略
+async function handleApiRequest(request) {
+  const cache = await caches.open(API_CACHE);
+
+  try {
+    const networkResponse = await fetch(request);
+    if (networkResponse && networkResponse.ok) {
+      // 缓存成功的响应
+      cache.put(request, networkResponse.clone());
+    }
+    return networkResponse;
+  } catch (error) {
+    // 网络失败时尝试从缓存获取
+    const cachedResponse = await cache.match(request);
+    if (cachedResponse) {
+      console.log('[SW] Serving cached API response:', request.url);
+      return cachedResponse;
+    }
+
+    // 返回离线错误响应
+    return new Response(
+      JSON.stringify({
+        error: 'OFFLINE',
+        message: '当前处于离线状态，无法获取最新数据',
+      }),
+      {
+        status: 503,
+        headers: { 'Content-Type': 'application/json' },
+      }
+    );
+  }
+}
+
+// 处理静态资源请求 - 缓存优先策略
+async function handleStaticRequest(request) {
+  const cachedResponse = await caches.match(request);
+
+  if (cachedResponse) {
+    return cachedResponse;
+  }
+
+  try {
+    const networkResponse = await fetch(request);
+    if (networkResponse && networkResponse.ok) {
+      const cache = await caches.open(RUNTIME_CACHE);
+      cache.put(request, networkResponse.clone());
+    }
+    return networkResponse;
+  } catch (error) {
+    // 对于导航请求，返回离线页面
+    if (request.mode === 'navigate') {
+      const offlineResponse = await caches.match('/');
+      if (offlineResponse) {
+        return offlineResponse;
+      }
+    }
+
+    return new Response('Offline', { status: 503 });
+  }
+}
+
+// 后台更新缓存
+async function fetchAndCache(request, cacheName) {
+  try {
+    const networkResponse = await fetch(request);
+    if (networkResponse && networkResponse.ok) {
+      const cache = await caches.open(cacheName);
+      cache.put(request, networkResponse);
+    }
+  } catch (error) {
+    // 静默失败
+  }
+}
+
+// 消息事件 - 支持手动操作
+self.addEventListener('message', (event) => {
+  const { type, payload } = event.data || {};
+
+  switch (type) {
+    case 'SKIP_WAITING':
+      self.skipWaiting();
+      break;
+
+    case 'CLEAR_CACHE':
+      event.waitUntil(
+        caches.keys().then((cacheNames) => {
+          return Promise.all(
+            cacheNames.map((cacheName) => caches.delete(cacheName))
+          );
+        })
+      );
+      break;
+
+    case 'CLEAR_API_CACHE':
+      event.waitUntil(caches.delete(API_CACHE));
+      break;
+
+    case 'CLEAR_IMAGE_CACHE':
+      event.waitUntil(caches.delete(IMAGE_CACHE));
+      break;
+
+    case 'CACHE_ERROR_QUESTIONS':
+      // 预缓存错题数据
+      if (payload && payload.urls) {
+        event.waitUntil(
+          caches.open(API_CACHE).then((cache) => {
+            return Promise.all(
+              payload.urls.map((url) =>
+                fetch(url).then((response) => {
+                  if (response.ok) {
+                    return cache.put(url, response);
+                  }
+                })
+              )
+            );
+          })
+        );
+      }
+      break;
+
+    case 'GET_CACHE_STATUS':
+      // 获取缓存状态
+      event.waitUntil(
+        Promise.all([
+          caches.open(STATIC_CACHE).then((cache) => cache.keys()),
+          caches.open(RUNTIME_CACHE).then((cache) => cache.keys()),
+          caches.open(IMAGE_CACHE).then((cache) => cache.keys()),
+          caches.open(API_CACHE).then((cache) => cache.keys()),
+        ]).then(([staticKeys, runtimeKeys, imageKeys, apiKeys]) => {
+          event.source.postMessage({
+            type: 'CACHE_STATUS',
+            payload: {
+              static: staticKeys.length,
+              runtime: runtimeKeys.length,
+              images: imageKeys.length,
+              api: apiKeys.length,
+            },
+          });
+        })
+      );
+      break;
+  }
+});
+
+// 后台同步事件
+self.addEventListener('sync', (event) => {
+  if (event.tag === 'sync-error-questions') {
+    event.waitUntil(syncErrorQuestions());
+  }
+});
+
+// 同步错题数据
+async function syncErrorQuestions() {
+  // 这里可以实现离线时保存的错题同步逻辑
+  console.log('[SW] Syncing error questions...');
+}
+
+// 推送通知事件
+self.addEventListener('push', (event) => {
+  if (!event.data) return;
+
+  const data = event.data.json();
+  const options = {
+    body: data.body || '您有新的学习提醒',
+    icon: '/icon-192x192.png',
+    badge: '/icon-72x72.png',
+    vibrate: [100, 50, 100],
+    data: {
+      url: data.url || '/',
+    },
+    actions: [
+      { action: 'open', title: '查看' },
+      { action: 'close', title: '关闭' },
+    ],
+  };
+
+  event.waitUntil(
+    self.registration.showNotification(data.title || '错题学习提醒', options)
+  );
+});
+
+// 通知点击事件
+self.addEventListener('notificationclick', (event) => {
+  event.notification.close();
+
+  if (event.action === 'close') return;
+
+  const url = event.notification.data?.url || '/';
+  event.waitUntil(
+    clients.matchAll({ type: 'window' }).then((windowClients) => {
+      // 如果已有窗口打开，聚焦它
+      for (const client of windowClients) {
+        if (client.url === url && 'focus' in client) {
+          return client.focus();
         }
-
-        const responseClone = response.clone();
-        caches.open(RUNTIME_CACHE).then((cache) => {
-          cache.put(request, responseClone);
-        });
-
-        return response;
-      });
+      }
+      // 否则打开新窗口
+      if (clients.openWindow) {
+        return clients.openWindow(url);
+      }
     })
   );
 });
 
-// 消息事件 - 支持手动清除缓存
-self.addEventListener('message', (event) => {
-  if (event.data && event.data.type === 'SKIP_WAITING') {
-    self.skipWaiting();
-  }
-
-  if (event.data && event.data.type === 'CLEAR_CACHE') {
-    event.waitUntil(
-      caches.keys().then((cacheNames) => {
-        return Promise.all(
-          cacheNames.map((cacheName) => caches.delete(cacheName))
-        );
-      })
-    );
-  }
-});
+console.log('[SW] Service Worker loaded - Version:', CACHE_VERSION);

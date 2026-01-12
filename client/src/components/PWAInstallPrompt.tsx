@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { X, Download, Smartphone } from "lucide-react";
 import { toast } from "sonner";
+import { useTranslation } from "react-i18next";
 
 interface BeforeInstallPromptEvent extends Event {
   prompt: () => Promise<void>;
@@ -12,6 +13,7 @@ export function PWAInstallPrompt() {
   const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | null>(null);
   const [showPrompt, setShowPrompt] = useState(false);
   const [isInstalled, setIsInstalled] = useState(false);
+  const { t } = useTranslation();
 
   useEffect(() => {
     // 检查是否已经安装
@@ -43,7 +45,7 @@ export function PWAInstallPrompt() {
     window.addEventListener('appinstalled', () => {
       setIsInstalled(true);
       setShowPrompt(false);
-      toast.success('应用已成功安装到主屏幕！');
+      toast.success(t('pwa.installed', '应用已成功安装到主屏幕！'));
     });
 
     return () => {
@@ -63,7 +65,7 @@ export function PWAInstallPrompt() {
     const { outcome } = await deferredPrompt.userChoice;
 
     if (outcome === 'accepted') {
-      toast.success('正在安装应用...');
+      toast.success(t('pwa.installing', '正在安装应用...'));
     }
 
     // 清除deferredPrompt
@@ -97,9 +99,9 @@ export function PWAInstallPrompt() {
             <Smartphone className="h-6 w-6 text-blue-600" />
           </div>
           <div className="flex-1 min-w-0">
-            <h3 className="font-semibold text-lg mb-1">安装到主屏幕</h3>
+            <h3 className="font-semibold text-lg mb-1">{t('pwa.installTitle', '安装到主屏幕')}</h3>
             <p className="text-sm text-blue-50 opacity-90">
-              将应用添加到主屏幕，像原生APP一样使用，支持离线访问
+              {t('pwa.installDesc', '将应用添加到主屏幕，像原生APP一样使用，支持离线访问')}
             </p>
           </div>
         </div>
@@ -111,7 +113,7 @@ export function PWAInstallPrompt() {
             size="sm"
           >
             <Download className="mr-2 h-4 w-4" />
-            立即安装
+            {t('pwa.install', '立即安装')}
           </Button>
           <Button
             onClick={handleDismiss}
@@ -119,7 +121,7 @@ export function PWAInstallPrompt() {
             className="text-white hover:bg-white/20"
             size="sm"
           >
-            稍后
+            {t('pwa.later', '稍后')}
           </Button>
         </div>
       </div>
@@ -143,9 +145,10 @@ export function registerPWA() {
               newWorker.addEventListener('statechange', () => {
                 if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
                   // 有新版本可用
-                  toast.info('发现新版本，刷新页面以更新', {
+                  const t = (key: string, fallback: string) => fallback; // 简化版本
+                  toast.info(t('pwa.newVersion', '发现新版本，刷新页面以更新'), {
                     action: {
-                      label: '刷新',
+                      label: t('pwa.refresh', '刷新'),
                       onClick: () => window.location.reload(),
                     },
                     duration: 10000,

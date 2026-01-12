@@ -1,4 +1,5 @@
 import { trpc } from "@/lib/trpc";
+import "@/i18n"; // 初始化i18n多语言支持
 import { UNAUTHED_ERR_MSG } from '@shared/const';
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { httpBatchLink, TRPCClientError } from "@trpc/client";

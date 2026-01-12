@@ -2559,3 +2559,31 @@ if (error.knowledgePointIds) {
 - [x] client/src/components/FormattedNumber.tsx - 数字格式化组件
 - [x] server/utils/timezone.ts - 服务端时区处理工具
 - [x] server/compat.test.ts - 兼容性工具单元测试
+
+
+## 第十八阶段：国际化和性能优化 (2026-01-13)
+
+### 多语言支持 (i18n)
+- [x] 安装i18n依赖包(react-i18next, i18next)
+- [x] 创建i18n语言配置文件和翻译资源
+- [x] 实现中文(zh-CN)翻译文件
+- [x] 实现英文(en)翻译文件
+- [x] 创建语言切换组件
+- [x] 在全局布局中集成语言切换器
+- [x] 为主要页面添加翻译支持
+
+### PWA离线支持
+- [x] 创建hService Worker配置
+- [x] 配置PWA manifest文件
+- [x] 实现离线缓存策略(错题数据、静态资源)
+- [x] 添加离线状态检测和提示
+- [x] 实现离线数据同步机制
+- [x] 测试PWA安装和离线功能
+
+### 图片懒加载优化
+- [x] 创建LazyImage组件(支持懒加载)
+- [x] 实现图片渐进式加载效果
+- [x] 添加图片加载占位符和骨架屏
+- [x] 实现图片加载失败重试机制
+- [x] 优化弱网环境下的图片加载体验
+- [x] 在错题列表和详情页应用懒加载组件

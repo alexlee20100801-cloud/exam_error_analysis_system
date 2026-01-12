@@ -1,6 +1,7 @@
 import { useAuth } from "@/_core/hooks/useAuth";
 import DashboardLayout from "@/components/DashboardLayout";
 import { Button } from "@/components/ui/button";
+import { ErrorQuestionImage } from "@/components/LazyImage";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
@@ -530,10 +531,11 @@ export default function ErrorQuestionDetail() {
           </CardHeader>
           <CardContent className="space-y-4">
             {question.imageUrl && (
-              <img
+              <ErrorQuestionImage
                 src={question.imageUrl}
                 alt="题目图片"
-                className="w-full max-w-2xl rounded-lg border"
+                questionId={String(question.id)}
+                className="w-full max-w-2xl"
               />
             )}
             <LatexText text={question.content} className="prose max-w-none dark:prose-invert" />

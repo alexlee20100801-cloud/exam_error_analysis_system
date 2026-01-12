@@ -1,5 +1,7 @@
 import { useAuth } from "@/_core/hooks/useAuth";
 import { Button } from "@/components/ui/button";
+import { LanguageSwitcher } from "@/components/LanguageSwitcher";
+import { useTranslation } from "react-i18next";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { getLoginUrl } from "@/const";
 import { BookOpen, Brain, LineChart, Video, CheckCircle, Target } from "lucide-react";
@@ -10,6 +12,7 @@ import { SEO } from "@/components/SEO";
 export default function Home() {
   const { user, loading, isAuthenticated } = useAuth();
   const [, setLocation] = useLocation();
+  const { t } = useTranslation();
 
   useEffect(() => {
     if (isAuthenticated && user) {
@@ -55,11 +58,14 @@ export default function Home() {
         <div className="container mx-auto px-4 py-4 flex justify-between items-center">
           <div className="flex items-center space-x-2">
             <BookOpen className="h-8 w-8 text-primary" />
-            <span className="text-2xl font-bold text-foreground">智能错题本</span>
+            <span className="text-2xl font-bold text-foreground">{t('common.appName', '智能错题本')}</span>
           </div>
-          <Button asChild>
-            <a href={getLoginUrl()}>登录 / 注册</a>
-          </Button>
+          <div className="flex items-center gap-2">
+            <LanguageSwitcher />
+            <Button asChild>
+              <a href={getLoginUrl()}>{t('nav.login', '登录')} / {t('nav.register', '注册')}</a>
+            </Button>
+          </div>
         </div>
       </nav>
 

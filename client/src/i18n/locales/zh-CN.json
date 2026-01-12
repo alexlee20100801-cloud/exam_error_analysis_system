@@ -1,0 +1,264 @@
+{
+  "common": {
+    "appName": "深圳初高中错题分析学习系统",
+    "loading": "加载中...",
+    "error": "出错了",
+    "retry": "重试",
+    "save": "保存",
+    "cancel": "取消",
+    "confirm": "确认",
+    "delete": "删除",
+    "edit": "编辑",
+    "search": "搜索",
+    "filter": "筛选",
+    "reset": "重置",
+    "submit": "提交",
+    "back": "返回",
+    "next": "下一步",
+    "previous": "上一步",
+    "close": "关闭",
+    "more": "更多",
+    "all": "全部",
+    "none": "无",
+    "yes": "是",
+    "no": "否",
+    "success": "成功",
+    "failed": "失败",
+    "noData": "暂无数据",
+    "comingSoon": "功能开发中"
+  },
+  "nav": {
+    "home": "首页",
+    "dashboard": "仪表盘",
+    "errorQuestions": "错题本",
+    "upload": "上传错题",
+    "practice": "练习",
+    "review": "复习",
+    "report": "学习报告",
+    "settings": "设置",
+    "profile": "个人中心",
+    "logout": "退出登录",
+    "login": "登录",
+    "register": "注册"
+  },
+  "home": {
+    "title": "AI智能错题分析学习系统",
+    "subtitle": "专为深圳初高中学生打造的个性化学习助手",
+    "features": {
+      "ocr": {
+        "title": "智能OCR识别",
+        "desc": "拍照即可识别错题，支持手写体和印刷体"
+      },
+      "ai": {
+        "title": "AI深度分析",
+        "desc": "智能分析错因，精准定位知识薄弱点"
+      },
+      "knowledge": {
+        "title": "知识图谱",
+        "desc": "可视化知识结构，掌握学习脉络"
+      },
+      "recommend": {
+        "title": "个性化推荐",
+        "desc": "基于学习数据，智能推荐练习题目"
+      }
+    },
+    "cta": {
+      "start": "开始使用",
+      "learn": "了解更多"
+    },
+    "stats": {
+      "users": "活跃用户",
+      "questions": "错题数量",
+      "accuracy": "识别准确率"
+    }
+  },
+  "errorQuestion": {
+    "title": "我的错题本",
+    "upload": "上传错题",
+    "batchUpload": "批量上传",
+    "filter": {
+      "subject": "学科",
+      "grade": "年级",
+      "difficulty": "难度",
+      "mastery": "掌握度",
+      "dateRange": "时间范围"
+    },
+    "subjects": {
+      "math": "数学",
+      "physics": "物理",
+      "chemistry": "化学",
+      "chinese": "语文",
+      "english": "英语",
+      "biology": "生物",
+      "history": "历史",
+      "geography": "地理",
+      "politics": "政治"
+    },
+    "grades": {
+      "junior1": "初一",
+      "junior2": "初二",
+      "junior3": "初三",
+      "senior1": "高一",
+      "senior2": "高二",
+      "senior3": "高三"
+    },
+    "difficulty": {
+      "easy": "简单",
+      "medium": "中等",
+      "hard": "困难"
+    },
+    "mastery": {
+      "notMastered": "未掌握",
+      "learning": "学习中",
+      "mastered": "已掌握"
+    },
+    "detail": {
+      "content": "题目内容",
+      "answer": "正确答案",
+      "myAnswer": "我的答案",
+      "analysis": "解析",
+      "knowledgePoints": "相关知识点",
+      "similarQuestions": "相似题目",
+      "aiAnalysis": "AI分析",
+      "reviewHistory": "复习记录"
+    },
+    "actions": {
+      "analyze": "AI分析",
+      "practice": "练习相似题",
+      "markMastered": "标记为已掌握",
+      "addToReview": "加入复习计划",
+      "export": "导出",
+      "share": "分享"
+    },
+    "empty": "还没有错题，快去上传吧！",
+    "uploadHint": "支持拍照或选择图片上传"
+  },
+  "upload": {
+    "title": "上传错题",
+    "dragHint": "拖拽图片到此处，或点击选择",
+    "selectFile": "选择文件",
+    "takePhoto": "拍照上传",
+    "processing": "正在处理...",
+    "ocrResult": "识别结果",
+    "editContent": "编辑内容",
+    "selectSubject": "选择学科",
+    "selectGrade": "选择年级",
+    "selectDifficulty": "选择难度",
+    "addTags": "添加标签",
+    "uploadSuccess": "上传成功",
+    "uploadFailed": "上传失败，请重试",
+    "batchMode": "批量模式",
+    "singleMode": "单张模式"
+  },
+  "practice": {
+    "title": "练习",
+    "startPractice": "开始练习",
+    "continuePractice": "继续练习",
+    "todayGoal": "今日目标",
+    "completed": "已完成",
+    "remaining": "剩余",
+    "accuracy": "正确率",
+    "timeSpent": "用时",
+    "submit": "提交答案",
+    "showAnswer": "查看答案",
+    "nextQuestion": "下一题",
+    "finish": "完成练习",
+    "result": {
+      "title": "练习结果",
+      "correct": "正确",
+      "wrong": "错误",
+      "score": "得分",
+      "suggestion": "学习建议"
+    }
+  },
+  "review": {
+    "title": "复习计划",
+    "todayReview": "今日待复习",
+    "overdue": "逾期未复习",
+    "upcoming": "即将复习",
+    "completed": "已完成",
+    "startReview": "开始复习",
+    "markCompleted": "标记完成",
+    "reschedule": "重新安排",
+    "reminder": {
+      "title": "复习提醒",
+      "enable": "开启提醒",
+      "time": "提醒时间",
+      "frequency": "提醒频率"
+    }
+  },
+  "report": {
+    "title": "学习报告",
+    "overview": "学习概览",
+    "trend": "学习趋势",
+    "subjectAnalysis": "学科分析",
+    "weakPoints": "薄弱知识点",
+    "improvement": "进步情况",
+    "timeRange": {
+      "week": "本周",
+      "month": "本月",
+      "year": "本年"
+    },
+    "metrics": {
+      "totalQuestions": "总错题数",
+      "masteredQuestions": "已掌握",
+      "studyTime": "学习时长",
+      "practiceCount": "练习次数"
+    }
+  },
+  "settings": {
+    "title": "设置",
+    "profile": {
+      "title": "个人资料",
+      "avatar": "头像",
+      "nickname": "昵称",
+      "grade": "年级",
+      "school": "学校"
+    },
+    "preferences": {
+      "title": "偏好设置",
+      "language": "语言",
+      "theme": "主题",
+      "notification": "通知",
+      "darkMode": "深色模式",
+      "autoMode": "跟随系统"
+    },
+    "notification": {
+      "title": "通知设置",
+      "reviewReminder": "复习提醒",
+      "dailyReport": "每日报告",
+      "achievementAlert": "成就提醒"
+    },
+    "account": {
+      "title": "账号安全",
+      "changePassword": "修改密码",
+      "bindPhone": "绑定手机",
+      "bindEmail": "绑定邮箱"
+    },
+    "about": {
+      "title": "关于",
+      "version": "版本",
+      "feedback": "意见反馈",
+      "privacy": "隐私政策",
+      "terms": "服务条款"
+    }
+  },
+  "pwa": {
+    "installTitle": "安装到主屏幕",
+    "installDesc": "将应用添加到主屏幕，像原生APP一样使用，支持离线访问",
+    "install": "立即安装",
+    "later": "稍后",
+    "installed": "应用已成功安装到主屏幕！",
+    "newVersion": "发现新版本，刷新页面以更新",
+    "refresh": "刷新",
+    "offline": "当前处于离线状态",
+    "online": "网络已恢复"
+  },
+  "errors": {
+    "networkError": "网络连接失败，请检查网络设置",
+    "serverError": "服务器错误，请稍后重试",
+    "authError": "登录已过期，请重新登录",
+    "notFound": "页面不存在",
+    "permissionDenied": "没有访问权限"
+  }
+}
