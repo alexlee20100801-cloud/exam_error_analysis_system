@@ -110,6 +110,23 @@ export default function OcrSettings() {
       toast.error(err.message || '处理失败');
     },
   });
+  
+  // OCR测试图片上传和验证
+  const testOcrMutation = trpc.ocrEnhanced.testOcrWithImage.useMutation({
+    onSuccess: (data) => {
+      setTestResult(data);
+      setIsProcessing(false);
+      if (data.success) {
+        toast.success('测试完成');
+      } else {
+        toast.error(data.error || '测试失败');
+      }
+    },
+    onError: (err) => {
+      setIsProcessing(false);
+      toast.error(err.message || '测试失败');
+    },
+  });
 
   // 边框检测
   const detectBorderMutation = trpc.ocrEnhanced.detectBorder.useMutation({
@@ -184,16 +201,19 @@ export default function OcrSettings() {
     setIsProcessing(true);
     setTestResult(null);
 
-    // 这里需要先上传图片获取URL，简化处理直接使用base64
-    // 实际应该先上传到S3
-    processImageMutation.mutate({
-      imageUrl: testImage,
-      autoBorderDetection: config.autoBorderDetection,
-      autoPerspectiveCorrection: config.autoPerspectiveCorrection,
-      handwritingMode: config.handwritingMode,
-      subject: config.defaultSubject,
-      mathSymbolEnhancement: config.mathSymbolEnhancement,
-      chemicalFormulaEnhancement: config.chemicalFormulaEnhancement,
+    // 使用新的测试API，支持base64图片
+    testOcrMutation.mutate({
+      imageBase64: testImage,
+      testType: 'full',
+      config: {
+        autoBorderDetection: config.autoBorderDetection,
+        borderDetectionSensitivity: config.borderDetectionSensitivity,
+        autoPerspectiveCorrection: config.autoPerspectiveCorrection,
+        handwritingMode: config.handwritingMode,
+        mathSymbolEnhancement: config.mathSymbolEnhancement,
+        chemicalFormulaEnhancement: config.chemicalFormulaEnhancement,
+        subject: config.defaultSubject,
+      },
     });
   };
 
@@ -808,49 +828,138 @@ export default function OcrSettings() {
                     <div className="space-y-4">
                       {/* 边框检测结果 */}
                       {testResult.borderDetection && (
-                        <div className="p-4 border rounded-lg">
-                          <div className="flex items-center gap-2 mb-2">
+                        <div className="p-4 border rounded-lg space-y-3">
+                          <div className="flex items-center gap-2">
                             <Crop className="h-4 w-4" />
                             <span className="font-medium">边框检测</span>
-                            <Badge variant="secondary">
-                              置信度: {testResult.borderDetection.confidence}%
+                            <Badge variant={testResult.borderDetection.detected ? 'default' : 'secondary'}>
+                              {testResult.borderDetection.detected ? '已检测到' : '未检测到'}
                             </Badge>
+                            {testResult.borderDetection.confidence > 0 && (
+                              <Badge variant="outline">
+                                置信度: {testResult.borderDetection.confidence}%
+                              </Badge>
+                            )}
                           </div>
-                          {testResult.borderDetection.croppedImageUrl && (
-                            <img
-                              src={testResult.borderDetection.croppedImageUrl}
-                              alt="裁剪结果"
-                              className="max-h-48 rounded border"
-                            />
+                          {testResult.borderDetection.detected && (
+                            <div className="grid grid-cols-2 gap-2 text-sm">
+                              <div className="p-2 bg-muted rounded">
+                                <span className="text-muted-foreground">透视校正:</span>
+                                <span className="ml-2">
+                                  {testResult.borderDetection.needsPerspectiveCorrection ? '需要' : '不需要'}
+                                </span>
+                              </div>
+                              <div className="p-2 bg-muted rounded">
+                                <span className="text-muted-foreground">处理时间:</span>
+                                <span className="ml-2">{testResult.borderDetection.processingTime}ms</span>
+                              </div>
+                            </div>
+                          )}
+                          {testResult.borderDetection.imageQuality && (
+                            <div className="text-sm">
+                              <span className="text-muted-foreground">图片质量:</span>
+                              <span className="ml-2">{testResult.borderDetection.imageQuality}</span>
+                            </div>
+                          )}
+                          {testResult.borderDetection.suggestions && (
+                            <Alert>
+                              <Info className="h-4 w-4" />
+                              <AlertDescription>
+                                {testResult.borderDetection.suggestions}
+                              </AlertDescription>
+                            </Alert>
                           )}
                         </div>
                       )}
 
                       {/* 文字识别结果 */}
-                      {testResult.text && (
-                        <div className="p-4 border rounded-lg">
-                          <div className="flex items-center gap-2 mb-2">
+                      {testResult.textRecognition && (
+                        <div className="p-4 border rounded-lg space-y-3">
+                          <div className="flex items-center gap-2">
                             <Type className="h-4 w-4" />
-                            <span className="font-medium">识别文字</span>
+                            <span className="font-medium">文字识别</span>
+                            {testResult.textRecognition.confidence > 0 && (
+                              <Badge variant="outline">
+                                置信度: {testResult.textRecognition.confidence}%
+                              </Badge>
+                            )}
+                            {testResult.textRecognition.textType && (
+                              <Badge variant="secondary">
+                                {testResult.textRecognition.textType === 'printed' ? '印刷体' : 
+                                 testResult.textRecognition.textType === 'handwritten' ? '手写体' : '混合'}
+                              </Badge>
+                            )}
                           </div>
-                          <div className="p-3 bg-muted rounded text-sm whitespace-pre-wrap">
-                            {testResult.text}
+                          {testResult.textRecognition.text && (
+                            <div className="p-3 bg-muted rounded text-sm whitespace-pre-wrap max-h-48 overflow-y-auto">
+                              {testResult.textRecognition.text}
+                            </div>
+                          )}
+                          {/* 特殊符号 */}
+                          {(testResult.textRecognition.specialSymbols?.math?.length > 0 || 
+                            testResult.textRecognition.specialSymbols?.chemical?.length > 0) && (
+                            <div className="grid grid-cols-2 gap-2">
+                              {testResult.textRecognition.specialSymbols?.math?.length > 0 && (
+                                <div className="p-2 bg-blue-50 dark:bg-blue-950 rounded">
+                                  <div className="flex items-center gap-1 text-sm font-medium mb-1">
+                                    <Calculator className="h-3 w-3" />
+                                    数学符号
+                                  </div>
+                                  <div className="text-xs text-muted-foreground">
+                                    {testResult.textRecognition.specialSymbols.math.join(', ')}
+                                  </div>
+                                </div>
+                              )}
+                              {testResult.textRecognition.specialSymbols?.chemical?.length > 0 && (
+                                <div className="p-2 bg-green-50 dark:bg-green-950 rounded">
+                                  <div className="flex items-center gap-1 text-sm font-medium mb-1">
+                                    <Beaker className="h-3 w-3" />
+                                    化学符号
+                                  </div>
+                                  <div className="text-xs text-muted-foreground">
+                                    {testResult.textRecognition.specialSymbols.chemical.join(', ')}
+                                  </div>
+                                </div>
+                              )}
+                            </div>
+                          )}
+                          {/* 不确定部分 */}
+                          {testResult.textRecognition.uncertainParts?.length > 0 && (
+                            <Alert variant="default">
+                              <AlertTriangle className="h-4 w-4" />
+                              <AlertDescription>
+                                <span className="font-medium">不确定部分:</span>
+                                <span className="ml-2">
+                                  {testResult.textRecognition.uncertainParts.join(', ')}
+                                </span>
+                              </AlertDescription>
+                            </Alert>
+                          )}
+                          {testResult.textRecognition.suggestions && (
+                            <Alert>
+                              <Info className="h-4 w-4" />
+                              <AlertDescription>
+                                {testResult.textRecognition.suggestions}
+                              </AlertDescription>
+                            </Alert>
+                          )}
+                          <div className="text-xs text-muted-foreground">
+                            处理时间: {testResult.textRecognition.processingTime}ms
                           </div>
                         </div>
                       )}
 
-                      {/* 处理信息 */}
-                      <div className="flex items-center gap-4 text-sm text-muted-foreground">
+                      {/* 总处理信息 */}
+                      <div className="flex items-center gap-4 text-sm text-muted-foreground border-t pt-3">
                         <span className="flex items-center gap-1">
                           <Clock className="h-4 w-4" />
-                          处理时间: {testResult.processTime || '-'}ms
+                          总处理时间: {testResult.processTime || '-'}ms
                         </span>
-                        {testResult.confidence && (
-                          <span className="flex items-center gap-1">
-                            <CheckCircle2 className="h-4 w-4" />
-                            置信度: {testResult.confidence}%
-                          </span>
-                        )}
+                        <span className="flex items-center gap-1">
+                          <CheckCircle2 className="h-4 w-4 text-green-500" />
+                          测试类型: {testResult.testType === 'full' ? '完整测试' : 
+                                       testResult.testType === 'border' ? '边框检测' : '文字识别'}
+                        </span>
                       </div>
                     </div>
                   ) : (

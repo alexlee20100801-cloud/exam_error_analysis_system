@@ -67,7 +67,7 @@ export const ocrEnhancedRouter = router({
   // 一站式OCR增强处理
   processImage: protectedProcedure
     .input(z.object({
-      imageUrl: z.string().url(),
+      imageUrl: z.string(), // 支持URL或base64
       imageKey: z.string().optional(),
       autoBorderDetection: z.boolean().optional(),
       autoPerspectiveCorrection: z.boolean().optional(),
@@ -89,6 +89,30 @@ export const ocrEnhancedRouter = router({
           mathSymbolEnhancement: input.mathSymbolEnhancement,
           chemicalFormulaEnhancement: input.chemicalFormulaEnhancement,
         }
+      );
+    }),
+  
+  // OCR测试图片上传和验证
+  testOcrWithImage: protectedProcedure
+    .input(z.object({
+      imageBase64: z.string(), // base64编码的图片
+      testType: z.enum(['border', 'handwriting', 'full']).optional(),
+      config: z.object({
+        autoBorderDetection: z.boolean().optional(),
+        borderDetectionSensitivity: z.enum(['low', 'medium', 'high']).optional(),
+        autoPerspectiveCorrection: z.boolean().optional(),
+        handwritingMode: z.boolean().optional(),
+        mathSymbolEnhancement: z.boolean().optional(),
+        chemicalFormulaEnhancement: z.boolean().optional(),
+        subject: z.string().optional(),
+      }).optional(),
+    }))
+    .mutation(async ({ input, ctx }) => {
+      return await ocrEnhancedService.testOcrWithImage(
+        ctx.user.id,
+        input.imageBase64,
+        input.testType || 'full',
+        input.config
       );
     }),
   

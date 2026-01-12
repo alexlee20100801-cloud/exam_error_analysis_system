@@ -114,6 +114,7 @@ import { ipBlacklistRouter } from "./routers/ipBlacklist";
 import { exportTemplatesEnhancedRouter } from "./routers/exportTemplatesEnhanced";
 import { parentNotificationRouter } from "./routers/parentNotification";
 import { ocrEnhancedRouter } from "./routers/ocrEnhanced";
+import { notificationServiceConfigRouter } from "./routers/notificationServiceConfig";
 
 export const appRouter = router({
   system: systemRouter,
@@ -434,6 +435,9 @@ export const appRouter = router({
   
   // OCR增强
   ocrEnhanced: ocrEnhancedRouter,
+  
+  // 通知服务配置
+  notificationService: notificationServiceConfigRouter,
 });
 
 export type AppRouter = typeof appRouter;

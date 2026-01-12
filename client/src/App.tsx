@@ -93,6 +93,7 @@ import ParentSupervisionDashboard from "@/pages/ParentSupervisionDashboard";
 import ExportTemplateManagement from "@/pages/ExportTemplateManagement";
 import ParentBinding from "@/pages/ParentBinding";
 import OcrSettings from "@/pages/OcrSettings";
+import NotificationServiceSettings from "@/pages/NotificationServiceSettings";
 
 function Router() {
   return (
@@ -185,6 +186,7 @@ function Router() {
       <Route path="/export-template-management" component={ExportTemplateManagement} />
       <Route path="/parent-binding" component={ParentBinding} />
       <Route path="/ocr-settings" component={OcrSettings} />
+      <Route path="/notification-service-settings" component={NotificationServiceSettings} />
       <Route component={NotFound} />
     </Switch>
   );

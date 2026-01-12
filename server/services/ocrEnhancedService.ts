@@ -679,3 +679,299 @@ export async function getOcrStatistics(userId: number): Promise<{
     totalImagesProcessed: batchStats[0]?.totalImages || 0,
   };
 }
+
+
+// ==================== OCR测试功能 ====================
+
+/**
+ * 测试OCR功能 - 支持base64图片上传
+ */
+export async function testOcrWithImage(
+  userId: number,
+  imageBase64: string,
+  testType: 'border' | 'handwriting' | 'full' = 'full',
+  config?: {
+    autoBorderDetection?: boolean;
+    borderDetectionSensitivity?: 'low' | 'medium' | 'high';
+    autoPerspectiveCorrection?: boolean;
+    handwritingMode?: boolean;
+    mathSymbolEnhancement?: boolean;
+    chemicalFormulaEnhancement?: boolean;
+    subject?: string;
+  }
+): Promise<{
+  success: boolean;
+  testType: string;
+  borderDetection?: {
+    detected: boolean;
+    confidence: number;
+    coordinates?: any;
+    croppedImageUrl?: string;
+    needsPerspectiveCorrection?: boolean;
+    processingTime?: number;
+  };
+  textRecognition?: {
+    text: string;
+    confidence: number;
+    specialSymbols?: {
+      math: string[];
+      chemical: string[];
+    };
+    processingTime?: number;
+  };
+  processTime: number;
+  error?: string;
+}> {
+  const startTime = Date.now();
+  
+  try {
+    // 验证base64图片格式
+    if (!imageBase64.startsWith('data:image/')) {
+      return {
+        success: false,
+        testType,
+        processTime: Date.now() - startTime,
+        error: '无效的图片格式，请上传有效的图片文件',
+      };
+    }
+    
+    const result: any = {
+      success: true,
+      testType,
+      processTime: 0,
+    };
+    
+    // 边框检测测试
+    if (testType === 'border' || testType === 'full') {
+      const borderStartTime = Date.now();
+      
+      try {
+        const borderResponse = await invokeLLM({
+          messages: [
+            {
+              role: 'system',
+              content: `你是一个专业的图像分析助手。请分析图片中的文档/试卷边框。
+分析以下内容：
+1. 是否检测到清晰的文档边框
+2. 边框的四个角点坐标（使用相对值0-1）
+3. 是否需要透视校正
+4. 图片质量评估
+
+灵敏度设置: ${config?.borderDetectionSensitivity || 'medium'}
+- low: 只检测非常清晰的边框
+- medium: 检测大多数可见边框
+- high: 尝试检测模糊或部分可见的边框`
+            },
+            {
+              role: 'user',
+              content: [
+                {
+                  type: 'text',
+                  text: '请检测这张图片中的文档边框，并返回详细的分析结果。'
+                },
+                {
+                  type: 'image_url',
+                  image_url: {
+                    url: imageBase64,
+                    detail: 'high'
+                  }
+                }
+              ]
+            }
+          ],
+          response_format: {
+            type: 'json_schema',
+            json_schema: {
+              name: 'border_detection_test',
+              strict: true,
+              schema: {
+                type: 'object',
+                properties: {
+                  detected: { type: 'boolean', description: '是否检测到边框' },
+                  confidence: { type: 'number', description: '检测置信度(0-100)' },
+                  coordinates: {
+                    type: 'object',
+                    properties: {
+                      topLeft: {
+                        type: 'object',
+                        properties: { x: { type: 'number' }, y: { type: 'number' } },
+                        required: ['x', 'y'],
+                        additionalProperties: false
+                      },
+                      topRight: {
+                        type: 'object',
+                        properties: { x: { type: 'number' }, y: { type: 'number' } },
+                        required: ['x', 'y'],
+                        additionalProperties: false
+                      },
+                      bottomRight: {
+                        type: 'object',
+                        properties: { x: { type: 'number' }, y: { type: 'number' } },
+                        required: ['x', 'y'],
+                        additionalProperties: false
+                      },
+                      bottomLeft: {
+                        type: 'object',
+                        properties: { x: { type: 'number' }, y: { type: 'number' } },
+                        required: ['x', 'y'],
+                        additionalProperties: false
+                      }
+                    },
+                    required: ['topLeft', 'topRight', 'bottomRight', 'bottomLeft'],
+                    additionalProperties: false
+                  },
+                  needsPerspectiveCorrection: { type: 'boolean', description: '是否需要透视校正' },
+                  imageQuality: { type: 'string', description: '图片质量评估' },
+                  suggestions: { type: 'string', description: '改进建议' }
+                },
+                required: ['detected', 'confidence', 'coordinates', 'needsPerspectiveCorrection', 'imageQuality', 'suggestions'],
+                additionalProperties: false
+              }
+            }
+          }
+        });
+        
+        const borderContent = borderResponse.choices[0].message.content;
+        const borderResult = JSON.parse(typeof borderContent === 'string' ? borderContent : '{}');
+        
+        result.borderDetection = {
+          detected: borderResult.detected,
+          confidence: Math.round(borderResult.confidence),
+          coordinates: borderResult.coordinates,
+          needsPerspectiveCorrection: borderResult.needsPerspectiveCorrection,
+          imageQuality: borderResult.imageQuality,
+          suggestions: borderResult.suggestions,
+          processingTime: Date.now() - borderStartTime,
+        };
+      } catch (error: any) {
+        result.borderDetection = {
+          detected: false,
+          confidence: 0,
+          error: error.message,
+          processingTime: Date.now() - borderStartTime,
+        };
+      }
+    }
+    
+    // 文字识别测试
+    if (testType === 'handwriting' || testType === 'full') {
+      const textStartTime = Date.now();
+      
+      try {
+        let systemPrompt = `你是一个专业的OCR文字识别专家。请仔细识别图片中的所有文字内容。
+要求：
+1. 保持原文的格式和换行
+2. 识别所有文字，包括手写和印刷体
+3. 对于不确定的字符，提供最可能的解读
+4. 评估识别的置信度`;
+
+        if (config?.mathSymbolEnhancement) {
+          systemPrompt += `
+5. 特别注意数学符号：分数、根号、指数、积分、希腊字母等`;
+        }
+        
+        if (config?.chemicalFormulaEnhancement) {
+          systemPrompt += `
+6. 特别注意化学符号：元素符号、下标、化学方程式等`;
+        }
+        
+        if (config?.subject) {
+          systemPrompt += `
+7. 这是一道${config.subject}题目，请根据学科特点进行识别`;
+        }
+        
+        const textResponse = await invokeLLM({
+          messages: [
+            {
+              role: 'system',
+              content: systemPrompt
+            },
+            {
+              role: 'user',
+              content: [
+                {
+                  type: 'text',
+                  text: '请识别这张图片中的所有文字内容，并返回详细的识别结果。'
+                },
+                {
+                  type: 'image_url',
+                  image_url: {
+                    url: imageBase64,
+                    detail: 'high'
+                  }
+                }
+              ]
+            }
+          ],
+          response_format: {
+            type: 'json_schema',
+            json_schema: {
+              name: 'text_recognition_test',
+              strict: true,
+              schema: {
+                type: 'object',
+                properties: {
+                  recognizedText: { type: 'string', description: '识别出的文字内容' },
+                  confidence: { type: 'number', description: '识别置信度(0-100)' },
+                  textType: { type: 'string', description: '文字类型(printed/handwritten/mixed)' },
+                  mathSymbols: {
+                    type: 'array',
+                    items: { type: 'string' },
+                    description: '识别到的数学符号'
+                  },
+                  chemicalSymbols: {
+                    type: 'array',
+                    items: { type: 'string' },
+                    description: '识别到的化学符号'
+                  },
+                  uncertainParts: {
+                    type: 'array',
+                    items: { type: 'string' },
+                    description: '不确定的部分'
+                  },
+                  suggestions: { type: 'string', description: '改进建议' }
+                },
+                required: ['recognizedText', 'confidence', 'textType', 'mathSymbols', 'chemicalSymbols', 'uncertainParts', 'suggestions'],
+                additionalProperties: false
+              }
+            }
+          }
+        });
+        
+        const textContent = textResponse.choices[0].message.content;
+        const textResult = JSON.parse(typeof textContent === 'string' ? textContent : '{}');
+        
+        result.textRecognition = {
+          text: textResult.recognizedText,
+          confidence: Math.round(textResult.confidence),
+          textType: textResult.textType,
+          specialSymbols: {
+            math: textResult.mathSymbols || [],
+            chemical: textResult.chemicalSymbols || [],
+          },
+          uncertainParts: textResult.uncertainParts || [],
+          suggestions: textResult.suggestions,
+          processingTime: Date.now() - textStartTime,
+        };
+      } catch (error: any) {
+        result.textRecognition = {
+          text: '',
+          confidence: 0,
+          error: error.message,
+          processingTime: Date.now() - textStartTime,
+        };
+      }
+    }
+    
+    result.processTime = Date.now() - startTime;
+    return result;
+    
+  } catch (error: any) {
+    return {
+      success: false,
+      testType,
+      processTime: Date.now() - startTime,
+      error: error.message || '测试失败',
+    };
+  }
+}

@@ -82,7 +82,7 @@ export default function ExportTemplateManagement() {
     groupByKnowledgePoint: false,
     // 样式配置
     paperSize: 'A4' as const,
-    orientation: 'portrait' as const,
+    orientation: 'portrait' as 'portrait' | 'landscape',
     fontSize: 12,
     lineSpacing: 1.5,
     headerText: '',
@@ -755,9 +755,9 @@ export default function ExportTemplateManagement() {
           </TabsContent>
         </Tabs>
 
-        {/* 编辑/创建对话框 */}
+        {/* 编辑/创建对话框 - 带实时预览 */}
         <Dialog open={editDialogOpen} onOpenChange={setEditDialogOpen}>
-          <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+          <DialogContent className="max-w-5xl max-h-[90vh] overflow-hidden">
             <DialogHeader>
               <DialogTitle>{isCreating ? '创建模板' : '编辑模板'}</DialogTitle>
               <DialogDescription>
@@ -765,7 +765,10 @@ export default function ExportTemplateManagement() {
               </DialogDescription>
             </DialogHeader>
 
-            <div className="space-y-6 py-4">
+            <div className="flex gap-6 py-4 h-[calc(90vh-180px)]">
+              {/* 左侧配置面板 */}
+              <ScrollArea className="flex-1 pr-4">
+                <div className="space-y-6">
               {/* 基本信息 */}
               <div className="space-y-4">
                 <h4 className="font-medium">基本信息</h4>
@@ -944,6 +947,137 @@ export default function ExportTemplateManagement() {
                     checked={formData.showPageNumber}
                     onCheckedChange={(checked) => setFormData({ ...formData, showPageNumber: checked })}
                   />
+                </div>
+              </div>
+                </div>
+              </ScrollArea>
+              
+              {/* 右侧实时预览面板 */}
+              <div className="w-80 flex-shrink-0 border-l pl-4">
+                <div className="sticky top-0">
+                  <h4 className="font-medium mb-3 flex items-center gap-2">
+                    <Eye className="h-4 w-4" />
+                    实时预览
+                  </h4>
+                  <div className="text-xs text-muted-foreground mb-3">
+                    配置更改将实时反映在预览中
+                  </div>
+                  <Card className={`p-4 bg-white dark:bg-gray-900 shadow-md ${
+                    formData.orientation === 'landscape' ? 'aspect-[1.414/1]' : 'aspect-[1/1.414]'
+                  } overflow-hidden`}>
+                    <div className="h-full flex flex-col" style={{ fontSize: `${Math.max(8, formData.fontSize * 0.6)}px` }}>
+                      {/* 页眉 */}
+                      {formData.headerText && (
+                        <div className="text-center border-b pb-2 mb-2 font-bold" style={{ fontSize: `${Math.max(10, formData.fontSize * 0.8)}px` }}>
+                          {formData.headerText}
+                        </div>
+                      )}
+                      
+                      {/* 内容区域 */}
+                      <div className="flex-1 overflow-hidden space-y-2">
+                        {/* 示例题目1 */}
+                        <div className="p-2 border rounded bg-muted/30">
+                          <div className="flex items-center gap-1 mb-1">
+                            {formData.showQuestionNumber && (
+                              <span className="bg-primary text-primary-foreground px-1 rounded text-xs">1</span>
+                            )}
+                            <span className="font-medium truncate">示例题目</span>
+                            {formData.showDifficulty && (
+                              <span className="text-xs text-orange-500">中等</span>
+                            )}
+                          </div>
+                          <p className="text-muted-foreground truncate mb-1">
+                            已知函数 f(x) = x² + 2x + 1，求 f(2) 的值。
+                          </p>
+                          {formData.showKnowledgePoints && (
+                            <div className="flex gap-1 mb-1">
+                              <span className="text-xs bg-blue-100 dark:bg-blue-900 px-1 rounded">二次函数</span>
+                            </div>
+                          )}
+                          {formData.showAnswer && (
+                            <div className="bg-green-50 dark:bg-green-950 p-1 rounded text-xs">
+                              <span className="font-medium">答案：</span>9
+                            </div>
+                          )}
+                          {formData.showExplanation && (
+                            <div className="text-xs text-muted-foreground mt-1">
+                              <span className="font-medium">解析：</span>f(2) = 4+4+1 = 9
+                            </div>
+                          )}
+                          {formData.showErrorAnalysis && (
+                            <div className="text-xs text-red-500 mt-1">
+                              <span className="font-medium">错因：</span>计算粗心
+                            </div>
+                          )}
+                        </div>
+                        
+                        {/* 示例题目2 */}
+                        <div className="p-2 border rounded bg-muted/30">
+                          <div className="flex items-center gap-1 mb-1">
+                            {formData.showQuestionNumber && (
+                              <span className="bg-primary text-primary-foreground px-1 rounded text-xs">2</span>
+                            )}
+                            <span className="font-medium truncate">示例题目</span>
+                            {formData.showDifficulty && (
+                              <span className="text-xs text-red-500">困难</span>
+                            )}
+                          </div>
+                          <p className="text-muted-foreground truncate">
+                            求不等式 x² - 3x + 2 &lt; 0 的解集...
+                          </p>
+                        </div>
+                        
+                        {formData.showSimilarQuestions && (
+                          <div className="text-xs p-1 bg-purple-50 dark:bg-purple-950 rounded">
+                            📚 相似题: 3道
+                          </div>
+                        )}
+                        {formData.showStudyNotes && (
+                          <div className="text-xs p-1 bg-yellow-50 dark:bg-yellow-950 rounded">
+                            📝 学习笔记: 注意公式变形
+                          </div>
+                        )}
+                        {formData.showReviewHistory && (
+                          <div className="text-xs p-1 bg-gray-50 dark:bg-gray-800 rounded">
+                            📅 复习: 3次 | 上次: 1天前
+                          </div>
+                        )}
+                      </div>
+                      
+                      {/* 页脚 */}
+                      {(formData.showPageNumber || formData.footerText) && (
+                        <div className="text-center border-t pt-2 mt-2 text-muted-foreground">
+                          {formData.footerText || '第 1 页'}
+                        </div>
+                      )}
+                    </div>
+                  </Card>
+                  
+                  {/* 预览信息 */}
+                  <div className="mt-3 text-xs text-muted-foreground space-y-1">
+                    <div className="flex justify-between">
+                      <span>纸张大小:</span>
+                      <span>{formData.paperSize}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span>页面方向:</span>
+                      <span>{formData.orientation === 'portrait' ? '纵向' : '横向'}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span>字体大小:</span>
+                      <span>{formData.fontSize}px</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span>导出格式:</span>
+                      <span>{exportFormatNames[formData.exportFormat]}</span>
+                    </div>
+                    {formData.groupBySubject && (
+                      <div className="text-blue-500">✓ 按学科分组</div>
+                    )}
+                    {formData.groupByKnowledgePoint && (
+                      <div className="text-blue-500">✓ 按知识点分组</div>
+                    )}
+                  </div>
                 </div>
               </div>
             </div>
