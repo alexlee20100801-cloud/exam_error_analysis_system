@@ -1,4 +1,5 @@
 import { useLocation } from "wouter";
+import { useTranslation } from "react-i18next";
 import { trpc } from "@/lib/trpc";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -20,6 +21,7 @@ import { Label } from "@/components/ui/label";
 import { VoiceInputButtonEnhanced } from "@/components/VoiceInputButtonEnhanced";
 
 export default function Review() {
+  const { t } = useTranslation();
   const [, setLocation] = useLocation();
   const [reviewingQuestion, setReviewingQuestion] = useState<any>(null);
   const [userAnswer, setUserAnswer] = useState("");
@@ -40,7 +42,7 @@ export default function Review() {
       setReviewingQuestion(prevReview);
       setUserAnswer("");
       setShowAnswer(false);
-      toast.info("已切换到上一题");
+      toast.info(t('errorQuestion.switchToPrevious'));
     }
   };
   
@@ -50,7 +52,7 @@ export default function Review() {
       setReviewingQuestion(nextReview);
       setUserAnswer("");
       setShowAnswer(false);
-      toast.info("已切换到下一题");
+      toast.info(t('errorQuestion.switchToNext'));
     }
   };
   
@@ -74,12 +76,12 @@ export default function Review() {
   // 标记已复习
   const markReviewedMutation = trpc.reviewPlan.markAsReviewed.useMutation({
     onSuccess: () => {
-      toast.success("已标记为已复习");
+      toast.success(t('review.markCompleted'));
       refetchDue();
       refetchPlans();
     },
     onError: (error) => {
-      toast.error(`标记失败：${error.message}`);
+      toast.error(`${t('errors.saveError')}: ${error.message}`);
     },
   });
 
@@ -87,13 +89,13 @@ export default function Review() {
   const sendReminderMutation = trpc.reviewPlan.sendReviewReminder.useMutation({
     onSuccess: (data) => {
       if (data.success) {
-        toast.success("复习提醒已发送");
+        toast.success(t('review.sendReminder'));
       } else {
-        toast.info("暂无待复习内容");
+        toast.info(t('review.noContent'));
       }
     },
     onError: (error) => {
-      toast.error(`发送失败：${error.message}`);
+      toast.error(`${t('errors.serverError')}: ${error.message}`);
     },
   });
 
@@ -194,13 +196,13 @@ export default function Review() {
           <div>
             <h1 className="text-3xl font-bold flex items-center gap-2">
               <Clock className="h-8 w-8 text-primary" />
-              复习计划
+              {t('review.title')}
             </h1>
-            <p className="text-muted-foreground mt-2">基于艾宾浩斯遗忘曲线的智能复习提醒</p>
+            <p className="text-muted-foreground mt-2">{t('review.subtitle')}</p>
           </div>
           <Button onClick={handleSendReminder} disabled={sendReminderMutation.isPending} size="lg">
             <Bell className="h-4 w-4 mr-2" />
-            {sendReminderMutation.isPending ? "发送中..." : "发送复习提醒"}
+            {sendReminderMutation.isPending ? t('review.sending') : t('review.sendReminder')}
           </Button>
         </div>
 
@@ -208,40 +210,40 @@ export default function Review() {
         <div className="grid gap-4 md:grid-cols-3">
           <Card className="border-orange-200 bg-gradient-to-br from-orange-50 to-orange-100/50 dark:from-orange-950/20 dark:to-orange-900/10">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium text-orange-900 dark:text-orange-100">待复习</CardTitle>
+              <CardTitle className="text-sm font-medium text-orange-900 dark:text-orange-100">{t('review.stats.dueCount')}</CardTitle>
               <div className="h-10 w-10 rounded-full bg-orange-100 dark:bg-orange-900/30 flex items-center justify-center">
                 <Clock className="h-5 w-5 text-orange-600 dark:text-orange-400" />
               </div>
             </CardHeader>
             <CardContent>
               <div className="text-3xl font-bold text-orange-600 dark:text-orange-400">{stats?.dueCount || 0}</div>
-              <p className="text-xs text-orange-600/70 dark:text-orange-400/70 mt-1">已到复习时间</p>
+              <p className="text-xs text-orange-600/70 dark:text-orange-400/70 mt-1">{t('review.stats.dueDescription')}</p>
             </CardContent>
           </Card>
 
           <Card className="border-blue-200 bg-gradient-to-br from-blue-50 to-blue-100/50 dark:from-blue-950/20 dark:to-blue-900/10">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium text-blue-900 dark:text-blue-100">计划中</CardTitle>
+              <CardTitle className="text-sm font-medium text-blue-900 dark:text-blue-100">{t('review.stats.totalCount')}</CardTitle>
               <div className="h-10 w-10 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center">
                 <Calendar className="h-5 w-5 text-blue-600 dark:text-blue-400" />
               </div>
             </CardHeader>
             <CardContent>
               <div className="text-3xl font-bold text-blue-600 dark:text-blue-400">{stats?.totalCount || 0}</div>
-              <p className="text-xs text-blue-600/70 dark:text-blue-400/70 mt-1">复习计划总数</p>
+              <p className="text-xs text-blue-600/70 dark:text-blue-400/70 mt-1">{t('review.stats.totalDescription')}</p>
             </CardContent>
           </Card>
 
           <Card className="border-green-200 bg-gradient-to-br from-green-50 to-green-100/50 dark:from-green-950/20 dark:to-green-900/10">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium text-green-900 dark:text-green-100">已掌握</CardTitle>
+              <CardTitle className="text-sm font-medium text-green-900 dark:text-green-100">{t('review.stats.completedCount')}</CardTitle>
               <div className="h-10 w-10 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center">
                 <CheckCircle2 className="h-5 w-5 text-green-600 dark:text-green-400" />
               </div>
             </CardHeader>
             <CardContent>
               <div className="text-3xl font-bold text-green-600 dark:text-green-400">{stats?.completedCount || 0}</div>
-              <p className="text-xs text-green-600/70 dark:text-green-400/70 mt-1">完成所有复习轮次</p>
+              <p className="text-xs text-green-600/70 dark:text-green-400/70 mt-1">{t('review.stats.completedDescription')}</p>
             </CardContent>
           </Card>
         </div>
@@ -252,20 +254,20 @@ export default function Review() {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Sparkles className="h-5 w-5 text-purple-600" />
-                艾宾浩斯遗忘曲线
+                {t('review.ebbinghaus.title')}
               </CardTitle>
-              <CardDescription>科学的复习间隔，帮助您高效记忆</CardDescription>
+              <CardDescription>{t('review.ebbinghaus.description')}</CardDescription>
             </CardHeader>
             <CardContent>
               <div className="flex flex-wrap gap-2">
                 {intervals.intervals.map((days, index) => (
                   <Badge key={index} variant="outline" className="text-sm">
-                    第 {index + 1} 次：{days} 天后
+                    {t('review.ebbinghaus.round', { round: index + 1 })}: {t('review.ebbinghaus.daysLater', { days })}
                   </Badge>
                 ))}
               </div>
               <p className="text-sm text-muted-foreground mt-3">
-                完成5轮复习后，该错题将被标记为"已掌握"
+                {t('review.ebbinghaus.completionHint')}
               </p>
             </CardContent>
           </Card>
@@ -276,11 +278,11 @@ export default function Review() {
           <TabsList>
             <TabsTrigger value="due" className="flex items-center gap-2">
               <Clock className="h-4 w-4" />
-              待复习 ({dueReviews?.length || 0})
+              {t('review.tabs.due')} ({dueReviews?.length || 0})
             </TabsTrigger>
             <TabsTrigger value="all" className="flex items-center gap-2">
               <Calendar className="h-4 w-4" />
-              全部计划 ({allPlans?.length || 0})
+              {t('review.tabs.all')} ({allPlans?.length || 0})
             </TabsTrigger>
           </TabsList>
 
@@ -290,7 +292,7 @@ export default function Review() {
               <Alert>
                 <CheckCircle2 className="h-4 w-4" />
                 <AlertDescription>
-                  太棒了！暂无待复习错题，继续保持学习状态 🎉
+                  {t('review.noContent')} 🎉
                 </AlertDescription>
               </Alert>
             ) : (
@@ -302,7 +304,7 @@ export default function Review() {
                         <div className="flex-1">
                           <div className="flex items-center gap-2 mb-2">
                             <Badge variant="outline">{getSubjectName(review.subject)}</Badge>
-                            <Badge variant="secondary">第 {review.reviewRound + 1} 次复习</Badge>
+                            <Badge variant="secondary">{t('review.ebbinghaus.round', { round: review.reviewRound + 1 })}</Badge>
                             <Badge variant="destructive">
                               {formatDate(review.nextReviewAt)}
                             </Badge>
@@ -318,12 +320,12 @@ export default function Review() {
                         <div className="flex items-center gap-4 text-sm text-muted-foreground">
                           <span className="flex items-center gap-1">
                             <BookOpen className="h-4 w-4" />
-                            已复习 {review.reviewCount || 0} 次
+                            {t('review.completed')}: {review.reviewCount || 0}
                           </span>
                           {review.lastReviewedAt && (
                             <span className="flex items-center gap-1">
                               <Clock className="h-4 w-4" />
-                              上次复习：{new Date(review.lastReviewedAt).toLocaleDateString()}
+                              {t('common.date')}: {new Date(review.lastReviewedAt).toLocaleDateString()}
                             </span>
                           )}
                         </div>
@@ -334,14 +336,14 @@ export default function Review() {
                             onClick={() => setLocation(`/error-questions/${review.id}`)}
                           >
                             <Eye className="h-4 w-4 mr-1" />
-                            查看详情
+                            {t('common.details')}
                           </Button>
                           <Button
                             size="sm"
                             onClick={() => handleStartReview(review)}
                           >
                             <Play className="h-4 w-4 mr-1" />
-                            开始复习
+                            {t('review.startReview')}
                           </Button>
                         </div>
                       </div>
@@ -358,7 +360,7 @@ export default function Review() {
               <Alert>
                 <TrendingUp className="h-4 w-4" />
                 <AlertDescription>
-                  还没有复习计划，在错题详情页点击"加入复习计划"开始使用吧！
+                  {t('review.noContent')}
                 </AlertDescription>
               </Alert>
             ) : (
@@ -370,9 +372,9 @@ export default function Review() {
                         <div className="flex-1">
                           <div className="flex items-center gap-2 mb-2">
                             <Badge variant="outline">{getSubjectName(plan.subject)}</Badge>
-                            <Badge variant="secondary">第 {plan.reviewRound + 1} 次复习</Badge>
+                            <Badge variant="secondary">{t('review.ebbinghaus.round', { round: plan.reviewRound + 1 })}</Badge>
                             {plan.isDue ? (
-                              <Badge variant="destructive">待复习</Badge>
+                              <Badge variant="destructive">{t('review.stats.dueCount')}</Badge>
                             ) : (
                               <Badge>{formatDate(plan.nextReviewAt)}</Badge>
                             )}
@@ -388,11 +390,11 @@ export default function Review() {
                         <div className="flex items-center gap-4 text-sm text-muted-foreground">
                           <span className="flex items-center gap-1">
                             <BookOpen className="h-4 w-4" />
-                            已复习 {plan.reviewCount || 0} 次
+                            {t('review.completed')}: {plan.reviewCount || 0}
                           </span>
                           <span className="flex items-center gap-1">
                             <Calendar className="h-4 w-4" />
-                            下次复习：{new Date(plan.nextReviewAt).toLocaleDateString()}
+                            {t('review.reviewDialog.nextRound')}: {new Date(plan.nextReviewAt).toLocaleDateString()}
                           </span>
                         </div>
                         <div className="flex gap-2">
@@ -401,7 +403,7 @@ export default function Review() {
                             size="sm"
                             onClick={() => setLocation(`/error-questions/${plan.id}`)}
                           >
-                            查看详情
+                            {t('common.details')}
                           </Button>
                           {plan.isDue && (
                             <Button
@@ -410,7 +412,7 @@ export default function Review() {
                               disabled={markReviewedMutation.isPending}
                             >
                               <CheckCircle2 className="h-4 w-4 mr-1" />
-                              标记已复习
+                              {t('review.reviewDialog.markAsReviewed')}
                             </Button>
                           )}
                         </div>
@@ -435,20 +437,20 @@ export default function Review() {
                   {dialogSwipeState.direction === "left" && hasNextReview && (
                     <>
                       <ChevronRight className="h-6 w-6" />
-                      <span className="text-sm font-medium">下一题</span>
+                      <span className="text-sm font-medium">{t('common.next')}</span>
                     </>
                   )}
                   {dialogSwipeState.direction === "right" && hasPreviousReview && (
                     <>
                       <ChevronLeft className="h-6 w-6" />
-                      <span className="text-sm font-medium">上一题</span>
+                      <span className="text-sm font-medium">{t('common.previous')}</span>
                     </>
                   )}
                   {dialogSwipeState.direction === "left" && !hasNextReview && (
-                    <span className="text-sm font-medium">已是最后一题</span>
+                    <span className="text-sm font-medium">{t('errorQuestion.switchToNext')}</span>
                   )}
                   {dialogSwipeState.direction === "right" && !hasPreviousReview && (
-                    <span className="text-sm font-medium">已是第一题</span>
+                    <span className="text-sm font-medium">{t('errorQuestion.switchToPrevious')}</span>
                   )}
                 </div>
               </div>
@@ -457,7 +459,7 @@ export default function Review() {
             <div className="flex items-center justify-between">
               <DialogTitle className="flex items-center gap-2">
                 <Play className="h-5 w-5" />
-                复习错题
+                {t('review.reviewDialog.title')}
               </DialogTitle>
               {reviewingQuestion && (
                 <Button
@@ -470,12 +472,12 @@ export default function Review() {
                   <Star
                     className={`h-5 w-5 ${reviewingQuestion.isFavorite ? 'fill-yellow-400 text-yellow-400' : 'text-muted-foreground'}`}
                   />
-                  {reviewingQuestion.isFavorite ? '已收藏' : '收藏'}
+                  {reviewingQuestion.isFavorite ? t('errorQuestion.actions.unfavorite') : t('errorQuestion.actions.favorite')}
                 </Button>
               )}
             </div>
             <DialogDescription>
-              请尝试重新答题，然后查看正确答案和解析
+              {t('review.reviewDialog.answerPlaceholder')}
             </DialogDescription>
           </DialogHeader>
 
@@ -485,8 +487,8 @@ export default function Review() {
               <div className="space-y-3">
                 <div className="flex items-center gap-2">
                   <Badge variant="outline">{getSubjectName(reviewingQuestion.subject)}</Badge>
-                  <Badge variant="secondary">第 {reviewingQuestion.reviewRound + 1} 次复习</Badge>
-                  <Badge>{reviewingQuestion.difficulty === "easy" ? "简单" : reviewingQuestion.difficulty === "medium" ? "中等" : "困难"}</Badge>
+                  <Badge variant="secondary">{t('review.ebbinghaus.round', { round: reviewingQuestion.reviewRound + 1 })}</Badge>
+                  <Badge>{reviewingQuestion.difficulty === "easy" ? t('errorQuestion.difficulty.easy') : reviewingQuestion.difficulty === "medium" ? t('errorQuestion.difficulty.medium') : t('errorQuestion.difficulty.hard')}</Badge>
                 </div>
                 <h3 className="text-lg font-semibold">{reviewingQuestion.title}</h3>
                 <div className="bg-muted p-4 rounded-lg">
@@ -501,7 +503,7 @@ export default function Review() {
               {!showAnswer && (
                 <div className="space-y-3">
                   <div className="flex items-center justify-between">
-                    <Label htmlFor="user-answer">你的答案</Label>
+                    <Label htmlFor="user-answer">{t('review.reviewDialog.yourAnswer')}</Label>
                     <VoiceInputButtonEnhanced
                       onTranscript={(text) => setUserAnswer((prev) => prev + text)}
                       lang={reviewingQuestion.subject === "english" ? "en-US" : "zh-CN"}
@@ -511,14 +513,14 @@ export default function Review() {
                   </div>
                   <Textarea
                     id="user-answer"
-                    placeholder="请在此输入你的答案，或点击语音输入按钮..."
+                    placeholder={t('review.reviewDialog.answerPlaceholder')}
                     value={userAnswer}
                     onChange={(e) => setUserAnswer(e.target.value)}
                     rows={6}
                     className="resize-none"
                   />
                   <Button onClick={handleSubmitReview} className="w-full" disabled={!userAnswer.trim()}>
-                    查看答案和解析
+                    {t('review.reviewDialog.showCorrectAnswer')}
                   </Button>
                 </div>
               )}
@@ -529,7 +531,7 @@ export default function Review() {
                   {/* 用户答案 */}
                   {userAnswer && (
                     <div className="space-y-2">
-                      <Label className="text-base font-semibold">你的答案</Label>
+                      <Label className="text-base font-semibold">{t('review.reviewDialog.yourAnswer')}</Label>
                       <div className="bg-blue-50 dark:bg-blue-950/20 p-4 rounded-lg border border-blue-200 dark:border-blue-900">
                         <p className="whitespace-pre-wrap">{userAnswer}</p>
                       </div>
@@ -539,7 +541,7 @@ export default function Review() {
                   {/* 正确答案 */}
                   {reviewingQuestion.correctAnswer && (
                     <div className="space-y-2">
-                      <Label className="text-base font-semibold text-green-700 dark:text-green-400">正确答案</Label>
+                      <Label className="text-base font-semibold text-green-700 dark:text-green-400">{t('review.reviewDialog.correctAnswer')}</Label>
                       <div className="bg-green-50 dark:bg-green-950/20 p-4 rounded-lg border border-green-200 dark:border-green-900">
                         <p className="whitespace-pre-wrap text-green-900 dark:text-green-100">{reviewingQuestion.correctAnswer}</p>
                       </div>
@@ -549,7 +551,7 @@ export default function Review() {
                   {/* 详细解析 */}
                   {reviewingQuestion.detailedExplanation && (
                     <div className="space-y-2">
-                      <Label className="text-base font-semibold">详细解析</Label>
+                      <Label className="text-base font-semibold">{t('review.reviewDialog.analysis')}</Label>
                       <div className="bg-muted p-4 rounded-lg">
                         <p className="whitespace-pre-wrap">{reviewingQuestion.detailedExplanation}</p>
                       </div>
@@ -559,7 +561,7 @@ export default function Review() {
                   {/* 错误分析 */}
                   {reviewingQuestion.errorAnalysis && (
                     <div className="space-y-2">
-                      <Label className="text-base font-semibold text-orange-700 dark:text-orange-400">错误分析</Label>
+                      <Label className="text-base font-semibold text-orange-700 dark:text-orange-400">{t('errorQuestion.detail.errorAnalysis')}</Label>
                       <div className="bg-orange-50 dark:bg-orange-950/20 p-4 rounded-lg border border-orange-200 dark:border-orange-900">
                         <p className="whitespace-pre-wrap text-orange-900 dark:text-orange-100">{reviewingQuestion.errorAnalysis}</p>
                       </div>
@@ -576,7 +578,7 @@ export default function Review() {
                       }}
                       className="flex-1"
                     >
-                      重新答题
+                      {t('common.retry')}
                     </Button>
                     <Button
                       onClick={handleCompleteReview}
@@ -584,7 +586,7 @@ export default function Review() {
                       className="flex-1"
                     >
                       <CheckCircle2 className="h-4 w-4 mr-2" />
-                      完成复习
+                      {t('review.reviewDialog.markAsReviewed')}
                     </Button>
                   </div>
                 </div>

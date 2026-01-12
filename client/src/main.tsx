@@ -9,6 +9,7 @@ import App from "./App";
 import { getLoginUrl } from "./const";
 import "./index.css";
 import { registerPWA } from "@/components/PWAInstallPrompt";
+import { initNotificationService } from "@/services/notificationService";
 
 const queryClient = new QueryClient();
 
@@ -65,3 +66,6 @@ createRoot(document.getElementById("root")!).render(
 
 // 注册PWA Service Worker
 registerPWA();
+
+// 初始化通知服务
+initNotificationService();

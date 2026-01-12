@@ -1,6 +1,6 @@
-// Service Worker for PWA offline support
-// Version: 2.0.0 - Enhanced with error question caching
-const CACHE_VERSION = 'v2';
+// Service Worker for PWA offline support and push notifications
+// Version: 3.0.0 - Enhanced with push notifications for review reminders
+const CACHE_VERSION = 'v3';
 const STATIC_CACHE = `exam-error-analysis-static-${CACHE_VERSION}`;
 const RUNTIME_CACHE = `exam-error-analysis-runtime-${CACHE_VERSION}`;
 const IMAGE_CACHE = `exam-error-analysis-images-${CACHE_VERSION}`;
@@ -297,6 +297,24 @@ self.addEventListener('message', (event) => {
         })
       );
       break;
+      
+    case 'SHOW_NOTIFICATION':
+      // 从客户端触发显示通知
+      if (payload) {
+        event.waitUntil(
+          self.registration.showNotification(payload.title || '学习提醒', {
+            body: payload.body || '您有新的学习任务',
+            icon: payload.icon || '/icon-192x192.png',
+            badge: payload.badge || '/icon-72x72.png',
+            tag: payload.tag || 'default',
+            data: payload.data || {},
+            vibrate: payload.vibrate || [100, 50, 100],
+            requireInteraction: payload.requireInteraction || false,
+            actions: payload.actions || [],
+          })
+        );
+      }
+      break;
   }
 });
 
@@ -305,35 +323,113 @@ self.addEventListener('sync', (event) => {
   if (event.tag === 'sync-error-questions') {
     event.waitUntil(syncErrorQuestions());
   }
+  
+  if (event.tag === 'check-review-reminders') {
+    event.waitUntil(checkReviewReminders());
+  }
 });
 
 // 同步错题数据
 async function syncErrorQuestions() {
-  // 这里可以实现离线时保存的错题同步逻辑
   console.log('[SW] Syncing error questions...');
 }
 
-// 推送通知事件
-self.addEventListener('push', (event) => {
-  if (!event.data) return;
+// 检查复习提醒
+async function checkReviewReminders() {
+  console.log('[SW] Checking review reminders...');
+  // 这里可以实现后台检查复习提醒的逻辑
+}
 
-  const data = event.data.json();
+// 推送通知事件 - 支持服务器推送
+self.addEventListener('push', (event) => {
+  if (!event.data) {
+    console.log('[SW] Push event received but no data');
+    return;
+  }
+
+  let data;
+  try {
+    data = event.data.json();
+  } catch (e) {
+    data = {
+      title: '学习提醒',
+      body: event.data.text() || '您有新的学习任务',
+    };
+  }
+
+  // 获取用户语言偏好
+  const lang = data.lang || 'zh-CN';
+  
+  // 多语言通知文本
+  const messages = {
+    'zh-CN': {
+      defaultTitle: '学习提醒',
+      defaultBody: '您有新的学习任务',
+      reviewTitle: '复习提醒',
+      reviewBody: `您有 ${data.count || 0} 道错题需要复习`,
+      practiceTitle: '练习提醒',
+      practiceBody: '今天还没有完成练习目标哦',
+      achievementTitle: '成就解锁',
+      achievementBody: `恭喜获得新徽章：${data.badge || ''}`,
+      viewAction: '查看',
+      closeAction: '稍后',
+    },
+    'en': {
+      defaultTitle: 'Study Reminder',
+      defaultBody: 'You have new study tasks',
+      reviewTitle: 'Review Reminder',
+      reviewBody: `You have ${data.count || 0} error questions to review`,
+      practiceTitle: 'Practice Reminder',
+      practiceBody: "You haven't completed today's practice goal yet",
+      achievementTitle: 'Achievement Unlocked',
+      achievementBody: `Congratulations! You earned a new badge: ${data.badge || ''}`,
+      viewAction: 'View',
+      closeAction: 'Later',
+    },
+  };
+
+  const msg = messages[lang] || messages['zh-CN'];
+
+  // 根据通知类型设置内容
+  let title = data.title || msg.defaultTitle;
+  let body = data.body || msg.defaultBody;
+  let url = data.url || '/';
+
+  if (data.type === 'review') {
+    title = msg.reviewTitle;
+    body = msg.reviewBody;
+    url = '/review';
+  } else if (data.type === 'practice') {
+    title = msg.practiceTitle;
+    body = msg.practiceBody;
+    url = '/practice';
+  } else if (data.type === 'achievement') {
+    title = msg.achievementTitle;
+    body = msg.achievementBody;
+    url = '/profile';
+  }
+
   const options = {
-    body: data.body || '您有新的学习提醒',
-    icon: '/icon-192x192.png',
-    badge: '/icon-72x72.png',
-    vibrate: [100, 50, 100],
+    body: body,
+    icon: data.icon || '/icon-192x192.png',
+    badge: data.badge || '/icon-72x72.png',
+    vibrate: data.vibrate || [200, 100, 200],
+    tag: data.tag || data.type || 'default',
+    renotify: true,
+    requireInteraction: data.requireInteraction !== false,
     data: {
-      url: data.url || '/',
+      url: url,
+      type: data.type,
+      timestamp: Date.now(),
     },
     actions: [
-      { action: 'open', title: '查看' },
-      { action: 'close', title: '关闭' },
+      { action: 'open', title: msg.viewAction },
+      { action: 'close', title: msg.closeAction },
     ],
   };
 
   event.waitUntil(
-    self.registration.showNotification(data.title || '错题学习提醒', options)
+    self.registration.showNotification(title, options)
   );
 });
 
@@ -341,14 +437,20 @@ self.addEventListener('push', (event) => {
 self.addEventListener('notificationclick', (event) => {
   event.notification.close();
 
-  if (event.action === 'close') return;
+  if (event.action === 'close') {
+    console.log('[SW] Notification dismissed by user');
+    return;
+  }
 
   const url = event.notification.data?.url || '/';
+  
   event.waitUntil(
-    clients.matchAll({ type: 'window' }).then((windowClients) => {
-      // 如果已有窗口打开，聚焦它
+    clients.matchAll({ type: 'window', includeUncontrolled: true }).then((windowClients) => {
+      // 查找已打开的窗口
       for (const client of windowClients) {
-        if (client.url === url && 'focus' in client) {
+        if (client.url.includes(self.location.origin) && 'focus' in client) {
+          // 导航到目标URL
+          client.navigate(url);
           return client.focus();
         }
       }
@@ -359,5 +461,48 @@ self.addEventListener('notificationclick', (event) => {
     })
   );
 });
+
+// 通知关闭事件
+self.addEventListener('notificationclose', (event) => {
+  console.log('[SW] Notification closed:', event.notification.tag);
+});
+
+// 定期后台同步（如果浏览器支持）
+self.addEventListener('periodicsync', (event) => {
+  if (event.tag === 'check-reviews') {
+    event.waitUntil(checkAndNotifyReviews());
+  }
+});
+
+// 检查并发送复习提醒
+async function checkAndNotifyReviews() {
+  try {
+    // 尝试从API获取待复习数量
+    const response = await fetch('/api/trpc/reviewPlan.getDueReviewsCount');
+    if (response.ok) {
+      const data = await response.json();
+      const count = data?.result?.data || 0;
+      
+      if (count > 0) {
+        const lang = 'zh-CN'; // 可以从存储中获取
+        const msg = lang === 'en' 
+          ? { title: 'Review Reminder', body: `You have ${count} error questions to review` }
+          : { title: '复习提醒', body: `您有 ${count} 道错题需要复习` };
+        
+        await self.registration.showNotification(msg.title, {
+          body: msg.body,
+          icon: '/icon-192x192.png',
+          badge: '/icon-72x72.png',
+          tag: 'review-reminder',
+          data: { url: '/review', type: 'review' },
+          vibrate: [200, 100, 200],
+          requireInteraction: true,
+        });
+      }
+    }
+  } catch (error) {
+    console.error('[SW] Error checking reviews:', error);
+  }
+}
 
 console.log('[SW] Service Worker loaded - Version:', CACHE_VERSION);

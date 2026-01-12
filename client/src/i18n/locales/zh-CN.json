@@ -25,7 +25,46 @@
     "success": "成功",
     "failed": "失败",
     "noData": "暂无数据",
-    "comingSoon": "功能开发中"
+    "comingSoon": "功能开发中",
+    "share": "分享",
+    "export": "导出",
+    "refresh": "刷新",
+    "view": "查看",
+    "details": "详情",
+    "actions": "操作",
+    "status": "状态",
+    "date": "日期",
+    "time": "时间",
+    "today": "今天",
+    "yesterday": "昨天",
+    "tomorrow": "明天",
+    "thisWeek": "本周",
+    "thisMonth": "本月",
+    "total": "总计",
+    "count": "数量",
+    "percentage": "百分比",
+    "average": "平均",
+    "max": "最大",
+    "min": "最小",
+    "start": "开始",
+    "end": "结束",
+    "continue": "继续",
+    "finish": "完成",
+    "skip": "跳过",
+    "select": "选择",
+    "selectAll": "全选",
+    "deselectAll": "取消全选",
+    "selected": "已选择",
+    "items": "项",
+    "page": "页",
+    "of": "共",
+    "showing": "显示",
+    "results": "结果",
+    "sortBy": "排序",
+    "ascending": "升序",
+    "descending": "降序",
+    "newest": "最新",
+    "oldest": "最早"
   },
   "nav": {
     "home": "首页",
@@ -39,7 +78,13 @@
     "profile": "个人中心",
     "logout": "退出登录",
     "login": "登录",
-    "register": "注册"
+    "register": "注册",
+    "knowledgeGraph": "知识图谱",
+    "favorites": "我的收藏",
+    "history": "历史记录",
+    "notifications": "通知",
+    "help": "帮助",
+    "about": "关于"
   },
   "home": {
     "title": "AI智能错题分析学习系统",
@@ -120,18 +165,53 @@
       "knowledgePoints": "相关知识点",
       "similarQuestions": "相似题目",
       "aiAnalysis": "AI分析",
-      "reviewHistory": "复习记录"
+      "reviewHistory": "复习记录",
+      "errorType": "错误类型",
+      "errorAnalysis": "错因分析",
+      "keyPoints": "重点内容",
+      "commonMistakes": "常见错误",
+      "solvingSteps": "解题步骤",
+      "studyAdvice": "学习建议",
+      "practiceDirection": "练习方向",
+      "notes": "笔记",
+      "tags": "标签"
     },
     "actions": {
       "analyze": "AI分析",
+      "deepAnalysis": "深度分析",
       "practice": "练习相似题",
       "markMastered": "标记为已掌握",
       "addToReview": "加入复习计划",
       "export": "导出",
-      "share": "分享"
+      "share": "分享",
+      "delete": "删除",
+      "favorite": "收藏",
+      "unfavorite": "取消收藏",
+      "generatePractice": "生成专项练习",
+      "voiceExplanation": "语音讲解",
+      "viewDetail": "查看详情"
     },
     "empty": "还没有错题，快去上传吧！",
-    "uploadHint": "支持拍照或选择图片上传"
+    "uploadHint": "支持拍照或选择图片上传",
+    "deleteConfirm": "确定要删除这道错题吗？",
+    "deleteSuccess": "错题已删除",
+    "analyzeSuccess": "AI分析完成！",
+    "analyzeFailed": "分析失败",
+    "addToReviewSuccess": "已加入复习计划！系统将按艾宾浩斯曲线提醒您复习",
+    "alreadyInReview": "该错题已在复习计划中",
+    "generatePracticeSuccess": "已生成{{count}}道专项练习题！",
+    "notExist": "错题不存在或已被删除",
+    "backToList": "返回错题本",
+    "switchToPrevious": "已切换到上一题",
+    "switchToNext": "已切换到下一题",
+    "batchOperations": {
+      "title": "批量操作",
+      "delete": "批量删除",
+      "markMastered": "批量标记掌握",
+      "export": "批量导出",
+      "changeDifficulty": "批量修改难度",
+      "addTags": "批量添加标签"
+    }
   },
   "upload": {
     "title": "上传错题",
@@ -148,10 +228,26 @@
     "uploadSuccess": "上传成功",
     "uploadFailed": "上传失败，请重试",
     "batchMode": "批量模式",
-    "singleMode": "单张模式"
+    "singleMode": "单张模式",
+    "imagePreview": "图片预览",
+    "cropImage": "裁剪图片",
+    "rotateImage": "旋转图片",
+    "recognizing": "正在识别...",
+    "recognizeSuccess": "识别成功",
+    "recognizeFailed": "识别失败",
+    "manualInput": "手动输入",
+    "correctAnswer": "正确答案",
+    "myWrongAnswer": "我的错误答案",
+    "errorReason": "错误原因",
+    "saveAndAnalyze": "保存并分析",
+    "saveDraft": "保存草稿",
+    "batchProgress": "批量上传进度",
+    "totalImages": "共{{count}}张图片",
+    "currentProgress": "当前进度：{{current}}/{{total}}"
   },
   "practice": {
-    "title": "练习",
+    "title": "练习中心",
+    "subtitle": "针对性练习，巩固薄弱知识点",
     "startPractice": "开始练习",
     "continuePractice": "继续练习",
     "todayGoal": "今日目标",
@@ -169,10 +265,34 @@
       "wrong": "错误",
       "score": "得分",
       "suggestion": "学习建议"
+    },
+    "knowledgePoint": "知识点",
+    "masteryLevel": "掌握度",
+    "practiceCount": "练习次数",
+    "correctCount": "正确次数",
+    "noTask": "暂无练习任务",
+    "noTaskHint": "先上传错题并进行AI分析，系统会自动生成练习任务",
+    "generateFromError": "从错题生成练习",
+    "smartRecommend": "智能推荐",
+    "bySubject": "按学科",
+    "byDifficulty": "按难度",
+    "byKnowledgePoint": "按知识点",
+    "practiceMode": {
+      "title": "练习模式",
+      "timed": "计时模式",
+      "free": "自由模式",
+      "exam": "模拟考试"
+    },
+    "questionTypes": {
+      "choice": "选择题",
+      "fillBlank": "填空题",
+      "shortAnswer": "简答题",
+      "calculation": "计算题"
     }
   },
   "review": {
     "title": "复习计划",
+    "subtitle": "基于艾宾浩斯遗忘曲线的智能复习提醒",
     "todayReview": "今日待复习",
     "overdue": "逾期未复习",
     "upcoming": "即将复习",
@@ -185,6 +305,47 @@
       "enable": "开启提醒",
       "time": "提醒时间",
       "frequency": "提醒频率"
+    },
+    "stats": {
+      "dueCount": "待复习",
+      "totalCount": "计划中",
+      "completedCount": "已掌握",
+      "dueDescription": "已到复习时间",
+      "totalDescription": "复习计划总数",
+      "completedDescription": "完成所有复习轮次"
+    },
+    "ebbinghaus": {
+      "title": "艾宾浩斯遗忘曲线",
+      "description": "科学的复习间隔，帮助您高效记忆",
+      "round": "第{{round}}次",
+      "daysLater": "{{days}}天后",
+      "completionHint": "完成5轮复习后，该错题将被标记为'已掌握'"
+    },
+    "tabs": {
+      "due": "待复习",
+      "all": "全部计划",
+      "completed": "已完成"
+    },
+    "sendReminder": "发送复习提醒",
+    "sending": "发送中...",
+    "noContent": "暂无待复习内容",
+    "reviewDialog": {
+      "title": "复习题目",
+      "yourAnswer": "你的答案",
+      "answerPlaceholder": "请输入你的答案...",
+      "submitAnswer": "提交答案",
+      "showCorrectAnswer": "查看正确答案",
+      "correctAnswer": "正确答案",
+      "analysis": "解析",
+      "markAsReviewed": "标记为已复习",
+      "nextRound": "下次复习",
+      "currentRound": "当前轮次"
+    },
+    "formatDate": {
+      "overdue": "已逾期 {{days}} 天",
+      "today": "今天",
+      "tomorrow": "明天",
+      "daysLater": "{{days}} 天后"
     }
   },
   "report": {
@@ -204,6 +365,55 @@
       "masteredQuestions": "已掌握",
       "studyTime": "学习时长",
       "practiceCount": "练习次数"
+    },
+    "charts": {
+      "masteryTrend": "掌握度趋势",
+      "subjectDistribution": "科目分布",
+      "masteryDistribution": "掌握度分布",
+      "studyTimeTrend": "学习时长趋势"
+    },
+    "suggestions": {
+      "title": "改进建议",
+      "focusOn": "建议重点关注",
+      "practiceMore": "建议多练习",
+      "reviewRegularly": "建议定期复习"
+    }
+  },
+  "dashboard": {
+    "title": "学习仪表盘",
+    "subtitle": "查看你的学习数据和进步曲线",
+    "allSubjects": "全部科目",
+    "stats": {
+      "totalErrors": "错题总数",
+      "masteredPoints": "已掌握知识点",
+      "masteryRate": "掌握率",
+      "analyzed": "已分析",
+      "reviewCount": "复习次数",
+      "monthlyReviews": "本月复习",
+      "studyDays": "学习天数",
+      "streakDays": "连续学习"
+    },
+    "charts": {
+      "masteryTrend": {
+        "title": "掌握度趋势",
+        "description": "最近30天的学习进步",
+        "yAxisLabel": "掌握率"
+      },
+      "subjectDistribution": {
+        "title": "科目分布",
+        "description": "各科目错题数量占比"
+      },
+      "masteryDistribution": {
+        "title": "掌握度分布",
+        "description": "错题掌握情况统计",
+        "questionCount": "题目数量"
+      },
+      "weakPoints": {
+        "title": "薄弱知识点",
+        "description": "需要重点关注的知识点",
+        "errorCount": "错误 {{count}} 次",
+        "masteryRate": "掌握率"
+      }
     }
   },
   "settings": {
@@ -227,7 +437,14 @@
       "title": "通知设置",
       "reviewReminder": "复习提醒",
       "dailyReport": "每日报告",
-      "achievementAlert": "成就提醒"
+      "achievementAlert": "成就提醒",
+      "pushNotification": "推送通知",
+      "enablePush": "开启推送通知",
+      "pushDescription": "在复习时间到达时接收系统通知",
+      "permissionDenied": "通知权限被拒绝",
+      "permissionDeniedDesc": "请在浏览器设置中允许通知权限",
+      "testNotification": "测试通知",
+      "notificationSent": "测试通知已发送"
     },
     "account": {
       "title": "账号安全",
@@ -252,13 +469,61 @@
     "newVersion": "发现新版本，刷新页面以更新",
     "refresh": "刷新",
     "offline": "当前处于离线状态",
-    "online": "网络已恢复"
+    "online": "网络已恢复",
+    "notification": {
+      "reviewReminder": "复习提醒",
+      "reviewReminderBody": "您有 {{count}} 道错题需要复习",
+      "practiceReminder": "练习提醒",
+      "practiceReminderBody": "今天还没有完成练习目标哦",
+      "achievementUnlocked": "成就解锁",
+      "newBadge": "恭喜获得新徽章：{{badge}}"
+    }
   },
   "errors": {
     "networkError": "网络连接失败，请检查网络设置",
     "serverError": "服务器错误，请稍后重试",
     "authError": "登录已过期，请重新登录",
     "notFound": "页面不存在",
-    "permissionDenied": "没有访问权限"
+    "permissionDenied": "没有访问权限",
+    "uploadError": "上传失败",
+    "analyzeError": "分析失败",
+    "saveError": "保存失败",
+    "deleteError": "删除失败",
+    "loadError": "加载失败",
+    "unknownError": "未知错误"
+  },
+  "knowledgeGraph": {
+    "title": "知识图谱",
+    "subtitle": "可视化知识结构，掌握学习脉络",
+    "selectSubject": "选择学科",
+    "selectGrade": "选择年级",
+    "zoomIn": "放大",
+    "zoomOut": "缩小",
+    "resetView": "重置视图",
+    "nodeDetail": "节点详情",
+    "relatedQuestions": "相关错题",
+    "masteryLevel": "掌握程度",
+    "prerequisite": "前置知识",
+    "followUp": "后续知识"
+  },
+  "share": {
+    "title": "分享",
+    "copyLink": "复制链接",
+    "linkCopied": "链接已复制",
+    "shareToWechat": "分享到微信",
+    "shareToQQ": "分享到QQ",
+    "shareToWeibo": "分享到微博",
+    "downloadImage": "下载图片",
+    "shareSuccess": "分享成功",
+    "shareFailed": "分享失败"
+  },
+  "voice": {
+    "startRecording": "开始录音",
+    "stopRecording": "停止录音",
+    "recording": "录音中...",
+    "processing": "处理中...",
+    "playExplanation": "播放讲解",
+    "pauseExplanation": "暂停讲解",
+    "voiceInput": "语音输入"
   }
 }

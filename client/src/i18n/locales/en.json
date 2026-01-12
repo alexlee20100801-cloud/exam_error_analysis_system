@@ -25,7 +25,46 @@
     "success": "Success",
     "failed": "Failed",
     "noData": "No data available",
-    "comingSoon": "Coming soon"
+    "comingSoon": "Coming soon",
+    "share": "Share",
+    "export": "Export",
+    "refresh": "Refresh",
+    "view": "View",
+    "details": "Details",
+    "actions": "Actions",
+    "status": "Status",
+    "date": "Date",
+    "time": "Time",
+    "today": "Today",
+    "yesterday": "Yesterday",
+    "tomorrow": "Tomorrow",
+    "thisWeek": "This Week",
+    "thisMonth": "This Month",
+    "total": "Total",
+    "count": "Count",
+    "percentage": "Percentage",
+    "average": "Average",
+    "max": "Max",
+    "min": "Min",
+    "start": "Start",
+    "end": "End",
+    "continue": "Continue",
+    "finish": "Finish",
+    "skip": "Skip",
+    "select": "Select",
+    "selectAll": "Select All",
+    "deselectAll": "Deselect All",
+    "selected": "Selected",
+    "items": "items",
+    "page": "Page",
+    "of": "of",
+    "showing": "Showing",
+    "results": "results",
+    "sortBy": "Sort by",
+    "ascending": "Ascending",
+    "descending": "Descending",
+    "newest": "Newest",
+    "oldest": "Oldest"
   },
   "nav": {
     "home": "Home",
@@ -39,7 +78,13 @@
     "profile": "Profile",
     "logout": "Logout",
     "login": "Login",
-    "register": "Register"
+    "register": "Register",
+    "knowledgeGraph": "Knowledge Graph",
+    "favorites": "My Favorites",
+    "history": "History",
+    "notifications": "Notifications",
+    "help": "Help",
+    "about": "About"
   },
   "home": {
     "title": "AI-Powered Error Analysis Learning System",
@@ -120,18 +165,53 @@
       "knowledgePoints": "Related Knowledge Points",
       "similarQuestions": "Similar Questions",
       "aiAnalysis": "AI Analysis",
-      "reviewHistory": "Review History"
+      "reviewHistory": "Review History",
+      "errorType": "Error Type",
+      "errorAnalysis": "Error Analysis",
+      "keyPoints": "Key Points",
+      "commonMistakes": "Common Mistakes",
+      "solvingSteps": "Solving Steps",
+      "studyAdvice": "Study Advice",
+      "practiceDirection": "Practice Direction",
+      "notes": "Notes",
+      "tags": "Tags"
     },
     "actions": {
       "analyze": "AI Analysis",
+      "deepAnalysis": "Deep Analysis",
       "practice": "Practice Similar",
       "markMastered": "Mark as Mastered",
       "addToReview": "Add to Review Plan",
       "export": "Export",
-      "share": "Share"
+      "share": "Share",
+      "delete": "Delete",
+      "favorite": "Favorite",
+      "unfavorite": "Unfavorite",
+      "generatePractice": "Generate Practice",
+      "voiceExplanation": "Voice Explanation",
+      "viewDetail": "View Details"
     },
     "empty": "No error questions yet, upload some!",
-    "uploadHint": "Take a photo or select an image to upload"
+    "uploadHint": "Take a photo or select an image to upload",
+    "deleteConfirm": "Are you sure you want to delete this error question?",
+    "deleteSuccess": "Error question deleted",
+    "analyzeSuccess": "AI analysis completed!",
+    "analyzeFailed": "Analysis failed",
+    "addToReviewSuccess": "Added to review plan! The system will remind you based on Ebbinghaus curve",
+    "alreadyInReview": "This question is already in your review plan",
+    "generatePracticeSuccess": "Generated {{count}} practice questions!",
+    "notExist": "Error question does not exist or has been deleted",
+    "backToList": "Back to Error Book",
+    "switchToPrevious": "Switched to previous question",
+    "switchToNext": "Switched to next question",
+    "batchOperations": {
+      "title": "Batch Operations",
+      "delete": "Batch Delete",
+      "markMastered": "Batch Mark Mastered",
+      "export": "Batch Export",
+      "changeDifficulty": "Batch Change Difficulty",
+      "addTags": "Batch Add Tags"
+    }
   },
   "upload": {
     "title": "Upload Error Question",
@@ -148,10 +228,26 @@
     "uploadSuccess": "Upload successful",
     "uploadFailed": "Upload failed, please retry",
     "batchMode": "Batch Mode",
-    "singleMode": "Single Mode"
+    "singleMode": "Single Mode",
+    "imagePreview": "Image Preview",
+    "cropImage": "Crop Image",
+    "rotateImage": "Rotate Image",
+    "recognizing": "Recognizing...",
+    "recognizeSuccess": "Recognition successful",
+    "recognizeFailed": "Recognition failed",
+    "manualInput": "Manual Input",
+    "correctAnswer": "Correct Answer",
+    "myWrongAnswer": "My Wrong Answer",
+    "errorReason": "Error Reason",
+    "saveAndAnalyze": "Save and Analyze",
+    "saveDraft": "Save Draft",
+    "batchProgress": "Batch Upload Progress",
+    "totalImages": "{{count}} images total",
+    "currentProgress": "Current progress: {{current}}/{{total}}"
   },
   "practice": {
-    "title": "Practice",
+    "title": "Practice Center",
+    "subtitle": "Targeted practice to strengthen weak points",
     "startPractice": "Start Practice",
     "continuePractice": "Continue Practice",
     "todayGoal": "Today's Goal",
@@ -169,10 +265,34 @@
       "wrong": "Wrong",
       "score": "Score",
       "suggestion": "Learning Suggestions"
+    },
+    "knowledgePoint": "Knowledge Point",
+    "masteryLevel": "Mastery Level",
+    "practiceCount": "Practice Count",
+    "correctCount": "Correct Count",
+    "noTask": "No practice tasks available",
+    "noTaskHint": "Upload error questions and run AI analysis first, the system will automatically generate practice tasks",
+    "generateFromError": "Generate from Errors",
+    "smartRecommend": "Smart Recommend",
+    "bySubject": "By Subject",
+    "byDifficulty": "By Difficulty",
+    "byKnowledgePoint": "By Knowledge Point",
+    "practiceMode": {
+      "title": "Practice Mode",
+      "timed": "Timed Mode",
+      "free": "Free Mode",
+      "exam": "Mock Exam"
+    },
+    "questionTypes": {
+      "choice": "Multiple Choice",
+      "fillBlank": "Fill in the Blank",
+      "shortAnswer": "Short Answer",
+      "calculation": "Calculation"
     }
   },
   "review": {
     "title": "Review Plan",
+    "subtitle": "Smart review reminders based on Ebbinghaus forgetting curve",
     "todayReview": "Today's Review",
     "overdue": "Overdue",
     "upcoming": "Upcoming",
@@ -185,6 +305,47 @@
       "enable": "Enable Reminder",
       "time": "Reminder Time",
       "frequency": "Frequency"
+    },
+    "stats": {
+      "dueCount": "Due for Review",
+      "totalCount": "In Plan",
+      "completedCount": "Mastered",
+      "dueDescription": "Ready for review",
+      "totalDescription": "Total review plans",
+      "completedDescription": "Completed all review rounds"
+    },
+    "ebbinghaus": {
+      "title": "Ebbinghaus Forgetting Curve",
+      "description": "Scientific review intervals for efficient memorization",
+      "round": "Round {{round}}",
+      "daysLater": "{{days}} days later",
+      "completionHint": "After completing 5 rounds of review, the question will be marked as 'Mastered'"
+    },
+    "tabs": {
+      "due": "Due",
+      "all": "All Plans",
+      "completed": "Completed"
+    },
+    "sendReminder": "Send Review Reminder",
+    "sending": "Sending...",
+    "noContent": "No content to review",
+    "reviewDialog": {
+      "title": "Review Question",
+      "yourAnswer": "Your Answer",
+      "answerPlaceholder": "Enter your answer...",
+      "submitAnswer": "Submit Answer",
+      "showCorrectAnswer": "Show Correct Answer",
+      "correctAnswer": "Correct Answer",
+      "analysis": "Analysis",
+      "markAsReviewed": "Mark as Reviewed",
+      "nextRound": "Next Review",
+      "currentRound": "Current Round"
+    },
+    "formatDate": {
+      "overdue": "Overdue by {{days}} days",
+      "today": "Today",
+      "tomorrow": "Tomorrow",
+      "daysLater": "In {{days}} days"
     }
   },
   "report": {
@@ -204,6 +365,55 @@
       "masteredQuestions": "Mastered",
       "studyTime": "Study Time",
       "practiceCount": "Practice Count"
+    },
+    "charts": {
+      "masteryTrend": "Mastery Trend",
+      "subjectDistribution": "Subject Distribution",
+      "masteryDistribution": "Mastery Distribution",
+      "studyTimeTrend": "Study Time Trend"
+    },
+    "suggestions": {
+      "title": "Improvement Suggestions",
+      "focusOn": "Recommended focus areas",
+      "practiceMore": "Practice more on",
+      "reviewRegularly": "Review regularly"
+    }
+  },
+  "dashboard": {
+    "title": "Learning Dashboard",
+    "subtitle": "View your learning data and progress",
+    "allSubjects": "All Subjects",
+    "stats": {
+      "totalErrors": "Total Errors",
+      "masteredPoints": "Mastered Knowledge Points",
+      "masteryRate": "Mastery Rate",
+      "analyzed": "Analyzed",
+      "reviewCount": "Review Count",
+      "monthlyReviews": "Monthly Reviews",
+      "studyDays": "Study Days",
+      "streakDays": "Streak Days"
+    },
+    "charts": {
+      "masteryTrend": {
+        "title": "Mastery Trend",
+        "description": "Learning progress over the last 30 days",
+        "yAxisLabel": "Mastery Rate"
+      },
+      "subjectDistribution": {
+        "title": "Subject Distribution",
+        "description": "Error questions by subject"
+      },
+      "masteryDistribution": {
+        "title": "Mastery Distribution",
+        "description": "Error question mastery statistics",
+        "questionCount": "Question Count"
+      },
+      "weakPoints": {
+        "title": "Weak Points",
+        "description": "Knowledge points that need attention",
+        "errorCount": "{{count}} errors",
+        "masteryRate": "Mastery Rate"
+      }
     }
   },
   "settings": {
@@ -227,7 +437,14 @@
       "title": "Notification Settings",
       "reviewReminder": "Review Reminder",
       "dailyReport": "Daily Report",
-      "achievementAlert": "Achievement Alert"
+      "achievementAlert": "Achievement Alert",
+      "pushNotification": "Push Notifications",
+      "enablePush": "Enable Push Notifications",
+      "pushDescription": "Receive system notifications when it's time to review",
+      "permissionDenied": "Notification permission denied",
+      "permissionDeniedDesc": "Please allow notification permission in browser settings",
+      "testNotification": "Test Notification",
+      "notificationSent": "Test notification sent"
     },
     "account": {
       "title": "Account Security",
@@ -252,13 +469,61 @@
     "newVersion": "New version available, refresh to update",
     "refresh": "Refresh",
     "offline": "You are currently offline",
-    "online": "Network connection restored"
+    "online": "Network connection restored",
+    "notification": {
+      "reviewReminder": "Review Reminder",
+      "reviewReminderBody": "You have {{count}} error questions to review",
+      "practiceReminder": "Practice Reminder",
+      "practiceReminderBody": "You haven't completed today's practice goal yet",
+      "achievementUnlocked": "Achievement Unlocked",
+      "newBadge": "Congratulations! You earned a new badge: {{badge}}"
+    }
   },
   "errors": {
     "networkError": "Network connection failed, please check your settings",
     "serverError": "Server error, please try again later",
     "authError": "Session expired, please login again",
     "notFound": "Page not found",
-    "permissionDenied": "Permission denied"
+    "permissionDenied": "Permission denied",
+    "uploadError": "Upload failed",
+    "analyzeError": "Analysis failed",
+    "saveError": "Save failed",
+    "deleteError": "Delete failed",
+    "loadError": "Load failed",
+    "unknownError": "Unknown error"
+  },
+  "knowledgeGraph": {
+    "title": "Knowledge Graph",
+    "subtitle": "Visualize knowledge structure, master learning paths",
+    "selectSubject": "Select Subject",
+    "selectGrade": "Select Grade",
+    "zoomIn": "Zoom In",
+    "zoomOut": "Zoom Out",
+    "resetView": "Reset View",
+    "nodeDetail": "Node Details",
+    "relatedQuestions": "Related Questions",
+    "masteryLevel": "Mastery Level",
+    "prerequisite": "Prerequisites",
+    "followUp": "Follow-up Topics"
+  },
+  "share": {
+    "title": "Share",
+    "copyLink": "Copy Link",
+    "linkCopied": "Link copied",
+    "shareToWechat": "Share to WeChat",
+    "shareToQQ": "Share to QQ",
+    "shareToWeibo": "Share to Weibo",
+    "downloadImage": "Download Image",
+    "shareSuccess": "Shared successfully",
+    "shareFailed": "Share failed"
+  },
+  "voice": {
+    "startRecording": "Start Recording",
+    "stopRecording": "Stop Recording",
+    "recording": "Recording...",
+    "processing": "Processing...",
+    "playExplanation": "Play Explanation",
+    "pauseExplanation": "Pause Explanation",
+    "voiceInput": "Voice Input"
   }
 }

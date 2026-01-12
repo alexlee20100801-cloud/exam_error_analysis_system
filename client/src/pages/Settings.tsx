@@ -13,6 +13,7 @@ import { useState, useEffect } from "react";
 import { toast } from "sonner";
 import { getConfigurableMenuItems, type MenuItem } from "../../../shared/menuConfig";
 import { useTheme } from "@/contexts/ThemeContext";
+import NotificationSettings from "@/components/NotificationSettings";
 
 const gradeOptions = [
   { value: "junior1", label: "初一" },
@@ -757,6 +758,9 @@ export default function Settings() {
             </Button>
           </CardContent>
         </Card>
+        
+        {/* PWA推送通知设置 */}
+        <NotificationSettings />
         
         {/* 提示信息 */}
         <Card className="border-blue-200 dark:border-blue-800 bg-blue-50/50 dark:bg-blue-950/20">

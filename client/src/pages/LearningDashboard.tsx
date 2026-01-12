@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
+import { useTranslation } from "react-i18next";
 import { trpc } from "@/lib/trpc";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -20,17 +21,17 @@ import {
   ResponsiveContainer,
 } from "recharts";
 
-const SUBJECTS = [
-  { value: "all", label: "全部科目" },
-  { value: "chinese", label: "语文" },
-  { value: "math", label: "数学" },
-  { value: "english", label: "英语" },
-  { value: "physics", label: "物理" },
-  { value: "chemistry", label: "化学" },
-  { value: "biology", label: "生物" },
-  { value: "politics", label: "政治" },
-  { value: "history", label: "历史" },
-  { value: "geography", label: "地理" },
+const SUBJECT_KEYS = [
+  { value: "all", labelKey: "dashboard.allSubjects" },
+  { value: "chinese", labelKey: "errorQuestion.subjects.chinese" },
+  { value: "math", labelKey: "errorQuestion.subjects.math" },
+  { value: "english", labelKey: "errorQuestion.subjects.english" },
+  { value: "physics", labelKey: "errorQuestion.subjects.physics" },
+  { value: "chemistry", labelKey: "errorQuestion.subjects.chemistry" },
+  { value: "biology", labelKey: "errorQuestion.subjects.biology" },
+  { value: "politics", labelKey: "errorQuestion.subjects.politics" },
+  { value: "history", labelKey: "errorQuestion.subjects.history" },
+  { value: "geography", labelKey: "errorQuestion.subjects.geography" },
 ];
 
 const SUBJECT_COLORS: Record<string, string> = {
@@ -48,7 +49,13 @@ const SUBJECT_COLORS: Record<string, string> = {
 const MASTERY_COLORS = ["#ef4444", "#f59e0b", "#10b981"];
 
 export default function LearningDashboard() {
+  const { t } = useTranslation();
   const [selectedSubject, setSelectedSubject] = useState("all");
+  
+  const SUBJECTS = useMemo(() => SUBJECT_KEYS.map(s => ({
+    value: s.value,
+    label: t(s.labelKey)
+  })), [t]);
 
   // 获取统计数据
   const { data: stats, isLoading: statsLoading } = trpc.learningStats.getOverview.useQuery({
@@ -93,9 +100,9 @@ export default function LearningDashboard() {
       {/* 标题和筛选 */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold">学习仪表盘</h1>
+          <h1 className="text-3xl font-bold">{t('dashboard.title')}</h1>
           <p className="text-muted-foreground mt-2">
-            查看你的学习数据和进步曲线
+            {t('dashboard.subtitle')}
           </p>
         </div>
         <Select value={selectedSubject} onValueChange={setSelectedSubject}>
@@ -116,20 +123,20 @@ export default function LearningDashboard() {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">错题总数</CardTitle>
+            <CardTitle className="text-sm font-medium">{t('dashboard.stats.totalErrors')}</CardTitle>
             <BookOpen className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{stats?.totalErrorQuestions || 0}</div>
             <p className="text-xs text-muted-foreground mt-1">
-              已掌握 {stats?.masteredKnowledgePoints || 0} 个知识点
+              {t('dashboard.stats.masteredPoints')}: {stats?.masteredKnowledgePoints || 0}
             </p>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">掌握率</CardTitle>
+            <CardTitle className="text-sm font-medium">{t('dashboard.stats.masteryRate')}</CardTitle>
             <Target className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
@@ -137,33 +144,33 @@ export default function LearningDashboard() {
               {(stats as any)?.totalErrorQuestions || 0}
             </div>
             <p className="text-xs text-muted-foreground mt-1">
-              已分析 {(stats as any)?.totalErrorQuestions || 0} 题
+              {t('dashboard.stats.analyzed')}: {(stats as any)?.totalErrorQuestions || 0}
             </p>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">复习次数</CardTitle>
+            <CardTitle className="text-sm font-medium">{t('dashboard.stats.reviewCount')}</CardTitle>
             <TrendingUp className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{(stats as any)?.totalReviews || 0}</div>
             <p className="text-xs text-muted-foreground mt-1">
-              本月 {(stats as any)?.monthlyReviews || 0} 次
+              {t('dashboard.stats.monthlyReviews')}: {(stats as any)?.monthlyReviews || 0}
             </p>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">学习天数</CardTitle>
+            <CardTitle className="text-sm font-medium">{t('dashboard.stats.studyDays')}</CardTitle>
             <Calendar className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{(stats as any)?.studyDays || 0}</div>
             <p className="text-xs text-muted-foreground mt-1">
-              连续 {(stats as any)?.streakDays || 0} 天
+              {t('dashboard.stats.streakDays')}: {(stats as any)?.streakDays || 0}
             </p>
           </CardContent>
         </Card>
@@ -174,8 +181,8 @@ export default function LearningDashboard() {
         {/* 掌握度趋势 */}
         <Card>
           <CardHeader>
-            <CardTitle>掌握度趋势</CardTitle>
-            <CardDescription>最近30天的学习进步</CardDescription>
+            <CardTitle>{t('dashboard.charts.masteryTrend.title')}</CardTitle>
+            <CardDescription>{t('dashboard.charts.masteryTrend.description')}</CardDescription>
           </CardHeader>
           <CardContent>
             {trendLoading ? (
@@ -194,7 +201,7 @@ export default function LearningDashboard() {
                   />
                   <YAxis tick={{ fontSize: 12 }} domain={[0, 100]} />
                   <Tooltip
-                    formatter={(value: number) => [`${value.toFixed(1)}%`, "掌握率"]}
+                    formatter={(value: number) => [`${value.toFixed(1)}%`, t('dashboard.charts.masteryTrend.yAxisLabel')]}
                     labelFormatter={(label) => {
                       const date = new Date(label);
                       return `${date.getFullYear()}/${date.getMonth() + 1}/${date.getDate()}`;
@@ -204,7 +211,7 @@ export default function LearningDashboard() {
                   <Line
                     type="monotone"
                     dataKey="masteryRate"
-                    name="掌握率"
+                    name={t('dashboard.charts.masteryTrend.yAxisLabel')}
                     stroke="#3b82f6"
                     strokeWidth={2}
                     dot={{ r: 4 }}
@@ -213,7 +220,7 @@ export default function LearningDashboard() {
               </ResponsiveContainer>
             ) : (
               <div className="h-64 flex items-center justify-center text-muted-foreground">
-                暂无数据
+                {t('common.noData')}
               </div>
             )}
           </CardContent>
@@ -222,8 +229,8 @@ export default function LearningDashboard() {
         {/* 科目分布 */}
         <Card>
           <CardHeader>
-            <CardTitle>科目分布</CardTitle>
-            <CardDescription>各科目错题数量占比</CardDescription>
+            <CardTitle>{t('dashboard.charts.subjectDistribution.title')}</CardTitle>
+            <CardDescription>{t('dashboard.charts.subjectDistribution.description')}</CardDescription>
           </CardHeader>
           <CardContent>
             {distributionLoading ? (
@@ -252,7 +259,7 @@ export default function LearningDashboard() {
               </ResponsiveContainer>
             ) : (
               <div className="h-64 flex items-center justify-center text-muted-foreground">
-                暂无数据
+                {t('common.noData')}
               </div>
             )}
           </CardContent>
@@ -261,8 +268,8 @@ export default function LearningDashboard() {
         {/* 掌握度分布 */}
         <Card>
           <CardHeader>
-            <CardTitle>掌握度分布</CardTitle>
-            <CardDescription>错题掌握情况统计</CardDescription>
+            <CardTitle>{t('dashboard.charts.masteryDistribution.title')}</CardTitle>
+            <CardDescription>{t('dashboard.charts.masteryDistribution.description')}</CardDescription>
           </CardHeader>
           <CardContent>
             {masteryLoading ? (
@@ -275,12 +282,12 @@ export default function LearningDashboard() {
                   <YAxis tick={{ fontSize: 12 }} />
                   <Tooltip />
                   <Legend />
-                  <Bar dataKey="count" name="题目数量" fill="#3b82f6" />
+                  <Bar dataKey="count" name={t('dashboard.charts.masteryDistribution.questionCount')} fill="#3b82f6" />
                 </BarChart>
               </ResponsiveContainer>
             ) : (
               <div className="h-64 flex items-center justify-center text-muted-foreground">
-                暂无数据
+                {t('common.noData')}
               </div>
             )}
           </CardContent>
@@ -289,8 +296,8 @@ export default function LearningDashboard() {
         {/* 薄弱知识点 */}
         <Card>
           <CardHeader>
-            <CardTitle>薄弱知识点</CardTitle>
-            <CardDescription>需要重点关注的知识点</CardDescription>
+            <CardTitle>{t('dashboard.charts.weakPoints.title')}</CardTitle>
+            <CardDescription>{t('dashboard.charts.weakPoints.description')}</CardDescription>
           </CardHeader>
           <CardContent>
             {weakPointsLoading ? (
@@ -313,7 +320,7 @@ export default function LearningDashboard() {
                       <div>
                         <p className="font-medium">{point.knowledgePoint}</p>
                         <p className="text-sm text-muted-foreground">
-                          错误 {point.errorCount} 次
+                          {t('dashboard.charts.weakPoints.errorCount', { count: point.errorCount })}
                         </p>
                       </div>
                     </div>
@@ -321,14 +328,14 @@ export default function LearningDashboard() {
                       <p className="text-sm font-medium text-red-600">
                         {point.masteryRate.toFixed(1)}%
                       </p>
-                      <p className="text-xs text-muted-foreground">掌握率</p>
+                      <p className="text-xs text-muted-foreground">{t('dashboard.charts.weakPoints.masteryRate')}</p>
                     </div>
                   </div>
                 ))}
               </div>
             ) : (
               <div className="h-64 flex items-center justify-center text-muted-foreground">
-                暂无数据
+                {t('common.noData')}
               </div>
             )}
           </CardContent>

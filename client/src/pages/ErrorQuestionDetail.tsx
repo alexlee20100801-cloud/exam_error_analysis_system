@@ -1,4 +1,5 @@
 import { useAuth } from "@/_core/hooks/useAuth";
+import { useTranslation } from "react-i18next";
 import DashboardLayout from "@/components/DashboardLayout";
 import { Button } from "@/components/ui/button";
 import { ErrorQuestionImage } from "@/components/LazyImage";
@@ -71,6 +72,7 @@ type DetailedAnalysis = {
 };
 
 export default function ErrorQuestionDetail() {
+  const { t } = useTranslation();
   const { user, loading: authLoading } = useAuth();
   const [, params] = useRoute("/error-questions/:id");
   const [, setLocation] = useLocation();
@@ -289,7 +291,7 @@ export default function ErrorQuestionDetail() {
         <div className="flex items-center justify-center min-h-[400px]">
           <div className="text-center">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
-            <p className="text-muted-foreground">加载中...</p>
+            <p className="text-muted-foreground">{t('common.loading')}</p>
           </div>
         </div>
       </DashboardLayout>
@@ -305,11 +307,11 @@ export default function ErrorQuestionDetail() {
         <div className="container py-8">
           <Alert>
             <AlertCircle className="h-4 w-4" />
-            <AlertDescription>错题不存在或已被删除</AlertDescription>
+            <AlertDescription>{t('errorQuestion.notExist')}</AlertDescription>
           </Alert>
           <Button onClick={() => setLocation("/error-questions")} className="mt-4">
             <ArrowLeft className="mr-2 h-4 w-4" />
-            返回错题本
+            {t('errorQuestion.backToList')}
           </Button>
         </div>
       </DashboardLayout>
@@ -322,30 +324,30 @@ export default function ErrorQuestionDetail() {
   };
 
   const difficultyMap = {
-    easy: { label: "简单", color: "bg-green-100 text-green-800" },
-    medium: { label: "中等", color: "bg-yellow-100 text-yellow-800" },
-    hard: { label: "困难", color: "bg-red-100 text-red-800" },
+    easy: { label: t('errorQuestion.difficulty.easy'), color: "bg-green-100 text-green-800" },
+    medium: { label: t('errorQuestion.difficulty.medium'), color: "bg-yellow-100 text-yellow-800" },
+    hard: { label: t('errorQuestion.difficulty.hard'), color: "bg-red-100 text-red-800" },
   };
 
   const subjectMap: Record<string, string> = {
-    chinese: "语文",
-    math: "数学",
-    english: "英语",
-    physics: "物理",
-    chemistry: "化学",
-    biology: "生物",
-    politics: "政治",
-    history: "历史",
-    geography: "地理",
+    chinese: t('errorQuestion.subjects.chinese'),
+    math: t('errorQuestion.subjects.math'),
+    english: t('errorQuestion.subjects.english'),
+    physics: t('errorQuestion.subjects.physics'),
+    chemistry: t('errorQuestion.subjects.chemistry'),
+    biology: t('errorQuestion.subjects.biology'),
+    politics: t('errorQuestion.subjects.politics'),
+    history: t('errorQuestion.subjects.history'),
+    geography: t('errorQuestion.subjects.geography'),
   };
 
   const gradeMap: Record<string, string> = {
-    junior1: "初一",
-    junior2: "初二",
-    junior3: "初三",
-    senior1: "高一",
-    senior2: "高二",
-    senior3: "高三",
+    junior1: t('errorQuestion.grades.junior1'),
+    junior2: t('errorQuestion.grades.junior2'),
+    junior3: t('errorQuestion.grades.junior3'),
+    senior1: t('errorQuestion.grades.senior1'),
+    senior2: t('errorQuestion.grades.senior2'),
+    senior3: t('errorQuestion.grades.senior3'),
   };
 
   return (
@@ -368,20 +370,20 @@ export default function ErrorQuestionDetail() {
               {swipeState.direction === "left" && hasNext && (
                 <>
                   <ChevronRight className="h-6 w-6" />
-                  <span className="text-sm font-medium">下一题</span>
+                  <span className="text-sm font-medium">{t('common.next')}</span>
                 </>
               )}
               {swipeState.direction === "right" && hasPrevious && (
                 <>
                   <ChevronLeft className="h-6 w-6" />
-                  <span className="text-sm font-medium">上一题</span>
+                  <span className="text-sm font-medium">{t('common.previous')}</span>
                 </>
               )}
               {swipeState.direction === "left" && !hasNext && (
-                <span className="text-sm font-medium">已是最后一题</span>
+                <span className="text-sm font-medium">{t('errorQuestion.switchToNext')}</span>
               )}
               {swipeState.direction === "right" && !hasPrevious && (
-                <span className="text-sm font-medium">已是第一题</span>
+                <span className="text-sm font-medium">{t('errorQuestion.switchToPrevious')}</span>
               )}
             </div>
           </div>
@@ -392,24 +394,24 @@ export default function ErrorQuestionDetail() {
             onClick={() => setLocation("/dashboard")} 
             className="hover:text-foreground transition-colors"
           >
-            首页
+            {t('nav.home')}
           </button>
           <span>/</span>
           <button 
             onClick={() => setLocation("/error-questions")} 
             className="hover:text-foreground transition-colors"
           >
-            错题本
+            {t('nav.errorQuestions')}
           </button>
           <span>/</span>
-          <span className="text-foreground font-medium">错题详情</span>
+          <span className="text-foreground font-medium">{t('errorQuestion.actions.viewDetail')}</span>
         </div>
 
         {/* 头部 */}
         <div className="mb-6">
           <div className="flex items-start justify-between gap-4 mb-4">
             <div className="flex-1">
-              <h1 className="text-3xl font-bold mb-3">{question.title || "错题详情"}</h1>
+              <h1 className="text-3xl font-bold mb-3">{question.title || t('errorQuestion.actions.viewDetail')}</h1>
               <div className="flex items-center gap-2 flex-wrap">
                 <Badge variant="outline" className="text-sm">
                   {subjectMap[question.subject]}
@@ -425,13 +427,13 @@ export default function ErrorQuestionDetail() {
                 {question.isMastered && (
                   <Badge className="bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400 text-sm">
                     <CheckCircle className="mr-1 h-3 w-3" />
-                    已掌握
+                    {t('errorQuestion.mastery.mastered')}
                   </Badge>
                 )}
                 {question.isAnalyzed && (
                   <Badge className="bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400 text-sm">
                     <Brain className="mr-1 h-3 w-3" />
-                    已分析
+                    {t('errorQuestion.detail.aiAnalysis')}
                   </Badge>
                 )}
               </div>
@@ -455,7 +457,7 @@ export default function ErrorQuestionDetail() {
               size="lg"
             >
               <Volume2 className="mr-2 h-4 w-4" />
-              {voiceLoading ? "生成中..." : showVoicePlayer ? "隐藏AI讲解" : "AI语音讲解"}
+              {voiceLoading ? t('common.loading') : showVoicePlayer ? t('voice.pauseExplanation') : t('errorQuestion.actions.voiceExplanation')}
             </Button>
             <Button
               variant="outline"
@@ -464,7 +466,7 @@ export default function ErrorQuestionDetail() {
               size="lg"
             >
               <Clock className="mr-2 h-4 w-4" />
-              {addToReviewMutation.isPending ? "添加中..." : "加入复习计划"}
+              {addToReviewMutation.isPending ? t('common.loading') : t('errorQuestion.actions.addToReview')}
             </Button>
             <Button
               onClick={handleDetailedAnalysis}
@@ -472,7 +474,7 @@ export default function ErrorQuestionDetail() {
               size="lg"
             >
               <Sparkles className="mr-2 h-4 w-4" />
-              {analyzeDetailedMutation.isPending ? "分析中..." : "AI深度分析"}
+              {analyzeDetailedMutation.isPending ? t('common.loading') : t('errorQuestion.actions.deepAnalysis')}
             </Button>
             <Button
               variant="default"
@@ -481,7 +483,7 @@ export default function ErrorQuestionDetail() {
               size="lg"
             >
               <Target className="mr-2 h-4 w-4" />
-              {generatePracticeMutation.isPending ? "生成中..." : "生成专项练习"}
+              {generatePracticeMutation.isPending ? t('common.loading') : t('errorQuestion.actions.generatePractice')}
             </Button>
             <Button
               variant="outline"
@@ -489,7 +491,7 @@ export default function ErrorQuestionDetail() {
               size="lg"
             >
               <Share2 className="mr-2 h-4 w-4" />
-              分享错题
+              {t('errorQuestion.actions.share')}
             </Button>
             <Button
               variant="destructive"
@@ -498,7 +500,7 @@ export default function ErrorQuestionDetail() {
               size="lg"
             >
               <Trash2 className="mr-2 h-4 w-4" />
-              删除错题
+              {t('errorQuestion.actions.delete')}
             </Button>
           </div>
 
@@ -506,15 +508,15 @@ export default function ErrorQuestionDetail() {
           <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
             <AlertDialogContent>
               <AlertDialogHeader>
-                <AlertDialogTitle>确认删除</AlertDialogTitle>
+                <AlertDialogTitle>{t('common.confirm')}</AlertDialogTitle>
                 <AlertDialogDescription>
-                  您确定要删除这道错题吗？此操作不可恢复，将同时删除相关的AI分析、练习记录等数据。
+                  {t('errorQuestion.deleteConfirm')}
                 </AlertDialogDescription>
               </AlertDialogHeader>
               <AlertDialogFooter>
-                <AlertDialogCancel>取消</AlertDialogCancel>
+                <AlertDialogCancel>{t('common.cancel')}</AlertDialogCancel>
                 <AlertDialogAction onClick={handleDelete} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
-                  确认删除
+                  {t('common.confirm')}
                 </AlertDialogAction>
               </AlertDialogFooter>
             </AlertDialogContent>
@@ -526,7 +528,7 @@ export default function ErrorQuestionDetail() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <BookOpen className="h-5 w-5" />
-              题目内容
+              {t('errorQuestion.detail.content')}
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
