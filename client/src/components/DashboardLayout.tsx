@@ -87,6 +87,9 @@ const toolsMenuGroup: MenuGroup = {
     { id: "reminders", icon: Bell, label: "学习提醒", path: "/reminders" },
     { id: "learning-path", icon: Route, label: "学习路径", path: "/learning-path" },
     { id: "video", icon: Video, label: "视频学习", path: "/videos" },
+    { id: "parent-binding", icon: Users, label: "家长绑定", path: "/parent-binding" },
+    { id: "export-template", icon: Folder, label: "导出模板", path: "/export-template-management" },
+    { id: "ocr-settings", icon: Crop, label: "OCR设置", path: "/ocr-settings" },
   ]
 };
 
