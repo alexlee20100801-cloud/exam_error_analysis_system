@@ -353,9 +353,9 @@ export const initNotificationService = (): void => {
 
 // 测试通知功能
 export const testNotification = async (
-  language: 'zh-CN' | 'en' = 'zh-CN'
+  language: 'zh-CN' | 'en' | 'ja' | 'ko' = 'zh-CN'
 ): Promise<boolean> => {
-  const messages = {
+  const messages: Record<string, { title: string; body: string }> = {
     'zh-CN': {
       title: '测试通知',
       body: '如果您看到这条消息，说明通知功能正常工作！',
@@ -364,9 +364,17 @@ export const testNotification = async (
       title: 'Test Notification',
       body: 'If you see this message, notifications are working correctly!',
     },
+    'ja': {
+      title: 'テスト通知',
+      body: 'このメッセージが表示されれば、通知機能は正常に動作しています！',
+    },
+    'ko': {
+      title: '테스트 알림',
+      body: '이 메시지가 보이면 알림 기능이 정상적으로 작동하고 있습니다!',
+    },
   };
 
-  const msg = messages[language];
+  const msg = messages[language] || messages['zh-CN'];
 
   return sendLocalNotification({
     title: msg.title,
