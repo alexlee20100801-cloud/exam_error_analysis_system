@@ -115,6 +115,8 @@ import { exportTemplatesEnhancedRouter } from "./routers/exportTemplatesEnhanced
 import { parentNotificationRouter } from "./routers/parentNotification";
 import { ocrEnhancedRouter } from "./routers/ocrEnhanced";
 import { notificationServiceConfigRouter } from "./routers/notificationServiceConfig";
+import { userNotificationHistoryRouter } from "./routers/userNotificationHistory";
+import { reviewReminderSchedulerRouter } from "./routers/reviewReminderScheduler";
 
 export const appRouter = router({
   system: systemRouter,
@@ -438,6 +440,12 @@ export const appRouter = router({
   
   // 通知服务配置
   notificationService: notificationServiceConfigRouter,
+  
+  // 用户通知历史
+  userNotificationHistory: userNotificationHistoryRouter,
+  
+  // 复习提醒调度器
+  reviewReminderScheduler: reviewReminderSchedulerRouter,
 });
 
 export type AppRouter = typeof appRouter;

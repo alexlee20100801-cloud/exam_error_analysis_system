@@ -4,11 +4,15 @@ import LanguageDetector from 'i18next-browser-languagedetector';
 
 import zhCN from './locales/zh-CN.json';
 import en from './locales/en.json';
+import ja from './locales/ja.json';
+import ko from './locales/ko.json';
 
 // 支持的语言列表
 export const supportedLanguages = [
   { code: 'zh-CN', name: '简体中文', nativeName: '简体中文' },
   { code: 'en', name: 'English', nativeName: 'English' },
+  { code: 'ja', name: '日本語', nativeName: '日本語' },
+  { code: 'ko', name: '한국어', nativeName: '한국어' },
 ] as const;
 
 export type SupportedLanguage = typeof supportedLanguages[number]['code'];
@@ -17,6 +21,8 @@ export type SupportedLanguage = typeof supportedLanguages[number]['code'];
 const resources = {
   'zh-CN': { translation: zhCN },
   'en': { translation: en },
+  'ja': { translation: ja },
+  'ko': { translation: ko },
 };
 
 // 浏览器语言映射表 - 将各种语言变体映射到支持的语言
@@ -40,6 +46,12 @@ const languageMapping: Record<string, SupportedLanguage> = {
   'en-IE': 'en',
   'en-ZA': 'en',
   'en-IN': 'en',
+  // 日语变体
+  'ja': 'ja',
+  'ja-JP': 'ja',
+  // 韩语变体
+  'ko': 'ko',
+  'ko-KR': 'ko',
 };
 
 // 自定义语言检测函数 - 从浏览器语言获取最佳匹配
