@@ -1,0 +1,1 @@
+ALTER TABLE `scheduled_task_logs` MODIFY COLUMN `task_type` enum('performance_evaluation','weekly_report_generation','alert_check','cache_warmup','ab_test_decision','cleanup') NOT NULL;

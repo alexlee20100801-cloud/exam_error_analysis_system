@@ -11,6 +11,7 @@ import {
   type NewAlertNotificationLog
 } from "../drizzle/schema";
 import { notifyOwner } from "./_core/notification";
+import { sendTaskAlertEmail } from "./services/emailNotificationService";
 
 const db = getDb();
 
@@ -348,12 +349,26 @@ export async function sendAlertNotification(alertId: number, config: {
         });
       }
       
-      // 这里可以集成实际的邮件发送服务
-      // 目前使用 notifyOwner 作为替代
+      // 使用SMTP邮件服务发送告警邮件
+      const emailResult = await sendTaskAlertEmail(config.emailRecipients, {
+        taskName: alert.taskName,
+        alertType: alert.alertType,
+        severity: alert.severity as "low" | "medium" | "high" | "critical",
+        message: alert.alertMessage,
+        alertTime: new Date(alert.alertTime),
+        consecutiveFailures: alert.consecutiveFailures || undefined,
+        executionDuration: alert.executionDuration || undefined,
+      });
+      
+      // 同时发送平台通知作为备份
       await notifyOwner({
         title: `[${alert.severity.toUpperCase()}] 定时任务告警: ${alert.taskName}`,
         content: alert.alertMessage,
       });
+      
+      if (!emailResult.success) {
+        console.warn(`[TaskAlert] 邮件发送部分失败:`, emailResult.errors);
+      }
       
       // 更新告警记录
       await db

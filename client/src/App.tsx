@@ -96,6 +96,9 @@ import ParentBinding from "@/pages/ParentBinding";
 import OcrSettings from "@/pages/OcrSettings";
 import NotificationServiceSettings from "@/pages/NotificationServiceSettings";
 import NotificationHistory from "@/pages/NotificationHistory";
+import TerminologyManagement from "@/pages/TerminologyManagement";
+import AlertConfigManagement from "@/pages/AlertConfigManagement";
+import ExportHistoryManagement from "@/pages/ExportHistoryManagement";
 
 function Router() {
   return (
@@ -190,6 +193,9 @@ function Router() {
       <Route path="/ocr-settings" component={OcrSettings} />
       <Route path="/notification-service-settings" component={NotificationServiceSettings} />
       <Route path="/notification-history" component={NotificationHistory} />
+      <Route path="/admin/terminology" component={TerminologyManagement} />
+      <Route path="/admin/alert-config" component={AlertConfigManagement} />
+      <Route path="/admin/export-history" component={ExportHistoryManagement} />
       <Route component={NotFound} />
     </Switch>
   );

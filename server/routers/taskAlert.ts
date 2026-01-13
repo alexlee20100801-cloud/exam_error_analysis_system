@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { router, protectedProcedure, publicProcedure } from "../_core/trpc";
 import * as taskAlertService from "../taskAlertService";
+import { testEmailConfiguration, sendTaskAlertEmail } from "../services/emailNotificationService";
 
 export const taskAlertRouter = router({
   // ==================== 告警配置管理 ====================
@@ -173,5 +174,47 @@ export const taskAlertRouter = router({
     }).optional())
     .query(async ({ input }) => {
       return await taskAlertService.getAlertStats(input?.days || 7);
+    }),
+  
+  // ==================== 邮件配置管理 ====================
+  
+  // 测试SMTP配置
+  testSmtpConfig: protectedProcedure
+    .mutation(async () => {
+      const isValid = await testEmailConfiguration();
+      return {
+        success: isValid,
+        message: isValid ? "SMTP配置有效" : "SMTP配置无效或未配置",
+      };
+    }),
+  
+  // 发送测试告警邮件
+  sendTestAlertEmail: protectedProcedure
+    .input(z.object({
+      recipients: z.array(z.string().email()).min(1),
+    }))
+    .mutation(async ({ input }) => {
+      const result = await sendTaskAlertEmail(input.recipients, {
+        taskName: "测试任务",
+        alertType: "error",
+        severity: "low",
+        message: "这是一封测试告警邮件，用于验证SMTP配置是否正确。",
+        alertTime: new Date(),
+      });
+      return result;
+    }),
+  
+  // 获取SMTP配置状态
+  getSmtpStatus: protectedProcedure
+    .query(async () => {
+      const hasConfig = !!(process.env.SMTP_HOST && process.env.SMTP_USER && process.env.SMTP_PASS);
+      return {
+        configured: hasConfig,
+        host: process.env.SMTP_HOST || null,
+        port: process.env.SMTP_PORT || "587",
+        secure: process.env.SMTP_SECURE === "true",
+        fromEmail: process.env.SMTP_FROM || process.env.SMTP_USER || null,
+        fromName: process.env.SMTP_FROM_NAME || "错题分析学习系统",
+      };
     }),
 });

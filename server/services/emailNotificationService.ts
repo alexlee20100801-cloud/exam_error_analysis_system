@@ -206,6 +206,226 @@ export async function sendEmailVerification(
 }
 
 /**
+ * 发送任务告警邮件
+ */
+export async function sendTaskAlertEmail(
+  recipients: string[],
+  alertInfo: {
+    taskName: string;
+    alertType: string;
+    severity: "low" | "medium" | "high" | "critical";
+    message: string;
+    alertTime: Date;
+    consecutiveFailures?: number;
+    executionDuration?: number;
+  }
+): Promise<{ success: boolean; sentCount: number; errors: string[] }> {
+  const results = {
+    success: false,
+    sentCount: 0,
+    errors: [] as string[],
+  };
+
+  const severityColors: Record<string, string> = {
+    low: "#3b82f6",
+    medium: "#f59e0b",
+    high: "#f97316",
+    critical: "#ef4444",
+  };
+
+  const severityLabels: Record<string, string> = {
+    low: "低",
+    medium: "中",
+    high: "高",
+    critical: "严重",
+  };
+
+  const alertTypeLabels: Record<string, string> = {
+    consecutive_failure: "连续失败",
+    timeout: "执行超时",
+    error: "执行错误",
+    partial_failure: "部分失败",
+  };
+
+  const subject = `[${severityLabels[alertInfo.severity]}] 定时任务告警: ${alertInfo.taskName}`;
+  const html = `
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <meta charset="utf-8">
+      <style>
+        body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+        .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+        .header { background: ${severityColors[alertInfo.severity]}; color: white; padding: 30px; text-align: center; border-radius: 10px 10px 0 0; }
+        .content { background: #f9f9f9; padding: 30px; border-radius: 0 0 10px 10px; }
+        .alert-card { background: white; padding: 20px; border-radius: 8px; margin: 20px 0; box-shadow: 0 2px 4px rgba(0,0,0,0.1); border-left: 4px solid ${severityColors[alertInfo.severity]}; }
+        .alert-title { font-size: 18px; font-weight: bold; color: ${severityColors[alertInfo.severity]}; margin-bottom: 10px; }
+        .alert-detail { margin: 10px 0; padding: 10px; background: #f0f0f0; border-radius: 5px; }
+        .severity-badge { display: inline-block; padding: 4px 12px; background: ${severityColors[alertInfo.severity]}; color: white; border-radius: 4px; font-size: 12px; font-weight: bold; }
+        .footer { text-align: center; margin-top: 30px; color: #999; font-size: 12px; }
+        .button { display: inline-block; padding: 12px 30px; background: #667eea; color: white; text-decoration: none; border-radius: 5px; margin: 20px 0; }
+      </style>
+    </head>
+    <body>
+      <div class="container">
+        <div class="header">
+          <h1>⚠️ 定时任务告警</h1>
+          <p>系统检测到任务执行异常</p>
+        </div>
+        <div class="content">
+          <div class="alert-card">
+            <div class="alert-title">
+              <span class="severity-badge">${severityLabels[alertInfo.severity]}</span>
+              ${alertInfo.taskName}
+            </div>
+            <div class="alert-detail">
+              <strong>📋 告警类型：</strong><br>
+              ${alertTypeLabels[alertInfo.alertType] || alertInfo.alertType}
+            </div>
+            <div class="alert-detail">
+              <strong>📝 告警信息：</strong><br>
+              ${alertInfo.message}
+            </div>
+            <div class="alert-detail">
+              <strong>⏰ 告警时间：</strong><br>
+              ${alertInfo.alertTime.toLocaleString("zh-CN", { timeZone: "Asia/Shanghai" })}
+            </div>
+            ${alertInfo.consecutiveFailures ? `
+            <div class="alert-detail">
+              <strong>🔄 连续失败次数：</strong><br>
+              ${alertInfo.consecutiveFailures} 次
+            </div>
+            ` : ""}
+            ${alertInfo.executionDuration ? `
+            <div class="alert-detail">
+              <strong>⏱️ 执行时长：</strong><br>
+              ${Math.round(alertInfo.executionDuration / 1000)} 秒
+            </div>
+            ` : ""}
+          </div>
+          <p style="text-align: center;">
+            <a href="${process.env.VITE_APP_URL || "https://example.com"}/admin/alert-config" class="button">
+              查看告警详情
+            </a>
+          </p>
+          <p style="color: #666; font-size: 14px;">
+            💡 提示：请及时处理告警，确保系统正常运行。
+          </p>
+        </div>
+        <div class="footer">
+          <p>这是一封系统自动发送的邮件，请勿直接回复</p>
+          <p>如需修改告警配置，请在系统管理后台进行设置</p>
+        </div>
+      </div>
+    </body>
+    </html>
+  `;
+
+  for (const recipient of recipients) {
+    try {
+      const sent = await sendEmail(recipient, subject, html);
+      if (sent) {
+        results.sentCount++;
+      } else {
+        results.errors.push(`发送到 ${recipient} 失败: SMTP未配置`);
+      }
+    } catch (error: any) {
+      results.errors.push(`发送到 ${recipient} 失败: ${error.message}`);
+    }
+  }
+
+  results.success = results.sentCount > 0;
+  return results;
+}
+
+/**
+ * 发送导出完成通知邮件
+ */
+export async function sendExportCompletedEmail(
+  email: string,
+  exportInfo: {
+    fileName: string;
+    exportType: string;
+    fileSize: number;
+    downloadUrl: string;
+    expiresAt: Date;
+  }
+): Promise<boolean> {
+  const exportTypeLabels: Record<string, string> = {
+    error_questions: "错题导出",
+    learning_report: "学习报告",
+    exam_paper: "试卷导出",
+    statistics: "统计数据",
+    custom: "自定义导出",
+  };
+
+  const formatFileSize = (bytes: number) => {
+    if (bytes < 1024) return `${bytes} B`;
+    if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
+    return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+  };
+
+  const subject = `📦 导出完成: ${exportInfo.fileName}`;
+  const html = `
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <meta charset="utf-8">
+      <style>
+        body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+        .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+        .header { background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white; padding: 30px; text-align: center; border-radius: 10px 10px 0 0; }
+        .content { background: #f9f9f9; padding: 30px; border-radius: 0 0 10px 10px; }
+        .export-card { background: white; padding: 20px; border-radius: 8px; margin: 20px 0; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .export-title { font-size: 18px; font-weight: bold; color: #10b981; margin-bottom: 10px; }
+        .export-detail { margin: 10px 0; padding: 10px; background: #f0f0f0; border-radius: 5px; }
+        .footer { text-align: center; margin-top: 30px; color: #999; font-size: 12px; }
+        .button { display: inline-block; padding: 12px 30px; background: #10b981; color: white; text-decoration: none; border-radius: 5px; margin: 20px 0; }
+      </style>
+    </head>
+    <body>
+      <div class="container">
+        <div class="header">
+          <h1>✅ 导出完成</h1>
+          <p>您的文件已准备就绪</p>
+        </div>
+        <div class="content">
+          <div class="export-card">
+            <div class="export-title">${exportInfo.fileName}</div>
+            <div class="export-detail">
+              <strong>📋 导出类型：</strong><br>
+              ${exportTypeLabels[exportInfo.exportType] || exportInfo.exportType}
+            </div>
+            <div class="export-detail">
+              <strong>📦 文件大小：</strong><br>
+              ${formatFileSize(exportInfo.fileSize)}
+            </div>
+            <div class="export-detail">
+              <strong>⏰ 过期时间：</strong><br>
+              ${exportInfo.expiresAt.toLocaleString("zh-CN", { timeZone: "Asia/Shanghai" })}
+            </div>
+          </div>
+          <p style="text-align: center;">
+            <a href="${exportInfo.downloadUrl}" class="button">
+              立即下载
+            </a>
+          </p>
+          <p style="color: #f59e0b; font-size: 14px;">
+            ⚠️ 注意：文件将在过期后自动删除，请及时下载保存。
+          </p>
+        </div>
+        <div class="footer">
+          <p>这是一封系统自动发送的邮件，请勿直接回复</p>
+        </div>
+      </div>
+    </body>
+    </html>
+  `;
+
+  return await sendEmail(email, subject, html);
+}
+
+/**
  * 测试邮件配置
  */
 export async function testEmailConfiguration(): Promise<boolean> {

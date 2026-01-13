@@ -14,6 +14,7 @@ import {
   getCrawlerPerformanceMetricsHistory,
 } from "./optimizationService";
 import { notifyOwner } from "./_core/notification";
+import { batchCleanupExpiredFiles, getCleanupStats } from "./exportHistoryService";
 
 // 存储所有定时任务
 // @ts-ignore
@@ -44,6 +45,13 @@ export function initializeAutomationScheduler() {
     "alert-check",
     "0 * * * *",
     alertCheckTask
+  );
+
+  // 每天凌晨3点清理过期导出文件
+  scheduleTask(
+    "export-cleanup",
+    "0 3 * * *",
+    exportCleanupTask
   );
 
   console.log("[Automation Scheduler] All tasks scheduled successfully");
@@ -102,12 +110,13 @@ function scheduleTask(
 /**
  * 获取任务类型
  */
-function getTaskType(taskName: string): "performance_evaluation" | "weekly_report_generation" | "alert_check" | "cache_warmup" | "ab_test_decision" {
+function getTaskType(taskName: string): "performance_evaluation" | "weekly_report_generation" | "alert_check" | "cache_warmup" | "ab_test_decision" | "cleanup" {
   if (taskName.includes("performance")) return "performance_evaluation";
   if (taskName.includes("report")) return "weekly_report_generation";
   if (taskName.includes("alert")) return "alert_check";
   if (taskName.includes("warmup")) return "cache_warmup";
   if (taskName.includes("ab-test")) return "ab_test_decision";
+  if (taskName.includes("cleanup")) return "cleanup";
   return "performance_evaluation";
 }
 
@@ -258,6 +267,45 @@ async function alertCheckTask() {
 }
 
 /**
+ * 导出文件清理任务
+ * 每天自动清理过期的导出文件
+ */
+async function exportCleanupTask() {
+  console.log("[Export Cleanup] Starting export file cleanup...");
+  
+  // 获取清理前的统计
+  const beforeStats = await getCleanupStats();
+  console.log(`[Export Cleanup] Before cleanup: ${beforeStats.pendingCleanup} files pending cleanup`);
+  
+  // 执行清理，每次最多清理100个文件
+  const result = await batchCleanupExpiredFiles(100);
+  
+  console.log(`[Export Cleanup] Cleanup completed: ${result.success} success, ${result.failed} failed`);
+  
+  if (result.errors.length > 0) {
+    console.warn("[Export Cleanup] Cleanup errors:", result.errors);
+  }
+  
+  // 如果清理了较多文件，发送通知
+  if (result.success >= 10) {
+    await notifyOwner({
+      title: "导出文件清理完成",
+      content: `已清理 ${result.success} 个过期导出文件，失败 ${result.failed} 个。`,
+    });
+  }
+  
+  // 如果有失败的清理，发送告警
+  if (result.failed > 0) {
+    await notifyOwner({
+      title: "导出文件清理部分失败",
+      content: `清理过程中有 ${result.failed} 个文件清理失败，请检查系统日志。`,
+    });
+  }
+  
+  console.log("[Export Cleanup] Export file cleanup completed");
+}
+
+/**
  * 停止所有定时任务
  */
 export function stopAllScheduledTasks() {
@@ -288,6 +336,9 @@ export async function triggerTask(taskName: string) {
       break;
     case "alert-check":
       await alertCheckTask();
+      break;
+    case "export-cleanup":
+      await exportCleanupTask();
       break;
     default:
       throw new Error(`Unknown task: ${taskName}`);

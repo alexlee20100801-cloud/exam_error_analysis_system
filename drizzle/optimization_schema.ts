@@ -126,7 +126,8 @@ export const scheduledTaskLogs = mysqlTable("scheduled_task_logs", {
     "weekly_report_generation",
     "alert_check",
     "cache_warmup",
-    "ab_test_decision"
+    "ab_test_decision",
+    "cleanup"
   ]).notNull(), // 任务类型
   executionTime: timestamp("execution_time").notNull().defaultNow(), // 执行时间
   status: mysqlEnum("status", ["success", "failed", "partial"]).notNull(), // 执行状态
