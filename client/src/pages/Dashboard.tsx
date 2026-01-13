@@ -13,6 +13,15 @@ export default function Dashboard() {
   const { user, loading, isAuthenticated } = useAuth();
   const [, setLocation] = useLocation();
 
+  const { data: errorQuestions, isLoading: loadingQuestions } = trpc.errorQuestions.list.useQuery({ limit: 10 });
+  const { data: progress, isLoading: loadingProgress } = trpc.practice.getProgress.useQuery();
+  const { data: reviewStats, isLoading: loadingReview } = trpc.review.getStatistics.useQuery();
+  const { data: achievementStats } = trpc.achievements.getStats.useQuery();
+  const { data: streakData } = trpc.achievements.getCurrentStreak.useQuery();
+  const { data: fullStats } = trpc.stats.getFullStats.useQuery();
+  const { data: favoriteData } = trpc.errorQuestions.getFavoriteCount.useQuery();
+  const { data: reminderStats } = trpc.reviewReminders.getStats.useQuery();
+
   useEffect(() => {
     if (!loading && !isAuthenticated) {
       setLocation("/");
@@ -33,15 +42,6 @@ export default function Dashboard() {
   if (!isAuthenticated) {
     return null;
   }
-
-  const { data: errorQuestions, isLoading: loadingQuestions } = trpc.errorQuestions.list.useQuery({ limit: 10 });
-  const { data: progress, isLoading: loadingProgress } = trpc.practice.getProgress.useQuery();
-  const { data: reviewStats, isLoading: loadingReview } = trpc.review.getStatistics.useQuery();
-  const { data: achievementStats } = trpc.achievements.getStats.useQuery();
-  const { data: streakData } = trpc.achievements.getCurrentStreak.useQuery();
-  const { data: fullStats } = trpc.stats.getFullStats.useQuery();
-  const { data: favoriteData } = trpc.errorQuestions.getFavoriteCount.useQuery();
-  const { data: reminderStats } = trpc.reviewReminders.getStats.useQuery();
 
   const totalQuestions = errorQuestions?.length || 0;
   const analyzedQuestions = errorQuestions?.filter(q => q.isAnalyzed).length || 0;
