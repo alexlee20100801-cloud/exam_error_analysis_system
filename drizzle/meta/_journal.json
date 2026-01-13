@@ -449,6 +449,20 @@
       "when": 1768150188020,
       "tag": "0067_whole_professor_monster",
       "breakpoints": true
+    },
+    {
+      "idx": 68,
+      "version": "5",
+      "when": 1768286904596,
+      "tag": "0068_optimal_reptil",
+      "breakpoints": true
+    },
+    {
+      "idx": 69,
+      "version": "5",
+      "when": 1768288125880,
+      "tag": "0069_loving_johnny_blaze",
+      "breakpoints": true
     }
   ]
 }

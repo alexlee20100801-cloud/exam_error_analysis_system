@@ -98,6 +98,35 @@ export {
   type NewDeduplicationConfig
 } from "./deduplication_schema";
 
+// 导入教育术语对照表 schema
+export {
+  educationTerminology,
+  terminologyReviewHistory,
+  terminologyValidation,
+  type EducationTerminology,
+  type NewEducationTerminology,
+  type TerminologyReviewHistory,
+  type NewTerminologyReviewHistory,
+  type TerminologyValidation,
+  type NewTerminologyValidation
+} from "./education_terminology_schema";
+
+// 导入定时任务告警 schema
+export {
+  taskAlertConfigs,
+  taskAlerts,
+  taskExecutionStatus,
+  alertNotificationLogs,
+  type TaskAlertConfig,
+  type NewTaskAlertConfig,
+  type TaskAlert,
+  type NewTaskAlert,
+  type TaskExecutionStatus,
+  type NewTaskExecutionStatus,
+  type AlertNotificationLog,
+  type NewAlertNotificationLog
+} from "./task_alert_schema";
+
 // 导入增强版导出模板 schema
 export {
   exportTemplatesEnhanced,

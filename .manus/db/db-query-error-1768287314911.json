@@ -1,0 +1,8 @@
+{
+  "query": "ALTER TABLE `export_history_records` \nADD COLUMN IF NOT EXISTS `file_name` varchar(255) AFTER `file_size`,\nADD COLUMN IF NOT EXISTS `download_count` int NOT NULL DEFAULT 0 AFTER `processing_time_ms`,\nADD COLUMN IF NOT EXISTS `last_download_at` timestamp NULL AFTER `download_count`,\nADD COLUMN IF NOT EXISTS `expires_at` timestamp NULL AFTER `last_download_at`,\nADD COLUMN IF NOT EXISTS `is_expired` tinyint(1) NOT NULL DEFAULT 0 AFTER `expires_at`,\nADD COLUMN IF NOT EXISTS `cleaned_at` timestamp NULL AFTER `is_expired`;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway03.us-east-1.prod.aws.tidbcloud.com --port 4000 --user Lfr9xqjx7LpxUD9.1efa314e7813 --database Yh4Z4ZSitSFdPWYxtKkkQS --execute ALTER TABLE `export_history_records` \nADD COLUMN IF NOT EXISTS `file_name` varchar(255) AFTER `file_size`,\nADD COLUMN IF NOT EXISTS `download_count` int NOT NULL DEFAULT 0 AFTER `processing_time_ms`,\nADD COLUMN IF NOT EXISTS `last_download_at` timestamp NULL AFTER `download_count`,\nADD COLUMN IF NOT EXISTS `expires_at` timestamp NULL AFTER `last_download_at`,\nADD COLUMN IF NOT EXISTS `is_expired` tinyint(1) NOT NULL DEFAULT 0 AFTER `expires_at`,\nADD COLUMN IF NOT EXISTS `cleaned_at` timestamp NULL AFTER `is_expired`;",
+  "returncode": 1,
+  "logs": [
+    "ERROR 1054 (42S22) at line 1: Unknown column 'download_count' in 'export_history_records'"
+  ]
+}

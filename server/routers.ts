@@ -117,6 +117,9 @@ import { ocrEnhancedRouter } from "./routers/ocrEnhanced";
 import { notificationServiceConfigRouter } from "./routers/notificationServiceConfig";
 import { userNotificationHistoryRouter } from "./routers/userNotificationHistory";
 import { reviewReminderSchedulerRouter } from "./routers/reviewReminderScheduler";
+import { terminologyManagementRouter } from "./routers/terminologyManagement";
+import { taskAlertRouter } from "./routers/taskAlert";
+import { exportHistoryRouter } from "./routers/exportHistory";
 
 export const appRouter = router({
   system: systemRouter,
@@ -446,6 +449,15 @@ export const appRouter = router({
   
   // 复习提醒调度器
   reviewReminderScheduler: reviewReminderSchedulerRouter,
+  
+  // 教育术语管理
+  terminologyManagement: terminologyManagementRouter,
+  
+  // 定时任务告警
+  taskAlert: taskAlertRouter,
+  
+  // 导出历史记录
+  exportHistory: exportHistoryRouter,
 });
 
 export type AppRouter = typeof appRouter;

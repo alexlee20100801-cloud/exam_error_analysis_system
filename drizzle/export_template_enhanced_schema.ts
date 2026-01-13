@@ -167,6 +167,7 @@ export const exportHistoryRecords = mysqlTable('export_history_records', {
   fileUrl: varchar('file_url', { length: 500 }),
   fileKey: varchar('file_key', { length: 500 }),
   fileSize: int('file_size'), // 字节
+  fileName: varchar('file_name', { length: 255 }), // 文件名
   
   // 导出配置快照（保存当时的配置）
   configSnapshot: json('config_snapshot'),
@@ -178,12 +179,23 @@ export const exportHistoryRecords = mysqlTable('export_history_records', {
   // 处理时间
   processingTimeMs: int('processing_time_ms'),
   
+  // 下载记录
+  downloadCount: int('download_count').default(0).notNull(),
+  lastDownloadAt: timestamp('last_download_at'),
+  
+  // 过期清理相关
+  expiresAt: timestamp('expires_at'), // 文件过期时间
+  isExpired: boolean('is_expired').default(false).notNull(), // 是否已过期
+  cleanedAt: timestamp('cleaned_at'), // 文件被清理的时间
+  
   createdAt: timestamp('created_at').defaultNow().notNull(),
 }, (table) => ({
   userIdIdx: index('user_id_idx').on(table.userId),
   templateIdIdx: index('template_id_idx').on(table.templateId),
   statusIdx: index('status_idx').on(table.status),
   createdAtIdx: index('created_at_idx').on(table.createdAt),
+  expiresAtIdx: index('expires_at_idx').on(table.expiresAt),
+  isExpiredIdx: index('is_expired_idx').on(table.isExpired),
 }));
 
 // 类型导出
