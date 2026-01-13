@@ -132,6 +132,7 @@ const adminMenuGroup: MenuGroup = {
     { id: "paper-algorithm", icon: Sparkles, label: "组卷算法优化", path: "/admin/paper-algorithm" },
     { id: "ip-blacklist", icon: Shield, label: "IP黑名单管理", path: "/admin/ip-manager" },
     { id: "admin-management", icon: UserCog, label: "管理员管理", path: "/admin/admin-management" },
+    { id: "monitoring", icon: Activity, label: "监控仪表板", path: "/admin/monitoring" },
   ]
 };
 

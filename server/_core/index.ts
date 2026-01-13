@@ -35,6 +35,12 @@ async function startServer() {
   // Configure body parser with larger size limit for file uploads
   app.use(express.json({ limit: "50mb" }));
   app.use(express.urlencoded({ limit: "50mb", extended: true }));
+  
+  // Import and register error logging middleware
+  const { performanceMonitoringMiddleware, requestLoggingMiddleware } = await import("./errorLoggingMiddleware");
+  app.use(performanceMonitoringMiddleware);
+  app.use(requestLoggingMiddleware);
+  
   // OAuth callback under /api/oauth/callback
   registerOAuthRoutes(app);
   
