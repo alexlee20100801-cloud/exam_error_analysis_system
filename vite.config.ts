@@ -4,10 +4,7 @@ import react from "@vitejs/plugin-react";
 import path from "path";
 import { defineConfig } from "vite";
 import { vitePluginManusRuntime } from "vite-plugin-manus-runtime";
-
-
 const plugins = [react(), tailwindcss(), jsxLocPlugin(), vitePluginManusRuntime()];
-
 export default defineConfig({
   plugins,
   resolve: {
@@ -46,9 +43,10 @@ export default defineConfig({
     },
     hmr: {
       protocol: "wss",
-      host: undefined, // 让浏览器自动使用当前 URL 的主机名
+      host: undefined,
       port: 443,
+      timeout: 60000,
     },
   },
 });
-// Cache bust: 1768123900
+// Cache bust: 1768310400

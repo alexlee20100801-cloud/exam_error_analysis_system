@@ -2,7 +2,7 @@
  * 统计服务 - 按板块和学科统计错题数据
  */
 
-import { eq, and, count } from "drizzle-orm";
+import { eq, and, count, sql } from "drizzle-orm";
 import { errorQuestions } from "../drizzle/schema";
 import { getDb } from "./db";
 import type { SchoolLevel, Subject } from "../shared/subjects";
@@ -44,17 +44,15 @@ export async function getErrorQuestionCountByLevel(userId: number) {
  * 按学科统计错题数量
  */
 export async function getErrorQuestionCountBySubject(
-  userId: string,
+  userId: number,
   schoolLevel?: SchoolLevel
 ) {
   const db = await getDb();
   if (!db) return {};
 
-  // @ts-ignore
   const conditions = [eq(errorQuestions.userId, userId)];
   if (schoolLevel) {
-    // @ts-ignore
-    conditions.push(sql`${errorQuestions.schoolLevel} = ${schoolLevel}`);
+    conditions.push(eq(errorQuestions.schoolLevel, schoolLevel));
   }
 
   const results = await db

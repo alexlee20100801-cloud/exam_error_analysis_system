@@ -2906,3 +2906,17 @@ if (error.knowledgePointIds) {
 - [x] 实现告警规则测试逻辑
 - [x] 验证邮件通知功能
 - [x] 验证消息通知功能
+
+
+## 第二十二阶段：错误修复 (2026-01-13)
+
+### sql is not defined 错误修复
+- [x] 查找使用未定义sql变量的代码位置
+- [x] 检查Dashboard相关的API调用
+- [x] 修复sql变量定义问题
+- [x] 验证API调用正常
+
+### Vite WebSocket 连接错误修复
+- [x] 检查Vite HMR配置
+- [x] 配置正确的WebSocket连接地址
+- [x] 验证开发服务器正常运行

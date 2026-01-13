@@ -1,12 +1,39 @@
 import DashboardLayout from "@/components/DashboardLayout";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { trpc } from "@/lib/trpc";
+import { useAuth } from "@/_core/hooks/useAuth";
 import { BookOpen, Brain, Target, TrendingUp, Calendar, Video, Trophy, Flame, GraduationCap, BookMarked, Play, BarChart3, AlertCircle, Star, Bell, Clock } from "lucide-react";
 import { SCHOOL_LEVELS, SUBJECTS } from "../../../shared/subjects";
 import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
+import { useEffect } from "react";
+import { useLocation } from "wouter";
 
 export default function Dashboard() {
+  const { user, loading, isAuthenticated } = useAuth();
+  const [, setLocation] = useLocation();
+
+  useEffect(() => {
+    if (!loading && !isAuthenticated) {
+      setLocation("/");
+    }
+  }, [isAuthenticated, loading, setLocation]);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
+          <p className="mt-4 text-muted-foreground">加载中...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!isAuthenticated) {
+    return null;
+  }
+
   const { data: errorQuestions, isLoading: loadingQuestions } = trpc.errorQuestions.list.useQuery({ limit: 10 });
   const { data: progress, isLoading: loadingProgress } = trpc.practice.getProgress.useQuery();
   const { data: reviewStats, isLoading: loadingReview } = trpc.review.getStatistics.useQuery();
