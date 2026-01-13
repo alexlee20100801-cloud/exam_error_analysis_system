@@ -119,15 +119,26 @@ export default function LoginPage() {
               )}
             </Button>
 
-            <div className="text-center text-sm">
-              <span className="text-gray-600">还没有账户？</span>
-              <button
-                type="button"
-                onClick={() => setLocation("/register")}
-                className="ml-1 text-blue-600 hover:text-blue-700 font-medium"
-              >
-                立即注册
-              </button>
+            <div className="space-y-2">
+              <div className="text-right">
+                <button
+                  type="button"
+                  onClick={() => setLocation("/forgot-password")}
+                  className="text-sm text-blue-600 hover:text-blue-700 font-medium"
+                >
+                  忘记密码？
+                </button>
+              </div>
+              <div className="text-center text-sm">
+                <span className="text-gray-600">还没有账户？</span>
+                <button
+                  type="button"
+                  onClick={() => setLocation("/register")}
+                  className="ml-1 text-blue-600 hover:text-blue-700 font-medium"
+                >
+                  立即注册
+                </button>
+              </div>
             </div>
           </form>
         </CardContent>

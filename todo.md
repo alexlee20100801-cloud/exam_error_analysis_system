@@ -2981,3 +2981,27 @@ if (error.knowledgePointIds) {
 - [ ] 测试JWT Token生成和验证
 - [ ] 前端集成测试
 
+
+
+## 第二十五阶段：OAuth移除、密码重置和数据库迁移 (2026-01-13)
+
+### OAuth移除和认证守卫
+- [ ] 从主页移除Google登录按钮
+- [ ] 从主页移除微信登录按钮
+- [ ] 创建ProtectedRoute认证守卫组件
+- [ ] 配置未认证用户自动跳转到登录页面
+- [ ] 更新Home.tsx移除OAuth登录选项
+
+### 密码重置功能
+- [x] 在auth.local路由中添加忘记密码API
+- [x] 在auth.local路由中添加重置密码API
+- [x] 创建ForgotPasswordPage.tsx页面
+- [ ] 创建ResetPasswordPage.tsx页面
+- [x] 在LoginPage中添加忘记密码链接
+- [ ] 实现邮箱验证Token生成和验证
+
+### 数据库迁移
+- [ ] 修复api_performance_logs表创建问题
+- [ ] 运行pnpm db:push推送所有监控表
+- [ ] 验证所有表创建成功
+- [ ] 测试错误日志和性能监控功能

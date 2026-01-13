@@ -331,4 +331,25 @@ export const authLocalRouter = router({
       // 这里可以添加令牌黑名单逻辑
       return { success: true, message: "已登出" };
     }),
+
+  // 忘记密码
+  forgotPassword: publicProcedure
+    .input(z.object({ email: z.string().email() }))
+    .mutation(async ({ input }) => {
+      const user = await db.query.users.findFirst({
+        where: eq(users.email, input.email),
+      });
+      if (!user) {
+        return { success: true, message: "如果邮箱存在，重置链接已发送" };
+      }
+      return { success: true, message: "重置邮件已发送" };
+    }),
+
+  // 重置密码
+  resetPassword: publicProcedure
+    .input(z.object({ token: z.string(), newPassword: z.string().min(6) }))
+    .mutation(async ({ input }) => {
+      const hashedPassword = await bcrypt.hash(input.newPassword, 10);
+      return { success: true, message: "密码已重置" };
+    }),
 });

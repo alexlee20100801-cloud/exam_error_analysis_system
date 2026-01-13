@@ -50,6 +50,7 @@ import { SmartDocumentProcessor } from "@/pages/SmartDocumentProcessor";
 import { PWAInstallPrompt } from "@/components/PWAInstallPrompt";
 import LoginPage from "./pages/LoginPage";
 import RegisterPage from "./pages/RegisterPage";
+import ForgotPasswordPage from "./pages/ForgotPasswordPage";
 import { AuthProvider } from "./lib/auth.tsx";
 import { OfflineIndicator } from "@/components/OfflineIndicator";
 import { MobileBottomNav } from "@/components/MobileBottomNav";
@@ -108,8 +109,9 @@ import MonitoringDashboard from "@/pages/MonitoringDashboard";
 function Router() {
   return (
     <Switch>
-      <Route path={"/login"} component={LoginPage} />
-      <Route path={"/register"} component={RegisterPage} />
+        <Route path="/login" component={LoginPage} />
+        <Route path="/register" component={RegisterPage} />
+        <Route path="/forgot-password" component={ForgotPasswordPage} />
       <Route path={"\/ "} component={Home} />
       <Route path={"/dashboard"} component={Dashboard} />
       <Route path="/error-questions" component={ErrorQuestions} />

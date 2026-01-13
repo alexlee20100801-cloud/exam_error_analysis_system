@@ -18,38 +18,48 @@ export async function logApiPerformance(
   if (!db) return null;
 
   try {
-    const result = await db.insert(apiPerformanceLogs).values(performanceData);
-    const insertedId = result[0].insertId;
+    // 容错机制：如果表不存在则跳过记录
+    try {
+      const result = await db.insert(apiPerformanceLogs).values(performanceData);
+      const insertedId = result[0].insertId;
 
-    // 获取插入的记录
-    const logs = await db
-      .select()
-      .from(apiPerformanceLogs)
-      .where(eq(apiPerformanceLogs.id, Number(insertedId)));
+      // 获取插入的记录
+      const logs = await db
+        .select()
+        .from(apiPerformanceLogs)
+        .where(eq(apiPerformanceLogs.id, Number(insertedId)));
 
-    const log = logs[0];
+      const log = logs[0];
 
-    // 如果响应时间过长或出错，创建告警
-    if (log) {
-      if (log.responseTime > 5000) {
-        // 响应时间超过5秒
-        await createPerformanceAlert(
-          `API响应缓慢: ${log.endpoint}`,
-          `端点: ${log.endpoint}\n方法: ${log.method}\n响应时间: ${log.responseTime}ms`,
-          "high"
-        );
+      // 如果响应时间过长或出错，创建告警
+      if (log) {
+        if (log.responseTime > 5000) {
+          // 响应时间超过5秒
+          await createPerformanceAlert(
+            `API响应缓慢: ${log.endpoint}`,
+            `端点: ${log.endpoint}\n方法: ${log.method}\n响应时间: ${log.responseTime}ms`,
+            "high"
+          );
+        }
+        if (log.isError) {
+          // API错误
+          await createPerformanceAlert(
+            `API错误: ${log.endpoint}`,
+            `端点: ${log.endpoint}\n方法: ${log.method}\n状态码: ${log.statusCode}\n错误: ${log.errorMessage}`,
+            "high"
+          );
+        }
       }
-      if (log.isError) {
-        // API错误
-        await createPerformanceAlert(
-          `API错误: ${log.endpoint}`,
-          `端点: ${log.endpoint}\n方法: ${log.method}\n状态码: ${log.statusCode}\n错误: ${log.errorMessage}`,
-          "high"
-        );
+
+      return log || null;
+    } catch (tableError: any) {
+      if (tableError.message?.includes("doesn't exist")) {
+        // 表不存在，静默处理
+        console.warn("api_performance_logs table does not exist yet");
+        return null;
       }
+      throw tableError;
     }
-
-    return log || null;
   } catch (error) {
     console.error("Failed to log API performance:", error);
     return null;
