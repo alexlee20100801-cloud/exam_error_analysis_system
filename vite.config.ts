@@ -43,10 +43,8 @@ export default defineConfig({
     },
     hmr: {
       protocol: "wss",
-      host: undefined,
       port: 443,
-      timeout: 60000,
     },
   },
 });
-// Cache bust: 1768310400
+// Cache bust: 1768312800
