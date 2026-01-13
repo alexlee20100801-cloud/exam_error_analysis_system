@@ -48,6 +48,9 @@ import ComplianceManagement from "@/pages/admin/ComplianceManagement";
 import QualityManagement from "@/pages/admin/QualityManagement";
 import { SmartDocumentProcessor } from "@/pages/SmartDocumentProcessor";
 import { PWAInstallPrompt } from "@/components/PWAInstallPrompt";
+import LoginPage from "./pages/LoginPage";
+import RegisterPage from "./pages/RegisterPage";
+import { AuthProvider } from "./lib/auth.tsx";
 import { OfflineIndicator } from "@/components/OfflineIndicator";
 import { MobileBottomNav } from "@/components/MobileBottomNav";
 import WeaknessAnalysis from "@/pages/WeaknessAnalysis";
@@ -105,7 +108,9 @@ import MonitoringDashboard from "@/pages/MonitoringDashboard";
 function Router() {
   return (
     <Switch>
-      <Route path={"/"} component={Home} />
+      <Route path={"/login"} component={LoginPage} />
+      <Route path={"/register"} component={RegisterPage} />
+      <Route path={"\/ "} component={Home} />
       <Route path={"/dashboard"} component={Dashboard} />
       <Route path="/error-questions" component={ErrorQuestions} />
       <Route path="/error-questions/:id" component={ErrorQuestionDetail} />
@@ -208,15 +213,17 @@ function Router() {
 function App() {
   return (
     <ErrorBoundary>
-      <ThemeProvider defaultTheme="system" switchable={true}>
-        <TooltipProvider>
-          <Toaster />
-          <PWAInstallPrompt />
-          <OfflineIndicator />
-          <Router />
-          <MobileBottomNav />
-        </TooltipProvider>
-      </ThemeProvider>
+      <AuthProvider>
+        <ThemeProvider defaultTheme="system" switchable={true}>
+          <TooltipProvider>
+            <Toaster />
+            <PWAInstallPrompt />
+            <OfflineIndicator />
+            <Router />
+            <MobileBottomNav />
+          </TooltipProvider>
+        </ThemeProvider>
+      </AuthProvider>
     </ErrorBoundary>
   );
 }
