@@ -98,6 +98,25 @@ export {
   type NewDeduplicationConfig
 } from "./deduplication_schema";
 
+// 导入监控和日志 schema
+export {
+  errorLogs,
+  apiPerformanceLogs,
+  systemResourceLogs,
+  monitoringAlerts,
+  monitoringRules,
+  type ErrorLog,
+  type NewErrorLog,
+  type ApiPerformanceLog,
+  type NewApiPerformanceLog,
+  type SystemResourceLog,
+  type NewSystemResourceLog,
+  type MonitoringAlert,
+  type NewMonitoringAlert,
+  type MonitoringRule,
+  type NewMonitoringRule
+} from "./monitoring_schema";
+
 // 导入教育术语对照表 schema
 export {
   educationTerminology,
