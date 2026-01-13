@@ -48,6 +48,7 @@ import { annotationTemplatesRouter } from "./routers/annotationTemplates";
 import { aiAnnotationRouter } from "./routers/aiAnnotation";
 import { collaborativeLearningRouter } from "./routers/collaborativeLearning";
 import { aiAnnotationFeedbackRouter } from "./routers/aiAnnotationFeedback";
+import { authLocalRouter } from "./routers/auth.local";
 import { sitemapRouter } from "./routers/sitemap";
 import { cacheStatsRouter } from "./routers/cacheStats";
 import { pointsRouter } from "./routers/points";
@@ -135,6 +136,9 @@ export const appRouter = router({
       } as const;
     }),
   }),
+  
+  // 本地账号认证
+  authLocal: authLocalRouter,
 
   // 错题管理
   errorQuestions: errorQuestionsRouter,
