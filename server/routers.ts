@@ -120,6 +120,7 @@ import { reviewReminderSchedulerRouter } from "./routers/reviewReminderScheduler
 import { terminologyManagementRouter } from "./routers/terminologyManagement";
 import { taskAlertRouter } from "./routers/taskAlert";
 import { exportHistoryRouter } from "./routers/exportHistory";
+import { adminManagementRouter } from "./routers/adminManagement";
 
 export const appRouter = router({
   system: systemRouter,
@@ -458,6 +459,9 @@ export const appRouter = router({
   
   // 导出历史记录
   exportHistory: exportHistoryRouter,
+  
+  // 管理员管理
+  adminManagement: adminManagementRouter,
 });
 
 export type AppRouter = typeof appRouter;

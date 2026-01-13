@@ -1410,6 +1410,11 @@ export const users = mysqlTable("users", {
 	// 手机号登录字段
 	phone: varchar({ length: 20 }),
 	phoneVerified: tinyint("phone_verified").default(0),
+	// 管理员管理字段
+	isActive: tinyint("is_active").default(1).notNull(),
+	adminNotes: text("admin_notes"),
+	lastAdminAction: timestamp("last_admin_action", { mode: 'string' }),
+	adminActionBy: int("admin_action_by"),
 },
 (table) => [
 	index("users_openId_unique").on(table.openId),

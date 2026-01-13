@@ -22,7 +22,7 @@ import {
 } from "@/components/ui/sidebar";
 import { getLoginUrl } from "@/const";
 import { useIsMobile } from "@/hooks/useMobile";
-import { LayoutDashboard, LogOut, PanelLeft, Users, BookOpen, GraduationCap, School, Trophy, Video, Calendar, BarChart3, Clock, UserCircle, FileText, Database, FileQuestion, Route, Settings, Timer, Target, Heart, Bell, Upload, Shield, Folder, Brain, Sparkles, HardDrive, Zap, History, FlaskConical, TrendingUp, Activity, FileSearch, UsersRound, Crop, BookMarked, AlertTriangle, FileArchive } from "lucide-react";
+import { LayoutDashboard, LogOut, PanelLeft, Users, BookOpen, GraduationCap, School, Trophy, Video, Calendar, BarChart3, Clock, UserCircle, FileText, Database, FileQuestion, Route, Settings, Timer, Target, Heart, Bell, Upload, Shield, Folder, Brain, Sparkles, HardDrive, Zap, History, FlaskConical, TrendingUp, Activity, FileSearch, UsersRound, Crop, BookMarked, AlertTriangle, FileArchive, UserCog } from "lucide-react";
 import { trpc } from "@/lib/trpc";
 import { Badge } from "@/components/ui/badge";
 import { CSSProperties, useEffect, useRef, useState } from "react";
@@ -131,6 +131,7 @@ const adminMenuGroup: MenuGroup = {
     { id: "ai-classification", icon: Brain, label: "AI分类优化", path: "/admin/ai-classification" },
     { id: "paper-algorithm", icon: Sparkles, label: "组卷算法优化", path: "/admin/paper-algorithm" },
     { id: "ip-blacklist", icon: Shield, label: "IP黑名单管理", path: "/admin/ip-manager" },
+    { id: "admin-management", icon: UserCog, label: "管理员管理", path: "/admin/admin-management" },
   ]
 };
 

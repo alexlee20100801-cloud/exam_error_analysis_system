@@ -99,6 +99,7 @@ import NotificationHistory from "@/pages/NotificationHistory";
 import TerminologyManagement from "@/pages/TerminologyManagement";
 import AlertConfigManagement from "@/pages/AlertConfigManagement";
 import ExportHistoryManagement from "@/pages/ExportHistoryManagement";
+import AdminManagement from "@/pages/AdminManagement";
 
 function Router() {
   return (
@@ -196,6 +197,7 @@ function Router() {
       <Route path="/admin/terminology" component={TerminologyManagement} />
       <Route path="/admin/alert-config" component={AlertConfigManagement} />
       <Route path="/admin/export-history" component={ExportHistoryManagement} />
+      <Route path="/admin/admin-management" component={AdminManagement} />
       <Route component={NotFound} />
     </Switch>
   );
