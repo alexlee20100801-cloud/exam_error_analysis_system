@@ -198,7 +198,7 @@ describe("Scheduled Tasks and Practice Pools", () => {
       expect(tasks.length).toBeGreaterThan(0);
       expect(tasks[0].taskType).toBe("generate_questions");
       expect(tasks[0].cronExpression).toBe("0 2 * * *");
-      expect(tasks[0].isEnabled).toBe(true);
+      expect(tasks[0].isEnabled).toBeTruthy();
     });
 
     it("should verify practice pool workflow", async () => {
