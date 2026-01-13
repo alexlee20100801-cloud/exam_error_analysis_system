@@ -954,6 +954,16 @@ export default function AlertConfigManagement() {
                                 <Button
                                   variant="ghost"
                                   size="icon"
+                                  title="测试告警规则"
+                                  onClick={() => {
+                                    toast.info(`测试告警规则: ${config.taskName}`);
+                                  }}
+                                >
+                                  <Zap className="h-4 w-4 text-yellow-500" />
+                                </Button>
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
                                   onClick={() => handleEdit(config)}
                                 >
                                   <Pencil className="h-4 w-4" />

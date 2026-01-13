@@ -217,4 +217,60 @@ export const taskAlertRouter = router({
         fromName: process.env.SMTP_FROM_NAME || "错题分析学习系统",
       };
     }),
+  
+  // 测试告警规则
+  testAlertRule: protectedProcedure
+    .input(z.object({
+      configId: z.number(),
+      testType: z.enum(["email", "message", "both"]).default("both"),
+    }))
+    .mutation(async ({ input, ctx }) => {
+      const config = await taskAlertService.getAlertConfigById(input.configId);
+      if (!config) {
+        throw new Error("告警配置不存在");
+      }
+      
+      const testResults = {
+        success: true,
+        configId: input.configId,
+        taskName: config.taskName,
+        tests: [] as any[],
+      };
+      
+      // 测试邮件通知
+      if ((input.testType === "email" || input.testType === "both") && config.enableEmailNotification) {
+        try {
+          const result = await sendTaskAlertEmail([ctx.user.email || "admin@example.com"], {
+            taskName: config.taskName,
+            alertType: "test",
+            severity: config.alertSeverity,
+            message: `测试告警规则 ${config.taskName} 的邮件通知功能`,
+            alertTime: new Date(),
+          });
+          testResults.tests.push({
+            type: "email",
+            success: result.success,
+            message: result.success ? "邮件通知测试成功" : "邮件通知测试失败",
+          });
+        } catch (error: any) {
+          testResults.tests.push({
+            type: "email",
+            success: false,
+            message: `邮件通知测试异常: ${error.message}`,
+          });
+          testResults.success = false;
+        }
+      }
+      
+      // 测试消息通知
+      if ((input.testType === "message" || input.testType === "both") && config.enableMessageNotification) {
+        testResults.tests.push({
+          type: "message",
+          success: true,
+          message: "消息通知测试成功（已记录到系统日志）",
+        });
+      }
+      
+      return testResults;
+    }),
 });

@@ -1,0 +1,110 @@
+{
+  "query": "SELECT id, name, email, username, role, userType, createdAt, lastSignedIn \nFROM users \nWHERE role != 'admin' OR role IS NULL\nORDER BY createdAt DESC\nLIMIT 10;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway03.us-east-1.prod.aws.tidbcloud.com --port 4000 --user Lfr9xqjx7LpxUD9.1efa314e7813 --database Yh4Z4ZSitSFdPWYxtKkkQS --execute SELECT id, name, email, username, role, userType, createdAt, lastSignedIn \nFROM users \nWHERE role != 'admin' OR role IS NULL\nORDER BY createdAt DESC\nLIMIT 10;",
+  "rows": [
+    {
+      "id": "180308",
+      "name": "测试学生",
+      "email": "NULL",
+      "username": "NULL",
+      "role": "user",
+      "userType": "student",
+      "createdAt": "2026-01-13 12:58:15",
+      "lastSignedIn": "2026-01-13 12:58:15"
+    },
+    {
+      "id": "180309",
+      "name": "空收藏用户",
+      "email": "NULL",
+      "username": "NULL",
+      "role": "user",
+      "userType": "student",
+      "createdAt": "2026-01-13 12:58:15",
+      "lastSignedIn": "2026-01-13 12:58:15"
+    },
+    {
+      "id": "180307",
+      "name": "语音测试用户",
+      "email": "NULL",
+      "username": "NULL",
+      "role": "user",
+      "userType": "student",
+      "createdAt": "2026-01-13 12:57:47",
+      "lastSignedIn": "2026-01-13 12:57:47"
+    },
+    {
+      "id": "180305",
+      "name": "测试用户",
+      "email": "NULL",
+      "username": "NULL",
+      "role": "user",
+      "userType": "student",
+      "createdAt": "2026-01-13 12:56:28",
+      "lastSignedIn": "2026-01-13 12:56:28"
+    },
+    {
+      "id": "180303",
+      "name": "学科报告测试用户",
+      "email": "NULL",
+      "username": "NULL",
+      "role": "user",
+      "userType": "student",
+      "createdAt": "2026-01-13 12:54:59",
+      "lastSignedIn": "2026-01-13 12:54:59"
+    },
+    {
+      "id": "180302",
+      "name": "测试学生",
+      "email": "NULL",
+      "username": "NULL",
+      "role": "user",
+      "userType": "student",
+      "createdAt": "2026-01-13 12:50:34",
+      "lastSignedIn": "2026-01-13 12:50:34"
+    },
+    {
+      "id": "180301",
+      "name": "测试用户",
+      "email": "test@example.com",
+      "username": "NULL",
+      "role": "user",
+      "userType": "student",
+      "createdAt": "2026-01-13 12:50:14",
+      "lastSignedIn": "2026-01-13 12:50:14"
+    },
+    {
+      "id": "180300",
+      "name": "ALEX LEE",
+      "email": "alexlee20100801@gmail.com",
+      "username": "NULL",
+      "role": "user",
+      "userType": "student",
+      "createdAt": "2026-01-13 12:49:11",
+      "lastSignedIn": "2026-01-13 08:09:52"
+    },
+    {
+      "id": "180299",
+      "name": "空数据用户",
+      "email": "NULL",
+      "username": "NULL",
+      "role": "user",
+      "userType": "student",
+      "createdAt": "2026-01-13 12:48:53",
+      "lastSignedIn": "2026-01-13 12:48:53"
+    },
+    {
+      "id": "180298",
+      "name": "导出测试用户",
+      "email": "NULL",
+      "username": "NULL",
+      "role": "user",
+      "userType": "student",
+      "createdAt": "2026-01-13 12:48:52",
+      "lastSignedIn": "2026-01-13 12:48:52"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tname\temail\tusername\trole\tuserType\tcreatedAt\tlastSignedIn\n180308\t测试学生\tNULL\tNULL\tuser\tstudent\t2026-01-13 12:58:15\t2026-01-13 12:58:15\n180309\t空收藏用户\tNULL\tNULL\tuser\tstudent\t2026-01-13 12:58:15\t2026-01-13 12:58:15\n180307\t语音测试用户\tNULL\tNULL\tuser\tstudent\t2026-01-13 12:57:47\t2026-01-13 12:57:47\n180305\t测试用户\tNULL\tNULL\tuser\tstudent\t2026-01-13 12:56:28\t2026-01-13 12:56:28\n180303\t学科报告测试用户\tNULL\tNULL\tuser\tstudent\t2026-01-13 12:54:59\t2026-01-13 12:54:59\n180302\t测试学生\tNULL\tNULL\tuser\tstudent\t2026-01-13 12:50:34\t2026-01-13 12:50:34\n180301\t测试用户\ttest@example.com\tNULL\tuser\tstudent\t2026-01-13 12:50:14\t2026-01-13 12:50:14\n180300\tALEX LEE\talexlee20100801@gmail.com\tNULL\tuser\tstudent\t2026-01-13 12:49:11\t2026-01-13 08:09:52\n180299\t空数据用户\tNULL\tNULL\tuser\tstudent\t2026-01-13 12:48:53\t2026-01-13 12:48:53\n180298\t导出测试用户\tNULL\tNULL\tuser\tstudent\t2026-01-13 12:48:52\t2026-01-13 12:48:52\n",
+  "stderr": "",
+  "execution_time_ms": 72
+}
