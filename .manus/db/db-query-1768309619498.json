@@ -1,0 +1,146 @@
+{
+  "query": "DESCRIBE task_alert_configs;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway03.us-east-1.prod.aws.tidbcloud.com --port 4000 --user Lfr9xqjx7LpxUD9.1efa314e7813 --database Yh4Z4ZSitSFdPWYxtKkkQS --execute DESCRIBE task_alert_configs;",
+  "rows": [
+    {
+      "Field": "id",
+      "Type": "int(11)",
+      "Null": "NO",
+      "Key": "PRI",
+      "Default": "NULL",
+      "Extra": "auto_increment"
+    },
+    {
+      "Field": "task_name",
+      "Type": "varchar(255)",
+      "Null": "NO",
+      "Key": "MUL",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "task_type",
+      "Type": "enum('performance_evaluation','weekly_report_generation','alert_check','cache_warmup','ab_test_decision','data_backup','cleanup','custom')",
+      "Null": "NO",
+      "Key": "MUL",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "consecutive_failure_threshold",
+      "Type": "int(11)",
+      "Null": "NO",
+      "Key": "",
+      "Default": "3",
+      "Extra": ""
+    },
+    {
+      "Field": "timeout_threshold",
+      "Type": "int(11)",
+      "Null": "NO",
+      "Key": "",
+      "Default": "300",
+      "Extra": ""
+    },
+    {
+      "Field": "alert_severity",
+      "Type": "enum('low','medium','high','critical')",
+      "Null": "NO",
+      "Key": "",
+      "Default": "medium",
+      "Extra": ""
+    },
+    {
+      "Field": "enable_email_notification",
+      "Type": "int(11)",
+      "Null": "NO",
+      "Key": "",
+      "Default": "1",
+      "Extra": ""
+    },
+    {
+      "Field": "enable_message_notification",
+      "Type": "int(11)",
+      "Null": "NO",
+      "Key": "",
+      "Default": "1",
+      "Extra": ""
+    },
+    {
+      "Field": "email_recipients",
+      "Type": "json",
+      "Null": "YES",
+      "Key": "",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "message_recipients",
+      "Type": "json",
+      "Null": "YES",
+      "Key": "",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "notification_cooldown",
+      "Type": "int(11)",
+      "Null": "NO",
+      "Key": "",
+      "Default": "3600",
+      "Extra": ""
+    },
+    {
+      "Field": "max_notifications_per_day",
+      "Type": "int(11)",
+      "Null": "NO",
+      "Key": "",
+      "Default": "10",
+      "Extra": ""
+    },
+    {
+      "Field": "is_active",
+      "Type": "int(11)",
+      "Null": "NO",
+      "Key": "MUL",
+      "Default": "1",
+      "Extra": ""
+    },
+    {
+      "Field": "description",
+      "Type": "text",
+      "Null": "YES",
+      "Key": "",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "created_by",
+      "Type": "int(11)",
+      "Null": "YES",
+      "Key": "",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "created_at",
+      "Type": "timestamp",
+      "Null": "NO",
+      "Key": "",
+      "Default": "CURRENT_TIMESTAMP",
+      "Extra": ""
+    },
+    {
+      "Field": "updated_at",
+      "Type": "timestamp",
+      "Null": "NO",
+      "Key": "",
+      "Default": "CURRENT_TIMESTAMP",
+      "Extra": "DEFAULT_GENERATED on update CURRENT_TIMESTAMP"
+    }
+  ],
+  "messages": [],
+  "stdout": "Field\tType\tNull\tKey\tDefault\tExtra\nid\tint(11)\tNO\tPRI\tNULL\tauto_increment\ntask_name\tvarchar(255)\tNO\tMUL\tNULL\t\ntask_type\tenum('performance_evaluation','weekly_report_generation','alert_check','cache_warmup','ab_test_decision','data_backup','cleanup','custom')\tNO\tMUL\tNULL\t\nconsecutive_failure_threshold\tint(11)\tNO\t\t3\t\ntimeout_threshold\tint(11)\tNO\t\t300\t\nalert_severity\tenum('low','medium','high','critical')\tNO\t\tmedium\t\nenable_email_notification\tint(11)\tNO\t\t1\t\nenable_message_notification\tint(11)\tNO\t\t1\t\nemail_recipients\tjson\tYES\t\tNULL\t\nmessage_recipients\tjson\tYES\t\tNULL\t\nnotification_cooldown\tint(11)\tNO\t\t3600\t\nmax_notifications_per_day\tint(11)\tNO\t\t10\t\nis_active\tint(11)\tNO\tMUL\t1\t\ndescription\ttext\tYES\t\tNULL\t\ncreated_by\tint(11)\tYES\t\tNULL\t\ncreated_at\ttimestamp\tNO\t\tCURRENT_TIMESTAMP\t\nupdated_at\ttimestamp\tNO\t\tCURRENT_TIMESTAMP\tDEFAULT_GENERATED on update CURRENT_TIMESTAMP\n",
+  "stderr": "",
+  "execution_time_ms": 55
+}

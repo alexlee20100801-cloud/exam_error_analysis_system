@@ -1,0 +1,9 @@
+{
+  "query": "UPDATE users \nSET role = 'admin', \n    is_active = 1, \n    admin_notes = '系统所有者 - 初始管理员账户',\n    last_admin_action = NOW(),\n    admin_action_by = 1\nWHERE id = 1;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway03.us-east-1.prod.aws.tidbcloud.com --port 4000 --user Lfr9xqjx7LpxUD9.1efa314e7813 --database Yh4Z4ZSitSFdPWYxtKkkQS --execute UPDATE users \nSET role = 'admin', \n    is_active = 1, \n    admin_notes = '系统所有者 - 初始管理员账户',\n    last_admin_action = NOW(),\n    admin_action_by = 1\nWHERE id = 1;",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 55
+}

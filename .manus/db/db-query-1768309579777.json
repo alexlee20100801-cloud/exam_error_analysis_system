@@ -1,0 +1,120 @@
+{
+  "query": "SELECT id, openId, name, email, username, role, is_active, userType, createdAt \nFROM users \nORDER BY id ASC\nLIMIT 10;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway03.us-east-1.prod.aws.tidbcloud.com --port 4000 --user Lfr9xqjx7LpxUD9.1efa314e7813 --database Yh4Z4ZSitSFdPWYxtKkkQS --execute SELECT id, openId, name, email, username, role, is_active, userType, createdAt \nFROM users \nORDER BY id ASC\nLIMIT 10;",
+  "rows": [
+    {
+      "id": "180281",
+      "openId": "test-student-openid",
+      "name": "测试学生",
+      "email": "NULL",
+      "username": "NULL",
+      "role": "user",
+      "is_active": "1",
+      "userType": "student",
+      "createdAt": "2026-01-13 12:47:26"
+    },
+    {
+      "id": "180282",
+      "openId": "test-parent-openid",
+      "name": "测试家长",
+      "email": "NULL",
+      "username": "NULL",
+      "role": "user",
+      "is_active": "1",
+      "userType": "parent",
+      "createdAt": "2026-01-13 12:47:26"
+    },
+    {
+      "id": "180283",
+      "openId": "test_stats_1768308458672",
+      "name": "统计测试用户",
+      "email": "NULL",
+      "username": "NULL",
+      "role": "user",
+      "is_active": "1",
+      "userType": "student",
+      "createdAt": "2026-01-13 12:47:38"
+    },
+    {
+      "id": "180284",
+      "openId": "test_empty_1768308458936",
+      "name": "空数据用户",
+      "email": "NULL",
+      "username": "NULL",
+      "role": "user",
+      "is_active": "1",
+      "userType": "student",
+      "createdAt": "2026-01-13 12:47:38"
+    },
+    {
+      "id": "180285",
+      "openId": "test-similar-1768308476301",
+      "name": "测试学生",
+      "email": "NULL",
+      "username": "NULL",
+      "role": "user",
+      "is_active": "1",
+      "userType": "student",
+      "createdAt": "2026-01-13 12:47:56"
+    },
+    {
+      "id": "180287",
+      "openId": "test_review_tasks_1768308499328",
+      "name": "测试用户",
+      "email": "test@example.com",
+      "username": "NULL",
+      "role": "user",
+      "is_active": "1",
+      "userType": "student",
+      "createdAt": "2026-01-13 12:48:19"
+    },
+    {
+      "id": "180288",
+      "openId": "test_no_tasks_1768308499622",
+      "name": "无任务用户",
+      "email": "notasks@example.com",
+      "username": "NULL",
+      "role": "user",
+      "is_active": "1",
+      "userType": "student",
+      "createdAt": "2026-01-13 12:48:19"
+    },
+    {
+      "id": "180289",
+      "openId": "test_error_comparison_1768308506651",
+      "name": "错题对比测试用户",
+      "email": "NULL",
+      "username": "NULL",
+      "role": "user",
+      "is_active": "1",
+      "userType": "student",
+      "createdAt": "2026-01-13 12:48:26"
+    },
+    {
+      "id": "180296",
+      "openId": "test_kp_detail_1768308519374",
+      "name": "知识点详情测试用户",
+      "email": "NULL",
+      "username": "NULL",
+      "role": "user",
+      "is_active": "1",
+      "userType": "student",
+      "createdAt": "2026-01-13 12:48:39"
+    },
+    {
+      "id": "180297",
+      "openId": "test_ai_advice_1768308526088",
+      "name": "AI建议测试用户",
+      "email": "NULL",
+      "username": "NULL",
+      "role": "user",
+      "is_active": "1",
+      "userType": "student",
+      "createdAt": "2026-01-13 12:48:46"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\topenId\tname\temail\tusername\trole\tis_active\tuserType\tcreatedAt\n180281\ttest-student-openid\t测试学生\tNULL\tNULL\tuser\t1\tstudent\t2026-01-13 12:47:26\n180282\ttest-parent-openid\t测试家长\tNULL\tNULL\tuser\t1\tparent\t2026-01-13 12:47:26\n180283\ttest_stats_1768308458672\t统计测试用户\tNULL\tNULL\tuser\t1\tstudent\t2026-01-13 12:47:38\n180284\ttest_empty_1768308458936\t空数据用户\tNULL\tNULL\tuser\t1\tstudent\t2026-01-13 12:47:38\n180285\ttest-similar-1768308476301\t测试学生\tNULL\tNULL\tuser\t1\tstudent\t2026-01-13 12:47:56\n180287\ttest_review_tasks_1768308499328\t测试用户\ttest@example.com\tNULL\tuser\t1\tstudent\t2026-01-13 12:48:19\n180288\ttest_no_tasks_1768308499622\t无任务用户\tnotasks@example.com\tNULL\tuser\t1\tstudent\t2026-01-13 12:48:19\n180289\ttest_error_comparison_1768308506651\t错题对比测试用户\tNULL\tNULL\tuser\t1\tstudent\t2026-01-13 12:48:26\n180296\ttest_kp_detail_1768308519374\t知识点详情测试用户\tNULL\tNULL\tuser\t1\tstudent\t2026-01-13 12:48:39\n180297\ttest_ai_advice_1768308526088\tAI建议测试用户\tNULL\tNULL\tuser\t1\tstudent\t2026-01-13 12:48:46\n",
+  "stderr": "",
+  "execution_time_ms": 56
+}

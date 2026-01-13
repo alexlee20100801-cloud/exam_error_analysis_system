@@ -1,0 +1,55 @@
+{
+  "query": "SELECT id, task_name, task_type, consecutive_failure_threshold, timeout_threshold, alert_severity, description \nFROM task_alert_configs \nORDER BY id ASC;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway03.us-east-1.prod.aws.tidbcloud.com --port 4000 --user Lfr9xqjx7LpxUD9.1efa314e7813 --database Yh4Z4ZSitSFdPWYxtKkkQS --execute SELECT id, task_name, task_type, consecutive_failure_threshold, timeout_threshold, alert_severity, description \nFROM task_alert_configs \nORDER BY id ASC;",
+  "rows": [
+    {
+      "id": "1",
+      "task_name": "performance-evaluation",
+      "task_type": "performance_evaluation",
+      "consecutive_failure_threshold": "3",
+      "timeout_threshold": "600",
+      "alert_severity": "high",
+      "description": "监控性能评估任务，连续失败3次或超时10分钟时告警"
+    },
+    {
+      "id": "2",
+      "task_name": "weekly-report-generation",
+      "task_type": "weekly_report_generation",
+      "consecutive_failure_threshold": "2",
+      "timeout_threshold": "900",
+      "alert_severity": "medium",
+      "description": "监控周报生成任务，连续失败2次或超时15分钟时告警"
+    },
+    {
+      "id": "3",
+      "task_name": "data-backup",
+      "task_type": "data_backup",
+      "consecutive_failure_threshold": "1",
+      "timeout_threshold": "1800",
+      "alert_severity": "critical",
+      "description": "监控数据备份任务，任何失败立即告警，超时30分钟告警"
+    },
+    {
+      "id": "4",
+      "task_name": "cache-warmup",
+      "task_type": "cache_warmup",
+      "consecutive_failure_threshold": "5",
+      "timeout_threshold": "300",
+      "alert_severity": "low",
+      "description": "监控缓存预热任务，连续失败5次或超时5分钟时告警"
+    },
+    {
+      "id": "5",
+      "task_name": "ab-test-decision",
+      "task_type": "ab_test_decision",
+      "consecutive_failure_threshold": "3",
+      "timeout_threshold": "300",
+      "alert_severity": "medium",
+      "description": "监控A/B测试决策任务，连续失败3次或超时5分钟时告警"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\ttask_name\ttask_type\tconsecutive_failure_threshold\ttimeout_threshold\talert_severity\tdescription\n1\tperformance-evaluation\tperformance_evaluation\t3\t600\thigh\t监控性能评估任务，连续失败3次或超时10分钟时告警\n2\tweekly-report-generation\tweekly_report_generation\t2\t900\tmedium\t监控周报生成任务，连续失败2次或超时15分钟时告警\n3\tdata-backup\tdata_backup\t1\t1800\tcritical\t监控数据备份任务，任何失败立即告警，超时30分钟告警\n4\tcache-warmup\tcache_warmup\t5\t300\tlow\t监控缓存预热任务，连续失败5次或超时5分钟时告警\n5\tab-test-decision\tab_test_decision\t3\t300\tmedium\t监控A/B测试决策任务，连续失败3次或超时5分钟时告警\n",
+  "stderr": "",
+  "execution_time_ms": 56
+}
