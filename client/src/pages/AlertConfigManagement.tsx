@@ -56,6 +56,10 @@ import {
   Activity,
   Settings,
   Eye,
+  FileText,
+  Zap,
+  Database,
+  FlaskConical,
 } from "lucide-react";
 
 const TASK_TYPES = [
@@ -88,6 +92,100 @@ const HEALTH_STATUS = [
   { value: "warning", label: "警告", color: "bg-yellow-500" },
   { value: "critical", label: "严重", color: "bg-red-500" },
   { value: "unknown", label: "未知", color: "bg-gray-500" },
+];
+
+// 预设告警规则模板
+const PRESET_ALERT_TEMPLATES = [
+  {
+    id: "performance",
+    label: "性能评估任务",
+    icon: Activity,
+    taskName: "performance-evaluation",
+    taskType: "performance_evaluation",
+    consecutiveFailureThreshold: 3,
+    timeoutThreshold: 600,
+    alertSeverity: "high",
+    enableEmailNotification: true,
+    enableMessageNotification: true,
+    notificationCooldown: 3600,
+    maxNotificationsPerDay: 5,
+    description: "监控性能评估任务，连续失败3次或超时10分钟时告警",
+  },
+  {
+    id: "weekly_report",
+    label: "周报生成任务",
+    icon: FileText,
+    taskName: "weekly-report-generation",
+    taskType: "weekly_report_generation",
+    consecutiveFailureThreshold: 2,
+    timeoutThreshold: 900,
+    alertSeverity: "medium",
+    enableEmailNotification: true,
+    enableMessageNotification: true,
+    notificationCooldown: 7200,
+    maxNotificationsPerDay: 3,
+    description: "监控周报生成任务，连续失败2次或超时15分钟时告警",
+  },
+  {
+    id: "cache_warmup",
+    label: "缓存预热任务",
+    icon: Zap,
+    taskName: "cache-warmup",
+    taskType: "cache_warmup",
+    consecutiveFailureThreshold: 5,
+    timeoutThreshold: 300,
+    alertSeverity: "low",
+    enableEmailNotification: false,
+    enableMessageNotification: true,
+    notificationCooldown: 1800,
+    maxNotificationsPerDay: 10,
+    description: "监控缓存预热任务，连续失败5次或超时5分钟时告警",
+  },
+  {
+    id: "data_backup",
+    label: "数据备份任务",
+    icon: Database,
+    taskName: "data-backup",
+    taskType: "data_backup",
+    consecutiveFailureThreshold: 1,
+    timeoutThreshold: 1800,
+    alertSeverity: "critical",
+    enableEmailNotification: true,
+    enableMessageNotification: true,
+    notificationCooldown: 3600,
+    maxNotificationsPerDay: 5,
+    description: "监控数据备份任务，任何失败立即告警，超时30分钟告警",
+  },
+  {
+    id: "ab_test",
+    label: "A/B测试决策",
+    icon: FlaskConical,
+    taskName: "ab-test-decision",
+    taskType: "ab_test_decision",
+    consecutiveFailureThreshold: 3,
+    timeoutThreshold: 300,
+    alertSeverity: "medium",
+    enableEmailNotification: true,
+    enableMessageNotification: true,
+    notificationCooldown: 3600,
+    maxNotificationsPerDay: 5,
+    description: "监控A/B测试决策任务，连续失败3次或超时5分钟时告警",
+  },
+  {
+    id: "cleanup",
+    label: "清理任务",
+    icon: Trash2,
+    taskName: "cleanup-task",
+    taskType: "cleanup",
+    consecutiveFailureThreshold: 5,
+    timeoutThreshold: 600,
+    alertSeverity: "low",
+    enableEmailNotification: false,
+    enableMessageNotification: true,
+    notificationCooldown: 7200,
+    maxNotificationsPerDay: 3,
+    description: "监控清理任务，连续失败5次或超时10分钟时告警",
+  },
 ];
 
 interface AlertConfigFormData {
@@ -730,6 +828,51 @@ export default function AlertConfigManagement() {
 
           {/* 告警配置 */}
           <TabsContent value="configs" className="space-y-4">
+            {/* 预设告警规则模板 */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-lg">快速创建告警规则</CardTitle>
+                <CardDescription>选择预设模板快速创建常用告警规则</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                  {PRESET_ALERT_TEMPLATES.map((template) => (
+                    <div
+                      key={template.id}
+                      className="p-4 border rounded-lg hover:border-primary cursor-pointer transition-colors"
+                      onClick={() => {
+                        setFormData({
+                          taskName: template.taskName,
+                          taskType: template.taskType,
+                          consecutiveFailureThreshold: template.consecutiveFailureThreshold,
+                          timeoutThreshold: template.timeoutThreshold,
+                          alertSeverity: template.alertSeverity,
+                          enableEmailNotification: template.enableEmailNotification,
+                          enableMessageNotification: template.enableMessageNotification,
+                          emailRecipients: [],
+                          notificationCooldown: template.notificationCooldown,
+                          maxNotificationsPerDay: template.maxNotificationsPerDay,
+                          description: template.description,
+                        });
+                        setIsCreateDialogOpen(true);
+                      }}
+                    >
+                      <div className="flex items-center gap-2 mb-2">
+                        <template.icon className="h-5 w-5 text-primary" />
+                        <span className="font-medium">{template.label}</span>
+                      </div>
+                      <p className="text-sm text-muted-foreground">{template.description}</p>
+                      <div className="mt-2 flex gap-2">
+                        {getSeverityBadge(template.alertSeverity)}
+                        <Badge variant="outline">失败{template.consecutiveFailureThreshold}次</Badge>
+                        <Badge variant="outline">超时{template.timeoutThreshold}s</Badge>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+
             <div className="flex justify-end">
               <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
                 <DialogTrigger asChild>

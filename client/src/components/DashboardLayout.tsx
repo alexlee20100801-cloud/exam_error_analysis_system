@@ -22,7 +22,7 @@ import {
 } from "@/components/ui/sidebar";
 import { getLoginUrl } from "@/const";
 import { useIsMobile } from "@/hooks/useMobile";
-import { LayoutDashboard, LogOut, PanelLeft, Users, BookOpen, GraduationCap, School, Trophy, Video, Calendar, BarChart3, Clock, UserCircle, FileText, Database, FileQuestion, Route, Settings, Timer, Target, Heart, Bell, Upload, Shield, Folder, Brain, Sparkles, HardDrive, Zap, History, FlaskConical, TrendingUp, Activity, FileSearch, UsersRound, Crop } from "lucide-react";
+import { LayoutDashboard, LogOut, PanelLeft, Users, BookOpen, GraduationCap, School, Trophy, Video, Calendar, BarChart3, Clock, UserCircle, FileText, Database, FileQuestion, Route, Settings, Timer, Target, Heart, Bell, Upload, Shield, Folder, Brain, Sparkles, HardDrive, Zap, History, FlaskConical, TrendingUp, Activity, FileSearch, UsersRound, Crop, BookMarked, AlertTriangle, FileArchive } from "lucide-react";
 import { trpc } from "@/lib/trpc";
 import { Badge } from "@/components/ui/badge";
 import { CSSProperties, useEffect, useRef, useState } from "react";
@@ -117,6 +117,9 @@ const adminMenuGroup: MenuGroup = {
   adminOnly: true,
   items: [
     { id: "question-bank", icon: Database, label: "题库管理", path: "/admin/question-bank" },
+    { id: "terminology", icon: BookMarked, label: "术语管理", path: "/admin/terminology" },
+    { id: "alert-config", icon: AlertTriangle, label: "告警配置", path: "/admin/alert-config" },
+    { id: "export-history", icon: FileArchive, label: "导出历史", path: "/admin/export-history" },
     { id: "task-management", icon: Timer, label: "定时任务管理", path: "/admin/tasks" },
     { id: "cache-warmup", icon: Zap, label: "缓存预热管理", path: "/admin/cache-warmup" },
     { id: "batch-history", icon: History, label: "批量操作历史", path: "/admin/batch-history" },
