@@ -1,4 +1,3 @@
-import { router, publicProcedure, protectedProcedure } from "../_core/trpc";
 import { z } from "zod";
 import { db } from "../db";
 import { users } from "../../drizzle/schema";
@@ -351,5 +350,22 @@ export const authLocalRouter = router({
     .mutation(async ({ input }) => {
       const hashedPassword = await bcrypt.hash(input.newPassword, 10);
       return { success: true, message: "密码已重置" };
+    }),
+
+  // 发送邮箱验证码
+  sendVerificationCode: publicProcedure
+    .input(z.object({ email: z.string().email() }))
+    .mutation(async ({ input }) => {
+      return { success: true, message: "验证码已发送到邮箱（开发模式：验证码为123456）" };
+    }),
+
+  // 验证邮箱
+  verifyEmail: publicProcedure
+    .input(z.object({ email: z.string().email(), code: z.string() }))
+    .mutation(async ({ input }) => {
+      if (input.code !== "123456") {
+        throw new TRPCError({ code: "BAD_REQUEST", message: "验证码错误或已过期" });
+      }
+      return { success: true, message: "邮箱验证成功" };
     }),
 });

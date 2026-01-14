@@ -52,6 +52,7 @@ import LoginPage from "./pages/LoginPage";
 import RegisterPage from "./pages/RegisterPage";
 import ForgotPasswordPage from "./pages/ForgotPasswordPage";
 import { AuthProvider } from "./lib/auth.tsx";
+import { ProtectedRoute } from "./components/ProtectedRoute";
 import { OfflineIndicator } from "@/components/OfflineIndicator";
 import { MobileBottomNav } from "@/components/MobileBottomNav";
 import WeaknessAnalysis from "@/pages/WeaknessAnalysis";
