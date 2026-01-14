@@ -63,7 +63,7 @@ export default function Home() {
           <div className="flex items-center gap-2">
             <LanguageSwitcher />
             <Button asChild>
-              <a href={getLoginUrl()}>{t('nav.login', '登录')} / {t('nav.register', '注册')}</a>
+              <a href="/login">{t('nav.login', '登录')} / {t('nav.register', '注册')}</a>
             </Button>
           </div>
         </div>
@@ -81,7 +81,7 @@ export default function Home() {
               专为深圳初高中学生打造的AI智能错题分析系统，提供错题拍照识别、智能分析、知识图谱、个性化推荐、协作学习等功能，帮助学生高效掌握知识点，提升学习成绩
             </h2>
             <Button size="lg" asChild className="text-lg px-8 py-6">
-              <a href={getLoginUrl()}>立即开始学习</a>
+              <a href="/login">立即开始学习</a>
             </Button>
           </div>
         </section>
