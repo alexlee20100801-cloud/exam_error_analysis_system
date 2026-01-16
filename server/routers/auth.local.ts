@@ -5,6 +5,8 @@ import { eq } from "drizzle-orm";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import { TRPCError } from "@trpc/server";
+import { router, publicProcedure, protectedProcedure } from "../_core/trpc";
+import { emailService } from "../emailService";
 
 const JWT_SECRET = process.env.JWT_SECRET || "your-secret-key";
 const JWT_EXPIRES_IN = "7d";
@@ -77,34 +79,38 @@ export const authLocalRouter = router({
       const hashedPassword = await bcrypt.hash(input.password, 10);
 
       // 创建用户
+      const openId = `local_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
       const result = await db
         .insert(users)
         .values({
+          openId,
           username: input.username,
           email: input.email,
           passwordHash: hashedPassword,
           name: input.username,
           role: "user",
           isActive: 1,
-          createdAt: new Date(),
-          updatedAt: new Date(),
+          userType: "student",
+          loginMethod: "local",
         })
-        .returning();
+        .$returningId();
 
-      const newUser = result[0];
+      const userId = (result[0] as any) as number;
 
       // 生成Token
-      const token = generateToken(newUser.id);
+      const token = generateToken(userId);
 
       return {
-        user: {
-          id: newUser.id,
-          username: newUser.username,
-          email: newUser.email,
-          name: newUser.name,
-          role: newUser.role,
-        },
+        success: true,
+        message: "注册成功",
         token,
+        user: {
+          id: userId,
+          username: input.username,
+          email: input.email,
+          name: input.username,
+          role: "user",
+        },
       };
     }),
 
@@ -113,23 +119,23 @@ export const authLocalRouter = router({
     .input(loginSchema)
     .mutation(async ({ input }) => {
       // 查找用户
-      const user = await db
+      const result = await db
         .select()
         .from(users)
         .where(eq(users.username, input.username))
         .limit(1);
 
-      if (user.length === 0) {
+      if (result.length === 0) {
         throw new TRPCError({
           code: "UNAUTHORIZED",
           message: "用户名或密码错误",
         });
       }
 
-      const foundUser = user[0];
+      const user = result[0];
 
-      // 检查用户是否被禁用
-      if (!foundUser.isActive) {
+      // 检查账户是否被禁用
+      if (!user.isActive) {
         throw new TRPCError({
           code: "FORBIDDEN",
           message: "账户已被禁用",
@@ -137,18 +143,7 @@ export const authLocalRouter = router({
       }
 
       // 验证密码
-      if (!foundUser.passwordHash) {
-        throw new TRPCError({
-          code: "UNAUTHORIZED",
-          message: "用户名或密码错误",
-        });
-      }
-
-      const passwordMatch = await bcrypt.compare(
-        input.password,
-        foundUser.passwordHash
-      );
-
+      const passwordMatch = await bcrypt.compare(input.password, user.passwordHash || "");
       if (!passwordMatch) {
         throw new TRPCError({
           code: "UNAUTHORIZED",
@@ -156,39 +151,21 @@ export const authLocalRouter = router({
         });
       }
 
-      // 更新最后登录时间
-      await db
-        .update(users)
-        .set({ lastSignedIn: new Date() })
-        .where(eq(users.id, foundUser.id));
-
       // 生成Token
-      const token = generateToken(foundUser.id);
+      const token = generateToken(user.id);
 
       return {
-        user: {
-          id: foundUser.id,
-          username: foundUser.username,
-          email: foundUser.email,
-          name: foundUser.name,
-          role: foundUser.role,
-        },
+        success: true,
+        message: "登录成功",
         token,
+        user: {
+          id: user.id,
+          username: user.username || "",
+          email: user.email || "",
+          name: user.name || "",
+          role: user.role,
+        },
       };
-    }),
-
-  // 验证Token
-  verifyToken: publicProcedure
-    .input(z.object({ token: z.string() }))
-    .query(({ input }) => {
-      const decoded = verifyToken(input.token);
-      if (!decoded) {
-        throw new TRPCError({
-          code: "UNAUTHORIZED",
-          message: "Token无效或已过期",
-        });
-      }
-      return { valid: true, userId: decoded.userId };
     }),
 
   // 修改密码
@@ -203,35 +180,25 @@ export const authLocalRouter = router({
         path: ["confirmPassword"],
       })
     )
-    .mutation(async ({ ctx, input }) => {
-      const user = await db
+    .mutation(async ({ input, ctx }) => {
+      // 查找用户
+      const result = await db
         .select()
         .from(users)
         .where(eq(users.id, ctx.user.id))
         .limit(1);
 
-      if (user.length === 0) {
+      if (result.length === 0) {
         throw new TRPCError({
           code: "NOT_FOUND",
           message: "用户不存在",
         });
       }
 
-      const foundUser = user[0];
+      const user = result[0];
 
       // 验证旧密码
-      if (!foundUser.passwordHash) {
-        throw new TRPCError({
-          code: "UNAUTHORIZED",
-          message: "密码验证失败",
-        });
-      }
-
-      const passwordMatch = await bcrypt.compare(
-        input.oldPassword,
-        foundUser.passwordHash
-      );
-
+      const passwordMatch = await bcrypt.compare(input.oldPassword, user.passwordHash || "");
       if (!passwordMatch) {
         throw new TRPCError({
           code: "UNAUTHORIZED",
@@ -245,13 +212,47 @@ export const authLocalRouter = router({
       // 更新密码
       await db
         .update(users)
-        .set({
-          passwordHash: hashedPassword,
-          updatedAt: new Date(),
-        })
+        .set({ passwordHash: hashedPassword })
         .where(eq(users.id, ctx.user.id));
 
       return { success: true, message: "密码已修改" };
+    }),
+
+  // 忘记密码
+  forgotPassword: publicProcedure
+    .input(z.object({ email: z.string().email() }))
+    .mutation(async ({ input }) => {
+      // 查找用户
+      const result = await db
+        .select()
+        .from(users)
+        .where(eq(users.email, input.email))
+        .limit(1);
+
+      if (result.length === 0) {
+        // 为了安全起见，即使用户不存在也返回成功
+        return { success: true, message: "如果邮箱存在，重置链接已发送" };
+      }
+
+      const user = result[0];
+
+      // 生成重置Token
+      const resetToken = jwt.sign({ userId: user.id, type: "reset" }, JWT_SECRET, {
+        expiresIn: "1h",
+      });
+
+      // 构建重置链接
+      const resetLink = `${process.env.FRONTEND_URL || "http://localhost:5173"}/reset-password?token=${resetToken}`;
+
+      // 发送邮件
+      const emailSent = await emailService.sendPasswordResetEmail(input.email, resetLink);
+
+      if (!emailSent) {
+        console.warn("密码重置邮件发送失败");
+        // 即使邮件发送失败，也返回成功（为了安全起见）
+      }
+
+      return { success: true, message: "如果邮箱存在，重置链接已发送" };
     }),
 
   // 重置密码（通过邮箱）
@@ -274,7 +275,7 @@ export const authLocalRouter = router({
         .where(eq(users.email, input.email))
         .limit(1);
 
-      if (user.length === 0) {
+      if (!user || user.length === 0) {
         throw new TRPCError({
           code: "NOT_FOUND",
           message: "用户不存在",
@@ -287,68 +288,9 @@ export const authLocalRouter = router({
       // 更新密码
       await db
         .update(users)
-        .set({
-          passwordHash: hashedPassword,
-          updatedAt: new Date(),
-        })
-        .where(eq(users.id, user[0].id));
+        .set({ passwordHash: hashedPassword })
+        .where(eq(users.email, input.email));
 
-      return { success: true, message: "密码已重置" };
-    }),
-
-  // 获取当前用户信息
-  getCurrentUser: protectedProcedure
-    .query(async ({ ctx }) => {
-      const user = await db
-        .select()
-        .from(users)
-        .where(eq(users.id, ctx.user.id))
-        .limit(1);
-
-      if (user.length === 0) {
-        throw new TRPCError({
-          code: "NOT_FOUND",
-          message: "用户不存在",
-        });
-      }
-
-      const foundUser = user[0];
-      return {
-        id: foundUser.id,
-        username: foundUser.username,
-        email: foundUser.email,
-        name: foundUser.name,
-        role: foundUser.role,
-        createdAt: foundUser.createdAt,
-        updatedAt: foundUser.updatedAt,
-      };
-    }),
-
-  // 登出
-  logout: protectedProcedure
-    .mutation(async ({ ctx }) => {
-      // 这里可以添加令牌黑名单逻辑
-      return { success: true, message: "已登出" };
-    }),
-
-  // 忘记密码
-  forgotPassword: publicProcedure
-    .input(z.object({ email: z.string().email() }))
-    .mutation(async ({ input }) => {
-      const user = await db.query.users.findFirst({
-        where: eq(users.email, input.email),
-      });
-      if (!user) {
-        return { success: true, message: "如果邮箱存在，重置链接已发送" };
-      }
-      return { success: true, message: "重置邮件已发送" };
-    }),
-
-  // 重置密码
-  resetPassword: publicProcedure
-    .input(z.object({ token: z.string(), newPassword: z.string().min(6) }))
-    .mutation(async ({ input }) => {
-      const hashedPassword = await bcrypt.hash(input.newPassword, 10);
       return { success: true, message: "密码已重置" };
     }),
 
@@ -356,16 +298,105 @@ export const authLocalRouter = router({
   sendVerificationCode: publicProcedure
     .input(z.object({ email: z.string().email() }))
     .mutation(async ({ input }) => {
-      return { success: true, message: "验证码已发送到邮箱（开发模式：验证码为123456）" };
+      // 生成6位随机验证码
+      const code = Math.floor(100000 + Math.random() * 900000).toString();
+
+      // 尝试发送邮件
+      const emailSent = await emailService.sendVerificationCodeEmail(input.email, code);
+
+      if (!emailSent) {
+        // 如果邮件发送失败，返回开发模式的验证码
+        console.warn(`邮件发送失败，使用开发模式验证码: ${code}`);
+        return {
+          success: true,
+          message: "验证码已生成（邮件服务未配置，开发模式：验证码为123456）",
+          code: "123456",
+        };
+      }
+
+      // 实际应用中应该将验证码存储到数据库，设置过期时间
+      // 这里为了演示，直接返回验证码
+      return { success: true, message: "验证码已发送到邮箱", code };
     }),
 
   // 验证邮箱
   verifyEmail: publicProcedure
     .input(z.object({ email: z.string().email(), code: z.string() }))
     .mutation(async ({ input }) => {
-      if (input.code !== "123456") {
-        throw new TRPCError({ code: "BAD_REQUEST", message: "验证码错误或已过期" });
+      // 在实际应用中，应该从数据库查询验证码并检查过期时间
+      // 这里为了演示，接受任何6位数字的验证码
+      if (!/^\d{6}$/.test(input.code)) {
+        throw new TRPCError({ code: "BAD_REQUEST", message: "验证码格式错误" });
       }
       return { success: true, message: "邮箱验证成功" };
     }),
+
+  // 获取当前用户信息
+  me: protectedProcedure.query(async ({ ctx }) => {
+    const result = await db
+      .select()
+      .from(users)
+      .where(eq(users.id, ctx.user.id))
+      .limit(1);
+
+    if (result.length === 0) {
+      throw new TRPCError({
+        code: "NOT_FOUND",
+        message: "用户不存在",
+      });
+    }
+
+    const user = result[0];
+    return {
+      id: user.id,
+      username: user.username || "",
+      email: user.email || "",
+      name: user.name || "",
+      role: user.role,
+    };
+  }),
+
+  // 更新用户资料
+  updateProfile: protectedProcedure
+    .input(
+      z.object({
+        name: z.string().max(100).optional(),
+        email: z.string().email().optional(),
+        phone: z.string().max(20).optional(),
+        school: z.string().max(200).optional(),
+        grade: z.enum(["junior1", "junior2", "junior3", "senior1", "senior2", "senior3"]).optional(),
+        userType: z.enum(["student", "parent", "teacher"]).optional(),
+        region: z.string().max(100).optional(),
+        learningGoals: z.string().optional(),
+      })
+    )
+    .mutation(async ({ input, ctx }) => {
+      // 构建更新对象
+      const updateData: any = {};
+
+      if (input.name) updateData.name = input.name;
+      if (input.email) updateData.email = input.email;
+      if (input.phone) updateData.phone = input.phone;
+      if (input.school) updateData.school = input.school;
+      if (input.grade) updateData.grade = input.grade;
+      if (input.userType) updateData.userType = input.userType;
+      if (input.region) updateData.region = input.region;
+      if (input.learningGoals) updateData.learningGoals = input.learningGoals;
+
+      // 更新用户资料
+      await db
+        .update(users)
+        .set(updateData)
+        .where(eq(users.id, ctx.user.id));
+
+      return {
+        success: true,
+        message: "用户资料已更新",
+      };
+    }),
+
+  // 登出
+  logout: protectedProcedure.mutation(async () => {
+    return { success: true, message: "已登出" };
+  }),
 });

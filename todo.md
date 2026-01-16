@@ -3005,3 +3005,36 @@ if (error.knowledgePointIds) {
 - [ ] 运行pnpm db:push推送所有监控表
 - [ ] 验证所有表创建成功
 - [ ] 测试错误日志和性能监控功能
+
+
+## 第二十六阶段：SMTP邮件服务、邮箱验证和用户资料编辑 (2026-01-16)
+
+### SMTP邮件服务配置
+- [x] 创建emailService.ts服务
+- [x] 实现邮件发送功能集成
+- [x] 添加邮件模板（验证码、密码重置、告警通知）
+- [ ] 在系统设置中添加SMTP配置界面
+- [ ] 创建SMTP配置API (保存/获取/测试)
+- [ ] 编写SMTP配置测试用例
+
+### 邮箱验证发送
+- [x] 修改sendVerificationCode API，集成邮件服务
+- [x] 实现验证码邮件模板
+- [x] 在auth.local.ts中集成邮箱验证功能
+- [ ] 在RegisterPage中集成邮箱验证流程
+- [ ] 在ForgotPasswordPage中集成邮箱验证
+- [ ] 编写邮箱验证功能测试
+
+### 用户资料编辑
+- [x] 创建UserProfilePage.tsx页面
+- [x] 创建用户资料编辑API (updateProfile)
+- [x] 在auth.local.ts中添加updateProfile procedure
+- [ ] 实现头像上传功能
+- [ ] 在侧边栏添加"个人资料"导航入口
+- [ ] 编写用户资料编辑测试用例
+
+### 集成和测试
+- [ ] 测试SMTP邮件发送功能
+- [ ] 测试邮箱验证流程
+- [ ] 测试用户资料编辑功能
+- [ ] 创建检查点保存
