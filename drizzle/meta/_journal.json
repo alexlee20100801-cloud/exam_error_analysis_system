@@ -484,6 +484,13 @@
       "when": 1768312069264,
       "tag": "0072_furry_the_hood",
       "breakpoints": true
+    },
+    {
+      "idx": 73,
+      "version": "5",
+      "when": 1768624391212,
+      "tag": "0073_faithful_yellowjacket",
+      "breakpoints": true
     }
   ]
 }

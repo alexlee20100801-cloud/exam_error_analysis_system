@@ -1,0 +1,11 @@
+--- drizzle/schema.ts
++++ drizzle/schema.ts
+@@ -1433,6 +1433,8 @@ export const users = mysqlTable("users", {
+ lastAdminAction: timestamp("last_admin_action", { mode: 'string' }),
+ adminActionBy: int("admin_action_by"),
++// 头像字段
++avatar: text("avatar"),
+ },
+ (table) => [
+ index("users_openId_unique").on(table.openId),
+ 

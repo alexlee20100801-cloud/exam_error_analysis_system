@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { db } from "../db";
-import { users } from "../../drizzle/schema";
-import { eq } from "drizzle-orm";
+import { users, verificationCodes } from "../../drizzle/schema";
+import { eq, and, gt } from "drizzle-orm";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import { TRPCError } from "@trpc/server";
@@ -298,37 +298,105 @@ export const authLocalRouter = router({
   sendVerificationCode: publicProcedure
     .input(z.object({ email: z.string().email() }))
     .mutation(async ({ input }) => {
-      // 生成6位随机验证码
-      const code = Math.floor(100000 + Math.random() * 900000).toString();
+      try {
+        // 生成1位随机验证码
+        const code = Math.floor(100000 + Math.random() * 900000).toString();
 
-      // 尝试发送邮件
-      const emailSent = await emailService.sendVerificationCodeEmail(input.email, code);
+        // 计算过期时间：10分钟
+        const expiresAt = new Date(Date.now() + 10 * 60 * 1000);
 
-      if (!emailSent) {
-        // 如果邮件发送失败，返回开发模式的验证码
-        console.warn(`邮件发送失败，使用开发模式验证码: ${code}`);
-        return {
-          success: true,
-          message: "验证码已生成（邮件服务未配置，开发模式：验证码为123456）",
-          code: "123456",
-        };
+        // 删除该邮箱的旧验证码
+        await db
+          .delete(verificationCodes)
+          .where(eq(verificationCodes.email, input.email));
+
+        // 保存新的验证码
+        await db
+          .insert(verificationCodes)
+          .values({
+            email: input.email,
+            code,
+            expiresAt: expiresAt.toISOString(),
+            type: "email_verification",
+            used: 0,
+          });
+
+        // 尝试发送邮件
+        const emailSent = await emailService.sendVerificationCodeEmail(input.email, code);
+
+        if (!emailSent) {
+          // 如果邮件发送失败，返回开发模式的验证码
+          console.warn(`邮件发送失败，使用开发模式验证码: ${code}`);
+          return {
+            success: true,
+            message: "验证码已生成（邮件服务未配置，开发模式：验证码为123456）",
+            code: "123456",
+          };
+        }
+
+        return { success: true, message: "验证码已发送到邮箱" };
+      } catch (error) {
+        console.error("发送验证码失败:", error);
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "发送验证码失败，请重试",
+        });
       }
-
-      // 实际应用中应该将验证码存储到数据库，设置过期时间
-      // 这里为了演示，直接返回验证码
-      return { success: true, message: "验证码已发送到邮箱", code };
     }),
 
   // 验证邮箱
   verifyEmail: publicProcedure
     .input(z.object({ email: z.string().email(), code: z.string() }))
     .mutation(async ({ input }) => {
-      // 在实际应用中，应该从数据库查询验证码并检查过期时间
-      // 这里为了演示，接受任何6位数字的验证码
-      if (!/^\d{6}$/.test(input.code)) {
-        throw new TRPCError({ code: "BAD_REQUEST", message: "验证码格式错误" });
+      try {
+        // 验证验证码格式
+        if (!/^\d{6}$/.test(input.code)) {
+          throw new TRPCError({ code: "BAD_REQUEST", message: "验证码格式错误" });
+        }
+
+        // 从数据库查询验证码
+        const result = await db
+          .select()
+          .from(verificationCodes)
+          .where(
+            and(
+              eq(verificationCodes.email, input.email),
+              eq(verificationCodes.code, input.code),
+              gt(verificationCodes.expiresAt, new Date().toISOString()),
+              eq(verificationCodes.used, 0)
+            )
+          )
+          .limit(1);
+
+        if (result.length === 0) {
+          throw new TRPCError({
+            code: "BAD_REQUEST",
+            message: "验证码错误或已过期",
+          });
+        }
+
+        // 标记验证码为已使用
+        await db
+          .update(verificationCodes)
+          .set({ used: 1 })
+          .where(
+            and(
+              eq(verificationCodes.email, input.email),
+              eq(verificationCodes.code, input.code)
+            )
+          );
+
+        return { success: true, message: "邮箱验证成功" };
+      } catch (error) {
+        if (error instanceof TRPCError) {
+          throw error;
+        }
+        console.error("邮箱验证失败:", error);
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "邮箱验证失败，请重试",
+        });
       }
-      return { success: true, message: "邮箱验证成功" };
     }),
 
   // 获取当前用户信息

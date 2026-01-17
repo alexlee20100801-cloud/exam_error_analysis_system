@@ -7,7 +7,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
-import { Loader2 } from "lucide-react";
+import { Loader2, Upload, X } from "lucide-react";
+import { trpc } from "@/lib/trpc";
 
 interface UserProfile {
   id: number;
@@ -32,6 +33,9 @@ export default function UserProfilePage() {
   const [isSaving, setIsSaving] = useState(false);
   const [avatarFile, setAvatarFile] = useState<File | null>(null);
   const [avatarPreview, setAvatarPreview] = useState<string>("");
+  const [isUploadingAvatar, setIsUploadingAvatar] = useState(false);
+  const uploadAvatarMutation = trpc.avatar.uploadAvatar.useMutation();
+  const deleteAvatarMutation = trpc.avatar.deleteAvatar.useMutation();
 
   // 检查认证状态
   useEffect(() => {
@@ -68,6 +72,74 @@ export default function UserProfilePage() {
         setAvatarPreview(reader.result as string);
       };
       reader.readAsDataURL(file);
+    }
+  };
+
+  // 处理头像上传
+  const handleUploadAvatar = async () => {
+    if (!avatarFile) {
+      toast.error("请先选择图片");
+      return;
+    }
+
+    // 验证文件类型
+    if (![
+      "image/jpeg",
+      "image/png",
+    ].includes(avatarFile.type)) {
+      toast.error("仅支持 JPG 和 PNG 格式的图片");
+      return;
+    }
+
+    // 验证文件大小
+    if (avatarFile.size > 5 * 1024 * 1024) {
+      toast.error("文件大小不能超过 5MB");
+      return;
+    }
+
+    setIsUploadingAvatar(true);
+    try {
+      const reader = new FileReader();
+      reader.onload = async () => {
+        const base64 = (reader.result as string).split(",")[1];
+        const result = await uploadAvatarMutation.mutateAsync({
+          base64,
+          mimeType: avatarFile.type,
+          filename: avatarFile.name,
+        });
+
+        if (result.success) {
+          toast.success("头像上传成功");
+          setAvatarFile(null);
+          setAvatarPreview("");
+          if (profile) {
+            setProfile({ ...profile, avatar: result.url });
+          }
+        }
+      };
+      reader.readAsDataURL(avatarFile);
+    } catch (error) {
+      console.error("头像上传失败:", error);
+      toast.error("头像上传失败，请重试");
+    } finally {
+      setIsUploadingAvatar(false);
+    }
+  };
+
+  // 处理删除头像
+  const handleDeleteAvatar = async () => {
+    try {
+      const result = await deleteAvatarMutation.mutateAsync();
+      if (result.success) {
+        toast.success("头像已删除");
+        setAvatarPreview("");
+        if (profile) {
+          setProfile({ ...profile, avatar: undefined });
+        }
+      }
+    } catch (error) {
+      console.error("删除头像失败:", error);
+      toast.error("删除头像失败，请重试");
     }
   };
 
@@ -119,26 +191,66 @@ export default function UserProfilePage() {
               <div className="space-y-2">
                 <label className="text-sm font-medium">头像</label>
                 <div className="flex items-center gap-4">
-                  <div className="w-24 h-24 rounded-lg bg-gray-200 overflow-hidden flex items-center justify-center">
+                  <div className="w-24 h-24 rounded-lg bg-gray-200 overflow-hidden flex items-center justify-center relative">
                     {avatarPreview ? (
-                      <img src={avatarPreview} alt="头像预览" className="w-full h-full object-cover" />
+                      <>
+                        <img src={avatarPreview} alt="头像预览" className="w-full h-full object-cover" />
+                        <button
+                          type="button"
+                          onClick={() => setAvatarPreview("")}
+                          className="absolute top-1 right-1 bg-red-500 text-white rounded-full p-1 hover:bg-red-600"
+                        >
+                          <X className="h-3 w-3" />
+                        </button>
+                      </>
+                    ) : profile?.avatar ? (
+                      <>
+                        <img src={profile.avatar} alt="头像" className="w-full h-full object-cover" />
+                        <button
+                          type="button"
+                          onClick={handleDeleteAvatar}
+                          className="absolute top-1 right-1 bg-red-500 text-white rounded-full p-1 hover:bg-red-600"
+                        >
+                          <X className="h-3 w-3" />
+                        </button>
+                      </>
                     ) : (
                       <span className="text-gray-400 text-sm">无头像</span>
                     )}
                   </div>
-                  <div>
+                  <div className="flex-1">
                     <input
                       type="file"
-                      accept="image/*"
+                      accept="image/jpeg,image/png"
                       onChange={handleAvatarChange}
                       className="hidden"
                       id="avatar-input"
                     />
                     <label htmlFor="avatar-input">
-                      <Button type="button" variant="outline" asChild>
-                        <span>选择头像</span>
+                      <Button type="button" variant="outline" asChild className="w-full">
+                        <span className="flex items-center justify-center gap-2">
+                          <Upload className="h-4 w-4" />
+                          选择图片
+                        </span>
                       </Button>
                     </label>
+                    {avatarPreview && (
+                      <Button
+                        type="button"
+                        onClick={handleUploadAvatar}
+                        disabled={isUploadingAvatar}
+                        className="w-full mt-2"
+                      >
+                        {isUploadingAvatar ? (
+                          <>
+                            <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                            上传中...
+                          </>
+                        ) : (
+                          "上传头像"
+                        )}
+                      </Button>
+                    )}
                     <p className="text-xs text-gray-500 mt-2">支持 JPG、PNG 格式，最大 5MB</p>
                   </div>
                 </div>

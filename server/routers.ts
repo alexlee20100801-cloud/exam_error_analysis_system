@@ -122,6 +122,7 @@ import { terminologyManagementRouter } from "./routers/terminologyManagement";
 import { taskAlertRouter } from "./routers/taskAlert";
 import { exportHistoryRouter } from "./routers/exportHistory";
 import { adminManagementRouter } from "./routers/adminManagement";
+import { avatarRouter } from "./routers/avatar";
 
 export const appRouter = router({
   system: systemRouter,
@@ -466,6 +467,9 @@ export const appRouter = router({
   
   // 管理员管理
   adminManagement: adminManagementRouter,
+  
+  // 用户头像管理
+  avatar: avatarRouter,
 });
 
 export type AppRouter = typeof appRouter;

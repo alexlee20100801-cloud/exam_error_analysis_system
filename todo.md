@@ -3038,3 +3038,38 @@ if (error.knowledgePointIds) {
 - [ ] 测试邮箱验证流程
 - [ ] 测试用户资料编辑功能
 - [ ] 创建检查点保存
+
+
+## 第二十七阶段：头像上传和邮箱验证码存储 (2026-01-17)
+
+### 数据库表创建
+- [x] 创建verification_codes表（email、code、expiresAt、createdAt）
+- [x] 在users表中添加avatar字段存储S3 URL
+- [x] 运行pnpm db:push推送数据库变更
+- [x] 验证表创建成功
+
+### 头像上传功能
+- [x] 创建uploadAvatar API (protectedProcedure)
+- [x] 集成S3存储（storagePut）
+- [x] 实现文件大小验证（最大5MB）
+- [x] 实现文件类型验证（JPG、PNG）
+- [x] 返回头像 URL并更新用户记录
+
+### 邮箱验证码存储
+- [x] 修改sendVerificationCode API，保存验证码到数据库
+- [x] 设置验证码过期时间（10分钟）
+- [x] 修改verifyEmail API，从数据库查询验证码
+- [x] 验证验证码是否过期
+- [x] 验证成功后删除验证码记录
+
+### 更新UserProfilePage
+- [x] 集成uploadAvatar API
+- [x] 实现头像预览功能
+- [x] 实现头像上传进度显示
+- [x] 处理上传错误提示
+
+### 集成和测试
+- [ ] 测试头像上传功能
+- [ ] 测试邮箱验证码存储和验证
+- [ ] 测试验证码过期处理
+- [ ] 创建检查点保存
