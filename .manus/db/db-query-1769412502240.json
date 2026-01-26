@@ -1,0 +1,13 @@
+{
+  "query": "SHOW TABLES LIKE 'api_performance_logs';",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway03.us-east-1.prod.aws.tidbcloud.com --port 4000 --user Lfr9xqjx7LpxUD9.1efa314e7813 --database Yh4Z4ZSitSFdPWYxtKkkQS --execute SHOW TABLES LIKE 'api_performance_logs';",
+  "rows": [
+    {
+      "Tables_in_Yh4Z4ZSitSFdPWYxtKkkQS (api_performance_logs)": "api_performance_logs"
+    }
+  ],
+  "messages": [],
+  "stdout": "Tables_in_Yh4Z4ZSitSFdPWYxtKkkQS (api_performance_logs)\napi_performance_logs\n",
+  "stderr": "",
+  "execution_time_ms": 1601
+}

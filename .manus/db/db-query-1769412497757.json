@@ -1,0 +1,9 @@
+{
+  "query": "CREATE TABLE IF NOT EXISTS `api_performance_logs` (\n  `id` int AUTO_INCREMENT NOT NULL,\n  `endpoint` varchar(255) NOT NULL,\n  `method` varchar(10) NOT NULL,\n  `user_id` int,\n  `response_time` int NOT NULL,\n  `status_code` int,\n  `request_size` int,\n  `response_size` int,\n  `is_error` int DEFAULT 0,\n  `error_message` text,\n  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,\n  PRIMARY KEY (`id`),\n  INDEX `endpoint_idx` (`endpoint`),\n  INDEX `response_time_idx` (`response_time`),\n  INDEX `created_at_idx` (`created_at`)\n);",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway03.us-east-1.prod.aws.tidbcloud.com --port 4000 --user Lfr9xqjx7LpxUD9.1efa314e7813 --database Yh4Z4ZSitSFdPWYxtKkkQS --execute CREATE TABLE IF NOT EXISTS `api_performance_logs` (\n  `id` int AUTO_INCREMENT NOT NULL,\n  `endpoint` varchar(255) NOT NULL,\n  `method` varchar(10) NOT NULL,\n  `user_id` int,\n  `response_time` int NOT NULL,\n  `status_code` int,\n  `request_size` int,\n  `response_size` int,\n  `is_error` int DEFAULT 0,\n  `error_message` text,\n  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,\n  PRIMARY KEY (`id`),\n  INDEX `endpoint_idx` (`endpoint`),\n  INDEX `response_time_idx` (`response_time`),\n  INDEX `created_at_idx` (`created_at`)\n);",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 1781
+}
