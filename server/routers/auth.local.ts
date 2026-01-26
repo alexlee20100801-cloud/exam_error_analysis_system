@@ -308,16 +308,16 @@ export const authLocalRouter = router({
         // 删除该邮箱的旧验证码
         await db
           .delete(verificationCodes)
-          .where(eq(verificationCodes.email, input.email));
+          .where(eq(verificationCodes.phone, input.email));
 
         // 保存新的验证码
         await db
           .insert(verificationCodes)
           .values({
-            email: input.email,
+            phone: input.email,
             code,
-            expiresAt: expiresAt.toISOString(),
-            type: "email_verification",
+            expiresAt,
+            type: "register",
             used: 0,
           });
 
@@ -360,9 +360,9 @@ export const authLocalRouter = router({
           .from(verificationCodes)
           .where(
             and(
-              eq(verificationCodes.email, input.email),
+              eq(verificationCodes.phone, input.email),
               eq(verificationCodes.code, input.code),
-              gt(verificationCodes.expiresAt, new Date().toISOString()),
+              gt(verificationCodes.expiresAt, new Date()),
               eq(verificationCodes.used, 0)
             )
           )
@@ -381,7 +381,7 @@ export const authLocalRouter = router({
           .set({ used: 1 })
           .where(
             and(
-              eq(verificationCodes.email, input.email),
+              eq(verificationCodes.phone, input.email),
               eq(verificationCodes.code, input.code)
             )
           );

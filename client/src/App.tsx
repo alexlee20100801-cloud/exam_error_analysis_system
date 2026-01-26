@@ -113,7 +113,7 @@ function Router() {
         <Route path="/login" component={LoginPage} />
         <Route path="/register" component={RegisterPage} />
         <Route path="/forgot-password" component={ForgotPasswordPage} />
-      <Route path={"\/ "} component={Home} />
+      <Route path="/" component={Home} />
       <Route path={"/dashboard"} component={Dashboard} />
       <Route path="/error-questions" component={ErrorQuestions} />
       <Route path="/error-questions/:id" component={ErrorQuestionDetail} />

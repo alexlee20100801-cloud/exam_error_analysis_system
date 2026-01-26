@@ -3,7 +3,7 @@
  */
 
 import type { Request, Response, NextFunction } from "express";
-import { logError, logApiPerformance } from "../errorLogService";
+import { logError } from "../errorLogService";
 import { logApiPerformance as logPerformance } from "../performanceMonitorService";
 import type { NewErrorLog, NewApiPerformanceLog } from "../../drizzle/schema";
 
